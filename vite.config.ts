@@ -18,6 +18,16 @@ export default defineConfig(import.meta.dirname, {
       rules: { "unicorn/require-post-message-target-origin": "off" },
     }),
 
+    lint.relax({
+      because:
+        "the rule keeps a component library navigable, where a file is found by the component it " +
+        "declares. A specification's components are fixtures rather than library components: they " +
+        "are read beside the test that drives them, and splitting each into a file of its own " +
+        "puts the fixture further from the assertion it exists for",
+      files: ["**/*.spec.tsx"],
+      rules: { "react/no-multi-comp": "off" },
+    }),
+
     test.uncounted({
       because:
         "the JSX runtime marks every element call `@__PURE__`, which tells a bundler it may drop " +
