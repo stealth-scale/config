@@ -4,6 +4,7 @@
 
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { parseAllDocuments } from "yaml";
 
 /**
  * What a lockfile records about one installed package.
@@ -124,13 +125,118 @@ function bun(root: string): ReadonlyMap<string, Installed> | undefined {
 }
 
 /**
+ * Splits a pnpm package key into what it names and which version.
+ *
+ * Keyed as `name@version`, and the name may itself begin with an `@`, so the last separator is the
+ * one that divides them. A package installed from anywhere but a registry carries its source where
+ * the version would be.
+ *
+ * @param key - The key as the lockfile writes it.
+ * @returns The name and what follows it, or nothing where the key divides nowhere.
+ */
+function divided(key: string): readonly [string, string] | undefined {
+  const at = key.lastIndexOf("@");
+
+  if (at <= 0) return undefined;
+
+  return [key.slice(0, at), key.slice(at + 1)];
+}
+
+/**
+ * Reads what one pnpm entry records about where its package came from.
+ *
+ * @param version - Whichever text followed the name in the key.
+ * @param resolution - The entry's `resolution` mapping.
+ * @returns The record.
+ */
+function resolved(version: string, resolution: Readonly<Record<string, unknown>>): Installed {
+  const integrity = resolution["integrity"];
+  const tarball = resolution["tarball"];
+  const url = resolution["url"];
+  const from = typeof tarball === "string" ? tarball : url;
+  const held: Installed = {};
+
+  if (integral(integrity)) held.integrity = integrity;
+  if (typeof from === "string") held.registry = from;
+  if (!/^\d/u.test(version) || typeof from === "string") held.resolution = version;
+
+  return held;
+}
+
+/**
+ * Reads one of a pnpm lockfile's package entries.
+ *
+ * @param key - The key it is filed under, which is its name and where it came from.
+ * @param one - The entry itself.
+ * @returns Its name and record, or nothing where the entry states no resolution.
+ */
+function record(key: string, one: unknown): readonly [string, Installed] | undefined {
+  const split = divided(key);
+  const resolution: unknown =
+    typeof one === "object" && one !== null ? Reflect.get(one, "resolution") : undefined;
+
+  if (split === undefined) return undefined;
+  if (typeof resolution !== "object" || resolution === null) return undefined;
+
+  return [split[0], resolved(split[1], Object.fromEntries(Object.entries(resolution)))];
+}
+
+/**
+ * Reads the `packages` map of one document into the entries gathered so far.
+ *
+ * @param held - The document, as an ordinary object.
+ * @param found - The map to add to.
+ */
+function gathered(held: unknown, found: Map<string, Installed>): void {
+  const packages: unknown =
+    typeof held === "object" && held !== null ? Reflect.get(held, "packages") : undefined;
+
+  if (typeof packages !== "object" || packages === null) return;
+
+  for (const [key, one] of Object.entries<unknown>(Object.fromEntries(Object.entries(packages)))) {
+    const read = record(key, one);
+
+    if (read !== undefined) found.set(read[0], read[1]);
+  }
+}
+
+/**
+ * Reads `pnpm-lock.yaml`.
+ *
+ * Parsed rather than scanned. A pnpm entry nests its resolution as a mapping and quotes its keys,
+ * and getting either subtly wrong loses the hash for a package rather than failing where somebody
+ * would notice.
+ *
+ * Every document, because the file holds more than one: pnpm writes the build it installed itself
+ * with ahead of a `---`, and the lockfile proper after it.
+ *
+ * @param root - The workspace root.
+ * @returns Each package it records, or nothing where this workspace is not pnpm's.
+ */
+function pnpm(root: string): ReadonlyMap<string, Installed> | undefined {
+  const at = join(root, "pnpm-lock.yaml");
+
+  if (!existsSync(at)) return undefined;
+
+  const found = new Map<string, Installed>();
+
+  for (const document of parseAllDocuments(readFileSync(at, "utf8"))) {
+    const held: unknown = document.toJS();
+
+    gathered(held, found);
+  }
+
+  return found;
+}
+
+/**
  * The lockfiles this knows how to read, tried in turn.
  *
  * One function each, answering nothing where its own lockfile is absent. Another manager is another
- * entry here: pnpm's lockfile is YAML and npm's is a nested tree, so each needs its own reading,
- * and neither needs anything else to change.
+ * entry here: npm's lockfile is a nested tree, so it needs its own reading and nothing else has to
+ * change.
  */
-const READERS: readonly Reader[] = [bun];
+const READERS: readonly Reader[] = [bun, pnpm];
 
 /**
  * Finds the workspace root above a package, which is where a lockfile sits.

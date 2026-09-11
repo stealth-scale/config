@@ -22,7 +22,7 @@ const PROSE = "*.{md,mdx,yml,yaml}";
 /**
  * The section a written file falls under, which nothing should tidy.
  */
-const WRITTEN = "{*.gen.*,bun.lock}";
+const WRITTEN = "{*.gen.*,pnpm-lock.yaml}";
 
 /**
  * What an editor is told, read off the file the repository ships.

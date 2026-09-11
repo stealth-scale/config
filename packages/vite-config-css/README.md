@@ -5,7 +5,7 @@ Checks a stylesheet against four rule sets, during the build that compiles it. D
 key of its own, so installing it pulls in the kernel and nothing else.
 
 ```bash
-bun add -D @stealthscale/vite-config-css @stealthscale/vite-config-core
+pnpm add -D @stealthscale/vite-config-css @stealthscale/vite-config-core
 ```
 
 ```ts

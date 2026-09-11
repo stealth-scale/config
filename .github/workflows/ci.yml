@@ -1,4 +1,4 @@
-# What `bun run ready` runs, on every pull request of this repository and in every stealth
+# What `pnpm run ready` runs, on every pull request of this repository and in every stealth
 # repository that calls this file: the same command a developer runs, and nothing this file
 # adds on top of it. A repository whose tests open a browser installs one in a step of its
 # own, because none here do.
@@ -11,9 +11,6 @@ on:
   pull_request:
   workflow_call:
 
-# One run per branch. A superseded run is cancelled, which on main means its release is
-# skipped too; the next one publishes both, because `changeset publish` goes by what is
-# missing from the registry rather than by what changed in a commit.
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -31,11 +28,10 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: oven-sh/setup-bun@v2
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v7
         with:
-          bun-version-file: package.json
-      - run: bun install --frozen-lockfile
-      # `ready` packs the config packages before it proves them. It has to: every config in
-      # the workspace imports them by name, and a checkout that has packed nothing resolves
-      # nothing.
-      - run: bun run ready
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run ready

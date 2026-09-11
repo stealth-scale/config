@@ -7,7 +7,7 @@ Peers on `vite`. Vite's `Plugin` extends rolldown's, so a plugin written against
 Vite, under rolldown, and under anything taking a rollup-shaped plugin.
 
 ```bash
-bun add -D @stealthscale/vite-plugin-base
+pnpm add -D @stealthscale/vite-plugin-base
 ```
 
 ## Writing a plugin

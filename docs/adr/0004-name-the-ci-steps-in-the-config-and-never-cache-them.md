@@ -73,7 +73,7 @@ as running it.
 **Negative:**
 
 - The task cannot bring a checkout up to the point where it works. Packages here have to be packed
-  first, so a clean clone runs `bun run bootstrap` before the task resolves anything, and anything
+  first, so a clean clone runs `pnpm run bootstrap` before the task resolves anything, and anything
   automating this carries that step separately.
 - Turning caching off is stated once and inherited silently. A contributor adding a fourth step pays
   the full cost of it on every run without being reminded why.

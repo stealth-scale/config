@@ -45,8 +45,8 @@ a plugin built by a tier would have to be packed before the package that packs i
 ## Working on it
 
 ```bash
-bun install
-bun run ready     # bootstrap, then build, check and test
+pnpm install
+pnpm run ready     # bootstrap, then build, check and test
 ```
 
 `ready` starts with `bootstrap`, which packs the plugins and then the config packages before

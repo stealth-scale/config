@@ -6,6 +6,8 @@ import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { type ConfigEnv, loadEnv } from "vite-plus";
 
+import { workspaces } from "#workspace.ts";
+
 /**
  * The parts of a manifest a layer has a reason to read.
  *
@@ -35,11 +37,13 @@ export interface Manifest {
   readonly version?: string;
 
   /**
-   * Which directories the workspace holds, where this manifest declares one.
+   * Which directories the workspace holds, where this directory declares one.
    *
-   * A manifest spells this either as a list or as an object holding one under `packages`. Both are
-   * read here and answered as a list, so nothing downstream handles two spellings. Absent where the
-   * manifest declares no workspace, which is what tells a package apart from a root.
+   * Three spellings reach this field. A manifest states it as a list or as an object holding one
+   * under `packages`; pnpm states it in `pnpm-workspace.yaml` beside the manifest instead, which is
+   * the only place it appears at all under that package manager. All three are answered as a list,
+   * so nothing downstream handles more than one. Absent where the directory declares no workspace,
+   * which is what tells a package apart from a root.
    */
   readonly workspaces?: readonly string[];
 }
@@ -93,23 +97,6 @@ export interface Context extends ConfigEnv {
 }
 
 /**
- * Reads the directories a `workspaces` field names, however the manifest spells it.
- *
- * @param stated - The field, as the file holds it.
- * @returns Each directory, or nothing where the manifest declares no workspace at all.
- */
-function workspacesOf(stated: unknown): readonly string[] | undefined {
-  if (stated === undefined) return undefined;
-
-  if (Array.isArray(stated)) return stated.filter((one): one is string => typeof one === "string");
-
-  const held: unknown =
-    typeof stated === "object" && stated !== null ? Reflect.get(stated, "packages") : undefined;
-
-  return Array.isArray(held) ? held.filter((one): one is string => typeof one === "string") : [];
-}
-
-/**
  * Reads a manifest, answering an empty one where the directory holds none.
  *
  * A missing manifest is not an error here. Whether a block can do its work without one is that
@@ -128,9 +115,9 @@ function read(at: string): Manifest {
 
   if (typeof held !== "object" || held === null) return {};
 
-  const workspaces = workspacesOf(Reflect.get(held, "workspaces"));
+  const stated = workspaces(at, Object.fromEntries(Object.entries(held)));
 
-  return workspaces === undefined ? held : { ...held, workspaces };
+  return stated === undefined ? held : { ...held, workspaces: stated };
 }
 
 /**

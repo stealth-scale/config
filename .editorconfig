@@ -24,6 +24,6 @@ max_line_length = 100
 
 # Written by a tool, and overwritten by it on the next run. The formatter walks past these, so an
 # editor has nothing to gain by tidying them either.
-[{*.gen.*,bun.lock}]
+[{*.gen.*,pnpm-lock.yaml}]
 insert_final_newline = unset
 trim_trailing_whitespace = unset

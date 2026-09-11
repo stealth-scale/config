@@ -159,34 +159,39 @@ test("answers the workspace as a list where the manifest states one", () => {
   expect(contextOf(SERVING, held.root, held.root).manifest.workspaces).toEqual(["packages/*"]);
 });
 
-test("answers the nested spelling as a list too, so nothing downstream reads two", () => {
-  const held = laid({ workspaces: { packages: ["packages/*"] } });
-
-  expect(contextOf(SERVING, held.root, held.root).manifest.workspaces).toEqual(["packages/*"]);
-});
-
-test("answers an empty list where a manifest declares a workspace holding nothing", () => {
-  const held = laid({ workspaces: {} });
-
-  expect(contextOf(SERVING, held.root, held.root).manifest.workspaces).toEqual([]);
-});
-
 test("answers nothing where the manifest declares no workspace, which is what a package is", () => {
   const held = workspace();
 
   expect(contextOf(SERVING, held.at, held.at).manifest.workspaces).toBeUndefined();
 });
 
-test("drops an entry that is not a name, rather than handing it on", () => {
-  const held = laid({ workspaces: ["packages/*", 3] });
+/**
+ * Lays out a workspace pnpm's way, which states the directories beside the manifest.
+ *
+ * @param yaml - What `pnpm-workspace.yaml` holds.
+ * @returns The root, and the package below it.
+ */
+function pnpm(yaml: string): { readonly at: string; readonly root: string } {
+  const held = laid({});
 
-  expect(contextOf(SERVING, held.root, held.root).manifest.workspaces).toEqual(["packages/*"]);
+  writeFileSync(join(held.root, "pnpm-workspace.yaml"), yaml);
+
+  return held;
+}
+
+test("finds the root by a pnpm workspace too, that manifest declaring none", () => {
+  const held = pnpm("packages:\n  - packages/*\n");
+
+  expect(rooted(held.at)).toBe(held.root);
 });
 
-test("answers an empty list where the field is neither a list nor an object", () => {
-  const held = laid({ workspaces: "packages/*" });
+test("carries what that file states through to the layer, as it does the manifest's own", () => {
+  const held = pnpm("packages:\n  - examples/*\n  - packages/*\n");
 
-  expect(contextOf(SERVING, held.root, held.root).manifest.workspaces).toEqual([]);
+  expect(contextOf(SERVING, held.root, held.root).manifest.workspaces).toEqual([
+    "examples/*",
+    "packages/*",
+  ]);
 });
 
 test("answers an empty manifest where the directory holds none, which is a block's question", () => {

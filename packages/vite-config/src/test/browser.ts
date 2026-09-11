@@ -79,7 +79,7 @@ export interface Browsed {
 /**
  * The browser driver, as the package that ships it declares.
  */
-type Driver = typeof import("vite-plus/test/browser-playwright");
+export type Driver = typeof import("vite-plus/test/browser-playwright");
 
 /**
  * Loads the browser driver, and says what to install where it is missing.
@@ -124,12 +124,27 @@ export async function driver(
  * @returns The preset.
  */
 export function browser(stated: Browsed = {}): Preset {
+  return browsing(stated);
+}
+
+/**
+ * States the browser block, reaching the driver through whichever loader it was given.
+ *
+ * Separate from `browser` so that the loader stays out of the published surface. A repository
+ * configuring a browser run passes a browser and a page size and nothing else; this repository
+ * installs no driver, so its own specification hands over one that answers without importing.
+ *
+ * @param stated - The browser and the page size. `Browsed` documents every member.
+ * @param load - How to reach the driver. The real import unless a specification says otherwise.
+ * @returns The preset.
+ */
+export function browsing(stated: Browsed, load?: () => Promise<Driver>): Preset {
   const driving = stated.browser ?? "chromium";
   const build = stated.channel ?? (driving === "chromium" ? CHROMIUM : undefined);
 
   return preset({
     config: async () => {
-      const { playwright } = await driver();
+      const { playwright } = await driver(load);
 
       return {
         test: {

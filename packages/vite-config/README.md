@@ -5,7 +5,7 @@ A layer for each part of a Vite+ config, and the tier a package is built on. Ext
 configure are defined here.
 
 ```bash
-bun add -D @stealthscale/vite-config @stealthscale/vite-config-core
+pnpm add -D @stealthscale/vite-config @stealthscale/vite-config-core
 ```
 
 ## Pick a tier

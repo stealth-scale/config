@@ -4,7 +4,7 @@ Defines a layer, and composes a list of them into one Vite+ config. Names no Vit
 block, so a package that only mints layers depends on this rather than on the entire toolchain.
 
 ```bash
-bun add -D @stealthscale/vite-config-core
+pnpm add -D @stealthscale/vite-config-core
 ```
 
 ## Four kinds

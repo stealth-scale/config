@@ -8,7 +8,7 @@ dependency has been inlined, renamed and minified into a file that names none of
 answer, written by the thing that did the inlining and so the only thing that knows.
 
 ```bash
-bun add -D @stealthscale/vite-plugin-sbom @stealthscale/vite-plugin-base
+pnpm add -D @stealthscale/vite-plugin-sbom @stealthscale/vite-plugin-base
 ```
 
 ```ts
@@ -58,9 +58,10 @@ document uses as its `bom-ref`. A package installed from git carries its source 
 pkg:npm/once@1.4.1?vcs_url=github%3Aisaacs%2Fonce%230fbb41e
 ```
 
-**Hashes** are SHA-512, read from the lockfile. bun writes no install metadata into an installed
-package, so the lockfile is the only place the integrity of what was installed survives. Only
-`bun.lock` is read today; the reader list in `locked.ts` is where pnpm and npm would go.
+**Hashes** are SHA-512, read from the lockfile. A package manager writes little or nothing into an
+installed package — bun writes none of it — so the lockfile is the only place the integrity of what
+was installed survives. `pnpm-lock.yaml` and `bun.lock` are both read; the reader list in
+`locked.ts` is where npm would go.
 
 **Licences** are recorded twice: the SPDX expression the manifest declares, and the text of the
 `LICENSE` file beside it, base64-encoded as evidence. The two disagree often enough that a licence

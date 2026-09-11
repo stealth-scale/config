@@ -4,7 +4,7 @@ What a package that renders adds on top of [`@stealthscale/vite-config`](../vite
 transform, the React lint rules, the page directory, and React as a federation singleton.
 
 ```bash
-bun add -D @stealthscale/vite-config-react @stealthscale/vite-config
+pnpm add -D @stealthscale/vite-config-react @stealthscale/vite-config
 ```
 
 ## Tiers

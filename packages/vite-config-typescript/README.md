@@ -4,7 +4,7 @@ Three tsconfigs to extend: a base that says nothing about where code runs, and o
 console and the browser.
 
 ```bash
-bun add -D @stealthscale/vite-config-typescript
+pnpm add -D @stealthscale/vite-config-typescript
 ```
 
 ```json
