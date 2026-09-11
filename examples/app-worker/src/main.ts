@@ -27,6 +27,10 @@ const output = document.querySelector("#total");
  * platform defines and the one the type checker reads without help. `type: "module"` is what the
  * `es` worker format is for: without it this is a classic worker whatever the config says, and it
  * fails on its first import.
+ *
+ * Only for something a browser loads. `import.meta.url` means one thing in a page and another in
+ * node, so this spelling does not survive a server render and an application that renders on a
+ * server starts its workers some other way.
  */
 const worker = new Worker(new URL("./total.worker.ts", import.meta.url), { type: "module" });
 
