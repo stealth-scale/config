@@ -1,0 +1,38 @@
+{
+  "name": "@stealthscale/example-lib-node",
+  "version": "0.0.0",
+  "private": true,
+  "description": "A library built for node, small enough that the config is the interesting part.",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "imports": {
+    "#*": "./src/*"
+  },
+  "exports": {
+    ".": {
+      "stealth-source": "./src/index.ts",
+      "default": "./dist/index.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": "./dist/index.mjs",
+      "./package.json": "./package.json"
+    }
+  },
+  "scripts": {
+    "build": "vp pack",
+    "check": "vp check",
+    "test": "vp test"
+  },
+  "devDependencies": {
+    "@stealthscale/config-typescript": "workspace:^",
+    "@stealthscale/config-vite": "workspace:^",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}

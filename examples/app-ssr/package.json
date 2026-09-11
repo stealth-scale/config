@@ -1,0 +1,33 @@
+{
+  "name": "@stealthscale/example-app-ssr",
+  "version": "0.0.0",
+  "private": true,
+  "description": "An app rendered on a server before it reaches a browser, which is where externalising a dependency starts to matter.",
+  "type": "module",
+  "imports": {
+    "#*": "./src/*"
+  },
+  "scripts": {
+    "build": "vp build && vp build --ssr src/server.ts --outDir dist/server",
+    "check": "vp check",
+    "dev": "vp dev",
+    "preview": "vp preview",
+    "test": "vp test"
+  },
+  "dependencies": {
+    "@stealthscale/example-lib-ui": "workspace:^",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@stealthscale/config-react": "workspace:^",
+    "@stealthscale/config-typescript": "workspace:^",
+    "@stealthscale/config-vite": "workspace:^",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "happy-dom": "catalog:",
+    "oxc-transform-react": "catalog:",
+    "typescript": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}

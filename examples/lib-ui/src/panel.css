@@ -1,0 +1,14 @@
+.panel {
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.panel > h2 {
+  margin-block: 0 0.5rem;
+  font-size: 1rem;
+}
+
+.panel-body {
+  font-size: 0.875rem;
+}

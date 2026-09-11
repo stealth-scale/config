@@ -1,0 +1,52 @@
+{
+  "name": "@stealthscale/example-lib-cli",
+  "version": "0.0.0",
+  "private": true,
+  "description": "A published library that installs a command, named for what it does rather than for the package.",
+  "bin": {
+    "tally": "./src/bin/tally.ts"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "imports": {
+    "#*": "./src/*"
+  },
+  "exports": {
+    ".": {
+      "stealth-source": "./src/index.ts",
+      "default": "./dist/index.mjs"
+    },
+    "./bin/tally": {
+      "stealth-source": "./src/bin/tally.ts",
+      "default": "./dist/bin/tally.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "bin": {
+      "tally": "./dist/bin/tally.mjs"
+    },
+    "exports": {
+      ".": "./dist/index.mjs",
+      "./bin/tally": "./dist/bin/tally.mjs",
+      "./package.json": "./package.json"
+    }
+  },
+  "scripts": {
+    "build": "vp pack",
+    "check": "vp check",
+    "test": "vp test"
+  },
+  "dependencies": {
+    "@stealthscale/example-lib-core": "workspace:^"
+  },
+  "devDependencies": {
+    "@stealthscale/config-typescript": "workspace:^",
+    "@stealthscale/config-vite": "workspace:^",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}
