@@ -14,6 +14,10 @@ import { type Preset, preset } from "#core/layer.ts";
  * Strict for the same reason the dev server is: a preview that quietly moves leaves whatever was
  * pointed at the stated port reaching a different process.
  *
+ * A port a person opens while working, and nothing a deployment sees. What serves a build in
+ * production serves static files on whatever port it already answers on, and neither of these
+ * commands runs there at all.
+ *
  * @param at - The port to serve the build at.
  * @returns The preset.
  */

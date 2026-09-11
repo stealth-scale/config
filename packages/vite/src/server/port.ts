@@ -20,6 +20,10 @@ import { type Preset, preset } from "#core/layer.ts";
  * refuses to move as well, but keeps its own port — which is what lets an app be previewed while it
  * is also being served.
  *
+ * A port a person opens while working, and nothing a deployment sees. What serves a build in
+ * production serves static files on whatever port it already answers on, and neither of these
+ * commands runs there at all.
+ *
  * @param at - The port to serve at.
  * @returns The preset.
  */

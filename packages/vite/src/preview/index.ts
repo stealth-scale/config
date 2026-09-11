@@ -10,6 +10,8 @@
  * preview keeps its own port but inherits its strictness.
  */
 
+export { bound } from "#preview/bound.ts";
 export { headers } from "#preview/headers.ts";
 export { port } from "#preview/port.ts";
+export { reachable } from "#preview/reachable.ts";
 export { shared } from "#preview/shared.ts";

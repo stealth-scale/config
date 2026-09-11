@@ -3,6 +3,7 @@
  */
 
 import { type Preset, preset } from "#core/layer.ts";
+import { origins as allowed } from "#serving/environment.ts";
 
 /**
  * Lets the named origins fetch what this preview serves.
@@ -16,10 +17,11 @@ import { type Preset, preset } from "#core/layer.ts";
  * thing, so whatever is true of it is about to be true in production, and `*` is not a thing to
  * discover there.
  *
- * @param origins - The origins allowed to fetch, each as a scheme and authority.
+ * @param origins - The origins allowed to fetch, each as a scheme and authority. Read from the
+ *   machine's own environment where none are given.
  * @returns The preset.
  */
-export function shared(origins: readonly string[]): Preset {
+export function shared(origins: readonly string[] = allowed()): Preset {
   return preset({
     config: { preview: { cors: { origin: [...origins] } } },
     name: `preview.shared(${origins.join(", ")})`,
