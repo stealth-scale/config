@@ -23,9 +23,7 @@
     "noFallthroughCasesInSwitch": true,
     "allowUnreachableCode": false,
     "noEmit": true,
-    "skipLibCheck": true,
-    "isolatedDeclarations": true,
-    "declaration": true
+    "skipLibCheck": true
   },
   "include": ["${configDir}/src", "${configDir}/vite.config.ts"],
   "_include": "What every package compiles: its source, and the config that builds it. `${configDir}` is what makes this shareable \u2014 a relative path here would resolve against this file and compile nothing. A package with another shape states its own `include`, which replaces this rather than adding to it."
