@@ -32,5 +32,3 @@ export {
   remove,
   type Stated,
 } from "#layer.ts";
-export { type Inventory, inventory, type Kind } from "#sbom/inventory.ts";
-export { type Contact, HOUSE, type Supplier } from "#sbom/supplier.ts";

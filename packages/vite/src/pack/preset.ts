@@ -6,7 +6,6 @@ import { type Layer } from "@stealthscale/config-core";
 
 import { carry } from "#pack/carry.ts";
 import { declarations } from "#pack/declarations.ts";
-import { inventory } from "#pack/inventory.ts";
 import { platform } from "#pack/platform.ts";
 import { quality } from "#pack/quality.ts";
 import { source } from "#pack/source.ts";
@@ -17,7 +16,7 @@ import { source } from "#pack/source.ts";
  * @returns The layers.
  */
 export function base(): readonly Layer[] {
-  return [carry(), declarations(), inventory(), quality(), source()];
+  return [carry(), declarations(), quality(), source()];
 }
 
 /**

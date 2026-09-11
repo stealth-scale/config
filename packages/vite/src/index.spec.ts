@@ -27,7 +27,6 @@ const SURFACE = [
   "remove",
   "resolve",
   "run",
-  "sbom",
   "server",
   "serving",
   "ssr",

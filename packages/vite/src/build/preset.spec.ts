@@ -24,9 +24,6 @@ test("writes a manifest and drops the polyfill where there is a page", () => {
   expect(held).toContain("build.preload");
 });
 
-test("says what it is made of and who to credit for it, wherever it is deployed", () => {
-  const held = web().map((one) => one.name);
-
-  expect(held).toContain("build.inventory");
-  expect(held).toContain("build.licences");
+test("says who to credit for what it is made of, wherever it is deployed", () => {
+  expect(web().map((one) => one.name)).toContain("build.licences");
 });

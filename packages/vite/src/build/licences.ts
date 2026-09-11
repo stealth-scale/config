@@ -14,9 +14,9 @@ import { type Preset, preset } from "@stealthscale/config-core";
  *
  * `.vite/license.md` is the file the builder writes, and it is prose rather than data: the full
  * text of each licence, under the name and version of the dependency it came from. That is what
- * attribution is for and it is why this is not the bill of materials — `build.inventory` answers
- * what is in here for a machine deciding whether to worry, and this answers who to credit for a
- * person deciding whether they may ship it.
+ * attribution is for, and it answers a different question from a bill of materials: who to credit
+ * for a person deciding whether they may ship it, rather than what is in here for a machine
+ * deciding whether to worry.
  *
  * @returns The preset.
  */

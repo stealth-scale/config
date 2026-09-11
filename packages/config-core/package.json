@@ -40,7 +40,6 @@
   "devDependencies": {
     "@stealthscale/config-typescript": "workspace:^",
     "@types/node": "catalog:",
-    "rollup-plugin-sbom": "catalog:",
     "typescript": "catalog:",
     "vite-plus": "catalog:"
   },

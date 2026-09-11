@@ -46,7 +46,6 @@ export * as pack from "#pack/index.ts";
 export * as preview from "#preview/index.ts";
 export * as resolve from "#resolve/index.ts";
 export * as run from "#run/index.ts";
-export * as sbom from "#sbom/index.ts";
 export * as server from "#server/index.ts";
 export * as serving from "#serving/index.ts";
 export * as ssr from "#ssr/index.ts";

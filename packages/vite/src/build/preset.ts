@@ -4,7 +4,6 @@
 
 import { type Layer } from "@stealthscale/config-core";
 
-import { inventory } from "#build/inventory.ts";
 import { licences } from "#build/licences.ts";
 import { manifest } from "#build/manifest.ts";
 import { preload } from "#build/preload.ts";
@@ -29,5 +28,5 @@ export function base(): readonly Layer[] {
  * @returns The layers, with what only a page has.
  */
 export function web(): readonly Layer[] {
-  return [...base(), inventory(), licences(), manifest(), preload()];
+  return [...base(), licences(), manifest(), preload()];
 }
