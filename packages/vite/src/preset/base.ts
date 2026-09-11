@@ -1,16 +1,19 @@
 /**
- * Configuring a package says nothing about where it runs.
+ * Configuring a package that publishes and says nothing about where it runs.
  */
 
 import { type Extendable } from "#core/layer.ts";
-import * as fmt from "#fmt/index.ts";
 import * as lint from "#lint/index.ts";
+import * as pack from "#pack/index.ts";
 import { configuring, type Defining } from "#preset/defaults.ts";
-import * as resolve from "#resolve/index.ts";
+import { house } from "#preset/house.ts";
 import * as test from "#test/index.ts";
 
 /**
  * The layers a package that reaches for neither node's globals nor the browser's is built on.
+ *
+ * A package that publishes, which is what the `pack` layers are for. An application is the other
+ * kind and reads `preset/app`: it is built rather than packed, and the two blocks do not overlap.
  *
  * Answered as a list as well as bound below, so that a config package for a framework composes
  * these with its own rather than sitting beside them. Sitting beside them is what lets a repository
@@ -19,17 +22,7 @@ import * as test from "#test/index.ts";
  * @returns Each layer the tier is built on, in the order they compose.
  */
 export function layers(): readonly Extendable[] {
-  return [
-    fmt.docblocks(),
-    fmt.imports(),
-    fmt.generated(),
-    fmt.prose(),
-    fmt.style(),
-    fmt.manifests(),
-    resolve.source(),
-    lint.preset.base(),
-    test.preset.base(),
-  ];
+  return [...house(), lint.preset.base(), pack.preset.base(), test.preset.base()];
 }
 
 /**

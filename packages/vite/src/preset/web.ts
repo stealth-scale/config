@@ -1,16 +1,20 @@
 /**
- * Configuring a package the browser runs.
+ * Configuring a package that publishes and runs in a browser.
  */
 
 import { type Extendable } from "#core/layer.ts";
-import * as fmt from "#fmt/index.ts";
 import * as lint from "#lint/index.ts";
+import * as pack from "#pack/index.ts";
 import { configuring, type Defining } from "#preset/defaults.ts";
-import * as resolve from "#resolve/index.ts";
+import { house } from "#preset/house.ts";
 import * as test from "#test/index.ts";
 
 /**
- * The layers a package that runs in a browser is built on.
+ * The layers a library the browser runs is built on.
+ *
+ * A library rather than an application: it is packed and installed by something else, which is what
+ * the `pack` layers are for and why nothing here decides anything about a page. An application
+ * reads `preset/app` instead.
  *
  * Answered as a list as well as bound below, so that a config package for a framework composes
  * these with its own rather than sitting beside them. Sitting beside them is what lets a repository
@@ -19,20 +23,10 @@ import * as test from "#test/index.ts";
  * @returns Each layer the tier is built on, in the order they compose.
  */
 export function layers(): readonly Extendable[] {
-  return [
-    fmt.docblocks(),
-    fmt.imports(),
-    fmt.generated(),
-    fmt.prose(),
-    fmt.style(),
-    fmt.manifests(),
-    resolve.source(),
-    lint.preset.web(),
-    test.preset.web(),
-  ];
+  return [...house(), lint.preset.web(), pack.preset.web(), test.preset.web()];
 }
 
 /**
- * Composes a config for a package that runs in a browser.
+ * Composes a config for a library the browser runs.
  */
 export const defineConfig: Defining = configuring(layers);

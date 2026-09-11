@@ -1,47 +1,37 @@
 import { type ConfigEnv, type UserConfig } from "vite-plus";
 import { expect, test } from "vite-plus/test";
 
-import { defineConfig, layers, workspace } from "#preset/web.ts";
+import { defineConfig, layers } from "#preset/web.ts";
 
 test("names every layer under this package, so provenance says where it came from", () => {
-  for (const held of [...layers(), ...workspace()]) {
+  for (const held of layers()) {
     expect(held.name.startsWith("react/")).toBe(true);
   }
 });
 
-test("states at the root the format and the rules, which are read from there and nowhere else", () => {
-  const held = workspace().map((one) => one.name);
-
-  expect(held).toContain("react/fmt.group(react)");
-  expect(held.some((one) => one.includes("lint.enforce"))).toBe(true);
-  expect(held.some((one) => one.includes("lint.relax"))).toBe(true);
+test("lays out no page, a library having none to lay out", () => {
+  expect(layers().some((one) => one.name.includes("layout.page"))).toBe(false);
 });
 
-test("turns on all three linter plugins, at the root where the linter reads them", () => {
-  expect(workspace().filter((one) => one.name.includes("react.plugin("))).toHaveLength(3);
+test("compiles the JSX, so a component is specified under the transform it ships under", () => {
+  expect(layers().map((one) => one.name)).toContain("react/react.refresh");
 });
 
-test("states in the package what compiles its JSX and where its page sits", () => {
-  const held = layers().map((one) => one.name);
+test("packs rather than builds, a library being published rather than deployed", async () => {
+  const held = await (defineConfig({}) as (env: ConfigEnv) => Promise<UserConfig>)({
+    command: "build",
+    mode: "production",
+  });
 
-  expect(held).toContain("react/layout.page(public)");
-  expect(held).toContain("react/react.refresh");
+  expect(held.pack).toBeDefined();
+  expect(held.build?.manifest).toBeUndefined();
 });
 
-test("keeps the two apart, so a root config is never rooted at a page it does not have", () => {
-  const root = workspace().map((one) => one.name);
-  const stated = layers().map((one) => one.name);
-
-  expect(root.some((one) => one.includes("layout.page"))).toBe(false);
-  expect(stated.some((one) => one.includes("lint."))).toBe(false);
-});
-
-test("binds the browser tier and this package's layers into one defineConfig", async () => {
+test("binds the library tier and this package's layers into one defineConfig", async () => {
   const held = await (defineConfig({}) as (env: ConfigEnv) => Promise<UserConfig>)({
     command: "build",
     mode: "production",
   });
 
   expect(held.plugins).toBeDefined();
-  expect(held.build?.rolldownOptions?.input).toBe("public/index.html");
 });
