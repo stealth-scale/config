@@ -2,7 +2,9 @@
  * Pinning the server that serves a build to a port, and meaning it.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset } from "@stealthscale/config-core";
+
+import { port as serves } from "#serving/listening.ts";
 
 /**
  * Serves a build at a port, and refuses to start rather than move off it.
@@ -22,8 +24,5 @@ import { type Preset, preset } from "@stealthscale/config-core";
  * @returns The preset.
  */
 export function port(at: number): Preset {
-  return preset({
-    config: { preview: { port: at, strictPort: true } },
-    name: `preview.port(${at})`,
-  });
+  return serves("preview", at);
 }

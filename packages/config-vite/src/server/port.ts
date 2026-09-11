@@ -2,7 +2,9 @@
  * Pinning a dev server to a port, and meaning it.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset } from "@stealthscale/config-core";
+
+import { port as serves } from "#serving/listening.ts";
 
 /**
  * Serves an app at a port, and refuses to start rather than move off it.
@@ -28,8 +30,5 @@ import { type Preset, preset } from "@stealthscale/config-core";
  * @returns The preset.
  */
 export function port(at: number): Preset {
-  return preset({
-    config: { server: { port: at, strictPort: true } },
-    name: `server.port(${at})`,
-  });
+  return serves("server", at);
 }

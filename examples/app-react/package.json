@@ -18,8 +18,8 @@
     "react-dom": "catalog:"
   },
   "devDependencies": {
+    "@stealthscale/config-css": "workspace:^",
     "@stealthscale/config-react": "workspace:^",
-    "@stealthscale/config-stylelint": "workspace:^",
     "@stealthscale/config-typescript": "workspace:^",
     "@stealthscale/config-vite": "workspace:^",
     "@types/node": "catalog:",

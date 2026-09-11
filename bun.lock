@@ -46,8 +46,8 @@
         "react-dom": "catalog:",
       },
       "devDependencies": {
+        "@stealthscale/config-css": "workspace:^",
         "@stealthscale/config-react": "workspace:^",
-        "@stealthscale/config-stylelint": "workspace:^",
         "@stealthscale/config-typescript": "workspace:^",
         "@stealthscale/config-vite": "workspace:^",
         "@types/node": "catalog:",
@@ -162,6 +162,9 @@
     "examples/lib-cli": {
       "name": "@stealthscale/example-lib-cli",
       "version": "0.0.0",
+      "bin": {
+        "tally": "./src/bin/tally.ts",
+      },
       "dependencies": {
         "@stealthscale/example-lib-core": "workspace:^",
       },
@@ -239,37 +242,12 @@
         "vite-plus": "catalog:",
       },
     },
-    "packages/react": {
-      "name": "@stealthscale/config-react",
+    "packages/config-css": {
+      "name": "@stealthscale/config-css",
       "version": "0.0.0",
       "devDependencies": {
         "@arethetypeswrong/core": "catalog:",
-        "@stealthscale/config-typescript": "workspace:^",
-        "@stealthscale/config-vite": "workspace:^",
-        "@types/node": "catalog:",
-        "@vitejs/plugin-react": "catalog:",
-        "@vitest/coverage-v8": "catalog:",
-        "oxc-transform-react": "catalog:",
-        "publint": "catalog:",
-        "react": "catalog:",
-        "react-dom": "catalog:",
-        "typescript": "catalog:",
-        "vite-plus": "catalog:",
-      },
-      "peerDependencies": {
-        "@stealthscale/config-vite": "workspace:^",
-        "@vitejs/plugin-react": "catalog:",
-        "oxc-transform-react": "catalog:",
-        "react": "catalog:",
-        "react-dom": "catalog:",
-        "vite-plus": "catalog:",
-      },
-    },
-    "packages/stylelint": {
-      "name": "@stealthscale/config-stylelint",
-      "version": "0.0.0",
-      "devDependencies": {
-        "@arethetypeswrong/core": "catalog:",
+        "@stealthscale/config-core": "workspace:^",
         "@stealthscale/config-typescript": "workspace:^",
         "@stealthscale/config-vite": "workspace:^",
         "@types/node": "catalog:",
@@ -285,7 +263,7 @@
         "vite-plus": "catalog:",
       },
       "peerDependencies": {
-        "@stealthscale/config-vite": "workspace:^",
+        "@stealthscale/config-core": "workspace:^",
         "stylelint": "catalog:",
         "stylelint-config-standard": "catalog:",
         "stylelint-high-performance-animation": "catalog:",
@@ -295,11 +273,7 @@
         "vite-plus": "catalog:",
       },
     },
-    "packages/typescript": {
-      "name": "@stealthscale/config-typescript",
-      "version": "0.0.0",
-    },
-    "packages/vite": {
+    "packages/config-vite": {
       "name": "@stealthscale/config-vite",
       "version": "0.0.0",
       "devDependencies": {
@@ -331,6 +305,36 @@
         "@module-federation/vite",
         "happy-dom",
       ],
+    },
+    "packages/react": {
+      "name": "@stealthscale/config-react",
+      "version": "0.0.0",
+      "devDependencies": {
+        "@arethetypeswrong/core": "catalog:",
+        "@stealthscale/config-typescript": "workspace:^",
+        "@stealthscale/config-vite": "workspace:^",
+        "@types/node": "catalog:",
+        "@vitejs/plugin-react": "catalog:",
+        "@vitest/coverage-v8": "catalog:",
+        "oxc-transform-react": "catalog:",
+        "publint": "catalog:",
+        "react": "catalog:",
+        "react-dom": "catalog:",
+        "typescript": "catalog:",
+        "vite-plus": "catalog:",
+      },
+      "peerDependencies": {
+        "@stealthscale/config-vite": "workspace:^",
+        "@vitejs/plugin-react": "catalog:",
+        "oxc-transform-react": "catalog:",
+        "react": "catalog:",
+        "react-dom": "catalog:",
+        "vite-plus": "catalog:",
+      },
+    },
+    "packages/typescript": {
+      "name": "@stealthscale/config-typescript",
+      "version": "0.0.0",
     },
   },
   "overrides": {
@@ -621,13 +625,13 @@
 
     "@stealthscale/config-core": ["@stealthscale/config-core@workspace:packages/config-core"],
 
-    "@stealthscale/config-react": ["@stealthscale/config-react@workspace:packages/react"],
+    "@stealthscale/config-css": ["@stealthscale/config-css@workspace:packages/config-css"],
 
-    "@stealthscale/config-stylelint": ["@stealthscale/config-stylelint@workspace:packages/stylelint"],
+    "@stealthscale/config-react": ["@stealthscale/config-react@workspace:packages/react"],
 
     "@stealthscale/config-typescript": ["@stealthscale/config-typescript@workspace:packages/typescript"],
 
-    "@stealthscale/config-vite": ["@stealthscale/config-vite@workspace:packages/vite"],
+    "@stealthscale/config-vite": ["@stealthscale/config-vite@workspace:packages/config-vite"],
 
     "@stealthscale/example-app-host": ["@stealthscale/example-app-host@workspace:examples/app-host"],
 

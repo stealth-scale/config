@@ -1,5 +1,5 @@
+import { plugin as stylelint } from "@stealthscale/config-css";
 import { defineConfig } from "@stealthscale/config-react/preset/app";
-import { plugin as stylelint } from "@stealthscale/config-stylelint";
 import { define, server } from "@stealthscale/config-vite";
 
 export default defineConfig(import.meta.dirname, {

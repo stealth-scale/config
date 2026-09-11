@@ -2,9 +2,9 @@
  * The names a dev server answers to.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset } from "@stealthscale/config-core";
 
-import { hosts } from "#serving/environment.ts";
+import { reachable as answers } from "#serving/listening.ts";
 
 /**
  * Answers to the names given, beyond the loopback ones every server answers to.
@@ -22,8 +22,5 @@ import { hosts } from "#serving/environment.ts";
  * @returns The preset.
  */
 export function reachable(names: readonly string[] = []): Preset {
-  return preset({
-    config: (context) => ({ server: { allowedHosts: [...hosts(context, names)] } }),
-    name: "server.reachable",
-  });
+  return answers("server", names);
 }

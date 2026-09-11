@@ -9,7 +9,7 @@
   ],
   "type": "module",
   "scripts": {
-    "bootstrap": "cd packages/config-core && vp pack && cd ../vite && vp pack && cd ../react && vp pack && cd ../stylelint && vp pack",
+    "bootstrap": "cd packages/config-core && vp pack && cd ../config-vite && vp pack && cd ../react && vp pack && cd ../config-css && vp pack",
     "ready": "bun run bootstrap && vp run ci"
   },
   "devDependencies": {

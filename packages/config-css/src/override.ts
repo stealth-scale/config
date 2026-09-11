@@ -2,7 +2,7 @@
  * Bending what this package decided, where a repository knows better than the house.
  */
 
-import { type Layer, remove } from "@stealthscale/config-vite";
+import { type Layer, remove } from "@stealthscale/config-core";
 
 import { check, type Checked } from "#plugin/check.ts";
 

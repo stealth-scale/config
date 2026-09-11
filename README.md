@@ -24,7 +24,7 @@ one `tsconfig.json` already taught everybody.
 | `config-typescript` | The tsconfigs every package compiles under, split into base, node and web                |
 | `config-vite`       | The layer kernel, and a block for each part of a Vite+ config                            |
 | `config-react`      | What a package that renders adds: the JSX transform, the React rules, the page directory |
-| `config-stylelint`  | What a stylesheet is checked against, which is Google's HTML/CSS style guide             |
+| `config-css`        | What a stylesheet is checked against and how it is built, whichever tools do it          |
 
 ## Working on it
 

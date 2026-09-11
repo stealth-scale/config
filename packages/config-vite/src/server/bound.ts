@@ -2,9 +2,9 @@
  * The address a dev server listens on.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset } from "@stealthscale/config-core";
 
-import { bound as derived } from "#serving/environment.ts";
+import { bound as listens } from "#serving/listening.ts";
 
 /**
  * Listens on the address given rather than on IPv6 loopback alone.
@@ -28,12 +28,5 @@ import { bound as derived } from "#serving/environment.ts";
  * @returns The preset.
  */
 export function bound(at: boolean | readonly string[] | string = []): Preset {
-  return preset({
-    config: (context) => {
-      const held = typeof at === "object" ? derived(context, at) : at;
-
-      return held === undefined ? {} : { server: { host: held } };
-    },
-    name: "server.bound",
-  });
+  return listens("server", at);
 }

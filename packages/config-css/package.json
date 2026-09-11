@@ -1,12 +1,12 @@
 {
-  "name": "@stealthscale/config-stylelint",
+  "name": "@stealthscale/config-css",
   "version": "0.0.0",
   "description": "What a stealth package's stylesheets are checked by, as a layer a config extends.",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/stealth-scale/config.git",
-    "directory": "packages/stylelint"
+    "directory": "packages/config-css"
   },
   "files": [
     "dist"
@@ -36,6 +36,7 @@
   },
   "devDependencies": {
     "@arethetypeswrong/core": "catalog:",
+    "@stealthscale/config-core": "workspace:^",
     "@stealthscale/config-typescript": "workspace:^",
     "@stealthscale/config-vite": "workspace:^",
     "@types/node": "catalog:",
@@ -51,7 +52,7 @@
     "vite-plus": "catalog:"
   },
   "peerDependencies": {
-    "@stealthscale/config-vite": "workspace:^",
+    "@stealthscale/config-core": "workspace:^",
     "stylelint": "catalog:",
     "stylelint-config-standard": "catalog:",
     "stylelint-high-performance-animation": "catalog:",
