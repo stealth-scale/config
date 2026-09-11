@@ -23,18 +23,28 @@ import { type Preset, preset } from "#core/layer.ts";
  * settle: whatever serves the build names a directory, while a test runner looking in the wrong
  * place reports that a package has no tests.
  *
- * `publicDir` is turned off because its default sits below the root, which is where the page now
- * lives — left alone it would copy the page over the built one, unprocessed.
+ * Nothing here touches `publicDir`, and the directory named must not be the one it reads. Those two
+ * sentences are the same sentence: `public` already means the files a build copies out untouched,
+ * so a page put there is copied over the built one unprocessed, and the only way out of that is to
+ * turn the copying off — which leaves an application unable to ship a `favicon.ico` or a
+ * `robots.txt` at all, silently. Named apart, each directory means what it means everywhere else.
  *
- * @param at - The directory holding the page, relative to the package.
+ * @param at - The directory holding the page, relative to the package. Not `public`, which is where
+ *   the files a build copies out untouched already live.
  * @returns The preset.
+ * @throws Error Where the directory named is the one `publicDir` reads.
  */
 export function page(at: string): Preset {
+  if (at === "public") {
+    throw new Error(
+      "layout.page(public) would put the page where the files a build copies out untouched live, " +
+        "so the copy would land on top of the built page. Name the page's own directory, and " +
+        "leave `public` to the assets.",
+    );
+  }
+
   return preset({
-    config: {
-      build: { rolldownOptions: { input: `${at}/index.html` } },
-      publicDir: false,
-    },
+    config: { build: { rolldownOptions: { input: `${at}/index.html` } } },
     name: `layout.page(${at})`,
   });
 }
