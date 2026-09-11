@@ -1,21 +1,33 @@
-import { mkdtempSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { type UserConfig } from "vite-plus";
 import { expect, test } from "vite-plus/test";
 
-import { projects } from "#test/override.ts";
+import { projects } from "#test/projects.ts";
 
 /**
- * Writes a manifest into a directory of its own.
+ * Writes a workspace: a root manifest, and a directory for each package named under it.
  *
- * @param stated - What the manifest says.
- * @returns Where that directory sits.
+ * @param stated - What the root manifest says.
+ * @param held - The package directories to create, each given a manifest of its own. A directory
+ *   named with a trailing slash is created empty, which is what a skeleton left for a package
+ *   nobody has written yet looks like.
+ * @returns Where the workspace sits.
  */
-function rooted(stated: Record<string, unknown>): string {
+function workspace(stated: Record<string, unknown>, held: readonly string[] = []): string {
   const at = mkdtempSync(join(tmpdir(), "stealth-projects-"));
 
   writeFileSync(join(at, "package.json"), JSON.stringify(stated));
+
+  for (const one of held) {
+    const where = join(at, one);
+
+    mkdirSync(where, { recursive: true });
+
+    if (!one.endsWith("/"))
+      writeFileSync(join(where, "package.json"), JSON.stringify({ name: one }));
+  }
 
   return at;
 }
@@ -31,35 +43,43 @@ function block(at: string): NonNullable<UserConfig["test"]> {
 }
 
 test("takes the packages from the manifest rather than from a second list", () => {
-  const at = rooted({ workspaces: ["apps/*", "libs/*"] });
+  const at = workspace({ workspaces: ["apps/*", "libs/*"] }, ["apps/one", "libs/two"]);
 
-  expect(block(at).projects).toEqual(["apps/*/vite.config.ts", "libs/*/vite.config.ts"]);
+  expect(block(at).projects).toEqual(["apps/one", "libs/two"]);
 });
 
-test("names a config file, so a directory without one is not a project with no name", () => {
-  const at = rooted({ workspaces: ["apps/*"] });
+test("names the package's directory, so one with no config of its own is still a project", () => {
+  const at = workspace({ workspaces: ["apps/*"] }, ["apps/bare"]);
 
-  for (const glob of block(at).projects as string[]) {
-    expect(glob.endsWith("/vite.config.ts")).toBe(true);
-  }
+  expect(block(at).projects).toEqual(["apps/bare"]);
+});
+
+test("passes over a skeleton directory, which holds no manifest and so is no package yet", () => {
+  const at = workspace({ workspaces: ["apps/*"] }, ["apps/real", "apps/planned/"]);
+
+  expect(block(at).projects).toEqual(["apps/real"]);
+});
+
+test("answers them in one order however the file system lists them", () => {
+  const at = workspace({ workspaces: ["apps/*"] }, ["apps/zeta", "apps/alpha"]);
+
+  expect(block(at).projects).toEqual(["apps/alpha", "apps/zeta"]);
 });
 
 test("reads the nested spelling a manifest may use instead", () => {
-  const at = rooted({ workspaces: { packages: ["apps/*"] } });
+  const at = workspace({ workspaces: { packages: ["apps/*"] } }, ["apps/one"]);
 
-  expect(block(at).projects).toEqual(["apps/*/vite.config.ts"]);
+  expect(block(at).projects).toEqual(["apps/one"]);
 });
 
 test("stops the root looking for its own tests, which all belong to a package", () => {
-  const at = rooted({ workspaces: ["apps/*"] });
+  const at = workspace({ workspaces: ["apps/*"] }, ["apps/one"]);
 
   expect(block(at).include).toEqual([]);
 });
 
 test("refuses a package, which knows nothing about what the workspace holds", () => {
-  const at = rooted({ name: "@acme/thing" });
-
-  expect(() => projects(at)).toThrow(/found no workspaces/u);
+  expect(() => projects(workspace({ name: "@acme/thing" }))).toThrow(/found no workspaces/u);
 });
 
 test("refuses a manifest that parses but holds no members at all", () => {
@@ -68,4 +88,8 @@ test("refuses a manifest that parses but holds no members at all", () => {
   writeFileSync(join(at, "package.json"), JSON.stringify("not an object"));
 
   expect(() => projects(at)).toThrow(/found no workspaces/u);
+});
+
+test("refuses a workspace naming somewhere nothing lives, rather than testing nothing", () => {
+  expect(() => projects(workspace({ workspaces: ["apps/*"] }))).toThrow(/found no packages/u);
 });
