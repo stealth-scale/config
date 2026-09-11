@@ -31,6 +31,6 @@ test("copies what it was given, so a caller's object is not the packer's", () =>
   expect(installs(stated)).not.toBe(stated);
 });
 
-test("names the commands, so provenance says what a package installs", () => {
+test("names the commands, so a config says what a package installs", () => {
   expect(command({ stealth: "src/bin/stealth.ts" }).name).toBe("pack.command(stealth)");
 });

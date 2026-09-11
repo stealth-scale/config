@@ -7,6 +7,6 @@ test("builds for a worker runtime, which has no node built-ins to fall back on",
   expect((runtime().config as UserConfig).ssr?.target).toBe("webworker");
 });
 
-test("names the runtime, so provenance says why a server build resolves as it does", () => {
+test("names the runtime, so a config says why a server build resolves as it does", () => {
   expect(runtime().name).toBe("ssr.runtime(webworker)");
 });

@@ -13,6 +13,6 @@ test("takes a path as readily as an origin, an application mounted under one nee
   expect((served("/remote/").config as UserConfig).base).toBe("/remote/");
 });
 
-test("names where it serves from, so provenance says why a URL is absolute", () => {
+test("names where it serves from, so a config says why a URL is absolute", () => {
   expect(served("/remote/").name).toBe("build.served(/remote/)");
 });

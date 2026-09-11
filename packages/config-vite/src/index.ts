@@ -7,8 +7,7 @@
  * appends one item to a list, a removal takes one back, and an override rewrites what is left.
  *
  * What is published is what a config is written with, and what another config package builds layers
- * with. How layers merge, where a contribution finds its list and how provenance is recorded are
- * this package's own.
+ * with. How layers merge and where a contribution finds its list are this package's own.
  *
  * @packageDocumentation
  */

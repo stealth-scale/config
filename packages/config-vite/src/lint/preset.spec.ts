@@ -33,7 +33,7 @@ test("sets a block rather than appending to a list", () => {
   expect(base().some((one) => one.kind === "preset")).toBe(true);
 });
 
-test("names itself, so the provenance report can say what decided a value", () => {
+test("names itself, so a repository disagreeing with it can take it back", () => {
   expect(namesOf(base())).toContain("lint.base");
   expect(namesOf(node())).toContain("lint.node");
   expect(namesOf(web())).toContain("lint.web");

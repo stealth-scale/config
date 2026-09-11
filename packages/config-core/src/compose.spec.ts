@@ -68,7 +68,7 @@ test("settles a preset asking to go last after one that said nothing", async () 
     preset({ config: { mode: "first" }, name: "before" }),
   ]);
 
-  expect(held.config.mode).toBe("last");
+  expect(held.mode).toBe("last");
 });
 
 test("appends what a contribution states outright", async () => {
@@ -76,7 +76,7 @@ test("appends what a contribution states outright", async () => {
     contribute({ at: "test.setupFiles", because: "a reason", item: "stated.ts", name: "one" }),
   ]);
 
-  expect(held.config.test?.setupFiles).toEqual(["stated.ts"]);
+  expect(held.test?.setupFiles).toEqual(["stated.ts"]);
 });
 
 test("appends what a contribution works out from what is being configured", async () => {
@@ -89,7 +89,7 @@ test("appends what a contribution works out from what is being configured", asyn
     }),
   ]);
 
-  expect(held.config.test?.setupFiles).toEqual(["production.ts"]);
+  expect(held.test?.setupFiles).toEqual(["production.ts"]);
 });
 
 test("prefers what it works out, where a layer states both", async () => {
@@ -103,5 +103,5 @@ test("prefers what it works out, where a layer states both", async () => {
     }),
   ]);
 
-  expect(held.config.test?.setupFiles).toEqual(["worked-out.ts"]);
+  expect(held.test?.setupFiles).toEqual(["worked-out.ts"]);
 });

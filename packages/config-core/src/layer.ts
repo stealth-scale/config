@@ -61,7 +61,7 @@ export interface Preset extends Minted {
   kind: "preset";
 
   /**
-   * What it is called, as the provenance report names it.
+   * What it is called, which is also what a removal names to take it back.
    */
   name: string;
 }

@@ -55,6 +55,6 @@ test("wins over the manifest for a subpath both name, the computed one being the
   expect(held["./g"]).toBe("./dist/g.css");
 });
 
-test("names the subpaths, so provenance says what was published beyond the manifest", () => {
+test("names the subpaths, so a config says what was published beyond the manifest", () => {
   expect(ships({ "./a": "./a.css", "./b": "./b.css" }).name).toBe("pack.ships(./a, ./b)");
 });

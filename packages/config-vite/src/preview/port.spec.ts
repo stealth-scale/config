@@ -15,6 +15,6 @@ test("leaves the dev server alone, an application being previewed while it is se
   expect((port(4300).config as UserConfig).server).toBeUndefined();
 });
 
-test("names the port, so provenance says which server was pinned where", () => {
+test("names the port, so a config says which server was pinned where", () => {
   expect(port(4300).name).toBe("preview.port(4300)");
 });

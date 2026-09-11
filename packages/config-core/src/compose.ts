@@ -8,7 +8,7 @@
  * Overrides run last, on a config nothing else will touch.
  */
 
-import { type UserConfig } from "vite-plus";
+import { mergeConfig, type UserConfig } from "vite-plus";
 
 import { type Context } from "#context.ts";
 import {
@@ -20,7 +20,6 @@ import {
   type Override,
   type Preset,
 } from "#layer.ts";
-import { type Composed, merged, NOTHING, replaced } from "#merge.ts";
 import { appended } from "#path.ts";
 
 /**
@@ -45,27 +44,29 @@ export function flattened(extended: readonly Extendable[]): readonly Layer[] {
  * @param preset - Whichever preset is being read.
  * @returns The config it sets.
  */
-function setBy(context: Context, preset: Preset): Promise<UserConfig> | UserConfig {
-  return typeof preset.config === "function" ? preset.config(context) : preset.config;
+async function setBy(context: Context, preset: Preset): Promise<UserConfig> {
+  const held = await (typeof preset.config === "function" ? preset.config(context) : preset.config);
+
+  return held;
 }
 
 /**
  * Settles every preset, in enforce order.
  *
+ * The merge is Vite+'s own, whose rules are specified already and carry years of edge cases.
+ *
  * @param context - The command, the mode and the repository around them.
  * @param presets - The presets taking part.
- * @returns The config they agree on, and the record of who set what.
+ * @returns The config they agree on.
  */
-async function settled(context: Context, presets: readonly Preset[]): Promise<Composed> {
+async function settled(context: Context, presets: readonly Preset[]): Promise<UserConfig> {
   const ordered = presets.toSorted(
     (one, other) => ORDER[one.enforce ?? "pre"] - ORDER[other.enforce ?? "pre"],
   );
 
-  const set = await Promise.all(
-    ordered.map(async (preset) => [preset, await setBy(context, preset)] as const),
-  );
+  const set = await Promise.all(ordered.map((preset) => setBy(context, preset)));
 
-  return set.reduce((composed, [preset, config]) => merged(composed, config, preset), NOTHING);
+  return set.reduce<UserConfig>((held, config) => mergeConfig(held, config), {});
 }
 
 /**
@@ -112,13 +113,13 @@ export function surviving(layers: readonly Layer[]): readonly Layer[] {
  *
  * @param context - The command, the mode and the repository around them.
  * @param extended - The layers, nested to any depth.
- * @returns The config, and the record of which layer decided each value.
+ * @returns The config every layer agreed on.
  * @throws Error When a removal names nothing stated above it.
  */
 export async function resolved(
   context: Context,
   extended: readonly Extendable[],
-): Promise<Composed> {
+): Promise<UserConfig> {
   const taking = surviving(flattened(extended).filter((layer) => applies(layer, context)));
 
   let composed = await settled(
@@ -131,11 +132,11 @@ export async function resolved(
   )) {
     const item = contribution.itemOf ? contribution.itemOf(context) : contribution.item;
 
-    composed = replaced(composed, appended(composed.config, contribution.at, item), contribution);
+    composed = appended(composed, contribution.at, item);
   }
 
   for (const layer of taking.filter((one): one is Override => one.kind === "override")) {
-    composed = replaced(composed, layer.refine(context, composed.config), layer);
+    composed = layer.refine(context, composed);
   }
 
   return composed;

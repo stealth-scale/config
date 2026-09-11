@@ -22,30 +22,12 @@ function walkable(value: unknown): value is Held {
 }
 
 /**
- * Reads whatever sits at a path.
- *
- * @param held - The object to read.
- * @param path - The dotted path.
- * @returns The value there, or nothing where the path names nothing.
- */
-export function at(held: object, path: string): unknown {
-  let found: unknown = held;
-
-  for (const step of path.split(".")) {
-    if (!walkable(found)) return undefined;
-    found = found[step];
-  }
-
-  return found;
-}
-
-/**
  * Appends an item to the list at a path, making the list and everything above it where absent.
  *
  * Answers the type it was handed, so a config goes in and a config comes out and no caller has to
  * assert its way back. Copies only along the path walked: everything else is the object that was
  * handed in, which keeps a config that is mostly untouched from being rebuilt once per
- * contribution, and lets the provenance record compare by identity.
+ * contribution.
  *
  * @typeParam Of - The shape being appended into.
  * @param held - The object to append into.
@@ -64,22 +46,4 @@ export function appended<Of extends object>(held: Of, path: string, item: unknow
       : appended(walkable(below) ? below : {}, path.slice(dot + 1), item);
 
   return { ...held, [step]: grown };
-}
-
-/**
- * Lists every leaf path an object holds.
- *
- * An array counts as a leaf. A contribution appends to one and a preset replaces one, and the
- * provenance record says which layer did that rather than which element moved.
- *
- * @param held - The object to walk.
- * @param prefix - The path it sits at, for a nested call.
- * @returns Every path holding something that is not a plain object.
- */
-export function leaves(held: object, prefix = ""): readonly string[] {
-  return Object.entries(held).flatMap(([key, value]: [string, unknown]) => {
-    const path = prefix === "" ? key : `${prefix}.${key}`;
-
-    return walkable(value) ? leaves(value, path) : [path];
-  });
 }

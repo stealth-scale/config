@@ -60,6 +60,6 @@ export function defineConfig(
 
     const composed = await resolved(context, extended);
 
-    return mergeConfig(composed.config, own) as UserConfig;
+    return mergeConfig(composed, own) as UserConfig;
   });
 }

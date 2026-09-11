@@ -36,25 +36,12 @@ const SURFACE = [
 ];
 
 /**
- * How layers are merged, where a contribution finds its list, how provenance is recorded.
+ * How layers are composed, and where a contribution finds its list.
  *
  * Every one of these is machinery `defineConfig` uses. Published, each becomes API that cannot
  * change without a major version, for nobody's benefit.
  */
-const WITHHELD = [
-  "appended",
-  "at",
-  "flattened",
-  "isLayer",
-  "leaves",
-  "merged",
-  "NOTHING",
-  "replaced",
-  "resolved",
-  "surviving",
-  "why",
-  "wrote",
-];
+const WITHHELD = ["appended", "flattened", "isLayer", "resolved", "surviving"];
 
 test("publishes what a config and a config package need", () => {
   for (const name of SURFACE) {
