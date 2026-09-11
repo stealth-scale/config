@@ -1,6 +1,7 @@
+import { type ConfigEnv, type UserConfig } from "vite-plus";
 import { expect, test } from "vite-plus/test";
 
-import { layers, workspace } from "#preset/web.ts";
+import { defineConfig, layers, workspace } from "#preset/web.ts";
 
 test("names every layer under this package, so provenance says where it came from", () => {
   for (const held of [...layers(), ...workspace()]) {
@@ -33,4 +34,14 @@ test("keeps the two apart, so a root config is never rooted at a page it does no
 
   expect(root.some((one) => one.includes("layout.page"))).toBe(false);
   expect(stated.some((one) => one.includes("lint."))).toBe(false);
+});
+
+test("binds the browser tier and this package's layers into one defineConfig", async () => {
+  const held = await (defineConfig({}) as (env: ConfigEnv) => Promise<UserConfig>)({
+    command: "build",
+    mode: "production",
+  });
+
+  expect(held.plugins).toBeDefined();
+  expect(held.build?.rolldownOptions?.input).toBe("public/index.html");
 });

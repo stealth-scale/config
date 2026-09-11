@@ -37,6 +37,7 @@
     "@stealthscale/config-typescript": "workspace:^",
     "@stealthscale/config-vite": "workspace:^",
     "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
     "stylelint": "catalog:",
     "stylelint-config-standard": "catalog:",
     "stylelint-high-performance-animation": "catalog:",

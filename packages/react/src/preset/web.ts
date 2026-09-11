@@ -9,6 +9,7 @@ import * as fmt from "#fmt/index.ts";
 import * as lint from "#lint/index.ts";
 import * as plugin from "#plugin/index.ts";
 import { PAGE } from "#preset/page.ts";
+import * as test from "#test/index.ts";
 
 /**
  * The layers a workspace states once, at its root.
@@ -16,6 +17,10 @@ import { PAGE } from "#preset/page.ts";
  * The formatter and the linter are read from the root config and nowhere else, so these belong
  * there even though what they describe is a package two directories down. A workspace holding
  * anything that renders states this, and every file in it is then grouped and checked as React.
+ *
+ * What a root states about the runner is not here. Every workspace needs it, including one that
+ * renders through something other than React, so it is the toolchain's `test.projects` rather than
+ * this package's to hand out.
  *
  * @returns Each layer the root config needs on behalf of what renders below it.
  */
@@ -33,7 +38,7 @@ export function workspace(): readonly Layer[] {
  * @returns Each layer React needs beyond what a browser package already gets.
  */
 export function layers(): readonly Layer[] {
-  return owned("react", [layout.page(PAGE), plugin.refresh()]);
+  return owned("react", [layout.page(PAGE), plugin.refresh(), test.cleanup()]);
 }
 
 /**

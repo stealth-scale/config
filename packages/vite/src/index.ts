@@ -36,3 +36,4 @@ export * as lint from "#lint/index.ts";
 export { configuring, type Defining } from "#preset/defaults.ts";
 export * as resolve from "#resolve/index.ts";
 export * as server from "#server/index.ts";
+export * as test from "#test/index.ts";

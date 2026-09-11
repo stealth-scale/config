@@ -13,3 +13,4 @@ export * as lint from "#lint/index.ts";
 export * as override from "#override.ts";
 export * as plugin from "#plugin/index.ts";
 export * as preset from "#preset/index.ts";
+export * as test from "#test/index.ts";

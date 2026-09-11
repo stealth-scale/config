@@ -22,6 +22,7 @@ const SURFACE = [
   "remove",
   "resolve",
   "server",
+  "test",
 ];
 
 /**

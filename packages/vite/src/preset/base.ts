@@ -7,6 +7,7 @@ import * as fmt from "#fmt/index.ts";
 import * as lint from "#lint/index.ts";
 import { configuring, type Defining } from "#preset/defaults.ts";
 import * as resolve from "#resolve/index.ts";
+import * as test from "#test/index.ts";
 
 /**
  * The layers a package that reaches for neither node's globals nor the browser's is built on.
@@ -27,6 +28,7 @@ export function layers(): readonly Extendable[] {
     fmt.manifests(),
     resolve.source(),
     lint.preset.base(),
+    test.preset.base(),
   ];
 }
 

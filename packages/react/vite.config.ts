@@ -5,7 +5,7 @@ export default defineConfig({
     dts: true,
     entry: ["src/index.ts", "src/preset/web.ts"],
     exports: {
-      customExports: { "./web.json": "./web.json" },
+      customExports: { "./vitest.setup.ts": "./vitest.setup.ts", "./web.json": "./web.json" },
       devExports: "stealth-source",
     },
   },

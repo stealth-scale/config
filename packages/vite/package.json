@@ -57,9 +57,12 @@
   "devDependencies": {
     "@stealthscale/config-typescript": "workspace:^",
     "@types/node": "catalog:",
+    "@vitest/browser-playwright": "4.1.11",
+    "@vitest/coverage-v8": "catalog:",
     "eslint-plugin-jsdoc": "catalog:",
     "eslint-plugin-perfectionist": "catalog:",
     "eslint-plugin-tsdoc": "catalog:",
+    "playwright": "^1.58.0",
     "typescript": "catalog:",
     "vite-plus": "catalog:"
   },
@@ -67,6 +70,12 @@
     "eslint-plugin-jsdoc": "catalog:",
     "eslint-plugin-perfectionist": "catalog:",
     "eslint-plugin-tsdoc": "catalog:",
+    "happy-dom": "catalog:",
     "vite-plus": "catalog:"
+  },
+  "peerDependenciesMeta": {
+    "happy-dom": {
+      "optional": true
+    }
   }
 }
