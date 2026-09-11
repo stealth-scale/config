@@ -82,6 +82,12 @@ export interface Checked {
  * configuration of its own: the shared set, plus what Google asks for beyond it, plus whatever the
  * repository adds here.
  *
+ * The plugin's own cache is off, which is stylelint's default and not the plugin's. It writes
+ * `.stylelintcache` into the package it is linting, so the build both reads and writes a file
+ * inside its own directory and the task runner will not cache it — trading a whole cached build for
+ * a partial linting speedup. What the cache would have saved is small anyway: `lintOnStart` is off,
+ * so stylesheets are linted as the build reaches them rather than all at once.
+ *
  * @param stated - The repository's own answers about its stylesheets. `Checked` documents every
  *   member.
  * @returns The contribution the bundler runs the linter from.
@@ -92,6 +98,7 @@ export function check(stated: Checked = {}): Contribution {
     because: "a stylesheet is the one thing in a repository the type checker never reads",
     item: stylelint({
       build: true,
+      cache: false,
       config: { extends: [STANDARD], plugins: PLUGINS, rules: { ...all(), ...stated.rules } },
       dev: true,
       emitErrorAsWarning: stated.warn ?? false,
