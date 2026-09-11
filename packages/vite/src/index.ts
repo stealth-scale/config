@@ -13,6 +13,7 @@
  * @packageDocumentation
  */
 
+export * as build from "#build/index.ts";
 export { type Config, type ConfigFn, defineConfig } from "#core/define.ts";
 export {
   type Apply,
@@ -30,10 +31,18 @@ export {
   type Stated,
 } from "#core/layer.ts";
 export * as define from "#define/index.ts";
+export * as deps from "#deps/index.ts";
 export * as fmt from "#fmt/index.ts";
 export * as layout from "#layout/index.ts";
 export * as lint from "#lint/index.ts";
+export * as pack from "#pack/index.ts";
 export { configuring, type Defining } from "#preset/defaults.ts";
+export * as preview from "#preview/index.ts";
 export * as resolve from "#resolve/index.ts";
+export * as run from "#run/index.ts";
+export * as sbom from "#sbom/index.ts";
 export * as server from "#server/index.ts";
+export * as ssr from "#ssr/index.ts";
+export * as staged from "#staged/index.ts";
 export * as test from "#test/index.ts";
+export * as worker from "#worker/index.ts";

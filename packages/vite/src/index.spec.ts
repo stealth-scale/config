@@ -9,20 +9,29 @@ import * as published from "#index.ts";
  * below is for: a surface grows because somebody meant it to.
  */
 const SURFACE = [
+  "build",
   "configuring",
   "contribute",
   "define",
   "defineConfig",
+  "deps",
   "fmt",
   "layout",
   "lint",
   "override",
+  "pack",
   "owned",
   "preset",
+  "preview",
   "remove",
   "resolve",
+  "run",
+  "sbom",
   "server",
+  "ssr",
+  "staged",
   "test",
+  "worker",
 ];
 
 /**

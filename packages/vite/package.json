@@ -21,6 +21,10 @@
       "stealth-source": "./src/index.ts",
       "default": "./dist/index.mjs"
     },
+    "./preset/app": {
+      "stealth-source": "./src/preset/app.ts",
+      "default": "./dist/preset/app.mjs"
+    },
     "./preset/base": {
       "stealth-source": "./src/preset/base.ts",
       "default": "./dist/preset/base.mjs"
@@ -39,6 +43,7 @@
   "publishConfig": {
     "exports": {
       ".": "./dist/index.mjs",
+      "./preset/app": "./dist/preset/app.mjs",
       "./preset/base": "./dist/preset/base.mjs",
       "./preset/node": "./dist/preset/node.mjs",
       "./preset/web": "./dist/preset/web.mjs",
@@ -55,14 +60,17 @@
     "test": "vp test"
   },
   "devDependencies": {
+    "@arethetypeswrong/core": "catalog:",
     "@stealthscale/config-typescript": "workspace:^",
     "@types/node": "catalog:",
-    "@vitest/browser-playwright": "4.1.11",
+    "@vitest/browser-playwright": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "eslint-plugin-jsdoc": "catalog:",
     "eslint-plugin-perfectionist": "catalog:",
     "eslint-plugin-tsdoc": "catalog:",
-    "playwright": "^1.58.0",
+    "playwright": "catalog:",
+    "publint": "catalog:",
+    "rollup-plugin-sbom": "catalog:",
     "typescript": "catalog:",
     "vite-plus": "catalog:"
   },
@@ -71,6 +79,7 @@
     "eslint-plugin-perfectionist": "catalog:",
     "eslint-plugin-tsdoc": "catalog:",
     "happy-dom": "catalog:",
+    "rollup-plugin-sbom": "catalog:",
     "vite-plus": "catalog:"
   },
   "peerDependenciesMeta": {
