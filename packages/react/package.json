@@ -1,0 +1,59 @@
+{
+  "name": "@stealthscale/config-react",
+  "version": "0.0.0",
+  "description": "What a stealth package that renders is configured, checked and formatted by.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stealth-scale/config.git",
+    "directory": "packages/react"
+  },
+  "files": [
+    "dist",
+    "web.json"
+  ],
+  "type": "module",
+  "imports": {
+    "#*": "./src/*"
+  },
+  "exports": {
+    ".": {
+      "stealth-source": "./src/index.ts",
+      "default": "./dist/index.mjs"
+    },
+    "./preset/web": {
+      "stealth-source": "./src/preset/web.ts",
+      "default": "./dist/preset/web.mjs"
+    },
+    "./package.json": "./package.json",
+    "./web.json": "./web.json"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": "./dist/index.mjs",
+      "./preset/web": "./dist/preset/web.mjs",
+      "./package.json": "./package.json",
+      "./web.json": "./web.json"
+    }
+  },
+  "scripts": {
+    "build": "vp pack",
+    "check": "vp check",
+    "test": "vp test"
+  },
+  "devDependencies": {
+    "@stealthscale/config-typescript": "workspace:^",
+    "@stealthscale/config-vite": "workspace:^",
+    "@types/node": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
+    "oxc-transform-react": "catalog:",
+    "typescript": "catalog:",
+    "vite-plus": "catalog:"
+  },
+  "peerDependencies": {
+    "@stealthscale/config-vite": "workspace:^",
+    "@vitejs/plugin-react": "catalog:",
+    "oxc-transform-react": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}

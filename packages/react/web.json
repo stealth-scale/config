@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@stealthscale/config-typescript/web.json",
+  "compilerOptions": {
+    "jsx": "react-jsx"
+  }
+}
