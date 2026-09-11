@@ -1,0 +1,59 @@
+{
+  "name": "@stealthscale/config-stylelint",
+  "version": "0.0.0",
+  "description": "What a stealth package's stylesheets are checked by, as a layer a config extends.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stealth-scale/config.git",
+    "directory": "packages/stylelint"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "imports": {
+    "#*": "./src/*"
+  },
+  "exports": {
+    ".": {
+      "stealth-source": "./src/index.ts",
+      "default": "./dist/index.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": "./dist/index.mjs",
+      "./package.json": "./package.json"
+    }
+  },
+  "scripts": {
+    "build": "vp pack",
+    "check": "vp check",
+    "test": "vp test"
+  },
+  "devDependencies": {
+    "@stealthscale/config-typescript": "workspace:^",
+    "@stealthscale/config-vite": "workspace:^",
+    "@types/node": "catalog:",
+    "stylelint": "catalog:",
+    "stylelint-config-standard": "catalog:",
+    "stylelint-high-performance-animation": "catalog:",
+    "stylelint-order": "catalog:",
+    "stylelint-use-nesting": "catalog:",
+    "typescript": "catalog:",
+    "vite-plugin-stylelint": "catalog:",
+    "vite-plus": "catalog:"
+  },
+  "peerDependencies": {
+    "@stealthscale/config-vite": "workspace:^",
+    "stylelint": "catalog:",
+    "stylelint-config-standard": "catalog:",
+    "stylelint-high-performance-animation": "catalog:",
+    "stylelint-order": "catalog:",
+    "stylelint-use-nesting": "catalog:",
+    "vite-plugin-stylelint": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}
