@@ -32,6 +32,7 @@ export {
 } from "#core/layer.ts";
 export * as define from "#define/index.ts";
 export * as deps from "#deps/index.ts";
+export * as federation from "#federation/index.ts";
 export * as fmt from "#fmt/index.ts";
 export * as layout from "#layout/index.ts";
 export * as lint from "#lint/index.ts";
@@ -42,6 +43,7 @@ export * as resolve from "#resolve/index.ts";
 export * as run from "#run/index.ts";
 export * as sbom from "#sbom/index.ts";
 export * as server from "#server/index.ts";
+export * as serving from "#serving/index.ts";
 export * as ssr from "#ssr/index.ts";
 export * as staged from "#staged/index.ts";
 export * as test from "#test/index.ts";

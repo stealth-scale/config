@@ -61,6 +61,7 @@
   },
   "devDependencies": {
     "@arethetypeswrong/core": "catalog:",
+    "@module-federation/vite": "catalog:",
     "@stealthscale/config-typescript": "workspace:^",
     "@types/node": "catalog:",
     "@vitest/browser-playwright": "catalog:",
@@ -75,6 +76,7 @@
     "vite-plus": "catalog:"
   },
   "peerDependencies": {
+    "@module-federation/vite": "catalog:",
     "eslint-plugin-jsdoc": "catalog:",
     "eslint-plugin-perfectionist": "catalog:",
     "eslint-plugin-tsdoc": "catalog:",
@@ -84,6 +86,9 @@
   },
   "peerDependenciesMeta": {
     "happy-dom": {
+      "optional": true
+    },
+    "@module-federation/vite": {
       "optional": true
     }
   }
