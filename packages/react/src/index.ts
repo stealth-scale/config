@@ -8,6 +8,7 @@
  * @packageDocumentation
  */
 
+export * as federation from "#federation/index.ts";
 export * as fmt from "#fmt/index.ts";
 export * as lint from "#lint/index.ts";
 export * as override from "#override.ts";
