@@ -8,8 +8,12 @@ import { type UserConfig } from "vite-plus";
  * A rule name against what the linter should do about it.
  *
  * The linter's own map, which names every built-in rule and the shape of its options — so a
- * misspelled name or an option the rule does not take is a type error rather than a rule that
- * quietly never runs.
+ * severity the rule does not take, or an option of the wrong type, is a type error rather than a
+ * rule configured into doing nothing.
+ *
+ * A name it does not know is taken as written, because the map stays open for the rules a plugin
+ * brings. A misspelling is therefore not caught here, and the linter reporting nothing from a rule
+ * is what a repository sees instead.
  */
 export type Rules = NonNullable<NonNullable<UserConfig["lint"]>["rules"]>;
 

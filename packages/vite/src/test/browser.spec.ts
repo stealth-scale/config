@@ -3,7 +3,7 @@ import { expect, test } from "vite-plus/test";
 
 import { defineConfig } from "#core/define.ts";
 import { readBack } from "#preset/preset.fixtures.ts";
-import { type Browsed, browser, driver } from "#test/override.ts";
+import { type Browsed, browser, driver } from "#test/browser.ts";
 
 /**
  * The environment a test run is read in.

@@ -6,21 +6,12 @@
  */
 
 export { assertion } from "#test/assertion.ts";
+export { type Browsed, browser, type Browser, type Viewport } from "#test/browser.ts";
 export { coverage } from "#test/coverage.ts";
 export { environment, type Environment } from "#test/environment.ts";
 export { files } from "#test/files.ts";
 export { isolation } from "#test/isolation.ts";
 export { order } from "#test/order.ts";
-export {
-  type Browsed,
-  browser,
-  type Browser,
-  covering,
-  type Global,
-  globalSetup,
-  projects,
-  uncounted,
-  type Uncounted,
-  type Viewport,
-} from "#test/override.ts";
+export { covering, type Global, globalSetup, uncounted, type Uncounted } from "#test/override.ts";
 export * as preset from "#test/preset.ts";
+export { projects } from "#test/projects.ts";
