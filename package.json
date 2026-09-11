@@ -5,7 +5,8 @@
   "description": "Every configuration a stealth repository is built, checked, tested and released under.",
   "workspaces": [
     "examples/*",
-    "packages/*"
+    "packages/*",
+    "plugins/*"
   ],
   "type": "module",
   "scripts": {
@@ -44,9 +45,14 @@
   "packageManager": "bun@1.4.2",
   "catalog": {
     "@arethetypeswrong/core": "^0.18.5",
+    "@cyclonedx/cyclonedx-library": "^10.2.0",
+    "@module-federation/runtime": "2.9.0",
+    "@module-federation/vite": "1.21.5",
+    "@tanstack/react-router": "1.170.34",
     "@types/node": "^26",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "@types/spdx-expression-parse": "^4.0.0",
     "@vitejs/plugin-react": "^6.1.1",
     "@vitest/browser-playwright": "4.1.11",
     "@vitest/coverage-v8": "4.1.11",
@@ -55,10 +61,12 @@
     "eslint-plugin-tsdoc": "^0.5.2",
     "happy-dom": "^20.14.3",
     "oxc-transform-react": "^0.149.0",
+    "packageurl-js": "^2.0.1",
     "playwright": "^1.58.0",
     "publint": "^0.3.24",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
+    "spdx-expression-parse": "^5.0.0",
     "stylelint": "^17.15.0",
     "stylelint-config-standard": "^40.0.0",
     "stylelint-high-performance-animation": "^2.0.0",
@@ -67,9 +75,6 @@
     "typescript": "^7.0.2",
     "vite": "npm:@voidzero-dev/vite-plus-core@0.3.1",
     "vite-plugin-stylelint": "^6.3.0",
-    "vite-plus": "0.3.1",
-    "@module-federation/vite": "1.21.5",
-    "@tanstack/react-router": "1.170.34",
-    "@module-federation/runtime": "2.9.0"
+    "vite-plus": "0.3.1"
   }
 }
