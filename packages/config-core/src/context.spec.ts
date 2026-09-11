@@ -153,6 +153,42 @@ test("reads the package's own manifest, so no two blocks open the same file", ()
   expect(contextOf(SERVING, held.at, held.at).manifest.version).toBe("1.2.3");
 });
 
+test("answers the workspace as a list where the manifest states one", () => {
+  const held = laid({ workspaces: ["packages/*"] });
+
+  expect(contextOf(SERVING, held.root, held.root).manifest.workspaces).toEqual(["packages/*"]);
+});
+
+test("answers the nested spelling as a list too, so nothing downstream reads two", () => {
+  const held = laid({ workspaces: { packages: ["packages/*"] } });
+
+  expect(contextOf(SERVING, held.root, held.root).manifest.workspaces).toEqual(["packages/*"]);
+});
+
+test("answers an empty list where a manifest declares a workspace holding nothing", () => {
+  const held = laid({ workspaces: {} });
+
+  expect(contextOf(SERVING, held.root, held.root).manifest.workspaces).toEqual([]);
+});
+
+test("answers nothing where the manifest declares no workspace, which is what a package is", () => {
+  const held = workspace();
+
+  expect(contextOf(SERVING, held.at, held.at).manifest.workspaces).toBeUndefined();
+});
+
+test("drops an entry that is not a name, rather than handing it on", () => {
+  const held = laid({ workspaces: ["packages/*", 3] });
+
+  expect(contextOf(SERVING, held.root, held.root).manifest.workspaces).toEqual(["packages/*"]);
+});
+
+test("answers an empty list where the field is neither a list nor an object", () => {
+  const held = laid({ workspaces: "packages/*" });
+
+  expect(contextOf(SERVING, held.root, held.root).manifest.workspaces).toEqual([]);
+});
+
 test("answers an empty manifest where the directory holds none, which is a block's question", () => {
   const held = workspace();
   const absent = join(held.root, "nothing");

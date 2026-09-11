@@ -9,7 +9,7 @@ export default defineConfig(import.meta.dirname, {
     run.ci(),
     staged.checked(),
     staged.formatted(),
-    test.projects(import.meta.dirname),
+    test.projects(),
 
     lint.relax({
       because:

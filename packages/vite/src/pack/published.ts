@@ -2,10 +2,7 @@
  * Reading the entry points a package's own manifest says it publishes.
  */
 
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
-
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Context, type Preset, preset } from "@stealthscale/config-core";
 
 import { SOURCE } from "#resolve/condition.ts";
 
@@ -25,21 +22,28 @@ function within(path: string): string {
 }
 
 /**
- * Reads the export map a manifest declares.
+ * Reads the export map of the package being configured.
  *
- * @param at - The directory holding it.
+ * @param context - The command, the mode and the repository around them.
  * @returns The map.
- * @throws Error Where the manifest declares no exports.
+ * @throws Error Where a workspace root is being packed, or the manifest declares no exports.
  */
-function exported(at: string): object {
-  const held: unknown = JSON.parse(readFileSync(join(at, "package.json"), "utf8"));
-  const stated: unknown =
-    typeof held === "object" && held !== null ? Reflect.get(held, "exports") : undefined;
-
-  if (typeof stated !== "object" || stated === null) {
+function exported(context: Context): Readonly<Record<string, unknown>> {
+  if (context.at === context.root) {
     throw new Error(
-      `pack.published(${at}) found no exports in its manifest. A package states what it publishes ` +
-        "there, because that is the file the resolver reads, and the packer builds exactly that.",
+      "pack.published() is reading the workspace root's manifest, which publishes nothing. A " +
+        "package states this in its own config, and a package with no config of its own takes " +
+        "the root's — so it names its entry on the command line instead.",
+    );
+  }
+
+  const stated = context.manifest.exports;
+
+  if (stated === undefined) {
+    throw new Error(
+      `pack.published() found no exports in the manifest at ${context.at}. A package states what ` +
+        "it publishes there, because that is the file the resolver reads, and the packer builds " +
+        "exactly that.",
     );
   }
 
@@ -63,37 +67,34 @@ function exported(at: string): object {
  * what it was given. A subpath is added by writing it into the manifest, beside the ones already
  * there, in the file a consumer will read it from.
  *
- * Which directory to read is the one thing this cannot work out, which is why it is asked for.
- * Under the test runner the working directory is the workspace root while the config being read is
- * a package's, so only the config file knows, and it says so with `import.meta.dirname`.
- *
- * @param at - The directory holding the manifest, which is `import.meta.dirname`.
  * @returns The preset.
  * @throws Error Where the manifest declares no exports, or none the packer could build.
  */
-export function published(at: string): Preset {
-  const stated = exported(at);
-  const entry: Record<string, string> = {};
-
-  for (const subpath of Object.keys(stated)) {
-    const value: unknown = Reflect.get(stated, subpath);
-    const source: unknown =
-      typeof value === "object" && value !== null ? Reflect.get(value, SOURCE) : undefined;
-
-    if (typeof source === "string") {
-      entry[subpath === "." ? ROOT : within(subpath)] = within(source);
-    }
-  }
-
-  if (Object.keys(entry).length === 0) {
-    throw new Error(
-      `pack.published(${at}) found nothing to build. Every subpath the packer produces carries a ` +
-        `\`${SOURCE}\` condition naming the file it is built from, and this manifest has none.`,
-    );
-  }
-
+export function published(): Preset {
   return preset({
-    config: { pack: { entry } },
-    name: `pack.published(${Object.keys(entry).join(", ")})`,
+    config: (context) => {
+      const stated = exported(context);
+      const entry: Record<string, string> = {};
+
+      for (const [subpath, value] of Object.entries(stated)) {
+        const source: unknown =
+          typeof value === "object" && value !== null ? Reflect.get(value, SOURCE) : undefined;
+
+        if (typeof source === "string") {
+          entry[subpath === "." ? ROOT : within(subpath)] = within(source);
+        }
+      }
+
+      if (Object.keys(entry).length === 0) {
+        throw new Error(
+          `pack.published() found nothing to build in the manifest at ${context.at}. Every ` +
+            `subpath the packer produces carries a \`${SOURCE}\` condition naming the file it is ` +
+            "built from, and this manifest has none.",
+        );
+      }
+
+      return { pack: { entry } };
+    },
+    name: "pack.published",
   });
 }

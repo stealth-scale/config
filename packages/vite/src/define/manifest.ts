@@ -2,9 +2,6 @@
  * The constants a package can read about itself.
  */
 
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
-
 import { type Preset, preset } from "@stealthscale/config-core";
 
 /**
@@ -30,31 +27,13 @@ export interface Injected {
 }
 
 /**
- * Reads one text field out of the manifest beside a config.
- *
- * @param at - The directory holding it.
- * @param field - Which field to read.
- * @returns The field's value, or an empty string where there is nothing to read.
- */
-function read(at: string, field: string): string {
-  try {
-    const held: unknown = JSON.parse(readFileSync(join(at, "package.json"), "utf8"));
-    const value: unknown =
-      typeof held === "object" && held !== null ? Reflect.get(held, field) : undefined;
-
-    return typeof value === "string" ? value : "";
-  } catch {
-    return "";
-  }
-}
-
-/**
  * Reads the revision the build is running against.
  *
+ * @param env - The variables in force, as `Context` carries them.
  * @returns The commit, or an empty string where there is no repository to ask.
  */
-function commitOf(): string {
-  return process.env["GITHUB_SHA"] ?? process.env["CI_COMMIT_SHA"] ?? "";
+function commitOf(env: Readonly<Record<string, string>>): string {
+  return env["GITHUB_SHA"] ?? env["CI_COMMIT_SHA"] ?? "";
 }
 
 /**
@@ -69,19 +48,24 @@ function commitOf(): string {
  * that make them type-check ship beside this package as `globals.d.ts`, and a specification asserts
  * the two lists agree.
  *
- * @param at - The directory the package lives in, which is `import.meta.dirname`. Only the config
- *   being loaded knows where it sits.
  * @param injected - The constants beyond the two always given. `Injected` documents every member.
  * @returns The preset.
  */
-export function manifest(at: string, injected: Injected = {}): Preset {
-  const held: Record<string, string> = {
-    __NAME__: JSON.stringify(read(at, "name")),
-    __VERSION__: JSON.stringify(read(at, "version")),
-  };
+export function manifest(injected: Injected = {}): Preset {
+  return preset({
+    config: (context) => {
+      const held: Record<string, string> = {
+        __NAME__: JSON.stringify(context.manifest.name ?? ""),
+        __VERSION__: JSON.stringify(context.manifest.version ?? ""),
+      };
 
-  if (injected.commit === true) held["__COMMIT__"] = JSON.stringify(commitOf());
-  if (injected.builtAt === true) held["__BUILT_AT__"] = JSON.stringify(new Date().toISOString());
+      if (injected.commit === true) held["__COMMIT__"] = JSON.stringify(commitOf(context.env));
+      if (injected.builtAt === true) {
+        held["__BUILT_AT__"] = JSON.stringify(new Date().toISOString());
+      }
 
-  return preset({ config: { define: held }, name: "define.manifest" });
+      return { define: held };
+    },
+    name: "define.manifest",
+  });
 }

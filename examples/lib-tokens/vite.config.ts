@@ -13,7 +13,7 @@ const OUT = join(import.meta.dirname, "dist");
 
 export default defineConfig(import.meta.dirname, {
   extends: [
-    pack.published(import.meta.dirname),
+    pack.published(),
 
     // `build:before` rather than `build:prepare`: the packer empties `dist` between the two, so a
     // file written at the earlier moment is deleted before anything looks for it.

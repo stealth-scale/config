@@ -1,7 +1,7 @@
 import { expect, test } from "vite-plus/test";
 
 import { bound } from "#preview/bound.ts";
-import { answered } from "#serving/serving.fixtures.ts";
+import { answered } from "#vite.fixtures.ts";
 
 test("listens on the address it was given", async () => {
   expect((await answered(bound("127.0.0.1"))).preview?.host).toBe("127.0.0.1");
@@ -20,7 +20,7 @@ test("states nothing where no name is in play, the default bind being right on i
 });
 
 test("takes the address the machine arranged when it arranged one", async () => {
-  const held = await answered(bound(), { STEALTH_HOSTS: "a.example.test" });
+  const held = await answered(bound(), { env: { STEALTH_HOSTS: "a.example.test" } });
 
   expect(held.preview?.host).toBe("127.0.0.1");
 });

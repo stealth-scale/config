@@ -2,34 +2,30 @@
  * Running every package in a workspace from its root, each under its own configuration.
  */
 
-import { globSync, readFileSync } from "node:fs";
-import { dirname, join, sep } from "node:path";
+import { globSync } from "node:fs";
+import { dirname, sep } from "node:path";
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Manifest, type Preset, preset } from "@stealthscale/config-core";
 
 /**
  * Reads the workspace globs a manifest declares.
  *
- * @param at - The directory holding it.
- * @returns Each glob, however the manifest spells the field.
+ * @param manifest - The manifest of the package being configured.
+ * @param at - Where that package is, named only so a failure says which one.
+ * @returns Each glob the workspace is spread over.
  * @throws Error Where the manifest declares no workspace, which means this is not a root.
  */
-function membership(at: string): readonly string[] {
-  const held: unknown = JSON.parse(readFileSync(join(at, "package.json"), "utf8"));
-  const stated: unknown =
-    typeof held === "object" && held !== null ? Reflect.get(held, "workspaces") : undefined;
-  const nested: unknown =
-    typeof stated === "object" && stated !== null ? Reflect.get(stated, "packages") : undefined;
-  const globs: unknown = Array.isArray(stated) ? stated : nested;
+function membership(manifest: Manifest, at: string): readonly string[] {
+  const globs = manifest.workspaces ?? [];
 
-  if (!Array.isArray(globs) || globs.length === 0) {
+  if (globs.length === 0) {
     throw new Error(
-      `test.projects(${at}) found no workspaces in its manifest. It belongs in the config at the ` +
-        "root of a workspace, which is the only one that knows what the workspace holds.",
+      `test.projects() found no workspaces in the manifest at ${at}. It belongs in the config at ` +
+        "the root of a workspace, which is the only one that knows what the workspace holds.",
     );
   }
 
-  return globs.filter((glob): glob is string => typeof glob === "string");
+  return globs;
 }
 
 /**
@@ -39,20 +35,21 @@ function membership(at: string): readonly string[] {
  * package when it holds a manifest, which is also what tells a real package apart from a skeleton
  * directory left for one nobody has written yet.
  *
- * @param at - The directory holding the workspace manifest.
+ * @param manifest - The manifest of the package being configured.
+ * @param at - The directory holding it.
  * @returns Each package's directory, relative to the root.
  * @throws Error Where the globs match no package at all.
  */
-function packages(at: string): readonly string[] {
+function packages(manifest: Manifest, at: string): readonly string[] {
   const found = globSync(
-    membership(at).map((glob) => `${glob}/package.json`),
+    membership(manifest, at).map((glob) => `${glob}/package.json`),
     { cwd: at },
   ).map((held) => dirname(held).replaceAll(sep, "/"));
 
   if (found.length === 0) {
     throw new Error(
-      `test.projects(${at}) found no packages under what its manifest calls a workspace. Either ` +
-        "the globs name somewhere nothing lives, or nothing has been written there yet.",
+      `test.projects() found no packages under what the manifest at ${at} calls a workspace. ` +
+        "Either the globs name somewhere nothing lives, or nothing has been written there yet.",
     );
   }
 
@@ -81,13 +78,20 @@ function packages(at: string): readonly string[] {
  * The root stops looking for its own tests, because every one of them belongs to a package and
  * would otherwise run twice: once under the package's settings and once under the root's.
  *
- * @param at - The directory holding the workspace manifest, which is `import.meta.dirname`.
+ * It states nothing unless the workspace root is what is being configured. A package shipping no
+ * config of its own takes the root's, and every layer in it then runs for that package — so this
+ * one would otherwise read the package's manifest, find no workspace in it, and refuse to build a
+ * package that had done nothing wrong.
+ *
  * @returns The preset.
- * @throws Error Where the manifest declares no workspace, or the workspace holds no package.
+ * @throws Error Where the root declares no workspace, or the workspace holds no package.
  */
-export function projects(at: string): Preset {
+export function projects(): Preset {
   return preset({
-    config: { test: { include: [], projects: [...packages(at)] } },
+    config: (context) =>
+      context.at === context.root
+        ? { test: { include: [], projects: [...packages(context.manifest, context.at)] } }
+        : {},
     name: "test.projects",
   });
 }

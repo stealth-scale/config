@@ -1,7 +1,7 @@
 import { expect, test } from "vite-plus/test";
 
 import { reachable } from "#preview/reachable.ts";
-import { answered } from "#serving/serving.fixtures.ts";
+import { answered } from "#vite.fixtures.ts";
 
 test("answers to the names it was given", async () => {
   const held = await answered(reachable(["app1.example.test"]));
@@ -27,7 +27,7 @@ test("copies the list, so a caller's array is not the server's", async () => {
 
 test("takes the environment's answer instead, where a machine has arranged its own", async () => {
   const held = await answered(reachable(["stated.example.test"]), {
-    STEALTH_HOSTS: "override.example.test",
+    env: { STEALTH_HOSTS: "override.example.test" },
   });
 
   expect(held.preview?.allowedHosts).toEqual(["override.example.test"]);

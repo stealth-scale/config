@@ -1,7 +1,7 @@
 import { expect, test } from "vite-plus/test";
 
 import { shared } from "#preview/shared.ts";
-import { answered } from "#serving/serving.fixtures.ts";
+import { answered } from "#vite.fixtures.ts";
 
 /**
  * Reads back the origins a layer allows.
@@ -14,7 +14,7 @@ async function allowed(
   origins: readonly string[],
   env: Record<string, string> = {},
 ): Promise<string[]> {
-  const held = (await answered(shared(origins), env)).preview?.cors as { origin: string[] };
+  const held = (await answered(shared(origins), { env })).preview?.cors as { origin: string[] };
 
   return held.origin;
 }

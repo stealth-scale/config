@@ -5,5 +5,5 @@ import { pack } from "./src/index.ts";
 import { defineConfig } from "./src/preset/node.ts";
 
 export default defineConfig(import.meta.dirname, {
-  extends: [pack.published(import.meta.dirname)],
+  extends: [pack.published()],
 });
