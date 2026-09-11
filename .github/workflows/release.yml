@@ -22,8 +22,6 @@ on:
     branches: [main]
   workflow_call:
 
-# Never cancelled. A publish stopped half way leaves some packages on the registry and some
-# not, which is the one state `changeset publish` cannot reason its way out of.
 concurrency: release
 
 jobs:
@@ -35,18 +33,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
-      # The version pull request, its commits and the tags.
       contents: write
       pull-requests: write
-      # npm's trusted publishing reads the job's OIDC token.
       id-token: write
     env:
-      # Attach the provenance statement to every package this job publishes.
       NPM_CONFIG_PROVENANCE: "true"
     steps:
       - uses: actions/checkout@v7
         with:
-          # `changeset version` reads the history to write the changelogs.
           fetch-depth: 0
       - uses: oven-sh/setup-bun@v2
         with:
@@ -54,21 +48,14 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 24
-      # Trusted publishing needs npm 11.5.1 or later; the runner's is older.
       - run: npm install --global npm@^11.5
       - run: bun install --frozen-lockfile
-      # Packs every publishable package, in dependency order. `changeset publish` publishes
-      # `dist` rather than building it, and two of these packages have no `prepublishOnly` to
-      # build their own.
       - run: bun run bootstrap
       - uses: changesets/action@v2
         env:
-          # `changeset version` runs as a child process, and the changelog generator reads
-          # the token from its own environment. The action's `github-token` input
-          # authenticates the action itself and reaches nothing it spawns.
           GITHUB_TOKEN: ${{ github.token }}
         with:
           version-script: bunx changeset version
           publish-script: bunx changeset publish
-          commit-message: "chore: version packages"
-          pr-title: "chore: version packages"
+          commit-message: "chore: bump every package and write the changelogs"
+          pr-title: "chore: release"

@@ -30,7 +30,6 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          # `changeset status` and every "last updated" read the history.
           fetch-depth: 0
       - uses: oven-sh/setup-bun@v2
         with:
