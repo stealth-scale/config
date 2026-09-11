@@ -1,0 +1,50 @@
+# What `bun run ready` runs, on every pull request of this repository and in every stealth
+# repository that calls this file: the same command a developer runs, on a runner with the
+# browsers a caller's tests need when the caller asks for them.
+#
+# A push to main does not run this directly. `release` owns that branch, calls this file
+# first, and publishes only what it proved.
+name: ci
+
+on:
+  pull_request:
+  workflow_call:
+    inputs:
+      browsers:
+        description: Install Playwright's Chromium before the task, for stories and e2e suites.
+        type: boolean
+        default: false
+
+# One run per branch. A superseded run is cancelled, which on main means its release is
+# skipped too; the next one publishes both, because `changeset publish` goes by what is
+# missing from the registry rather than by what changed in a commit.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CI: "true"
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # `changeset status` and every "last updated" read the history.
+          fetch-depth: 0
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
+      - run: bun install --frozen-lockfile
+      # No test here opens a browser, so nothing is installed for this repository's own runs.
+      # A caller with stories or an e2e suite asks for one.
+      - if: inputs.browsers
+        run: bunx playwright install --with-deps chromium
+      # `ready` packs the config packages before it proves them. It has to: every config in
+      # the workspace imports them by name, and a checkout that has packed nothing resolves
+      # nothing.
+      - run: bun run ready
