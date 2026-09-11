@@ -4,6 +4,7 @@ import { expect, test } from "vite-plus/test";
 import { type Contribution, type Preset } from "@stealthscale/vite-config";
 
 import { host, type Hosted } from "#federation/host.ts";
+import { told } from "#vite.fixtures.ts";
 
 /**
  * Reads back the layer that carries the plugins.
@@ -19,8 +20,8 @@ test("appends to the plugin list rather than replacing whatever else is there", 
   expect(plugged({ name: "one", remotes: [] }).at).toBe("plugins");
 });
 
-test("carries the plugins the bundler resolves the remotes through", () => {
-  expect(plugged({ name: "one", remotes: ["two"] }).item).toBeDefined();
+test("carries the plugins the bundler resolves the remotes through", async () => {
+  await expect(plugged({ name: "one", remotes: ["two"] }).itemOf?.(told())).resolves.toBeDefined();
 });
 
 test("says why, which is that these modules come from another deployment", () => {
@@ -31,14 +32,16 @@ test("names the host, so a repository loading nothing can take the layer back", 
   expect(plugged({ name: "shell", remotes: [] }).name).toBe("federation.host(shell)");
 });
 
-test("takes a shared list, the host being the side that decides what a singleton is", () => {
-  expect(
-    plugged({ name: "one", remotes: ["two"], shared: { react: { singleton: true } } }).item,
-  ).toBeDefined();
+test("takes a shared list, the host being the side that decides what a singleton is", async () => {
+  await expect(
+    plugged({ name: "one", remotes: ["two"], shared: { react: { singleton: true } } }).itemOf?.(
+      told(),
+    ),
+  ).resolves.toBeDefined();
 });
 
-test("takes no remotes at all, which is how one build reaches more than one environment", () => {
-  expect(plugged({ name: "one" }).item).toBeDefined();
+test("takes no remotes at all, which is how one build reaches more than one environment", async () => {
+  await expect(plugged({ name: "one" }).itemOf?.(told())).resolves.toBeDefined();
 });
 
 test("states nothing for the runner where a repository named no stand-ins", () => {

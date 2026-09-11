@@ -2,10 +2,9 @@
  * An application that hands modules to another one at run time.
  */
 
-import { federation } from "@module-federation/vite";
-
 import { contribute, type Contribution } from "@stealthscale/vite-config-core";
 
+import { plugged } from "#federation/plugged.ts";
 import { ENTRY, type Exposed, type Shared } from "#federation/settings.ts";
 
 /**
@@ -54,13 +53,14 @@ export function remote(stated: Remoted): Contribution {
   return contribute({
     at: "plugins",
     because: "another application loads these modules at run time rather than installing them",
-    item: federation({
-      dts: false,
-      exposes: { ...stated.exposes },
-      filename: ENTRY,
-      name: stated.name,
-      shared: { ...stated.shared },
-    }),
+    itemOf: () =>
+      plugged({
+        dts: false,
+        exposes: { ...stated.exposes },
+        filename: ENTRY,
+        name: stated.name,
+        shared: { ...stated.shared },
+      }),
     name: `federation.remote(${stated.name})`,
   });
 }

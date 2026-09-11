@@ -2,10 +2,9 @@
  * An application that loads modules from another one at run time.
  */
 
-import { federation } from "@module-federation/vite";
-
 import { contribute, type Layer, preset } from "@stealthscale/vite-config-core";
 
+import { plugged } from "#federation/plugged.ts";
 import { type Remotes, type Shared, UNSET } from "#federation/settings.ts";
 
 /**
@@ -73,18 +72,19 @@ export function host(stated: Hosted): readonly Layer[] {
   const held = contribute({
     at: "plugins",
     because: "these modules are fetched from another deployment rather than built into this one",
-    item: federation({
-      dts: false,
-      hostInitInjectLocation: "entry",
-      name: stated.name,
-      remotes: Object.fromEntries(
-        (stated.remotes ?? []).map((named) => [
-          named,
-          { entry: `${UNSET}/${named}/remoteEntry.js`, name: named, type: "module" },
-        ]),
-      ),
-      shared: { ...stated.shared },
-    }),
+    itemOf: () =>
+      plugged({
+        dts: false,
+        hostInitInjectLocation: "entry",
+        name: stated.name,
+        remotes: Object.fromEntries(
+          (stated.remotes ?? []).map((named) => [
+            named,
+            { entry: `${UNSET}/${named}/remoteEntry.js`, name: named, type: "module" },
+          ]),
+        ),
+        shared: { ...stated.shared },
+      }),
     name: `federation.host(${stated.name})`,
   });
 
