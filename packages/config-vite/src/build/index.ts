@@ -9,6 +9,7 @@
  * package's maps are the packer's to decide.
  */
 
+export { inventory } from "#build/inventory.ts";
 export { licences } from "#build/licences.ts";
 export { manifest } from "#build/manifest.ts";
 export { preload } from "#build/preload.ts";

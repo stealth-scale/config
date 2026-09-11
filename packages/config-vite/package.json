@@ -69,6 +69,7 @@
     "@module-federation/vite": "catalog:",
     "@stealthscale/config-core": "workspace:^",
     "@stealthscale/config-typescript": "workspace:^",
+    "@stealthscale/plugin-sbom": "workspace:^",
     "@types/node": "catalog:",
     "@vitest/browser-playwright": "catalog:",
     "@vitest/coverage-v8": "catalog:",
@@ -83,6 +84,7 @@
   "peerDependencies": {
     "@module-federation/vite": "catalog:",
     "@stealthscale/config-core": "workspace:^",
+    "@stealthscale/plugin-sbom": "workspace:^",
     "eslint-plugin-jsdoc": "catalog:",
     "eslint-plugin-perfectionist": "catalog:",
     "eslint-plugin-tsdoc": "catalog:",

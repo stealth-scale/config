@@ -7,6 +7,7 @@ export { command } from "#pack/command.ts";
 export { declarations } from "#pack/declarations.ts";
 export { entry } from "#pack/entry.ts";
 export { buildBefore, buildDone, buildPrepare, hook, type Hooked } from "#pack/hook.ts";
+export { inventory } from "#pack/inventory.ts";
 export { platform, type Platform } from "#pack/platform.ts";
 export * as preset from "#pack/preset.ts";
 export { published } from "#pack/published.ts";
