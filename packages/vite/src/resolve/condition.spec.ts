@@ -1,0 +1,40 @@
+import { readFileSync } from "node:fs";
+import { expect, test } from "vite-plus/test";
+
+import { SOURCE } from "#resolve/condition.ts";
+
+/**
+ * Reads a JSON file beside this package.
+ *
+ * @param at - Where it sits, relative to this file.
+ * @returns Its parsed contents.
+ */
+function read(at: string): Record<string, unknown> {
+  return JSON.parse(readFileSync(new URL(at, import.meta.url).pathname, "utf8")) as Record<
+    string,
+    unknown
+  >;
+}
+
+test("is the condition the shared tsconfig switches on", () => {
+  const options = read("../../../typescript/base.json")["compilerOptions"] as {
+    customConditions: string[];
+  };
+
+  expect(options.customConditions).toEqual([SOURCE]);
+});
+
+test("is the condition this package publishes its source under", () => {
+  const exported = read("../../package.json")["exports"] as Record<string, unknown>;
+
+  for (const [path, held] of Object.entries(exported)) {
+    if (typeof held !== "object" || held === null) continue;
+    expect(Object.keys(held), `${path} does not publish source under ${SOURCE}`).toContain(SOURCE);
+  }
+});
+
+test("is the condition the packer is told to write", () => {
+  const config = readFileSync(new URL("../../vite.config.ts", import.meta.url).pathname, "utf8");
+
+  expect(config).toContain(`devExports: "${SOURCE}"`);
+});

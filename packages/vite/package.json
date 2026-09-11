@@ -1,0 +1,72 @@
+{
+  "name": "@stealthscale/config-vite",
+  "version": "0.0.0",
+  "description": "Composes a Vite+ config out of layers: presets set, contributions append, removals take back, overrides rewrite.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stealth-scale/config.git",
+    "directory": "packages/vite"
+  },
+  "files": [
+    "dist",
+    "globals.d.ts"
+  ],
+  "type": "module",
+  "imports": {
+    "#*": "./src/*"
+  },
+  "exports": {
+    ".": {
+      "stealth-source": "./src/index.ts",
+      "default": "./dist/index.mjs"
+    },
+    "./preset/base": {
+      "stealth-source": "./src/preset/base.ts",
+      "default": "./dist/preset/base.mjs"
+    },
+    "./preset/node": {
+      "stealth-source": "./src/preset/node.ts",
+      "default": "./dist/preset/node.mjs"
+    },
+    "./preset/web": {
+      "stealth-source": "./src/preset/web.ts",
+      "default": "./dist/preset/web.mjs"
+    },
+    "./package.json": "./package.json",
+    "./globals": "./globals.d.ts"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": "./dist/index.mjs",
+      "./preset/base": "./dist/preset/base.mjs",
+      "./preset/node": "./dist/preset/node.mjs",
+      "./preset/web": "./dist/preset/web.mjs",
+      "./package.json": "./package.json",
+      "./globals": "./globals.d.ts"
+    },
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vp pack",
+    "check": "vp check",
+    "dev": "vp pack --watch",
+    "prepublishOnly": "vp pack",
+    "test": "vp test"
+  },
+  "devDependencies": {
+    "@stealthscale/config-typescript": "workspace:^",
+    "@types/node": "catalog:",
+    "eslint-plugin-jsdoc": "catalog:",
+    "eslint-plugin-perfectionist": "catalog:",
+    "eslint-plugin-tsdoc": "catalog:",
+    "typescript": "catalog:",
+    "vite-plus": "catalog:"
+  },
+  "peerDependencies": {
+    "eslint-plugin-jsdoc": "catalog:",
+    "eslint-plugin-perfectionist": "catalog:",
+    "eslint-plugin-tsdoc": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}
