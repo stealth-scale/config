@@ -22,6 +22,10 @@
       "stealth-source": "./src/index.ts",
       "default": "./dist/index.mjs"
     },
+    "./preset/app": {
+      "stealth-source": "./src/preset/app.ts",
+      "default": "./dist/preset/app.mjs"
+    },
     "./preset/web": {
       "stealth-source": "./src/preset/web.ts",
       "default": "./dist/preset/web.mjs"
@@ -33,11 +37,13 @@
   "publishConfig": {
     "exports": {
       ".": "./dist/index.mjs",
+      "./preset/app": "./dist/preset/app.mjs",
       "./preset/web": "./dist/preset/web.mjs",
       "./package.json": "./package.json",
       "./vitest.setup.ts": "./vitest.setup.ts",
       "./web.json": "./web.json"
-    }
+    },
+    "access": "public"
   },
   "scripts": {
     "build": "vp pack",
@@ -45,12 +51,14 @@
     "test": "vp test"
   },
   "devDependencies": {
+    "@arethetypeswrong/core": "catalog:",
     "@stealthscale/config-typescript": "workspace:^",
     "@stealthscale/config-vite": "workspace:^",
     "@types/node": "catalog:",
     "@vitejs/plugin-react": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "oxc-transform-react": "catalog:",
+    "publint": "catalog:",
     "typescript": "catalog:",
     "vite-plus": "catalog:"
   },

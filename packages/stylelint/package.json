@@ -26,7 +26,8 @@
     "exports": {
       ".": "./dist/index.mjs",
       "./package.json": "./package.json"
-    }
+    },
+    "access": "public"
   },
   "scripts": {
     "build": "vp pack",
@@ -34,10 +35,12 @@
     "test": "vp test"
   },
   "devDependencies": {
+    "@arethetypeswrong/core": "catalog:",
     "@stealthscale/config-typescript": "workspace:^",
     "@stealthscale/config-vite": "workspace:^",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
+    "publint": "catalog:",
     "stylelint": "catalog:",
     "stylelint-config-standard": "catalog:",
     "stylelint-high-performance-animation": "catalog:",

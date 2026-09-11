@@ -1,6 +1,8 @@
 import { readFileSync } from "node:fs";
+import { type UserConfig } from "vite-plus";
 import { expect, test } from "vite-plus/test";
 
+import { source } from "#pack/source.ts";
 import { SOURCE } from "#resolve/condition.ts";
 
 /**
@@ -34,7 +36,7 @@ test("is the condition this package publishes its source under", () => {
 });
 
 test("is the condition the packer is told to write", () => {
-  const config = readFileSync(new URL("../../vite.config.ts", import.meta.url).pathname, "utf8");
+  const held = (source().config as UserConfig).pack as { exports: { devExports: string } };
 
-  expect(config).toContain(`devExports: "${SOURCE}"`);
+  expect(held.exports.devExports).toBe(SOURCE);
 });
