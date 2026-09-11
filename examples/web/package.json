@@ -1,0 +1,23 @@
+{
+  "name": "@stealthscale/example-web",
+  "version": "1.4.0",
+  "private": true,
+  "description": "An app the browser runs, on a pinned port, reading what it knows about itself.",
+  "type": "module",
+  "imports": {
+    "#*": "./src/*"
+  },
+  "scripts": {
+    "build": "vp build",
+    "check": "vp check",
+    "dev": "vp dev",
+    "preview": "vp preview"
+  },
+  "devDependencies": {
+    "@stealthscale/config-typescript": "workspace:^",
+    "@stealthscale/config-vite": "workspace:^",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}

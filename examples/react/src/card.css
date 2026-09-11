@@ -1,0 +1,13 @@
+.card {
+  display: flex;
+  gap: 8px;
+}
+.card:hover {
+  background: #eee;
+}
+
+@media (width >= 40rem) {
+  .card {
+    gap: 16px;
+  }
+}
