@@ -273,6 +273,36 @@
         "vite-plus": "catalog:",
       },
     },
+    "packages/config-react": {
+      "name": "@stealthscale/config-react",
+      "version": "0.0.0",
+      "devDependencies": {
+        "@arethetypeswrong/core": "catalog:",
+        "@stealthscale/config-typescript": "workspace:^",
+        "@stealthscale/config-vite": "workspace:^",
+        "@types/node": "catalog:",
+        "@vitejs/plugin-react": "catalog:",
+        "@vitest/coverage-v8": "catalog:",
+        "oxc-transform-react": "catalog:",
+        "publint": "catalog:",
+        "react": "catalog:",
+        "react-dom": "catalog:",
+        "typescript": "catalog:",
+        "vite-plus": "catalog:",
+      },
+      "peerDependencies": {
+        "@stealthscale/config-vite": "workspace:^",
+        "@vitejs/plugin-react": "catalog:",
+        "oxc-transform-react": "catalog:",
+        "react": "catalog:",
+        "react-dom": "catalog:",
+        "vite-plus": "catalog:",
+      },
+    },
+    "packages/config-typescript": {
+      "name": "@stealthscale/config-typescript",
+      "version": "0.0.0",
+    },
     "packages/config-vite": {
       "name": "@stealthscale/config-vite",
       "version": "0.0.0",
@@ -305,36 +335,6 @@
         "@module-federation/vite",
         "happy-dom",
       ],
-    },
-    "packages/react": {
-      "name": "@stealthscale/config-react",
-      "version": "0.0.0",
-      "devDependencies": {
-        "@arethetypeswrong/core": "catalog:",
-        "@stealthscale/config-typescript": "workspace:^",
-        "@stealthscale/config-vite": "workspace:^",
-        "@types/node": "catalog:",
-        "@vitejs/plugin-react": "catalog:",
-        "@vitest/coverage-v8": "catalog:",
-        "oxc-transform-react": "catalog:",
-        "publint": "catalog:",
-        "react": "catalog:",
-        "react-dom": "catalog:",
-        "typescript": "catalog:",
-        "vite-plus": "catalog:",
-      },
-      "peerDependencies": {
-        "@stealthscale/config-vite": "workspace:^",
-        "@vitejs/plugin-react": "catalog:",
-        "oxc-transform-react": "catalog:",
-        "react": "catalog:",
-        "react-dom": "catalog:",
-        "vite-plus": "catalog:",
-      },
-    },
-    "packages/typescript": {
-      "name": "@stealthscale/config-typescript",
-      "version": "0.0.0",
     },
   },
   "overrides": {
@@ -627,9 +627,9 @@
 
     "@stealthscale/config-css": ["@stealthscale/config-css@workspace:packages/config-css"],
 
-    "@stealthscale/config-react": ["@stealthscale/config-react@workspace:packages/react"],
+    "@stealthscale/config-react": ["@stealthscale/config-react@workspace:packages/config-react"],
 
-    "@stealthscale/config-typescript": ["@stealthscale/config-typescript@workspace:packages/typescript"],
+    "@stealthscale/config-typescript": ["@stealthscale/config-typescript@workspace:packages/config-typescript"],
 
     "@stealthscale/config-vite": ["@stealthscale/config-vite@workspace:packages/config-vite"],
 

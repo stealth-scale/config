@@ -2,7 +2,7 @@ import { expect, test } from "vite-plus/test";
 
 import { workspace } from "#preset/workspace.ts";
 
-test("names every layer under this package, so provenance says where it came from", () => {
+test("names every layer under this package, so a repository can take one back", () => {
   for (const held of workspace()) {
     expect(held.name.startsWith("react/")).toBe(true);
   }

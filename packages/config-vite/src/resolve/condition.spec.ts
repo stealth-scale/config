@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
 import { type UserConfig } from "vite-plus";
 import { expect, test } from "vite-plus/test";
 
@@ -18,8 +19,23 @@ function read(at: string): Record<string, unknown> {
   >;
 }
 
+/**
+ * Reads a JSON file another package publishes.
+ *
+ * Resolved by the subpath a consumer imports rather than by a path across the workspace, so moving
+ * the package it lives in cannot silently point this somewhere else.
+ *
+ * @param specifier - The subpath, as a consumer writes it.
+ * @returns Its parsed contents.
+ */
+function published(specifier: string): Record<string, unknown> {
+  const at = createRequire(import.meta.url).resolve(specifier);
+
+  return JSON.parse(readFileSync(at, "utf8")) as Record<string, unknown>;
+}
+
 test("is the condition the shared tsconfig switches on", () => {
-  const options = read("../../../typescript/base.json")["compilerOptions"] as {
+  const options = published("@stealthscale/config-typescript/base.json")["compilerOptions"] as {
     customConditions: string[];
   };
 

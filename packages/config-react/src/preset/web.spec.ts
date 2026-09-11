@@ -4,11 +4,14 @@ import { expect, test } from "vite-plus/test";
 import { defineConfig, layers } from "#preset/web.ts";
 
 /**
- * Where the config under specification is, which every `defineConfig` states for itself.
+ * Where the config under specification is: this package's own root.
+ *
+ * A config file sits at a package root, and the tier reads the manifest beside it. Naming this
+ * directory instead would hand the layers a directory holding no manifest at all.
  */
-const AT = import.meta.dirname;
+const AT = new URL("../..", import.meta.url).pathname;
 
-test("names every layer under this package, so provenance says where it came from", () => {
+test("names every layer under this package, so a repository can take one back", () => {
   for (const held of layers()) {
     expect(held.name.startsWith("react/")).toBe(true);
   }
