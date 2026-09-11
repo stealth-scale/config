@@ -1,26 +1,25 @@
+import { federation as react } from "@stealthscale/config-react";
 import { defineConfig } from "@stealthscale/config-react/preset/app";
-import { build, preview, server } from "@stealthscale/config-vite";
-
-/**
- * Where the host's own build is served from, and so the one origin allowed to fetch this one's.
- */
-const HOST = "http://localhost:4401";
-
-/**
- * Where this application's built files are served from.
- *
- * The preview port rather than the dev server's, because `base` is written into the build and the
- * build is what a preview serves.
- */
-const SERVED = "http://localhost:4403";
+import { federation, preview, server } from "@stealthscale/config-vite";
 
 export default defineConfig({
   extends: [
-    // Absolute, because the chunks are fetched by a page this application did not serve. A relative
-    // URL would resolve against the host's origin, where none of them are.
-    build.served(`${SERVED}/`),
+    // No `build.served` here, and that absence is the point. With no base the federation plugin
+    // resolves this application's chunks against wherever `remoteEntry.js` was fetched from, so one
+    // build runs under any origin. Setting a base pins the build to the origin it was built for,
+    // which is one build per environment and a rebuild to move it.
+    federation.remote({
+      exposes: { "./Dashboard": "./src/dashboard.tsx" },
+      name: "remote",
+      shared: react.shared(),
+    }),
+
     server.port(4402),
+    server.reachable(),
+    server.bound(),
     preview.port(4403),
-    preview.shared([HOST]),
+    preview.reachable(),
+    preview.bound(),
+    preview.shared(),
   ],
 });

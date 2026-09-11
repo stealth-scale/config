@@ -1,8 +1,8 @@
 {
-  "name": "@stealthscale/example-app-host",
+  "name": "@stealthscale/example-app-tanstack",
   "version": "0.0.0",
   "private": true,
-  "description": "An app that loads another one at run time, working out where its files are from a build manifest.",
+  "description": "A routed application that loads a federated remote on one of its routes.",
   "type": "module",
   "imports": {
     "#*": "./src/*"
@@ -17,6 +17,7 @@
   "dependencies": {
     "@module-federation/runtime": "catalog:",
     "@stealthscale/example-lib-ui": "workspace:^",
+    "@tanstack/react-router": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"
   },

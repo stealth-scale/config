@@ -2,26 +2,34 @@
  * The page the host owns, and the hole it leaves for what it loads.
  */
 
-import { type ReactElement, useRef } from "react";
+import { type ReactElement, type ReactNode } from "react";
 
 import { Panel } from "@stealthscale/example-lib-ui";
 
 /**
- * Draws the host's own page around an element the loaded application draws into.
+ * Describes what the host draws around.
+ */
+export interface ShellProps {
+  /**
+   * What the loaded application drew, or what to show while it has not.
+   */
+  children: ReactNode;
+}
+
+/**
+ * Draws the host's own page around whatever it was handed.
  *
- * The hole is a plain element rather than anything React owns, because what fills it is another
- * application with its own React root. Two roots on one element is the one arrangement that breaks,
- * so the host draws the box and hands over what is inside it.
+ * The loaded application arrives as an element rather than being imported here, so what this draws
+ * can be specified without a remote running.
  *
+ * @param props - The element to draw inside. `ShellProps` documents every member.
  * @returns The element.
  */
-export function Shell(): ReactElement {
-  const hole = useRef<HTMLDivElement>(null);
-
+export function Shell({ children }: ShellProps): ReactElement {
   return (
     <main>
       <Panel title="Host">{"This page is the host."}</Panel>
-      <div id="remote" ref={hole} />
+      <div id="remote">{children}</div>
     </main>
   );
 }
