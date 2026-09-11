@@ -17,3 +17,12 @@ test("says why, which is the thing the type checker cannot do", () => {
 test("carries a plugin for the bundler to run", () => {
   expect(check().item).toBeDefined();
 });
+
+test("checks the extra globs a repository names, on top of the ones it reaches already", () => {
+  expect(() => check({ also: ["**/*.module.css"] })).not.toThrow();
+  expect(check({ also: ["**/*.module.css"] }).item).toBeDefined();
+});
+
+test("leaves alone the globs a repository names, whatever else it checks", () => {
+  expect(check({ except: ["vendor/**"] }).item).toBeDefined();
+});

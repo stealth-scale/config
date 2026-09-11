@@ -1,6 +1,6 @@
 import { expect, test } from "vite-plus/test";
 
-import { surviving } from "#core/compose.ts";
+import { resolved, surviving } from "#core/compose.ts";
 import { contribute, type Contribution, preset, type Removal, remove } from "#core/layer.ts";
 
 /**
@@ -59,4 +59,16 @@ test("refuses a removal naming nothing contributed above it", () => {
 
 test("refuses a removal naming nothing at all", () => {
   expect(() => surviving([added("a"), taken("z")])).toThrow(/nothing above it stated/u);
+});
+
+test("settles a preset asking to go last after one that said nothing", async () => {
+  const held = await resolved(
+    [
+      preset({ config: { mode: "last" }, enforce: "post", name: "after" }),
+      preset({ config: { mode: "first" }, name: "before" }),
+    ],
+    { command: "build", mode: "production" },
+  );
+
+  expect(held.config.mode).toBe("last");
 });

@@ -136,3 +136,11 @@ test("publishes them after packing too, where a consumer reads them from", () =>
 
   expect((published as Record<string, unknown>)[SUBPATH]).toBe("./globals.d.ts");
 });
+
+test("answers an empty string where the manifest is not an object at all", () => {
+  const at = packaged();
+
+  writeFileSync(join(at, "package.json"), JSON.stringify("not an object"));
+
+  expect(definedBy(at)["__NAME__"]).toBe('""');
+});

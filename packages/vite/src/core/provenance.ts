@@ -8,7 +8,7 @@
  */
 
 import { type Layer } from "#core/layer.ts";
-import { leaves } from "#core/path.ts";
+import { leaves, at as read } from "#core/path.ts";
 
 /**
  * Says that one layer decided one value.
@@ -73,12 +73,7 @@ function reasonOf(layer: Layer): string | undefined {
 function at(held: object): ReadonlyMap<string, unknown> {
   return new Map(
     leaves(held).map((path) => {
-      let found: unknown = held;
-      for (const step of path.split(".")) {
-        found = typeof found === "object" && found !== null ? Reflect.get(found, step) : undefined;
-      }
-
-      return [path, found];
+      return [path, read(held, path)];
     }),
   );
 }

@@ -1,6 +1,7 @@
 import { expect, test } from "vite-plus/test";
 
 import { defineConfig } from "#core/define.ts";
+import { preset } from "#core/layer.ts";
 import { imports } from "#fmt/imports.ts";
 import { generated, group, internal, skip } from "#fmt/override.ts";
 import { GENERATED } from "#ignore/generated.ts";
@@ -96,4 +97,20 @@ test("refuses a group where nothing above it sorts imports, rather than writing 
   await expect(
     sorted([group({ because: "renders", name: "react", patterns: ["^react$"] })]),
   ).rejects.toThrow("nothing above it sorts imports");
+});
+
+test("adds the first group where nothing has defined one yet", async () => {
+  const held = await readBack(
+    defineConfig({
+      extends: [
+        preset({ config: { fmt: { sortImports: {} } }, name: "bare" }),
+        group({ because: "renders", name: "react", patterns: ["react"] }),
+      ],
+    }),
+  );
+
+  expect(held.fmt?.sortImports).toMatchObject({
+    customGroups: [{ elementNamePattern: ["react"], groupName: "react" }],
+    groups: ["react"],
+  });
 });

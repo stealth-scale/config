@@ -32,3 +32,7 @@ test("counts an array as a leaf rather than walking into it", () => {
 
   expect([...held].toSorted()).toEqual(["mode", "resolve.conditions"]);
 });
+
+test("appends at the top where the path names one step and no deeper", () => {
+  expect(appended({}, "plugins", "one")).toEqual({ plugins: ["one"] });
+});

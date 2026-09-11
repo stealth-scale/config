@@ -54,15 +54,14 @@ export function at(held: object, path: string): unknown {
  * @returns A copy holding the longer list.
  */
 export function appended<Of extends object>(held: Of, path: string, item: unknown): Of {
-  const [step, ...rest] = path.split(".");
-  if (step === undefined) return held;
-
+  const dot = path.indexOf(".");
+  const step = dot < 0 ? path : path.slice(0, dot);
   const below: unknown = Reflect.get(held, step);
 
   const grown =
-    rest.length > 0
-      ? appended(walkable(below) ? below : {}, rest.join("."), item)
-      : [...(Array.isArray(below) ? (below as readonly unknown[]) : []), item];
+    dot < 0
+      ? [...(Array.isArray(below) ? (below as readonly unknown[]) : []), item]
+      : appended(walkable(below) ? below : {}, path.slice(dot + 1), item);
 
   return { ...held, [step]: grown };
 }

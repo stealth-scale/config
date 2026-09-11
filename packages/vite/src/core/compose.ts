@@ -25,7 +25,7 @@ import { appended } from "#core/path.ts";
 /**
  * Where a preset sits relative to the others.
  */
-const ORDER = { post: 1, pre: -1 } as const;
+const ORDER: Record<NonNullable<Preset["enforce"]>, number> = { post: 1, pre: -1 };
 
 /**
  * Flattens whatever nesting a caller wrote into one list of layers.
@@ -57,15 +57,14 @@ function setBy(preset: Preset, env: ConfigEnv): Promise<UserConfig> | UserConfig
  */
 async function settled(presets: readonly Preset[], env: ConfigEnv): Promise<Composed> {
   const ordered = presets.toSorted(
-    (one, other) => (ORDER[one.enforce ?? "pre"] ?? 0) - (ORDER[other.enforce ?? "pre"] ?? 0),
+    (one, other) => ORDER[one.enforce ?? "pre"] - ORDER[other.enforce ?? "pre"],
   );
 
-  const set = await Promise.all(ordered.map((preset) => Promise.resolve(setBy(preset, env))));
-
-  return ordered.reduce(
-    (composed, preset, index) => merged(composed, set[index] ?? {}, preset),
-    NOTHING,
+  const set = await Promise.all(
+    ordered.map(async (preset) => [preset, await setBy(preset, env)] as const),
   );
+
+  return set.reduce((composed, [preset, config]) => merged(composed, config, preset), NOTHING);
 }
 
 /**
