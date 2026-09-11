@@ -1,6 +1,6 @@
 import { preset as react } from "@stealthscale/vite-config-react";
 
-import { lint, test } from "./packages/vite-config/src/index.ts";
+import { fmt, lint, test } from "./packages/vite-config/src/index.ts";
 import { defineConfig } from "./packages/vite-config/src/preset/node.ts";
 import { workspace } from "./packages/vite-config/src/preset/workspace.ts";
 
@@ -16,6 +16,14 @@ export default defineConfig(import.meta.dirname, {
         "so there is no origin to pass and the rule asks for an argument that does not exist",
       files: ["**/*.worker.ts", "**/*.worker-client.ts"],
       rules: { "unicorn/require-post-message-target-origin": "off" },
+    }),
+
+    fmt.skip({
+      because:
+        "changesets writes it from the changeset files and rewrites it on every release, so a " +
+        "wrapped changelog is undone by the next `changeset version` and the diff it leaves is " +
+        "nobody's to read. The prose is already wrapped where it is written, in the changeset",
+      files: ["**/CHANGELOG.md"],
     }),
 
     lint.relax({
