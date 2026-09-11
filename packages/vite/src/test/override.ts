@@ -4,7 +4,7 @@
 
 import { type UserConfig } from "vite-plus";
 
-import { contribute, type Contribution, type Preset, preset } from "#core/layer.ts";
+import { contribute, type Contribution, type Preset, preset } from "@stealthscale/config-core";
 
 /**
  * Where a contribution to the list of what coverage leaves out lands.

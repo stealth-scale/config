@@ -4,7 +4,14 @@ import { federation as react } from "@stealthscale/config-react";
 import { defineConfig } from "@stealthscale/config-react/preset/app";
 import { federation, preview, server } from "@stealthscale/config-vite";
 
-export default defineConfig({
+/**
+ * The names this application is served under while it is being worked on, beyond loopback. Stated
+ * rather than derived, so the tree says which application answers to which name. `STEALTH_HOSTS`
+ * overrides it on a machine that has arranged something else.
+ */
+const NAMES = ["app2.stealthscale.dev"];
+
+export default defineConfig(import.meta.dirname, {
   extends: [
     // The same remote app-host loads, from a second application with a router in front of it. What
     // a remote is loaded into is the remote's business not at all: it exposes modules, and whether
@@ -20,10 +27,10 @@ export default defineConfig({
     }),
 
     server.port(4404),
-    server.reachable(),
-    server.bound(),
+    server.reachable(NAMES),
+    server.bound(NAMES),
     preview.port(4405),
-    preview.reachable(),
-    preview.bound(),
+    preview.reachable(NAMES),
+    preview.bound(NAMES),
   ],
 });

@@ -226,6 +226,20 @@
         "react": "catalog:",
       },
     },
+    "packages/config-core": {
+      "name": "@stealthscale/config-core",
+      "version": "0.0.0",
+      "devDependencies": {
+        "@stealthscale/config-typescript": "workspace:^",
+        "@types/node": "catalog:",
+        "rollup-plugin-sbom": "catalog:",
+        "typescript": "catalog:",
+        "vite-plus": "catalog:",
+      },
+      "peerDependencies": {
+        "vite-plus": "catalog:",
+      },
+    },
     "packages/react": {
       "name": "@stealthscale/config-react",
       "version": "0.0.0",
@@ -292,6 +306,7 @@
       "devDependencies": {
         "@arethetypeswrong/core": "catalog:",
         "@module-federation/vite": "catalog:",
+        "@stealthscale/config-core": "workspace:^",
         "@stealthscale/config-typescript": "workspace:^",
         "@types/node": "catalog:",
         "@vitest/browser-playwright": "catalog:",
@@ -307,6 +322,7 @@
       },
       "peerDependencies": {
         "@module-federation/vite": "catalog:",
+        "@stealthscale/config-core": "workspace:^",
         "eslint-plugin-jsdoc": "catalog:",
         "eslint-plugin-perfectionist": "catalog:",
         "eslint-plugin-tsdoc": "catalog:",
@@ -608,6 +624,8 @@
     "@sindresorhus/merge-streams": ["@sindresorhus/merge-streams@4.0.0", "", {}, "sha512-tlqY9xq5ukxTUZBmoOp+m61cqwQD5pHJtFY3Mn8CA8ps6yghLH/Hw8UPdqg4OLmFW3IFlcXnQNmo/dh8HzXYIQ=="],
 
     "@standard-schema/spec": ["@standard-schema/spec@1.1.0", "", {}, "sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w=="],
+
+    "@stealthscale/config-core": ["@stealthscale/config-core@workspace:packages/config-core"],
 
     "@stealthscale/config-react": ["@stealthscale/config-react@workspace:packages/react"],
 

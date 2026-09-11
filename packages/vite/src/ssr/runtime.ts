@@ -2,7 +2,7 @@
  * What the server build is built to run on.
  */
 
-import { type Preset, preset } from "#core/layer.ts";
+import { type Preset, preset } from "@stealthscale/config-core";
 
 /**
  * Builds the server bundle for a worker runtime rather than for node.

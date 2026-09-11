@@ -1,9 +1,15 @@
 import { resolveConfig, type ResolvedConfig, type UserConfig } from "vite-plus";
 import { expect, test } from "vite-plus/test";
 
-import { defineConfig } from "#core/define.ts";
+import { defineConfig } from "@stealthscale/config-core";
+
 import { readBack } from "#preset/preset.fixtures.ts";
 import { proxy } from "#server/proxy.ts";
+
+/**
+ * Where the config under specification is, which every `defineConfig` states for itself.
+ */
+const AT = import.meta.dirname;
 
 /**
  * Resolves a config the way a running server does, which is where a default settles.
@@ -23,7 +29,7 @@ test("forwards the path it was given to the origin it was given", () => {
 
 test("lets two modules each state a route, and keeps both", async () => {
   const held = await readBack(
-    defineConfig({ extends: [proxy("/api", "http://one"), proxy("/ws", "http://two")] }),
+    defineConfig(AT, { extends: [proxy("/api", "http://one"), proxy("/ws", "http://two")] }),
   );
 
   expect(held.server?.proxy).toEqual({ "/api": "http://one", "/ws": "http://two" });
@@ -31,7 +37,7 @@ test("lets two modules each state a route, and keeps both", async () => {
 
 test("lets a later route replace an earlier one naming the same path", async () => {
   const held = await readBack(
-    defineConfig({ extends: [proxy("/api", "http://one"), proxy("/api", "http://two")] }),
+    defineConfig(AT, { extends: [proxy("/api", "http://one"), proxy("/api", "http://two")] }),
   );
 
   expect(held.server?.proxy).toEqual({ "/api": "http://two" });
@@ -42,7 +48,7 @@ test("names the path it forwards, so a removal can take that route back", () => 
 });
 
 test("forwards in a preview server too, which reads its routes from these", async () => {
-  const stated = await readBack(defineConfig({ extends: [proxy("/api", "http://one")] }));
+  const stated = await readBack(defineConfig(AT, { extends: [proxy("/api", "http://one")] }));
   const held = await running(stated);
 
   expect(held.preview.proxy).toEqual({ "/api": "http://one" });

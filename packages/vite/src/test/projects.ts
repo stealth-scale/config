@@ -5,7 +5,7 @@
 import { globSync, readFileSync } from "node:fs";
 import { dirname, join, sep } from "node:path";
 
-import { type Preset, preset } from "#core/layer.ts";
+import { type Preset, preset } from "@stealthscale/config-core";
 
 /**
  * Reads the workspace globs a manifest declares.

@@ -8,8 +8,9 @@
  * Overrides run last, on a config nothing else will touch.
  */
 
-import { type ConfigEnv, type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite-plus";
 
+import { type Context } from "#context.ts";
 import {
   applies,
   type Contribution,
@@ -18,9 +19,9 @@ import {
   type Layer,
   type Override,
   type Preset,
-} from "#core/layer.ts";
-import { type Composed, merged, NOTHING, replaced } from "#core/merge.ts";
-import { appended } from "#core/path.ts";
+} from "#layer.ts";
+import { type Composed, merged, NOTHING, replaced } from "#merge.ts";
+import { appended } from "#path.ts";
 
 /**
  * Where a preset sits relative to the others.
@@ -40,28 +41,28 @@ export function flattened(extended: readonly Extendable[]): readonly Layer[] {
 /**
  * Reads what a preset sets, which may be stated or computed.
  *
+ * @param context - The command, the mode and the repository around them.
  * @param preset - Whichever preset is being read.
- * @param env - The environment the config is being read for.
  * @returns The config it sets.
  */
-function setBy(preset: Preset, env: ConfigEnv): Promise<UserConfig> | UserConfig {
-  return typeof preset.config === "function" ? preset.config(env) : preset.config;
+function setBy(context: Context, preset: Preset): Promise<UserConfig> | UserConfig {
+  return typeof preset.config === "function" ? preset.config(context) : preset.config;
 }
 
 /**
  * Settles every preset, in enforce order.
  *
+ * @param context - The command, the mode and the repository around them.
  * @param presets - The presets taking part.
- * @param env - The environment.
  * @returns The config they agree on, and the record of who set what.
  */
-async function settled(presets: readonly Preset[], env: ConfigEnv): Promise<Composed> {
+async function settled(context: Context, presets: readonly Preset[]): Promise<Composed> {
   const ordered = presets.toSorted(
     (one, other) => ORDER[one.enforce ?? "pre"] - ORDER[other.enforce ?? "pre"],
   );
 
   const set = await Promise.all(
-    ordered.map(async (preset) => [preset, await setBy(preset, env)] as const),
+    ordered.map(async (preset) => [preset, await setBy(context, preset)] as const),
   );
 
   return set.reduce((composed, [preset, config]) => merged(composed, config, preset), NOTHING);
@@ -109,31 +110,32 @@ export function surviving(layers: readonly Layer[]): readonly Layer[] {
 /**
  * Composes every layer into one config.
  *
+ * @param context - The command, the mode and the repository around them.
  * @param extended - The layers, nested to any depth.
- * @param env - The environment the config is being read for.
  * @returns The config, and the record of which layer decided each value.
  * @throws Error When a removal names nothing stated above it.
  */
-export async function resolved(extended: readonly Extendable[], env: ConfigEnv): Promise<Composed> {
-  const taking = surviving(flattened(extended).filter((layer) => applies(layer, env)));
+export async function resolved(
+  context: Context,
+  extended: readonly Extendable[],
+): Promise<Composed> {
+  const taking = surviving(flattened(extended).filter((layer) => applies(layer, context)));
 
   let composed = await settled(
+    context,
     taking.filter((layer): layer is Preset => layer.kind === "preset"),
-    env,
   );
 
   for (const contribution of taking.filter(
     (one): one is Contribution => one.kind === "contribution",
   )) {
-    composed = replaced(
-      composed,
-      appended(composed.config, contribution.at, contribution.item),
-      contribution,
-    );
+    const item = contribution.itemOf ? contribution.itemOf(context) : contribution.item;
+
+    composed = replaced(composed, appended(composed.config, contribution.at, item), contribution);
   }
 
   for (const layer of taking.filter((one): one is Override => one.kind === "override")) {
-    composed = replaced(composed, layer.refine(composed.config, env), layer);
+    composed = replaced(composed, layer.refine(context, composed.config), layer);
   }
 
   return composed;

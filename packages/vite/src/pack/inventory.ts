@@ -4,9 +4,12 @@
 
 import sbom from "rollup-plugin-sbom";
 
-import { contribute, type Contribution } from "#core/layer.ts";
-import { inventory as described } from "#sbom/inventory.ts";
-import { type Supplier } from "#sbom/supplier.ts";
+import {
+  contribute,
+  type Contribution,
+  inventory as described,
+  type Supplier,
+} from "@stealthscale/config-core";
 
 /**
  * Writes down what the package was built out of.
@@ -22,6 +25,10 @@ import { type Supplier } from "#sbom/supplier.ts";
  *
  * No copy goes to `.well-known`. That is a path on a server, and nothing serves a tarball.
  *
+ * A production pack says which build wrote it and when, and a development one does not. Which of
+ * the two this is Vite has already decided, so the item is answered from what the layer is handed
+ * rather than settled when the layer is written.
+ *
  * @param supplier - Who supplied it. The house unless a repository says otherwise.
  * @returns The contribution the packer writes the inventory from.
  */
@@ -29,7 +36,15 @@ export function inventory(supplier?: Supplier): Contribution {
   return contribute({
     at: "pack.plugins",
     because: "what a packer inlines is no longer named by the manifest that declared it",
-    item: sbom(described({ served: false, supplier, type: "library" })),
+    itemOf: (context) =>
+      sbom(
+        described({
+          identified: context.mode === "production",
+          served: false,
+          supplier,
+          type: "library",
+        }),
+      ),
     name: "pack.inventory",
   });
 }

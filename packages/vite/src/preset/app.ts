@@ -2,10 +2,10 @@
  * Configuring an application, which is deployed rather than published.
  */
 
+import { configuring, type Defining, type Extendable } from "@stealthscale/config-core";
+
 import * as build from "#build/index.ts";
-import { type Extendable } from "#core/layer.ts";
 import * as lint from "#lint/index.ts";
-import { configuring, type Defining } from "#preset/defaults.ts";
 import { house } from "#preset/house.ts";
 import * as test from "#test/index.ts";
 

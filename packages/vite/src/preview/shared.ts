@@ -2,7 +2,8 @@
  * Letting another origin fetch what a preview serves.
  */
 
-import { type Preset, preset } from "#core/layer.ts";
+import { type Preset, preset } from "@stealthscale/config-core";
+
 import { origins as allowed } from "#serving/environment.ts";
 
 /**
@@ -17,13 +18,13 @@ import { origins as allowed } from "#serving/environment.ts";
  * thing, so whatever is true of it is about to be true in production, and `*` is not a thing to
  * discover there.
  *
- * @param origins - The origins allowed to fetch, each as a scheme and authority. Read from the
- *   machine's own environment where none are given.
+ * @param origins - The origins allowed to fetch, each as a scheme and authority. What the
+ *   repository knows, which `STEALTH_ORIGINS` overrides where a machine needs its own.
  * @returns The preset.
  */
-export function shared(origins: readonly string[] = allowed()): Preset {
+export function shared(origins: readonly string[] = []): Preset {
   return preset({
-    config: { preview: { cors: { origin: [...origins] } } },
-    name: `preview.shared(${origins.join(", ")})`,
+    config: (context) => ({ preview: { cors: { origin: [...allowed(context, origins)] } } }),
+    name: "preview.shared",
   });
 }

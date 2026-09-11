@@ -2,10 +2,10 @@
  * Configuring a package that publishes and says nothing about where it runs.
  */
 
-import { type Extendable } from "#core/layer.ts";
+import { configuring, type Defining, type Extendable } from "@stealthscale/config-core";
+
 import * as lint from "#lint/index.ts";
 import * as pack from "#pack/index.ts";
-import { configuring, type Defining } from "#preset/defaults.ts";
 import { house } from "#preset/house.ts";
 import * as test from "#test/index.ts";
 

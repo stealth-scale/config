@@ -2,7 +2,7 @@
  * Running the tests in a real browser rather than against a document implementation.
  */
 
-import { type Preset, preset } from "#core/layer.ts";
+import { type Preset, preset } from "@stealthscale/config-core";
 
 /**
  * The browsers Playwright drives.

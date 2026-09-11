@@ -13,14 +13,18 @@
  * @packageDocumentation
  */
 
-export * as build from "#build/index.ts";
-export { type Config, type ConfigFn, defineConfig } from "#core/define.ts";
 export {
   type Apply,
+  type Config,
+  type ConfigFn,
+  configuring,
   contribute,
   type Contribution,
+  defineConfig,
+  type Defining,
   type Extendable,
   type Layer,
+  type Manifest,
   override,
   type Override,
   owned,
@@ -29,7 +33,9 @@ export {
   type Removal,
   remove,
   type Stated,
-} from "#core/layer.ts";
+} from "@stealthscale/config-core";
+
+export * as build from "#build/index.ts";
 export * as define from "#define/index.ts";
 export * as deps from "#deps/index.ts";
 export * as federation from "#federation/index.ts";
@@ -37,7 +43,6 @@ export * as fmt from "#fmt/index.ts";
 export * as layout from "#layout/index.ts";
 export * as lint from "#lint/index.ts";
 export * as pack from "#pack/index.ts";
-export { configuring, type Defining } from "#preset/defaults.ts";
 export * as preview from "#preview/index.ts";
 export * as resolve from "#resolve/index.ts";
 export * as run from "#run/index.ts";

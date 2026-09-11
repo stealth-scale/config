@@ -8,8 +8,8 @@
 
 import { mergeConfig, type UserConfig } from "vite-plus";
 
-import { type Layer } from "#core/layer.ts";
-import { type Source, wrote } from "#core/provenance.ts";
+import { type Layer } from "#layer.ts";
+import { type Source, wrote } from "#provenance.ts";
 
 /**
  * Holds a config part-composed, and everything known about how it got that way.

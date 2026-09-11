@@ -4,7 +4,8 @@
 
 import { type UserConfig } from "vite-plus";
 
-import { type Layer, preset } from "#core/layer.ts";
+import { type Layer, preset } from "@stealthscale/config-core";
+
 import { GENERATED } from "#ignore/generated.ts";
 import { defaultExported, undocumented } from "#lint/override.ts";
 import * as rules from "#lint/rules/index.ts";

@@ -1,6 +1,6 @@
 import { expect, test } from "vite-plus/test";
 
-import { appended, at, leaves } from "#core/path.ts";
+import { appended, at, leaves } from "#path.ts";
 
 test("reads what sits at a path", () => {
   expect(at({ test: { environment: "node" } }, "test.environment")).toBe("node");

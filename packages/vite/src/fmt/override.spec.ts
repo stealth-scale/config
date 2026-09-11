@@ -1,20 +1,24 @@
 import { expect, test } from "vite-plus/test";
 
-import { defineConfig } from "#core/define.ts";
-import { preset } from "#core/layer.ts";
+import { defineConfig, preset } from "@stealthscale/config-core";
+
 import { imports } from "#fmt/imports.ts";
 import { generated, group, internal, skip } from "#fmt/override.ts";
 import { GENERATED } from "#ignore/generated.ts";
-import { readBack } from "#preset/preset.fixtures.ts";
-
 /**
  * Reads the import settings back once the layers have composed.
  *
  * @param layers - What a repository extends.
  * @returns Those settings.
  */
+import { readBack } from "#preset/preset.fixtures.ts";
+
+/**
+ * Where the config under specification is, which every `defineConfig` states for itself.
+ */
+const AT = import.meta.dirname;
 async function sorted(layers: readonly unknown[]): Promise<Record<string, unknown>> {
-  const held = await readBack(defineConfig({ extends: layers as never }));
+  const held = await readBack(defineConfig(AT, { extends: layers as never }));
 
   return held.fmt?.sortImports as Record<string, unknown>;
 }
@@ -101,7 +105,7 @@ test("refuses a group where nothing above it sorts imports, rather than writing 
 
 test("adds the first group where nothing has defined one yet", async () => {
   const held = await readBack(
-    defineConfig({
+    defineConfig(AT, {
       extends: [
         preset({ config: { fmt: { sortImports: {} } }, name: "bare" }),
         group({ because: "renders", name: "react", patterns: ["react"] }),

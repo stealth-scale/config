@@ -2,7 +2,8 @@
  * How a packed package points at its own source.
  */
 
-import { type Preset, preset } from "#core/layer.ts";
+import { type Preset, preset } from "@stealthscale/config-core";
+
 import { SOURCE } from "#resolve/condition.ts";
 
 /**

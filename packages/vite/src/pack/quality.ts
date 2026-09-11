@@ -2,7 +2,7 @@
  * What a package is checked against before it is published.
  */
 
-import { type Preset, preset } from "#core/layer.ts";
+import { type Preset, preset } from "@stealthscale/config-core";
 
 /**
  * The subpaths a type checker has nothing to say about.

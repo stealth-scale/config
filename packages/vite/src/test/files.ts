@@ -2,7 +2,8 @@
  * Which files hold tests.
  */
 
-import { type Preset, preset } from "#core/layer.ts";
+import { type Preset, preset } from "@stealthscale/config-core";
+
 import { FOREIGN } from "#ignore/foreign.ts";
 
 /**

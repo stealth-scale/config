@@ -4,7 +4,8 @@
 
 import { type UserConfig } from "vite-plus";
 
-import { contribute, type Contribution, override, type Override } from "#core/layer.ts";
+import { contribute, type Contribution, type Override, override } from "@stealthscale/config-core";
+
 import { GENERATED } from "#ignore/generated.ts";
 
 /**
@@ -155,7 +156,7 @@ export function group(stated: Grouped): Override {
   return override({
     because: stated.because,
     name: `fmt.group(${stated.name})`,
-    refine: (config: UserConfig): UserConfig => {
+    refine: (_context, config: UserConfig): UserConfig => {
       const held = sorting(config, stated.name);
 
       return {

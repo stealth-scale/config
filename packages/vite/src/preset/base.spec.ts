@@ -4,23 +4,28 @@ import { CATEGORIES } from "#lint/rules/index.ts";
 import { defineConfig } from "#preset/base.ts";
 import { readBack } from "#preset/preset.fixtures.ts";
 
+/**
+ * Where the config under specification is, which every `defineConfig` states for itself.
+ */
+const AT = import.meta.dirname;
+
 test("says nothing about where the package runs", async () => {
-  expect((await readBack(defineConfig({}))).lint?.env).toBeUndefined();
+  expect((await readBack(defineConfig(AT, {}))).lint?.env).toBeUndefined();
 });
 
 test("lints with the type checker's answers, and fails on what they find", async () => {
-  expect((await readBack(defineConfig({}))).lint).toMatchObject({
+  expect((await readBack(defineConfig(AT, {}))).lint).toMatchObject({
     categories: CATEGORIES,
     options: { typeAware: true, typeCheck: true },
   });
 });
 
 test("still lets a caller's own keys through", async () => {
-  expect((await readBack(defineConfig({ publicDir: "theirs" }))).publicDir).toBe("theirs");
+  expect((await readBack(defineConfig(AT, { publicDir: "theirs" }))).publicDir).toBe("theirs");
 });
 
 test("carries the house format whole, so a repository states none of it", async () => {
-  const held = (await readBack(defineConfig({}))).fmt;
+  const held = (await readBack(defineConfig(AT, {}))).fmt;
 
   expect(held?.proseWrap, "fmt.prose is missing").toBe("always");
   expect(held?.jsdoc, "fmt.docblocks is missing").toBeTruthy();

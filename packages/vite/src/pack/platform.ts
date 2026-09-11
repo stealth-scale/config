@@ -2,7 +2,7 @@
  * What a packed package is built to run on.
  */
 
-import { type Preset, preset } from "#core/layer.ts";
+import { type Preset, preset } from "@stealthscale/config-core";
 
 /**
  * Where a packed package runs, which decides what the packer may leave to it.

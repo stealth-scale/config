@@ -2,7 +2,8 @@
  * Running a repository's own code around a pack.
  */
 
-import { override, type Override } from "#core/layer.ts";
+import { type Override, override } from "@stealthscale/config-core";
+
 import { type Moments } from "#pack/settings.ts";
 
 /**
@@ -45,7 +46,7 @@ export function hook(stated: Hooked): Override {
   return override({
     because: stated.because,
     name: `pack.hook(${Object.keys(stated.hooks).join(", ")})`,
-    refine: (config) => {
+    refine: (_context, config) => {
       const held = Array.isArray(config.pack) ? undefined : config.pack;
       const already: Moments = typeof held?.hooks === "object" ? held.hooks : {};
 

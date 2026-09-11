@@ -2,7 +2,8 @@
  * How a stealth package is packed.
  */
 
-import { type Layer } from "#core/layer.ts";
+import { type Layer } from "@stealthscale/config-core";
+
 import { carry } from "#pack/carry.ts";
 import { declarations } from "#pack/declarations.ts";
 import { inventory } from "#pack/inventory.ts";

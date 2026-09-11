@@ -2,7 +2,7 @@
  * Pinning the server that serves a build to a port, and meaning it.
  */
 
-import { type Preset, preset } from "#core/layer.ts";
+import { type Preset, preset } from "@stealthscale/config-core";
 
 /**
  * Serves a build at a port, and refuses to start rather than move off it.

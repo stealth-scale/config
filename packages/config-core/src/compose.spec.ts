@@ -1,7 +1,8 @@
 import { expect, test } from "vite-plus/test";
 
-import { resolved, surviving } from "#core/compose.ts";
-import { contribute, type Contribution, preset, type Removal, remove } from "#core/layer.ts";
+import { resolved, surviving } from "#compose.ts";
+import { BUILDING } from "#core.fixtures.ts";
+import { contribute, type Contribution, preset, type Removal, remove } from "#layer.ts";
 
 /**
  * States one contribution, since only its name matters here.
@@ -62,13 +63,45 @@ test("refuses a removal naming nothing at all", () => {
 });
 
 test("settles a preset asking to go last after one that said nothing", async () => {
-  const held = await resolved(
-    [
-      preset({ config: { mode: "last" }, enforce: "post", name: "after" }),
-      preset({ config: { mode: "first" }, name: "before" }),
-    ],
-    { command: "build", mode: "production" },
-  );
+  const held = await resolved(BUILDING, [
+    preset({ config: { mode: "last" }, enforce: "post", name: "after" }),
+    preset({ config: { mode: "first" }, name: "before" }),
+  ]);
 
   expect(held.config.mode).toBe("last");
+});
+
+test("appends what a contribution states outright", async () => {
+  const held = await resolved(BUILDING, [
+    contribute({ at: "test.setupFiles", because: "a reason", item: "stated.ts", name: "one" }),
+  ]);
+
+  expect(held.config.test?.setupFiles).toEqual(["stated.ts"]);
+});
+
+test("appends what a contribution works out from what is being configured", async () => {
+  const held = await resolved(BUILDING, [
+    contribute({
+      at: "test.setupFiles",
+      because: "a reason",
+      itemOf: (context) => `${context.mode}.ts`,
+      name: "one",
+    }),
+  ]);
+
+  expect(held.config.test?.setupFiles).toEqual(["production.ts"]);
+});
+
+test("prefers what it works out, where a layer states both", async () => {
+  const held = await resolved(BUILDING, [
+    contribute({
+      at: "test.setupFiles",
+      because: "a reason",
+      item: "stated.ts",
+      itemOf: () => "worked-out.ts",
+      name: "one",
+    }),
+  ]);
+
+  expect(held.config.test?.setupFiles).toEqual(["worked-out.ts"]);
 });

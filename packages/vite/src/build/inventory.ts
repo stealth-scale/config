@@ -4,9 +4,12 @@
 
 import sbom from "rollup-plugin-sbom";
 
-import { contribute, type Contribution } from "#core/layer.ts";
-import { inventory as described } from "#sbom/inventory.ts";
-import { type Supplier } from "#sbom/supplier.ts";
+import {
+  contribute,
+  type Contribution,
+  inventory as described,
+  type Supplier,
+} from "@stealthscale/config-core";
 
 /**
  * Writes down what the application was built out of.
@@ -27,6 +30,10 @@ import { type Supplier } from "#sbom/supplier.ts";
  * A copy goes to `.well-known/sbom`, which is where a scanner looks on a deployment that is already
  * running.
  *
+ * A production build says which build wrote it and when, and a development one does not. Which of
+ * the two this is Vite has already decided, so the item is answered from what the layer is handed
+ * rather than settled when the layer is written.
+ *
  * @param supplier - Who supplied it. The house unless a repository says otherwise.
  * @returns The contribution the bundler writes the inventory from.
  */
@@ -34,7 +41,15 @@ export function inventory(supplier?: Supplier): Contribution {
   return contribute({
     at: "plugins",
     because: "a bundle names none of what went into it, and somebody will need to ask",
-    item: sbom(described({ served: true, supplier, type: "application" })),
+    itemOf: (context) =>
+      sbom(
+        described({
+          identified: context.mode === "production",
+          served: true,
+          supplier,
+          type: "application",
+        }),
+      ),
     name: "build.inventory",
   });
 }

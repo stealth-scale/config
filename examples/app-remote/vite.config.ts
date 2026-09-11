@@ -2,7 +2,19 @@ import { federation as react } from "@stealthscale/config-react";
 import { defineConfig } from "@stealthscale/config-react/preset/app";
 import { federation, preview, server } from "@stealthscale/config-vite";
 
-export default defineConfig({
+/**
+ * The names this application is served under while it is being worked on, beyond loopback. Stated
+ * rather than derived, so the tree says which application answers to which name. `STEALTH_HOSTS`
+ * overrides it on a machine that has arranged something else.
+ */
+const NAMES = ["app1.stealthscale.dev"];
+
+/**
+ * The origins allowed to fetch what this application serves. `STEALTH_ORIGINS` overrides it.
+ */
+const ALLOWED = ["https://host.stealthscale.dev", "http://localhost:4401"];
+
+export default defineConfig(import.meta.dirname, {
   extends: [
     // No `build.served` here, and that absence is the point. With no base the federation plugin
     // resolves this application's chunks against wherever `remoteEntry.js` was fetched from, so one
@@ -15,11 +27,11 @@ export default defineConfig({
     }),
 
     server.port(4402),
-    server.reachable(),
-    server.bound(),
+    server.reachable(NAMES),
+    server.bound(NAMES),
     preview.port(4403),
-    preview.reachable(),
-    preview.bound(),
-    preview.shared(),
+    preview.reachable(NAMES),
+    preview.bound(NAMES),
+    preview.shared(ALLOWED),
   ],
 });

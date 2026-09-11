@@ -4,7 +4,7 @@
 
 import { type UserConfig } from "vite-plus";
 
-import { type Preset, preset } from "#core/layer.ts";
+import { type Preset, preset } from "@stealthscale/config-core";
 
 /**
  * The environments the runner knows, read off the block rather than written out again.

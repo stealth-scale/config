@@ -1,8 +1,13 @@
 import { type ConfigEnv, type UserConfig } from "vite-plus";
 import { expect, test } from "vite-plus/test";
 
-import { defineConfig } from "#core/define.ts";
-import { contribute, override, preset, remove } from "#core/layer.ts";
+import { defineConfig } from "#define.ts";
+import { contribute, override, preset, remove } from "#layer.ts";
+
+/**
+ * Where the config under specification is, which every `defineConfig` states for itself.
+ */
+const AT = import.meta.dirname;
 
 /**
  * The environment a build is read in.
@@ -20,10 +25,10 @@ const BUILDING: ConfigEnv = { command: "build", mode: "production" };
  * @returns The composed config.
  */
 function readBack(
-  config: Parameters<typeof defineConfig>[0],
+  config: Parameters<typeof defineConfig>[1],
   env: ConfigEnv = BUILDING,
 ): Promise<UserConfig> {
-  const held = defineConfig(config) as (given: ConfigEnv) => Promise<UserConfig>;
+  const held = defineConfig(AT, config) as (given: ConfigEnv) => Promise<UserConfig>;
 
   return held(env);
 }

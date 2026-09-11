@@ -1,9 +1,15 @@
 import { type ConfigEnv, type UserConfig } from "vite-plus";
 import { expect, test } from "vite-plus/test";
 
-import { flattened } from "#core/compose.ts";
+import { type Layer } from "@stealthscale/config-core";
+
 import { defineConfig, layers } from "#preset/app.ts";
 import { layers as web } from "#preset/web.ts";
+
+/**
+ * Where the config under specification is, which every `defineConfig` states for itself.
+ */
+const AT = import.meta.dirname;
 
 /**
  * Names every layer the tier is built on.
@@ -12,7 +18,11 @@ import { layers as web } from "#preset/web.ts";
  * @returns Every name in it.
  */
 function names(of: ReturnType<typeof layers>): string[] {
-  return flattened(of).map((held) => held.name);
+  const flat: Layer[] = of.flatMap((held) =>
+    Array.isArray(held) ? (held as Layer[]) : [held as Layer],
+  );
+
+  return flat.map((held) => held.name);
 }
 
 test("packs nothing, an application having no export map for a packer to write", () => {
@@ -46,7 +56,7 @@ test("is the same as the library tier but for which of the two blocks it carries
 
 test("composes into a config a repository's own keys still win over", async () => {
   const held = await (
-    defineConfig({ build: { manifest: false } }) as (env: ConfigEnv) => Promise<UserConfig>
+    defineConfig(AT, { build: { manifest: false } }) as (env: ConfigEnv) => Promise<UserConfig>
   )({ command: "build", mode: "production" });
 
   expect(held.build?.manifest).toBe(false);

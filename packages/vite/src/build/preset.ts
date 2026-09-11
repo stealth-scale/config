@@ -2,12 +2,13 @@
  * How a package is built.
  */
 
+import { type Layer } from "@stealthscale/config-core";
+
 import { inventory } from "#build/inventory.ts";
 import { licences } from "#build/licences.ts";
 import { manifest } from "#build/manifest.ts";
 import { preload } from "#build/preload.ts";
 import { sourcemaps } from "#build/sourcemaps.ts";
-import { type Layer } from "#core/layer.ts";
 
 /**
  * What every build gets, wherever its output runs.

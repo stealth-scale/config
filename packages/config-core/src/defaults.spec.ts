@@ -1,8 +1,13 @@
 import { expect, test } from "vite-plus/test";
 
-import { preset } from "#core/layer.ts";
-import { configuring } from "#preset/defaults.ts";
-import { readBack } from "#preset/preset.fixtures.ts";
+import { readBack } from "#core.fixtures.ts";
+import { configuring } from "#defaults.ts";
+import { preset } from "#layer.ts";
+
+/**
+ * Where the config under specification is, which every `defineConfig` states for itself.
+ */
+const AT = import.meta.dirname;
 
 /**
  * A `defineConfig` carrying one default, for testing the binding itself.
@@ -12,16 +17,16 @@ const defineConfig = configuring(() => [
 ]);
 
 test("carries its defaults where the caller extends nothing", async () => {
-  expect((await readBack(defineConfig({}))).publicDir).toBe("held");
+  expect((await readBack(defineConfig(AT, {}))).publicDir).toBe("held");
 });
 
 test("carries them where the caller passes nothing at all", async () => {
-  expect((await readBack(defineConfig())).publicDir).toBe("held");
+  expect((await readBack(defineConfig(AT))).publicDir).toBe("held");
 });
 
 test("puts them beneath what the caller extends, so the caller's layers win", async () => {
   const held = await readBack(
-    defineConfig({ extends: [preset({ config: { mode: "from-caller" }, name: "theirs" })] }),
+    defineConfig(AT, { extends: [preset({ config: { mode: "from-caller" }, name: "theirs" })] }),
   );
 
   expect(held.mode).toBe("from-caller");
@@ -29,26 +34,26 @@ test("puts them beneath what the caller extends, so the caller's layers win", as
 
 test("keeps what the caller extends as well as the defaults", async () => {
   const held = await readBack(
-    defineConfig({ extends: [preset({ config: { base: "/theirs/" }, name: "theirs" })] }),
+    defineConfig(AT, { extends: [preset({ config: { base: "/theirs/" }, name: "theirs" })] }),
   );
 
   expect(held).toMatchObject({ base: "/theirs/", publicDir: "held" });
 });
 
 test("lets the caller's own keys win over a default", async () => {
-  expect((await readBack(defineConfig({ mode: "from-own-keys" }))).mode).toBe("from-own-keys");
+  expect((await readBack(defineConfig(AT, { mode: "from-own-keys" }))).mode).toBe("from-own-keys");
 });
 
-test("takes a function, and hands it the environment", async () => {
+test("takes a function, and hands it what is being configured", async () => {
   const held = await readBack(
-    defineConfig(({ command }) => ({ base: command === "build" ? "/built/" : "/served/" })),
+    defineConfig(AT, ({ command }) => ({ base: command === "build" ? "/built/" : "/served/" })),
   );
 
   expect(held).toMatchObject({ base: "/built/", publicDir: "held" });
 });
 
 test("takes a promise", async () => {
-  const held = await readBack(defineConfig(Promise.resolve({ base: "/awaited/" })));
+  const held = await readBack(defineConfig(AT, Promise.resolve({ base: "/awaited/" })));
 
   expect(held).toMatchObject({ base: "/awaited/", publicDir: "held" });
 });

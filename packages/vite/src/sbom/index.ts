@@ -6,6 +6,10 @@
  * for a library it publishes — so that the two differ in what they are describing and in nothing
  * else.
  *
+ * Stated in the kernel and re-exported here. The kernel packs before this package and cannot reach
+ * it, so a bill of materials for the kernel's own tarball would otherwise be a second copy of these
+ * settings kept true by hand.
+ *
  * A build prints `Cannot find module 'rollup'` and `Cannot find module 'rolldown'`, three lines of
  * it per package. The plugin is looking for the tools that produced the output so it can record
  * which ones did, and neither is installed under its own name here: Vite+ carries its bundler
@@ -14,5 +18,11 @@
  * plugin and the bundler under `metadata.tools`.
  */
 
-export { type Inventory, inventory, type Kind } from "#sbom/inventory.ts";
-export { type Contact, HOUSE, type Supplier } from "#sbom/supplier.ts";
+export {
+  type Contact,
+  HOUSE,
+  type Inventory,
+  inventory,
+  type Kind,
+  type Supplier,
+} from "@stealthscale/config-core";

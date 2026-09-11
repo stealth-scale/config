@@ -2,7 +2,8 @@
  * How a stealth package is tested.
  */
 
-import { type Layer } from "#core/layer.ts";
+import { type Layer } from "@stealthscale/config-core";
+
 import { assertion } from "#test/assertion.ts";
 import { coverage } from "#test/coverage.ts";
 import { environment } from "#test/environment.ts";

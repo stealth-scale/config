@@ -2,7 +2,7 @@
  * Where an application's page sits.
  */
 
-import { type Preset, preset } from "#core/layer.ts";
+import { type Preset, preset } from "@stealthscale/config-core";
 
 /**
  * Builds an application from the page in the directory it names.

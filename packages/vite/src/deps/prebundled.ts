@@ -2,7 +2,7 @@
  * Naming the dependencies the dev server cannot find by crawling.
  */
 
-import { contribute, type Contribution } from "#core/layer.ts";
+import { contribute, type Contribution } from "@stealthscale/config-core";
 
 /**
  * Where a contribution to the list of what is pre-bundled lands.

@@ -4,7 +4,8 @@
 
 import { type UserConfig } from "vite-plus";
 
-import { contribute, type Contribution } from "#core/layer.ts";
+import { contribute, type Contribution } from "@stealthscale/config-core";
+
 import { docblocksOff } from "#lint/rules/docblock.ts";
 
 /**

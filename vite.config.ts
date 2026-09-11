@@ -3,7 +3,7 @@ import { preset } from "@stealthscale/config-react";
 import { lint, run, staged, test } from "./packages/vite/src/index.ts";
 import { defineConfig } from "./packages/vite/src/preset/node.ts";
 
-export default defineConfig({
+export default defineConfig(import.meta.dirname, {
   extends: [
     run.cache(),
     run.ci(),

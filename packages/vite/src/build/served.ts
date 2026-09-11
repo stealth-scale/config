@@ -2,7 +2,7 @@
  * Where a built application's own files are fetched from.
  */
 
-import { type Preset, preset } from "#core/layer.ts";
+import { type Preset, preset } from "@stealthscale/config-core";
 
 /**
  * Serves an application's own files from a fixed place rather than from wherever it was loaded.

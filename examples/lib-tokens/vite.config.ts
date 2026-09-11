@@ -11,7 +11,7 @@ import { stylesheet, TOKEN_EXPORTS } from "./src/palette.ts";
  */
 const OUT = join(import.meta.dirname, "dist");
 
-export default defineConfig({
+export default defineConfig(import.meta.dirname, {
   extends: [
     pack.published(import.meta.dirname),
 

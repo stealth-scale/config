@@ -4,23 +4,28 @@ import { CATEGORIES } from "#lint/rules/index.ts";
 import { defineConfig } from "#preset/node.ts";
 import { readBack } from "#preset/preset.fixtures.ts";
 
+/**
+ * Where the config under specification is, which every `defineConfig` states for itself.
+ */
+const AT = import.meta.dirname;
+
 test("gives the package node's globals, so `process` is not undefined", async () => {
-  expect((await readBack(defineConfig({}))).lint?.env).toEqual({ node: true });
+  expect((await readBack(defineConfig(AT, {}))).lint?.env).toEqual({ node: true });
 });
 
 test("withholds the browser's, so reaching for `document` is reported", async () => {
-  expect((await readBack(defineConfig({}))).lint?.env).not.toHaveProperty("browser");
+  expect((await readBack(defineConfig(AT, {}))).lint?.env).not.toHaveProperty("browser");
 });
 
 test("carries the linting every entry shares", async () => {
-  expect((await readBack(defineConfig({}))).lint).toMatchObject({
+  expect((await readBack(defineConfig(AT, {}))).lint).toMatchObject({
     categories: CATEGORIES,
     options: { typeAware: true, typeCheck: true },
   });
 });
 
 test("carries the house format whole, so a repository states none of it", async () => {
-  const held = (await readBack(defineConfig({}))).fmt;
+  const held = (await readBack(defineConfig(AT, {}))).fmt;
 
   expect(held?.proseWrap, "fmt.prose is missing").toBe("always");
   expect(held?.jsdoc, "fmt.docblocks is missing").toBeTruthy();

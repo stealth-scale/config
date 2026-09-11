@@ -2,7 +2,7 @@
  * Pinning a dev server to a port, and meaning it.
  */
 
-import { type Preset, preset } from "#core/layer.ts";
+import { type Preset, preset } from "@stealthscale/config-core";
 
 /**
  * Serves an app at a port, and refuses to start rather than move off it.

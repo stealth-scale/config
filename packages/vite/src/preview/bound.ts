@@ -2,7 +2,8 @@
  * The address a preview listens on.
  */
 
-import { type Preset, preset } from "#core/layer.ts";
+import { type Preset, preset } from "@stealthscale/config-core";
+
 import { bound as derived } from "#serving/environment.ts";
 
 /**
@@ -21,13 +22,18 @@ import { bound as derived } from "#serving/environment.ts";
  * is a decision about where a person is working rather than about the application, so it is asked
  * for rather than assumed.
  *
- * @param at - The address to listen on, or `true` for every interface. Worked out from the
- *   machine's own environment where none is given.
+ * @param at - The address to listen on, or `true` for every interface. A list of names instead
+ *   works the address out from them and from the machine's own environment, which is what an
+ *   application that states the names it is served under passes.
  * @returns The preset.
  */
-export function bound(at: boolean | string | undefined = derived()): Preset {
+export function bound(at: boolean | readonly string[] | string = []): Preset {
   return preset({
-    config: at === undefined ? {} : { preview: { host: at } },
-    name: `preview.bound(${at ?? "its own answer"})`,
+    config: (context) => {
+      const held = typeof at === "object" ? derived(context, at) : at;
+
+      return held === undefined ? {} : { preview: { host: held } };
+    },
+    name: "preview.bound",
   });
 }

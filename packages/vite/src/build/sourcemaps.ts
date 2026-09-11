@@ -2,7 +2,7 @@
  * Keeping a stack trace readable without handing the source to everybody who asks.
  */
 
-import { type Preset, preset } from "#core/layer.ts";
+import { type Preset, preset } from "@stealthscale/config-core";
 
 /**
  * Emits source maps the bundle does not point at.

@@ -1,6 +1,6 @@
 import { expect, test } from "vite-plus/test";
 
-import { applies, contribute, override, preset, remove } from "#core/layer.ts";
+import { applies, contribute, override, preset, remove } from "#layer.ts";
 
 /**
  * The environment a build is read in.

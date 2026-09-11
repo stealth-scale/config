@@ -1,7 +1,7 @@
 import { deps, layout, preview, server, worker } from "@stealthscale/config-vite";
 import { defineConfig } from "@stealthscale/config-vite/preset/app";
 
-export default defineConfig({
+export default defineConfig(import.meta.dirname, {
   extends: [
     layout.page("page"),
 

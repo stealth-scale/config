@@ -1,7 +1,8 @@
 import { type UserConfig } from "vite-plus";
 import { expect, test } from "vite-plus/test";
 
-import { type Layer, type Preset } from "#core/layer.ts";
+import { type Layer, type Preset } from "@stealthscale/config-core";
+
 import { GENERATED } from "#ignore/generated.ts";
 import { base, node, web } from "#lint/preset.ts";
 import * as rules from "#lint/rules/index.ts";

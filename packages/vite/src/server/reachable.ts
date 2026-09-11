@@ -2,7 +2,8 @@
  * The names a dev server answers to.
  */
 
-import { type Preset, preset } from "#core/layer.ts";
+import { type Preset, preset } from "@stealthscale/config-core";
+
 import { hosts } from "#serving/environment.ts";
 
 /**
@@ -16,13 +17,13 @@ import { hosts } from "#serving/environment.ts";
  * server writes relative URLs for its own assets, and a page on another origin resolves those
  * against itself.
  *
- * @param names - The host names to answer to, each without a scheme or a port. Read from the
- *   machine's own environment where none are given.
+ * @param names - The host names to answer to, each without a scheme or a port. What the repository
+ *   knows about itself, which `STEALTH_HOSTS` overrides where a machine needs its own.
  * @returns The preset.
  */
-export function reachable(names: readonly string[] = hosts()): Preset {
+export function reachable(names: readonly string[] = []): Preset {
   return preset({
-    config: { server: { allowedHosts: [...names] } },
-    name: `server.reachable(${names.join(", ")})`,
+    config: (context) => ({ server: { allowedHosts: [...hosts(context, names)] } }),
+    name: "server.reachable",
   });
 }

@@ -3,6 +3,11 @@ import { expect, test } from "vite-plus/test";
 
 import { defineConfig, layers } from "#preset/app.ts";
 
+/**
+ * Where the config under specification is, which every `defineConfig` states for itself.
+ */
+const AT = import.meta.dirname;
+
 test("names every layer under this package, so provenance says where it came from", () => {
   for (const held of layers()) {
     expect(held.name.startsWith("react/")).toBe(true);
@@ -29,7 +34,7 @@ test("states no rules of its own, those being read from the root and nowhere els
 });
 
 test("binds the application tier and this package's layers into one defineConfig", async () => {
-  const held = await (defineConfig({}) as (env: ConfigEnv) => Promise<UserConfig>)({
+  const held = await (defineConfig(AT, {}) as (env: ConfigEnv) => Promise<UserConfig>)({
     command: "build",
     mode: "production",
   });
@@ -39,7 +44,7 @@ test("binds the application tier and this package's layers into one defineConfig
 });
 
 test("builds rather than packs, an application being deployed rather than published", async () => {
-  const held = await (defineConfig({}) as (env: ConfigEnv) => Promise<UserConfig>)({
+  const held = await (defineConfig(AT, {}) as (env: ConfigEnv) => Promise<UserConfig>)({
     command: "build",
     mode: "production",
   });

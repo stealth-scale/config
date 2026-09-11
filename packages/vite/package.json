@@ -62,6 +62,7 @@
   "devDependencies": {
     "@arethetypeswrong/core": "catalog:",
     "@module-federation/vite": "catalog:",
+    "@stealthscale/config-core": "workspace:^",
     "@stealthscale/config-typescript": "workspace:^",
     "@types/node": "catalog:",
     "@vitest/browser-playwright": "catalog:",
@@ -77,6 +78,7 @@
   },
   "peerDependencies": {
     "@module-federation/vite": "catalog:",
+    "@stealthscale/config-core": "workspace:^",
     "eslint-plugin-jsdoc": "catalog:",
     "eslint-plugin-perfectionist": "catalog:",
     "eslint-plugin-tsdoc": "catalog:",

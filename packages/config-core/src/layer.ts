@@ -9,6 +9,8 @@
 
 import { type ConfigEnv, type UserConfig } from "vite-plus";
 
+import { type Context } from "#context.ts";
+
 /**
  * Marks a layer as minted here. Declared but never exported as a value, so only this module can
  * satisfy it.
@@ -45,7 +47,7 @@ export interface Preset extends Minted {
   /**
    * What it sets, or a function of the environment answering the same.
    */
-  config: ((env: ConfigEnv) => Promise<UserConfig> | UserConfig) | UserConfig;
+  config: ((context: Context) => Promise<UserConfig> | UserConfig) | UserConfig;
 
   /**
    * Where it sits among the other presets. Plugin order is decided here rather than by position in
@@ -87,9 +89,21 @@ export interface Contribution extends Minted {
   because: string;
 
   /**
-   * The item appended.
+   * The item appended, where it does not depend on what is being configured.
+   *
+   * Stated instead of `itemOf`, never beside it.
    */
-  item: unknown;
+  item?: unknown;
+
+  /**
+   * Answers the item appended, given what is being configured.
+   *
+   * Stated where the item depends on the repository, the mode or the environment — a bill of
+   * materials carrying a timestamp only for a release, say. Separate from `item` rather than told
+   * apart by its type, because an item may legitimately be a function: a hook, a plugin factory, a
+   * resolver. Nothing could tell those two apart by looking.
+   */
+  itemOf?: ((context: Context) => unknown) | undefined;
 
   /**
    * Names this kind.
@@ -165,9 +179,12 @@ export interface Override extends Minted {
   name: string;
 
   /**
-   * Takes the merged config and answers the config to use instead.
+   * Takes what is being configured and the merged config, and answers the config to use instead.
+   *
+   * The context comes first, as it does everywhere a layer is handed one, so its position is never
+   * something to remember.
    */
-  refine: (config: UserConfig, env: ConfigEnv) => UserConfig;
+  refine: (context: Context, config: UserConfig) => UserConfig;
 }
 
 /**

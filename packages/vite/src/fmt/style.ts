@@ -2,7 +2,7 @@
  * The measurements every file is written to.
  */
 
-import { type Preset, preset } from "#core/layer.ts";
+import { type Preset, preset } from "@stealthscale/config-core";
 
 /**
  * Writes every file to the same measurements.

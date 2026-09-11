@@ -2,7 +2,7 @@
  * What order tests run in.
  */
 
-import { type Preset, preset } from "#core/layer.ts";
+import { type Preset, preset } from "@stealthscale/config-core";
 
 /**
  * Runs the files and the tests in a different order every time.

@@ -2,7 +2,7 @@
  * What a worker is bundled as.
  */
 
-import { type Preset, preset } from "#core/layer.ts";
+import { type Preset, preset } from "@stealthscale/config-core";
 
 /**
  * Bundles a worker as a module rather than as one self-contained script.

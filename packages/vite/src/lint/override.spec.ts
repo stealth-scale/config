@@ -1,9 +1,14 @@
 import { type ConfigEnv, type UserConfig } from "vite-plus";
 import { expect, test } from "vite-plus/test";
 
-import { defineConfig } from "#core/define.ts";
-import { type Layer, owned, remove } from "#core/layer.ts";
+import { defineConfig, type Layer, owned, remove } from "@stealthscale/config-core";
+
 import { defaultExported, forbid, relax, undocumented } from "#lint/override.ts";
+
+/**
+ * Where the config under specification is, which every `defineConfig` states for itself.
+ */
+const AT = import.meta.dirname;
 
 /**
  * The environment a build is read in.
@@ -16,8 +21,8 @@ const BUILDING: ConfigEnv = { command: "build", mode: "production" };
  * @param config - What was defined.
  * @returns The composed config.
  */
-function readBack(config: Parameters<typeof defineConfig>[0]): Promise<UserConfig> {
-  const held = defineConfig(config) as (given: ConfigEnv) => Promise<UserConfig>;
+function readBack(config: Parameters<typeof defineConfig>[1]): Promise<UserConfig> {
+  const held = defineConfig(AT, config) as (given: ConfigEnv) => Promise<UserConfig>;
 
   return held(BUILDING);
 }

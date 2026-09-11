@@ -7,8 +7,8 @@
  * turns that into a question with an answer.
  */
 
-import { type Layer } from "#core/layer.ts";
-import { leaves, at as read } from "#core/path.ts";
+import { type Layer } from "#layer.ts";
+import { leaves, at as read } from "#path.ts";
 
 /**
  * Says that one layer decided one value.

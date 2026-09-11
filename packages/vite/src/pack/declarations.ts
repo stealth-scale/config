@@ -2,7 +2,7 @@
  * The types a package publishes beside its code.
  */
 
-import { type Preset, preset } from "#core/layer.ts";
+import { type Preset, preset } from "@stealthscale/config-core";
 
 /**
  * Emits a declaration file for everything the package exports.

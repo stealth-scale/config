@@ -1,7 +1,7 @@
 import { expect, test } from "vite-plus/test";
 
-import { preset } from "#core/layer.ts";
-import { why, wrote } from "#core/provenance.ts";
+import { preset } from "#layer.ts";
+import { why, wrote } from "#provenance.ts";
 
 /**
  * One layer, since only its name and kind are read here.

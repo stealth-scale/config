@@ -1,7 +1,7 @@
 import { expect, test } from "vite-plus/test";
 
-import { contribute, preset } from "#core/layer.ts";
-import { merged, NOTHING, replaced } from "#core/merge.ts";
+import { contribute, preset } from "#layer.ts";
+import { merged, NOTHING, replaced } from "#merge.ts";
 
 /**
  * One layer, since only its name and kind are read into the record.

@@ -1,30 +1,38 @@
-import { type UserConfig } from "vite-plus";
 import { expect, test } from "vite-plus/test";
 
 import { reachable } from "#preview/reachable.ts";
+import { answered } from "#serving/serving.fixtures.ts";
 
-test("answers to the names it was given", () => {
-  const held = (reachable(["app1.example.test"]).config as UserConfig).preview?.allowedHosts;
+test("answers to the names it was given", async () => {
+  const held = await answered(reachable(["app1.example.test"]));
 
-  expect(held).toEqual(["app1.example.test"]);
+  expect(held.preview?.allowedHosts).toEqual(["app1.example.test"]);
 });
 
-test("answers to more than one, a deployment having a name per application", () => {
-  const held = reachable(["a.example.test", "b.example.test"]);
+test("answers to more than one, a deployment having a name per application", async () => {
+  const held = await answered(reachable(["a.example.test", "b.example.test"]));
 
-  expect((held.config as UserConfig).preview?.allowedHosts).toHaveLength(2);
+  expect(held.preview?.allowedHosts).toHaveLength(2);
 });
 
-test("names them rather than turning the check off", () => {
-  expect((reachable(["a.example.test"]).config as UserConfig).preview?.allowedHosts).not.toBe(true);
+test("names them rather than turning the check off", async () => {
+  expect((await answered(reachable(["a.example.test"]))).preview?.allowedHosts).not.toBe(true);
 });
 
-test("copies the list, so a caller's array is not the server's", () => {
+test("copies the list, so a caller's array is not the server's", async () => {
   const names = ["a.example.test"];
 
-  expect((reachable(names).config as UserConfig).preview?.allowedHosts).not.toBe(names);
+  expect((await answered(reachable(names))).preview?.allowedHosts).not.toBe(names);
 });
 
-test("names the hosts, so provenance says who was let in", () => {
-  expect(reachable(["a.example.test"]).name).toBe("preview.reachable(a.example.test)");
+test("takes the environment's answer instead, where a machine has arranged its own", async () => {
+  const held = await answered(reachable(["stated.example.test"]), {
+    STEALTH_HOSTS: "override.example.test",
+  });
+
+  expect(held.preview?.allowedHosts).toEqual(["override.example.test"]);
+});
+
+test("is named the same whatever a machine arranged, so a repository can take it back", () => {
+  expect(reachable(["a.example.test"]).name).toBe("preview.reachable");
 });

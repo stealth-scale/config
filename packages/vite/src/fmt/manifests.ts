@@ -2,7 +2,7 @@
  * Putting a manifest's keys in the order everybody already expects them.
  */
 
-import { type Preset, preset } from "#core/layer.ts";
+import { type Preset, preset } from "@stealthscale/config-core";
 
 /**
  * Sorts every `package.json` into the conventional order.

@@ -2,7 +2,7 @@
  * Which dependencies a server build compiles rather than leaves to the runtime.
  */
 
-import { contribute, type Contribution } from "#core/layer.ts";
+import { contribute, type Contribution } from "@stealthscale/config-core";
 
 /**
  * Where a contribution to the list of what is not externalised lands.

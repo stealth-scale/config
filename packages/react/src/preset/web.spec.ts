@@ -3,6 +3,11 @@ import { expect, test } from "vite-plus/test";
 
 import { defineConfig, layers } from "#preset/web.ts";
 
+/**
+ * Where the config under specification is, which every `defineConfig` states for itself.
+ */
+const AT = import.meta.dirname;
+
 test("names every layer under this package, so provenance says where it came from", () => {
   for (const held of layers()) {
     expect(held.name.startsWith("react/")).toBe(true);
@@ -18,7 +23,7 @@ test("compiles the JSX, so a component is specified under the transform it ships
 });
 
 test("packs rather than builds, a library being published rather than deployed", async () => {
-  const held = await (defineConfig({}) as (env: ConfigEnv) => Promise<UserConfig>)({
+  const held = await (defineConfig(AT, {}) as (env: ConfigEnv) => Promise<UserConfig>)({
     command: "build",
     mode: "production",
   });
@@ -28,7 +33,7 @@ test("packs rather than builds, a library being published rather than deployed",
 });
 
 test("binds the library tier and this package's layers into one defineConfig", async () => {
-  const held = await (defineConfig({}) as (env: ConfigEnv) => Promise<UserConfig>)({
+  const held = await (defineConfig(AT, {}) as (env: ConfigEnv) => Promise<UserConfig>)({
     command: "build",
     mode: "production",
   });

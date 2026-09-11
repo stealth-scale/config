@@ -2,7 +2,8 @@
  * The commands a package installs.
  */
 
-import { type Preset, preset } from "#core/layer.ts";
+import { type Preset, preset } from "@stealthscale/config-core";
+
 import { type Commands } from "#pack/settings.ts";
 
 /**

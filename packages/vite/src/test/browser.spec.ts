@@ -1,9 +1,15 @@
 import { type ConfigEnv } from "vite-plus";
 import { expect, test } from "vite-plus/test";
 
-import { defineConfig } from "#core/define.ts";
+import { defineConfig } from "@stealthscale/config-core";
+
 import { readBack } from "#preset/preset.fixtures.ts";
 import { type Browsed, browser, driver } from "#test/browser.ts";
+
+/**
+ * Where the config under specification is, which every `defineConfig` states for itself.
+ */
+const AT = import.meta.dirname;
 
 /**
  * The environment a test run is read in.
@@ -17,7 +23,7 @@ const RUNNING: ConfigEnv = { command: "serve", mode: "test" };
  * @returns That block.
  */
 async function block(stated: Browsed = {}): Promise<Record<string, unknown>> {
-  const held = await readBack(defineConfig({ extends: [browser(stated)] }), RUNNING);
+  const held = await readBack(defineConfig(AT, { extends: [browser(stated)] }), RUNNING);
 
   return held.test?.browser as unknown as Record<string, unknown>;
 }
@@ -28,7 +34,7 @@ test("names the browser it drives, so a repository can take one back", () => {
 });
 
 test("asks for no driver until it is called, so the peer stays optional", async () => {
-  const held = await readBack(defineConfig({ extends: [] }), RUNNING);
+  const held = await readBack(defineConfig(AT, { extends: [] }), RUNNING);
 
   expect(held.test?.browser).toBeUndefined();
 });

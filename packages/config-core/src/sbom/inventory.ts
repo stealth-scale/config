@@ -12,19 +12,12 @@ export type Kind = "application" | "library";
 /**
  * The settings both blocks hand the plugin, whatever they are describing.
  *
- * `saveTimestamp` is off, and it is the one that matters beyond taste. A timestamp makes every
- * build write a file that differs from the last one by the moment it ran, which costs two things:
- * the task runner stops being able to tell a rebuilt package from an unchanged one, and two builds
- * of the same commit stop being comparable — which is the whole of what a reproducible build is
- * for. A serial number would do the same, and is off already.
- *
  * JSON and not XML. Both say the same thing and every tool reads the first; the second needs
  * another package installed to write it at all.
  */
 const SHARED = {
-  generateSerial: false,
+  collectLicenseEvidence: true,
   outFormats: ["json"] as const,
-  saveTimestamp: false,
   specVersion: "1.7" as const,
 };
 
@@ -32,6 +25,21 @@ const SHARED = {
  * Describes a bill of materials.
  */
 export interface Inventory {
+  /**
+   * Whether the document says which build wrote it and when.
+   *
+   * A serial number and a timestamp are what a scanner tracks one bill of materials by, and the
+   * minimum elements a published inventory is expected to carry name a timestamp outright. They
+   * also make every run write a file differing from the last by the moment it ran, so two builds of
+   * one commit stop being comparable — which is the whole of what a reproducible build is for.
+   *
+   * Production gets the identity and development gets the reproducibility. A release is written
+   * once and read by people who need to know which one they have; a build somebody runs forty times
+   * an afternoon is one where a file changing on its own is noise. Vite already decides which of
+   * the two this is, so nothing here reads it again.
+   */
+  identified: boolean;
+
   /**
    * Whether the output is served, which decides whether a copy goes where a browser looks for one.
    */
@@ -63,8 +71,10 @@ export function inventory(stated: Inventory): Record<string, unknown> {
 
   return {
     ...SHARED,
+    generateSerial: stated.identified,
     includeWellKnown: stated.served,
     rootComponentType: stated.type,
+    saveTimestamp: stated.identified,
     supplier: { contact: [...supplier.contact], name: supplier.name, url: [...supplier.url] },
   };
 }

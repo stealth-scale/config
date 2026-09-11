@@ -1,12 +1,21 @@
-import { type ConfigEnv, type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite-plus";
 import { expect, test } from "vite-plus/test";
+
+import { type Context } from "@stealthscale/config-core";
 
 import { hook } from "#pack/hook.ts";
 
 /**
- * The environment a refinement is handed, which this layer never reads.
+ * What a refinement is handed, which this layer never reads.
  */
-const ANY: ConfigEnv = { command: "build", mode: "production" };
+const ANY: Context = {
+  at: "/repository/packages/one",
+  command: "build",
+  env: {},
+  manifest: {},
+  mode: "production",
+  root: "/repository",
+};
 
 /**
  * Stands in for a repository's own code, told apart by identity rather than by what it does.
@@ -30,7 +39,7 @@ function two(): void {
  * @returns The hooks on the refined config.
  */
 function refined(config: UserConfig, hooks: Record<string, () => void>): Record<string, unknown> {
-  const held = hook({ because: "a theme writes its stylesheet", hooks }).refine(config, ANY);
+  const held = hook({ because: "a theme writes its stylesheet", hooks }).refine(ANY, config);
 
   return (held.pack as { hooks: Record<string, unknown> }).hooks;
 }
@@ -63,19 +72,19 @@ test("passes over hooks stated as a function, which nothing could merge with", (
 });
 
 test("leaves the rest of the pack settings alone", () => {
-  const held = hook({ because: "why", hooks: {} }).refine({ pack: { dts: true } }, ANY);
+  const held = hook({ because: "why", hooks: {} }).refine(ANY, { pack: { dts: true } });
 
   expect((held.pack as { dts: boolean }).dts).toBe(true);
 });
 
 test("leaves the rest of the config alone", () => {
-  const held = hook({ because: "why", hooks: {} }).refine({ test: { globals: true } }, ANY);
+  const held = hook({ because: "why", hooks: {} }).refine(ANY, { test: { globals: true } });
 
   expect(held.test?.globals).toBe(true);
 });
 
 test("passes over a packer configured as a list, every layer here describing one package", () => {
-  const held = hook({ because: "why", hooks: {} }).refine({ pack: [{ dts: true }] }, ANY);
+  const held = hook({ because: "why", hooks: {} }).refine(ANY, { pack: [{ dts: true }] });
 
   expect((held.pack as { dts?: boolean }).dts).toBeUndefined();
 });
