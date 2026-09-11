@@ -1,0 +1,29 @@
+# What an editor should do before the formatter runs. Oxfmt reads this file and then overrides it
+# from `fmt.style`, so the two are written to agree and a specification checks that they still do.
+
+root = true
+
+# Every file the formatter touches, which it writes to one width whatever the language.
+[*]
+charset = utf-8
+end_of_line = lf
+indent_size = 2
+indent_style = space
+insert_final_newline = true
+max_line_length = 100
+trim_trailing_whitespace = true
+
+# The one place a quote is a choice rather than the syntax.
+[*.{ts,tsx,mts,cts,js,jsx,mjs,cjs}]
+quote_type = double
+
+# Prose, which the formatter rewraps to the same width as everything else. A hard break written as
+# two trailing spaces will not survive that, so nothing here asks an editor to keep one.
+[*.{md,mdx,yml,yaml}]
+max_line_length = 100
+
+# Written by a tool, and overwritten by it on the next run. The formatter walks past these, so an
+# editor has nothing to gain by tidying them either.
+[{*.gen.*,bun.lock}]
+insert_final_newline = unset
+trim_trailing_whitespace = unset

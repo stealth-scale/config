@@ -1,0 +1,67 @@
+{
+  "name": "@stealthscale/config",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Every configuration a stealth repository is built, checked, tested and released under.",
+  "workspaces": [
+    "examples/*",
+    "packages/*"
+  ],
+  "type": "module",
+  "scripts": {
+    "bootstrap": "cd packages/vite && vp pack && cd ../react && vp pack && cd ../stylelint && vp pack",
+    "ready": "bun run bootstrap && vp check && vp run -r test && vp run -r build"
+  },
+  "devDependencies": {
+    "@stealthscale/config-react": "workspace:^",
+    "@stealthscale/config-typescript": "workspace:^",
+    "@types/node": "catalog:",
+    "eslint-plugin-jsdoc": "catalog:",
+    "eslint-plugin-perfectionist": "catalog:",
+    "eslint-plugin-tsdoc": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
+  },
+  "overrides": {
+    "vite": "catalog:"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "bun",
+      "version": "^1.4.2",
+      "onFail": "download"
+    },
+    "runtime": {
+      "name": "node",
+      "version": "^26",
+      "onFail": "download"
+    }
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "packageManager": "bun@1.4.2",
+  "catalog": {
+    "@types/node": "^26",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "eslint-plugin-jsdoc": "^64.3.4",
+    "eslint-plugin-perfectionist": "^5.11.0",
+    "eslint-plugin-tsdoc": "^0.5.2",
+    "happy-dom": "^20.14.3",
+    "oxc-transform-react": "^0.149.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "stylelint": "^17.15.0",
+    "stylelint-config-standard": "^40.0.0",
+    "stylelint-high-performance-animation": "^2.0.0",
+    "stylelint-order": "^8.1.1",
+    "stylelint-use-nesting": "^6.0.2",
+    "typescript": "^7.0.2",
+    "vite": "npm:@voidzero-dev/vite-plus-core@0.3.1",
+    "vite-plugin-stylelint": "^6.3.0",
+    "vite-plus": "0.3.1"
+  }
+}
