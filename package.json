@@ -13,6 +13,7 @@
     "ready": "bun run bootstrap && vp run ci"
   },
   "devDependencies": {
+    "@changesets/changelog-github": "catalog:",
     "@changesets/cli": "catalog:",
     "@stealthscale/vite-config-react": "workspace:^",
     "@stealthscale/vite-config-typescript": "workspace:^",
@@ -45,6 +46,7 @@
   "packageManager": "bun@1.4.2",
   "catalog": {
     "@arethetypeswrong/core": "^0.18.5",
+    "@changesets/changelog-github": "^1.0.1",
     "@changesets/cli": "^3.0.2",
     "@cyclonedx/cyclonedx-library": "^10.2.0",
     "@module-federation/runtime": "2.9.0",
@@ -55,7 +57,6 @@
     "@types/react-dom": "^19.3.0",
     "@types/spdx-expression-parse": "^4.0.0",
     "@vitejs/plugin-react": "^6.1.1",
-    "@vitest/browser-playwright": "4.1.11",
     "@vitest/coverage-v8": "4.1.11",
     "eslint-plugin-jsdoc": "^64.3.4",
     "eslint-plugin-perfectionist": "^5.11.0",
@@ -63,7 +64,6 @@
     "happy-dom": "^20.14.3",
     "oxc-transform-react": "^0.149.0",
     "packageurl-js": "^2.0.1",
-    "playwright": "^1.58.0",
     "publint": "^0.3.24",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",

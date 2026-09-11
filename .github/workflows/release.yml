@@ -62,6 +62,11 @@ jobs:
       # build their own.
       - run: bun run bootstrap
       - uses: changesets/action@v2
+        env:
+          # `changeset version` runs as a child process, and the changelog generator reads
+          # the token from its own environment. The action's `github-token` input
+          # authenticates the action itself and reaches nothing it spawns.
+          GITHUB_TOKEN: ${{ github.token }}
         with:
           version-script: bunx changeset version
           publish-script: bunx changeset publish
