@@ -16,18 +16,18 @@ Accepted
 
 ## Context
 
-`config-vite` held two things a configuration needs. The kernel supplies four kinds of layer, the
+`vite-config` held two things a configuration needs. The kernel supplies four kinds of layer, the
 function that produces each kind, and the three passes that turn a list of them into a config. The
 blocks supply one entry point per part of a Vite+ configuration, from `build` through `worker`.
 
-A package that only mints layers needs the kernel and none of the blocks. `config-css` is one of
-those. It states what a stylesheet is checked by, reaching for `contribute` and `preset` to state it
-and naming no Vite key of its own. With the kernel inside `config-vite`, a repository installing a
-stylelint configuration pulled in every Vite block to get at two functions.
+A package that only mints layers needs the kernel and none of the blocks. `vite-config-css` is one
+of those. It states what a stylesheet is checked by, reaching for `contribute` and `preset` to state
+it and naming no Vite key of its own. With the kernel inside `vite-config`, a repository installing
+a stylelint configuration pulled in every Vite block to get at two functions.
 
 ## Decision
 
-We will publish the kernel as `@stealthscale/config-core`, because a package that mints layers
+We will publish the kernel as `@stealthscale/vite-config-core`, because a package that mints layers
 should depend on how layers compose rather than on what any one block configures.
 
 Nothing in the kernel names a key of a Vite+ configuration or knows what a block is. Reading the
@@ -36,14 +36,14 @@ what every block would otherwise work out for itself.
 
 ## Alternatives Considered
 
-### Leave the kernel in `config-vite`
+### Leave the kernel in `vite-config`
 
 One published package, with every configuration package taking it as a peer dependency. There is one
 version number, nothing to keep in step, and the barrel a repository already imports from is the
 barrel that mints layers.
 
-It lost on what it costs a consumer. `config-css` reaches for two functions and would declare a peer
-dependency on every block in the toolchain to get them, which a repository that wants its
+It lost on what it costs a consumer. `vite-config-css` reaches for two functions and would declare a
+peer dependency on every block in the toolchain to get them, which a repository that wants its
 stylesheets checked pays for and never calls.
 
 ### Give each configuration package its own minting functions
@@ -60,8 +60,8 @@ drops it without saying so.
 
 **Positive:**
 
-- `config-css` depends on the kernel alone, and a consumer installing it gets nothing it does not
-  call.
+- `vite-config-css` depends on the kernel alone, and a consumer installing it gets nothing it does
+  not call.
 - A configuration package for another framework starts from the kernel without inheriting a position
   on Vite blocks.
 
@@ -74,6 +74,6 @@ drops it without saying so.
 
 **Neutral:**
 
-- `config-react` still takes `config-vite` as a peer, because it composes the toolchain's tiers
+- `vite-config-react` still takes `vite-config` as a peer, because it composes the toolchain's tiers
   rather than only minting layers. The split separates packages by what they need, not by what they
   are.
