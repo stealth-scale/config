@@ -1,0 +1,26 @@
+{
+  "name": "@stealthscale/config-typescript",
+  "version": "0.0.0",
+  "description": "The TypeScript settings every stealth package compiles under, as configs to extend.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stealth-scale/config.git",
+    "directory": "packages/typescript"
+  },
+  "files": [
+    "base.json",
+    "node.json",
+    "web.json"
+  ],
+  "type": "module",
+  "exports": {
+    "./base.json": "./base.json",
+    "./node.json": "./node.json",
+    "./web.json": "./web.json",
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
