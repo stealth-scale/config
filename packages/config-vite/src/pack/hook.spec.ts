@@ -3,7 +3,7 @@ import { expect, test } from "vite-plus/test";
 
 import { type Context } from "@stealthscale/config-core";
 
-import { hook } from "#pack/hook.ts";
+import { buildBefore, buildDone, buildPrepare, hook } from "#pack/hook.ts";
 
 /**
  * What a refinement is handed, which this layer never reads.
@@ -95,8 +95,26 @@ test("carries the reason, this being the least legible layer a config can hold",
   );
 });
 
-test("names the moments it runs at, so provenance says what reaches past the layers", () => {
+test("names the moments it runs at, which is what reaches past the layers", () => {
   const held = hook({ because: "why", hooks: { "build:before": one, "build:done": two } });
 
   expect(held.name).toBe("pack.hook(build:before, build:done)");
+});
+
+test("states one moment at a time, which is how a repository states them", () => {
+  expect(buildPrepare("why", one).name).toBe("pack.hook(build:prepare)");
+  expect(buildBefore("why", one).name).toBe("pack.hook(build:before)");
+  expect(buildDone("why", one).name).toBe("pack.hook(build:done)");
+});
+
+test("runs the code at the moment its name says", () => {
+  const held = buildBefore("why", one).refine(ANY, {}) as {
+    pack: { hooks: Record<string, unknown> };
+  };
+
+  expect(held.pack.hooks["build:before"]).toBe(one);
+});
+
+test("carries the reason each was given, one moment at a time", () => {
+  expect(buildDone("a theme reads what it built", one).because).toBe("a theme reads what it built");
 });

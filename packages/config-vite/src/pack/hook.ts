@@ -54,3 +54,58 @@ export function hook(stated: Hooked): Override {
     },
   });
 }
+
+/**
+ * What the packer runs at one moment, as the packer declares it.
+ *
+ * Read off the moment rather than shared between the three, because each is handed something
+ * different: the bundler at `build:before`, the chunks it produced at `build:done`, and neither
+ * before it has started.
+ *
+ * @typeParam At - Which moment.
+ */
+type Runs<At extends keyof Moments> = NonNullable<Moments[At]>;
+
+/**
+ * Runs code before the packer starts, which is before it empties the output directory.
+ *
+ * The moment for what has to exist before the packer looks at anything, and the wrong moment for
+ * writing into `dist`: the directory is emptied between this and `buildBefore`, so a file written
+ * here is deleted before the bundle is made.
+ *
+ * @param because - Why this repository needs it.
+ * @param runs - The code to run.
+ * @returns The override.
+ */
+export function buildPrepare(because: string, runs: Runs<"build:prepare">): Override {
+  return hook({ because, hooks: { "build:prepare": runs } });
+}
+
+/**
+ * Runs code before each bundle, once the output directory has been emptied.
+ *
+ * The moment for an artefact the package ships and no bundler produces — a stylesheet solved from a
+ * recipe, a file written from a schema. Writing it here is what puts it on disk in time for the
+ * packer to find it.
+ *
+ * @param because - Why this repository needs it.
+ * @param runs - The code to run.
+ * @returns The override.
+ */
+export function buildBefore(because: string, runs: Runs<"build:before">): Override {
+  return hook({ because, hooks: { "build:before": runs } });
+}
+
+/**
+ * Runs code once the chunks exist.
+ *
+ * The moment for reading what was built rather than adding to it: an inventory of the output, a
+ * check on what landed, a copy taken somewhere else.
+ *
+ * @param because - Why this repository needs it.
+ * @param runs - The code to run.
+ * @returns The override.
+ */
+export function buildDone(because: string, runs: Runs<"build:done">): Override {
+  return hook({ because, hooks: { "build:done": runs } });
+}

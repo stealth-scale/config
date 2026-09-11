@@ -1,15 +1,13 @@
-import { preset } from "@stealthscale/config-react";
+import { preset as react } from "@stealthscale/config-react";
 
-import { lint, run, staged, test } from "./packages/config-vite/src/index.ts";
+import { lint, test } from "./packages/config-vite/src/index.ts";
 import { defineConfig } from "./packages/config-vite/src/preset/node.ts";
+import { workspace } from "./packages/config-vite/src/preset/workspace.ts";
 
 export default defineConfig(import.meta.dirname, {
   extends: [
-    run.cache(),
-    run.ci(),
-    staged.checked(),
-    staged.formatted(),
-    test.projects(),
+    workspace(),
+    react.workspace(),
 
     lint.relax({
       because:
@@ -28,6 +26,5 @@ export default defineConfig(import.meta.dirname, {
         "whose root element has more than one child reports one such branch",
       files: ["examples/lib-ui/src/panel.tsx"],
     }),
-    preset.workspace(),
   ],
 });

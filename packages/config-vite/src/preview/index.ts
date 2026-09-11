@@ -14,4 +14,5 @@ export { bound } from "#preview/bound.ts";
 export { headers } from "#preview/headers.ts";
 export { port } from "#preview/port.ts";
 export { reachable } from "#preview/reachable.ts";
+export { reached } from "#preview/reached.ts";
 export { shared } from "#preview/shared.ts";

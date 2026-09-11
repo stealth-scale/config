@@ -25,17 +25,11 @@ function within(path: string): string {
  * Reads the export map of the package being configured.
  *
  * @param context - The command, the mode and the repository around them.
- * @returns The map.
- * @throws Error Where a workspace root is being packed, or the manifest declares no exports.
+ * @returns The map, or nothing where a workspace root is what is being configured.
+ * @throws Error Where the manifest declares no exports.
  */
-function exported(context: Context): Readonly<Record<string, unknown>> {
-  if (context.at === context.root) {
-    throw new Error(
-      "pack.published() is reading the workspace root's manifest, which publishes nothing. A " +
-        "package states this in its own config, and a package with no config of its own takes " +
-        "the root's — so it names its entry on the command line instead.",
-    );
-  }
+function exported(context: Context): Readonly<Record<string, unknown>> | undefined {
+  if (context.at === context.root) return undefined;
 
   const stated = context.manifest.exports;
 
@@ -67,13 +61,21 @@ function exported(context: Context): Readonly<Record<string, unknown>> {
  * what it was given. A subpath is added by writing it into the manifest, beside the ones already
  * there, in the file a consumer will read it from.
  *
+ * Part of the tier rather than something a package states, so the entry list is read from the one
+ * file that already holds it wherever a package publishes at all. It states nothing where the
+ * workspace root is what is being configured: a root publishes nothing, and a package with no
+ * config of its own is read through the root's, so refusing there would refuse the package too.
+ *
  * @returns The preset.
- * @throws Error Where the manifest declares no exports, or none the packer could build.
+ * @throws Error Where a package's manifest declares no exports, or none the packer could build.
  */
 export function published(): Preset {
   return preset({
     config: (context) => {
       const stated = exported(context);
+
+      if (stated === undefined) return {};
+
       const entry: Record<string, string> = {};
 
       for (const [subpath, value] of Object.entries(stated)) {

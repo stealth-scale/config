@@ -73,8 +73,14 @@ test("refuses an export map holding nothing it could build", () => {
   );
 });
 
-test("refuses a workspace root, which publishes nothing of its own", () => {
+test("states nothing for a workspace root, which publishes nothing of its own", () => {
+  const held = resolving({ at: "/repository", manifest: {}, root: "/repository" });
+
+  expect(held()).toEqual({});
+});
+
+test("states nothing for a root even where a package below takes the root's config", () => {
   const held = resolving({ at: "/repository", manifest: { exports: {} }, root: "/repository" });
 
-  expect(held).toThrow(/publishes nothing/u);
+  expect(held()).toEqual({});
 });

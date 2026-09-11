@@ -8,6 +8,7 @@ import * as build from "#build/index.ts";
 import * as lint from "#lint/index.ts";
 import { house } from "#preset/house.ts";
 import * as test from "#test/index.ts";
+import * as worker from "#worker/index.ts";
 
 /**
  * The layers an application a browser opens is built on.
@@ -22,6 +23,10 @@ import * as test from "#test/index.ts";
  * published is rare, and a command-line tool — which is the common case — is installed from a
  * registry and belongs on `preset/node` with the rest of what publishes.
  *
+ * The worker format is among them, because it costs nothing to state and everything to forget: an
+ * application with no worker is unaffected, and one that grows a worker gets a module rather than a
+ * script that cannot import. `worker.format` says what that buys.
+ *
  * Answered as a list as well as bound below, so that a config package for a framework composes
  * these with its own rather than sitting beside them. Sitting beside them is what lets a repository
  * pair the wrong tier with the right framework and lose half its rules without being told.
@@ -29,7 +34,7 @@ import * as test from "#test/index.ts";
  * @returns Each layer the tier is built on, in the order they compose.
  */
 export function layers(): readonly Extendable[] {
-  return [...house(), build.preset.web(), lint.preset.web(), test.preset.web()];
+  return [...house(), build.preset.web(), lint.preset.web(), test.preset.web(), worker.format()];
 }
 
 /**

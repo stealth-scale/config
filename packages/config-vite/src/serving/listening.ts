@@ -97,3 +97,26 @@ export function reachable(where: Serving, names: readonly string[]): Preset {
     name: `${where}.reachable`,
   });
 }
+
+/**
+ * States the port, the names and the address together, which is how they are true.
+ *
+ * The three answer one question between them: where this server is reached. Stated apart they are
+ * three lines a config repeats per application, and two of them are the same list — a name the
+ * server answers to is a name that resolves to loopback, so binding follows from answering.
+ *
+ * Each is still its own layer underneath, named as it always was, so a repository disagreeing with
+ * one of the three takes that one back rather than all three.
+ *
+ * @param where - Which server is being configured.
+ * @param at - The port to serve at.
+ * @param names - The names it answers to, beyond loopback.
+ * @returns The three layers, in the order they compose.
+ */
+export function reached(
+  where: Serving,
+  at: number,
+  names: readonly string[] = [],
+): readonly Preset[] {
+  return [port(where, at), reachable(where, names), bound(where, names)];
+}

@@ -7,9 +7,12 @@ import { defineConfig, layers } from "#preset/app.ts";
 import { layers as web } from "#preset/web.ts";
 
 /**
- * Where the config under specification is, which every `defineConfig` states for itself.
+ * Where the config under specification is: this package's own root.
+ *
+ * A config file sits at a package root, and the tier reads the manifest beside it. Naming this
+ * directory instead would hand the layers a directory holding no manifest at all.
  */
-const AT = import.meta.dirname;
+const AT = new URL("../..", import.meta.url).pathname;
 
 /**
  * Names every layer the tier is built on.
@@ -37,6 +40,10 @@ test("builds, which is the half of the pair a library does not do", () => {
   expect(held).toContain("build.preload");
 });
 
+test("bundles a worker as a module, so one added later can import at all", () => {
+  expect(names(layers())).toContain("worker.format");
+});
+
 test("is the browser's rules and the browser's environment", () => {
   const held = names(layers());
 
@@ -44,13 +51,13 @@ test("is the browser's rules and the browser's environment", () => {
   expect(held.some((one) => one.startsWith("lint."))).toBe(true);
 });
 
-test("is the same as the library tier but for which of the two blocks it carries", () => {
+test("is the same as the library tier but for what is deployed rather than published", () => {
   const held = new Set(names(layers()));
   const other = new Set(names(web()));
   const onlyHere = [...held].filter((one) => !other.has(one));
   const onlyThere = [...other].filter((one) => !held.has(one));
 
-  expect(onlyHere.every((one) => one.startsWith("build."))).toBe(true);
+  expect(onlyHere.every((one) => one.startsWith("build.") || one === "worker.format")).toBe(true);
   expect(onlyThere.every((one) => one.startsWith("pack."))).toBe(true);
 });
 

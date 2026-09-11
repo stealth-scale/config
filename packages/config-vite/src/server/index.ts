@@ -6,3 +6,4 @@ export { bound } from "#server/bound.ts";
 export { port } from "#server/port.ts";
 export { proxy } from "#server/proxy.ts";
 export { reachable } from "#server/reachable.ts";
+export { reached } from "#server/reached.ts";

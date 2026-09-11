@@ -6,8 +6,6 @@ import { defineConfig } from "vite-plus";
 
 export default defineConfig({
   pack: {
-    // `pack.quality`: an export pointing at a file that is not shipped, and types that resolve as
-    // something other than the module they sit beside.
     attw: true,
     dts: true,
     entry: { index: "src/index.ts" },
@@ -16,20 +14,13 @@ export default defineConfig({
   },
 
   test: {
-    // `test.isolation`: nothing a test did reaches the next one.
     clearMocks: true,
     exclude: ["**/node_modules/**", "**/dist/**", "**/coverage/**"],
-
-    // `test.assertion`: a test that asserts nothing has not tested anything.
     expandSnapshotDiff: true,
     expect: { requireAssertions: true },
     globals: false,
-
-    // `test.files`: tests live beside what they cover, and nowhere else.
     include: ["**/*.spec.ts"],
     restoreMocks: true,
-
-    // `test.order`: a different order every run, so no test leans on the one before it.
     sequence: { shuffle: true },
     unstubEnvs: true,
     unstubGlobals: true,

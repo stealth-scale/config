@@ -26,12 +26,8 @@ export default defineConfig(import.meta.dirname, {
       shared: react.shared(),
     }),
 
-    server.port(4402),
-    server.reachable(NAMES),
-    server.bound(NAMES),
-    preview.port(4403),
-    preview.reachable(NAMES),
-    preview.bound(NAMES),
+    server.reached(4402, NAMES),
+    preview.reached(4403, NAMES),
     preview.shared(ALLOWED),
   ],
 });

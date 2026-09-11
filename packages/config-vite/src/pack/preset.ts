@@ -7,16 +7,20 @@ import { type Layer } from "@stealthscale/config-core";
 import { carry } from "#pack/carry.ts";
 import { declarations } from "#pack/declarations.ts";
 import { platform } from "#pack/platform.ts";
+import { published } from "#pack/published.ts";
 import { quality } from "#pack/quality.ts";
 import { source } from "#pack/source.ts";
 
 /**
  * What every published package is packed with, wherever it runs.
  *
+ * The entry list is among them. Every package that publishes states its subpaths in its manifest
+ * already, so reading them here is what stops each config repeating the answer.
+ *
  * @returns The layers.
  */
 export function base(): readonly Layer[] {
-  return [carry(), declarations(), quality(), source()];
+  return [carry(), declarations(), published(), quality(), source()];
 }
 
 /**

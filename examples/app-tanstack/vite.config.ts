@@ -26,11 +26,7 @@ export default defineConfig(import.meta.dirname, {
       stubs: { "remote/Dashboard": join(import.meta.dirname, "src/remote.fixtures.tsx") },
     }),
 
-    server.port(4404),
-    server.reachable(NAMES),
-    server.bound(NAMES),
-    preview.port(4405),
-    preview.reachable(NAMES),
-    preview.bound(NAMES),
+    server.reached(4404, NAMES),
+    preview.reached(4405, NAMES),
   ],
 });

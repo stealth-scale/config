@@ -37,6 +37,10 @@
       "stealth-source": "./src/preset/web.ts",
       "default": "./dist/preset/web.mjs"
     },
+    "./preset/workspace": {
+      "stealth-source": "./src/preset/workspace.ts",
+      "default": "./dist/preset/workspace.mjs"
+    },
     "./package.json": "./package.json",
     "./globals": "./globals.d.ts"
   },
@@ -47,6 +51,7 @@
       "./preset/base": "./dist/preset/base.mjs",
       "./preset/node": "./dist/preset/node.mjs",
       "./preset/web": "./dist/preset/web.mjs",
+      "./preset/workspace": "./dist/preset/workspace.mjs",
       "./package.json": "./package.json",
       "./globals": "./globals.d.ts"
     },
