@@ -4,7 +4,7 @@
 
 import { federation } from "@module-federation/vite";
 
-import { contribute, type Layer, preset } from "@stealthscale/config-core";
+import { contribute, type Layer, preset } from "@stealthscale/vite-config-core";
 
 import { type Remotes, type Shared, UNSET } from "#federation/settings.ts";
 

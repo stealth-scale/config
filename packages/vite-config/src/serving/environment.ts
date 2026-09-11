@@ -2,7 +2,7 @@
  * What a machine says about how the servers on it are reached.
  */
 
-import { type Context } from "@stealthscale/config-core";
+import { type Context } from "@stealthscale/vite-config-core";
 
 /**
  * Where the names a server answers to are read from.

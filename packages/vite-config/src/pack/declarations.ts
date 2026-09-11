@@ -2,7 +2,7 @@
  * The types a package publishes beside its code.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
  * Emits a declaration file for everything the package exports.

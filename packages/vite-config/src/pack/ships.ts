@@ -2,7 +2,7 @@
  * Publishing subpaths a package works out rather than writes down.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 import { carrying, type Packed } from "#pack/carry.ts";
 

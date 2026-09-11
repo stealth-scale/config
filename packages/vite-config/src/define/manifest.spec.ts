@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { type UserConfig } from "vite-plus";
 import { expect, test } from "vite-plus/test";
 
-import { type Manifest } from "@stealthscale/config-core";
+import { type Manifest } from "@stealthscale/vite-config-core";
 
 import { type Injected, manifest } from "#define/manifest.ts";
 import { answered } from "#vite.fixtures.ts";

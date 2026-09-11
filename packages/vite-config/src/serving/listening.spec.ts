@@ -1,7 +1,7 @@
 import { type UserConfig } from "vite-plus";
 import { expect, test } from "vite-plus/test";
 
-import { type Context, type Preset } from "@stealthscale/config-core";
+import { type Context, type Preset } from "@stealthscale/vite-config-core";
 
 import { bound, port, reachable, type Serving } from "#serving/listening.ts";
 import { answered } from "#vite.fixtures.ts";

@@ -1,5 +1,5 @@
-import { defineConfig } from "@stealthscale/config-react/preset/app";
-import { preview, server, ssr } from "@stealthscale/config-vite";
+import { preview, server, ssr } from "@stealthscale/vite-config";
+import { defineConfig } from "@stealthscale/vite-config-react/preset/app";
 
 export default defineConfig(import.meta.dirname, {
   extends: [

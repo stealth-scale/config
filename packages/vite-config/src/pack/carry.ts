@@ -2,7 +2,7 @@
  * Keeping the subpaths a package ships without building them.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
  * The subpath the packer writes on its own, and would write twice if it were handed back.

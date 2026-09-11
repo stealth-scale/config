@@ -2,7 +2,7 @@
  * Which dependencies a server build compiles rather than leaves to the runtime.
  */
 
-import { contribute, type Contribution } from "@stealthscale/config-core";
+import { contribute, type Contribution } from "@stealthscale/vite-config-core";
 
 /**
  * Where a contribution to the list of what is not externalised lands.

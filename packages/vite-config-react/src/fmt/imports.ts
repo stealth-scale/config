@@ -2,7 +2,7 @@
  * Where a rendering file's framework imports sit.
  */
 
-import { fmt, type Override } from "@stealthscale/config-vite";
+import { fmt, type Override } from "@stealthscale/vite-config";
 
 /**
  * The modules that are React rather than a dependency that happens to be installed.

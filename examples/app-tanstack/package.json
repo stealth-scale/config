@@ -23,9 +23,9 @@
   },
   "devDependencies": {
     "@module-federation/vite": "catalog:",
-    "@stealthscale/config-react": "workspace:^",
-    "@stealthscale/config-typescript": "workspace:^",
-    "@stealthscale/config-vite": "workspace:^",
+    "@stealthscale/vite-config": "workspace:^",
+    "@stealthscale/vite-config-react": "workspace:^",
+    "@stealthscale/vite-config-typescript": "workspace:^",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "happy-dom": "catalog:",

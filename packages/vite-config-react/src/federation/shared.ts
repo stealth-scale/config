@@ -4,7 +4,7 @@
 
 import { createRequire } from "node:module";
 
-import { type federation } from "@stealthscale/config-vite";
+import { type federation } from "@stealthscale/vite-config";
 
 /**
  * The packages a host and its remotes must load exactly one copy of.

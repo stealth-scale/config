@@ -2,7 +2,7 @@
  * How a package is built.
  */
 
-import { type Layer } from "@stealthscale/config-core";
+import { type Layer } from "@stealthscale/vite-config-core";
 
 import { inventory } from "#build/inventory.ts";
 import { licences } from "#build/licences.ts";

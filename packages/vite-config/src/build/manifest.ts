@@ -2,7 +2,7 @@
  * Writing down which built file each source file became.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
  * Writes the map from source paths to the hashed files they were built into.

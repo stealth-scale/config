@@ -2,8 +2,8 @@
  * Configuring an application that renders.
  */
 
-import { configuring, type Defining, type Layer, layout, owned } from "@stealthscale/config-vite";
-import { layers as application } from "@stealthscale/config-vite/preset/app";
+import { configuring, type Defining, type Layer, layout, owned } from "@stealthscale/vite-config";
+import { layers as application } from "@stealthscale/vite-config/preset/app";
 
 import * as plugin from "#plugin/index.ts";
 import { PAGE } from "#preset/page.ts";

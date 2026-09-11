@@ -2,7 +2,7 @@
  * The attribution an application owes for what it bundled.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
  * Writes out the licence of everything the build bundled.

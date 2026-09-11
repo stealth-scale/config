@@ -2,7 +2,7 @@
  * Putting a manifest's keys in the order everybody already expects them.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
  * Sorts every `package.json` into the conventional order.

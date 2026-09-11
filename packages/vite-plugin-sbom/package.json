@@ -1,15 +1,27 @@
 {
-  "name": "@stealthscale/plugin-sbom",
-  "version": "0.0.0",
+  "name": "@stealthscale/vite-plugin-sbom",
+  "version": "0.1.0",
   "description": "A bill of materials for what a build actually reached, and the toolchain that produced it.",
+  "keywords": [
+    "cyclonedx",
+    "sbom",
+    "spdx",
+    "supply-chain",
+    "vite",
+    "vite-plugin"
+  ],
+  "homepage": "https://github.com/stealth-scale/config/tree/main/packages/vite-plugin-sbom#readme",
+  "bugs": "https://github.com/stealth-scale/config/issues",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/stealth-scale/config.git",
-    "directory": "plugins/plugin-sbom"
+    "directory": "packages/vite-plugin-sbom"
   },
   "files": [
-    "dist"
+    "dist",
+    "LICENSE",
+    "README.md"
   ],
   "type": "module",
   "sideEffects": false,
@@ -43,8 +55,8 @@
     "spdx-expression-parse": "catalog:"
   },
   "devDependencies": {
-    "@stealthscale/config-typescript": "workspace:^",
-    "@stealthscale/plugin-base": "workspace:^",
+    "@stealthscale/vite-config-typescript": "workspace:^",
+    "@stealthscale/vite-plugin-base": "workspace:^",
     "@types/node": "catalog:",
     "@types/spdx-expression-parse": "catalog:",
     "typescript": "catalog:",
@@ -52,7 +64,10 @@
     "vite-plus": "catalog:"
   },
   "peerDependencies": {
-    "@stealthscale/plugin-base": "workspace:^",
-    "vite": "catalog:"
+    "@stealthscale/vite-plugin-base": "workspace:^",
+    "vite": "catalog:peer"
+  },
+  "engines": {
+    "node": ">=24.0.0"
   }
 }

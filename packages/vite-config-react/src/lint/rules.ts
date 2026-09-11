@@ -2,7 +2,7 @@
  * What a file that renders answers to beyond what every file does.
  */
 
-import { type Contribution, lint } from "@stealthscale/config-vite";
+import { type Contribution, lint } from "@stealthscale/vite-config";
 
 /**
  * The files these reach, which is everything a package that renders compiles.

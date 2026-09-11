@@ -2,7 +2,7 @@
  * What is put back between one test and the next.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
  * Undoes everything a test did to something it shares with the next one.

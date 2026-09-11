@@ -35,7 +35,9 @@ function published(specifier: string): Record<string, unknown> {
 }
 
 test("is the condition the shared tsconfig switches on", () => {
-  const options = published("@stealthscale/config-typescript/base.json")["compilerOptions"] as {
+  const options = published("@stealthscale/vite-config-typescript/base.json")[
+    "compilerOptions"
+  ] as {
     customConditions: string[];
   };
 

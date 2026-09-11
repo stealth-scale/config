@@ -2,7 +2,7 @@
  * Wrapping prose that is not in code.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
  * Wraps a paragraph of prose at the same width as everything else.

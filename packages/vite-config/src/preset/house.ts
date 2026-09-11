@@ -2,7 +2,7 @@
  * What every stealth package answers to, whatever it is and wherever it runs.
  */
 
-import { type Extendable } from "@stealthscale/config-core";
+import { type Extendable } from "@stealthscale/vite-config-core";
 
 import * as fmt from "#fmt/index.ts";
 import * as resolve from "#resolve/index.ts";

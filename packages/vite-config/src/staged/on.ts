@@ -2,7 +2,7 @@
  * Running a repository's own command over what it is about to commit.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 import { type Runs } from "#staged/settings.ts";
 

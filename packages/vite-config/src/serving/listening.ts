@@ -4,7 +4,7 @@
 
 import { type UserConfig } from "vite-plus";
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 import { bound as derived, hosts } from "#serving/environment.ts";
 

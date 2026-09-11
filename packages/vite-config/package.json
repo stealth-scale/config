@@ -1,16 +1,27 @@
 {
-  "name": "@stealthscale/config-vite",
-  "version": "0.0.0",
+  "name": "@stealthscale/vite-config",
+  "version": "0.1.0",
   "description": "Composes a Vite+ config out of layers: presets set, contributions append, removals take back, overrides rewrite.",
+  "keywords": [
+    "config",
+    "monorepo",
+    "preset",
+    "vite",
+    "vite-plus"
+  ],
+  "homepage": "https://github.com/stealth-scale/config/tree/main/packages/vite-config#readme",
+  "bugs": "https://github.com/stealth-scale/config/issues",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/stealth-scale/config.git",
-    "directory": "packages/config-vite"
+    "directory": "packages/vite-config"
   },
   "files": [
     "dist",
-    "globals.d.ts"
+    "globals.d.ts",
+    "LICENSE",
+    "README.md"
   ],
   "type": "module",
   "imports": {
@@ -67,9 +78,9 @@
   "devDependencies": {
     "@arethetypeswrong/core": "catalog:",
     "@module-federation/vite": "catalog:",
-    "@stealthscale/config-core": "workspace:^",
-    "@stealthscale/config-typescript": "workspace:^",
-    "@stealthscale/plugin-sbom": "workspace:^",
+    "@stealthscale/vite-config-core": "workspace:^",
+    "@stealthscale/vite-config-typescript": "workspace:^",
+    "@stealthscale/vite-plugin-sbom": "workspace:^",
     "@types/node": "catalog:",
     "@vitest/browser-playwright": "catalog:",
     "@vitest/coverage-v8": "catalog:",
@@ -83,8 +94,8 @@
   },
   "peerDependencies": {
     "@module-federation/vite": "catalog:",
-    "@stealthscale/config-core": "workspace:^",
-    "@stealthscale/plugin-sbom": "workspace:^",
+    "@stealthscale/vite-config-core": "workspace:^",
+    "@stealthscale/vite-plugin-sbom": "workspace:^",
     "eslint-plugin-jsdoc": "catalog:",
     "eslint-plugin-perfectionist": "catalog:",
     "eslint-plugin-tsdoc": "catalog:",
@@ -98,5 +109,8 @@
     "@module-federation/vite": {
       "optional": true
     }
+  },
+  "engines": {
+    "node": ">=24.0.0"
   }
 }

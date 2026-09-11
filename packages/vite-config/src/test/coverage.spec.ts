@@ -35,7 +35,11 @@ test("leaves out what a tool wrote, the same list the linter and formatter walk 
 });
 
 test("reports for a reader and for a machine, and drops the two nobody opens", () => {
-  expect(settings()["reporter"]).toEqual(["text", "html", "lcov"]);
+  expect(settings()["reporter"]).toEqual(["text-summary", "html", "lcov"]);
+});
+
+test("prints the four numbers to the terminal, not a row for every file", () => {
+  expect(settings()["reporter"]).not.toContain("text");
 });
 
 test("asks for all of it, which is the one number that needs no explaining", () => {

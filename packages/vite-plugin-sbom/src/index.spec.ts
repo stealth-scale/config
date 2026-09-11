@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, test } from "vite-plus/test";
 
-import { type Bundling } from "@stealthscale/plugin-base";
+import { type Bundling } from "@stealthscale/vite-plugin-base";
 
 import { sbom, written } from "#index.ts";
 

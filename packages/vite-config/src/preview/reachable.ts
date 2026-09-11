@@ -2,7 +2,7 @@
  * The names a preview answers to.
  */
 
-import { type Preset } from "@stealthscale/config-core";
+import { type Preset } from "@stealthscale/vite-config-core";
 
 import { reachable as answers } from "#serving/listening.ts";
 

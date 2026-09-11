@@ -2,7 +2,7 @@
  * What order tests run in.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
  * Runs the files and the tests in a different order every time.

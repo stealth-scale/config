@@ -4,7 +4,7 @@
  * The constants `define` injects, declared so that reading one type-checks.
  *
  * A package reaches these by referencing this file's types from one it already compiles, with a
- * triple-slash directive naming `@stealthscale/config-vite/globals`.
+ * triple-slash directive naming `@stealthscale/vite-config/globals`.
  *
  * Each is a substitution the bundler makes rather than a variable, so it exists only in a build
  * this config configured. A package reading one without that reference gets a type error, which is

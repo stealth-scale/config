@@ -5,7 +5,7 @@
 import { globSync } from "node:fs";
 import { dirname, sep } from "node:path";
 
-import { type Manifest, type Preset, preset } from "@stealthscale/config-core";
+import { type Manifest, type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
  * Reads the workspace globs a manifest declares.

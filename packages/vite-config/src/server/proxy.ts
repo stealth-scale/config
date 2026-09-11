@@ -2,7 +2,7 @@
  * Forwarding one path to whatever is answering behind it.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
  * Forwards every request under a path to the origin answering behind it.

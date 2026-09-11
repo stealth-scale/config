@@ -1,6 +1,6 @@
-import { federation as react } from "@stealthscale/config-react";
-import { defineConfig } from "@stealthscale/config-react/preset/app";
-import { federation, preview, server } from "@stealthscale/config-vite";
+import { federation, preview, server } from "@stealthscale/vite-config";
+import { federation as react } from "@stealthscale/vite-config-react";
+import { defineConfig } from "@stealthscale/vite-config-react/preset/app";
 
 /**
  * The names this application is served under while it is being worked on, beyond loopback. Stated

@@ -5,17 +5,17 @@
   "description": "Every configuration a stealth repository is built, checked, tested and released under.",
   "workspaces": [
     "examples/*",
-    "packages/*",
-    "plugins/*"
+    "packages/*"
   ],
   "type": "module",
   "scripts": {
-    "bootstrap": "cd packages/config-core && vp pack && cd ../config-vite && vp pack && cd ../config-react && vp pack && cd ../config-css && vp pack",
+    "bootstrap": "cd packages/vite-plugin-base && vp pack && cd ../vite-plugin-sbom && vp pack && cd ../vite-config-core && vp pack && cd ../vite-config && vp pack && cd ../vite-config-react && vp pack && cd ../vite-config-css && vp pack",
     "ready": "bun run bootstrap && vp run ci"
   },
   "devDependencies": {
-    "@stealthscale/config-react": "workspace:^",
-    "@stealthscale/config-typescript": "workspace:^",
+    "@changesets/cli": "catalog:",
+    "@stealthscale/vite-config-react": "workspace:^",
+    "@stealthscale/vite-config-typescript": "workspace:^",
     "@types/node": "catalog:",
     "eslint-plugin-jsdoc": "catalog:",
     "eslint-plugin-perfectionist": "catalog:",
@@ -45,6 +45,7 @@
   "packageManager": "bun@1.4.2",
   "catalog": {
     "@arethetypeswrong/core": "^0.18.5",
+    "@changesets/cli": "^3.0.2",
     "@cyclonedx/cyclonedx-library": "^10.2.0",
     "@module-federation/runtime": "2.9.0",
     "@module-federation/vite": "1.21.5",
@@ -76,5 +77,10 @@
     "vite": "npm:@voidzero-dev/vite-plus-core@0.3.1",
     "vite-plugin-stylelint": "^6.3.0",
     "vite-plus": "0.3.1"
+  },
+  "catalogs": {
+    "peer": {
+      "vite": "^8.0.0"
+    }
   }
 }

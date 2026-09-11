@@ -2,7 +2,7 @@
  * What coverage counts, what it does not, and how much of it is enough.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 import { FOREIGN } from "#ignore/foreign.ts";
 import { GENERATED } from "#ignore/generated.ts";
@@ -66,7 +66,7 @@ export function coverage(): Preset {
           enabled: true,
           exclude: UNCOUNTED,
           provider: "v8",
-          reporter: ["text", "html", "lcov"],
+          reporter: ["text-summary", "html", "lcov"],
           thresholds: ENOUGH,
         },
       },

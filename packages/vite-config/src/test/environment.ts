@@ -4,7 +4,7 @@
 
 import { type UserConfig } from "vite-plus";
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
  * The environments the runner knows, read off the block rather than written out again.

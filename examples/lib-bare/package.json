@@ -30,8 +30,9 @@
     "test": "vp test"
   },
   "devDependencies": {
-    "@stealthscale/config-typescript": "workspace:^",
-    "@stealthscale/config-vite": "workspace:^",
+    "@stealthscale/vite-config": "workspace:^",
+    "@stealthscale/vite-config-react": "workspace:^",
+    "@stealthscale/vite-config-typescript": "workspace:^",
     "typescript": "catalog:",
     "vite-plus": "catalog:"
   }

@@ -21,7 +21,7 @@ import {
   type Reached,
   reached,
   text,
-} from "@stealthscale/plugin-base";
+} from "@stealthscale/vite-plugin-base";
 
 import { type Installed, locked } from "#locked.ts";
 

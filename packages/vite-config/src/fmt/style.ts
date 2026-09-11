@@ -2,7 +2,7 @@
  * The measurements every file is written to.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
  * Writes every file to the same measurements.

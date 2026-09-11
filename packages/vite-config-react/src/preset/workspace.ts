@@ -2,7 +2,7 @@
  * What a workspace holding anything that renders states once, at its root.
  */
 
-import { type Layer, owned } from "@stealthscale/config-vite";
+import { type Layer, owned } from "@stealthscale/vite-config";
 
 import * as fmt from "#fmt/index.ts";
 import * as lint from "#lint/index.ts";

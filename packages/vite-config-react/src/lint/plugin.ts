@@ -2,7 +2,7 @@
  * The linter's React plugins, which it carries but does not turn on.
  */
 
-import { contribute, type Contribution } from "@stealthscale/config-vite";
+import { contribute, type Contribution } from "@stealthscale/vite-config";
 
 /**
  * Where a contribution to the list of plugins lands.

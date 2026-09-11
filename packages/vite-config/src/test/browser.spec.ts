@@ -1,7 +1,7 @@
 import { type ConfigEnv } from "vite-plus";
 import { expect, test } from "vite-plus/test";
 
-import { defineConfig } from "@stealthscale/config-core";
+import { defineConfig } from "@stealthscale/vite-config-core";
 
 import { readBack } from "#preset/preset.fixtures.ts";
 import { type Browsed, browser, driver } from "#test/browser.ts";

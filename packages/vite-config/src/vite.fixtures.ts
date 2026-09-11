@@ -4,7 +4,7 @@
 
 import { type UserConfig } from "vite-plus";
 
-import { type Context, type Preset } from "@stealthscale/config-core";
+import { type Context, type Preset } from "@stealthscale/vite-config-core";
 
 /**
  * States what a layer is told, with whatever a test wants to differ.

@@ -2,7 +2,7 @@
  * The address a preview listens on.
  */
 
-import { type Preset } from "@stealthscale/config-core";
+import { type Preset } from "@stealthscale/vite-config-core";
 
 import { bound as listens } from "#serving/listening.ts";
 

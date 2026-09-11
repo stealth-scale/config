@@ -10,9 +10,9 @@
  * condition reaches a registry, so an installed package matches nothing and falls through to
  * `default`.
  *
- * The same string is in `@stealthscale/config-typescript`'s `customConditions`, and a specification
- * asserts the two agree — the type checker resolves through one and the bundler through the other,
- * so a drift between them is a package whose types come from source while its values come from a
- * build.
+ * The same string is in `@stealthscale/vite-config-typescript`'s `customConditions`, and a
+ * specification asserts the two agree — the type checker resolves through one and the bundler
+ * through the other, so a drift between them is a package whose types come from source while its
+ * values come from a build.
  */
 export const SOURCE = "stealth-source";

@@ -2,7 +2,7 @@
  * Keeping a stack trace readable without handing the source to everybody who asks.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
  * Emits source maps the bundle does not point at.

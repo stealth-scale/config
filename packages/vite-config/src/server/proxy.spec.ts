@@ -1,7 +1,7 @@
 import { resolveConfig, type ResolvedConfig, type UserConfig } from "vite-plus";
 import { expect, test } from "vite-plus/test";
 
-import { defineConfig } from "@stealthscale/config-core";
+import { defineConfig } from "@stealthscale/vite-config-core";
 
 import { readBack } from "#preset/preset.fixtures.ts";
 import { proxy } from "#server/proxy.ts";

@@ -2,7 +2,7 @@
  * The one command that proves a repository.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
  * What the task is called, so a workflow and a repository agree on one word.

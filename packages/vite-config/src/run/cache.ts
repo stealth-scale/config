@@ -2,7 +2,7 @@
  * Remembering what a task produced, so it runs once per change rather than once per ask.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
  * Caches every task and every script, keyed on what each one reads.

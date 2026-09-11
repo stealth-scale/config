@@ -1,1 +1,1 @@
-/// <reference types="@stealthscale/config-vite/globals" />
+/// <reference types="@stealthscale/vite-config/globals" />

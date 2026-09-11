@@ -1,7 +1,7 @@
 import { type ConfigEnv, type UserConfig } from "vite-plus";
 import { expect, test } from "vite-plus/test";
 
-import { type Layer } from "@stealthscale/config-core";
+import { type Layer } from "@stealthscale/vite-config-core";
 
 import { defineConfig, layers } from "#preset/app.ts";
 import { layers as web } from "#preset/web.ts";

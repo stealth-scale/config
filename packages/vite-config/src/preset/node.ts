@@ -2,7 +2,7 @@
  * Configuring a package that publishes and runs on node.
  */
 
-import { configuring, type Defining, type Extendable } from "@stealthscale/config-core";
+import { configuring, type Defining, type Extendable } from "@stealthscale/vite-config-core";
 
 import * as lint from "#lint/index.ts";
 import * as pack from "#pack/index.ts";

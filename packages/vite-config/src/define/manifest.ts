@@ -2,7 +2,7 @@
  * The constants a package can read about itself.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
  * Describes which constants a package wants beyond the two it always gets.

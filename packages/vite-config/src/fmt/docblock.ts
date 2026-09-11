@@ -2,7 +2,7 @@
  * Laying out a docblock, which is the part of one nobody should be doing by hand.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
  * Lays out every docblock the same way.

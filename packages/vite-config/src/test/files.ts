@@ -2,7 +2,7 @@
  * Which files hold tests.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 import { FOREIGN } from "#ignore/foreign.ts";
 

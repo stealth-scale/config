@@ -2,7 +2,7 @@
  * How a stealth package is packed.
  */
 
-import { type Layer } from "@stealthscale/config-core";
+import { type Layer } from "@stealthscale/vite-config-core";
 
 import { carry } from "#pack/carry.ts";
 import { declarations } from "#pack/declarations.ts";

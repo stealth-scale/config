@@ -1,8 +1,8 @@
-import { preset as react } from "@stealthscale/config-react";
+import { preset as react } from "@stealthscale/vite-config-react";
 
-import { lint, test } from "./packages/config-vite/src/index.ts";
-import { defineConfig } from "./packages/config-vite/src/preset/node.ts";
-import { workspace } from "./packages/config-vite/src/preset/workspace.ts";
+import { lint, test } from "./packages/vite-config/src/index.ts";
+import { defineConfig } from "./packages/vite-config/src/preset/node.ts";
+import { workspace } from "./packages/vite-config/src/preset/workspace.ts";
 
 export default defineConfig(import.meta.dirname, {
   extends: [

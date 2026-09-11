@@ -2,7 +2,7 @@
  * Reading the entry points a package's own manifest says it publishes.
  */
 
-import { type Context, type Preset, preset } from "@stealthscale/config-core";
+import { type Context, type Preset, preset } from "@stealthscale/vite-config-core";
 
 import { SOURCE } from "#resolve/condition.ts";
 

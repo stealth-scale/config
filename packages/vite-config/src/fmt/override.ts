@@ -4,7 +4,12 @@
 
 import { type UserConfig } from "vite-plus";
 
-import { contribute, type Contribution, type Override, override } from "@stealthscale/config-core";
+import {
+  contribute,
+  type Contribution,
+  type Override,
+  override,
+} from "@stealthscale/vite-config-core";
 
 import { GENERATED } from "#ignore/generated.ts";
 

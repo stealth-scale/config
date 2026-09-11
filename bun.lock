@@ -5,8 +5,8 @@
     "": {
       "name": "@stealthscale/config",
       "devDependencies": {
-        "@stealthscale/config-react": "workspace:^",
-        "@stealthscale/config-typescript": "workspace:^",
+        "@stealthscale/vite-config-react": "workspace:^",
+        "@stealthscale/vite-config-typescript": "workspace:^",
         "@types/node": "catalog:",
         "eslint-plugin-jsdoc": "catalog:",
         "eslint-plugin-perfectionist": "catalog:",
@@ -27,9 +27,9 @@
       },
       "devDependencies": {
         "@module-federation/vite": "catalog:",
-        "@stealthscale/config-react": "workspace:^",
-        "@stealthscale/config-typescript": "workspace:^",
-        "@stealthscale/config-vite": "workspace:^",
+        "@stealthscale/vite-config": "workspace:^",
+        "@stealthscale/vite-config-react": "workspace:^",
+        "@stealthscale/vite-config-typescript": "workspace:^",
         "@types/react": "catalog:",
         "@types/react-dom": "catalog:",
         "happy-dom": "catalog:",
@@ -46,10 +46,10 @@
         "react-dom": "catalog:",
       },
       "devDependencies": {
-        "@stealthscale/config-css": "workspace:^",
-        "@stealthscale/config-react": "workspace:^",
-        "@stealthscale/config-typescript": "workspace:^",
-        "@stealthscale/config-vite": "workspace:^",
+        "@stealthscale/vite-config": "workspace:^",
+        "@stealthscale/vite-config-css": "workspace:^",
+        "@stealthscale/vite-config-react": "workspace:^",
+        "@stealthscale/vite-config-typescript": "workspace:^",
         "@types/node": "catalog:",
         "@types/react": "catalog:",
         "@types/react-dom": "catalog:",
@@ -69,9 +69,9 @@
       },
       "devDependencies": {
         "@module-federation/vite": "catalog:",
-        "@stealthscale/config-react": "workspace:^",
-        "@stealthscale/config-typescript": "workspace:^",
-        "@stealthscale/config-vite": "workspace:^",
+        "@stealthscale/vite-config": "workspace:^",
+        "@stealthscale/vite-config-react": "workspace:^",
+        "@stealthscale/vite-config-typescript": "workspace:^",
         "@types/react": "catalog:",
         "@types/react-dom": "catalog:",
         "happy-dom": "catalog:",
@@ -89,9 +89,9 @@
         "react-dom": "catalog:",
       },
       "devDependencies": {
-        "@stealthscale/config-react": "workspace:^",
-        "@stealthscale/config-typescript": "workspace:^",
-        "@stealthscale/config-vite": "workspace:^",
+        "@stealthscale/vite-config": "workspace:^",
+        "@stealthscale/vite-config-react": "workspace:^",
+        "@stealthscale/vite-config-typescript": "workspace:^",
         "@types/react": "catalog:",
         "@types/react-dom": "catalog:",
         "happy-dom": "catalog:",
@@ -112,9 +112,9 @@
       },
       "devDependencies": {
         "@module-federation/vite": "catalog:",
-        "@stealthscale/config-react": "workspace:^",
-        "@stealthscale/config-typescript": "workspace:^",
-        "@stealthscale/config-vite": "workspace:^",
+        "@stealthscale/vite-config": "workspace:^",
+        "@stealthscale/vite-config-react": "workspace:^",
+        "@stealthscale/vite-config-typescript": "workspace:^",
         "@types/react": "catalog:",
         "@types/react-dom": "catalog:",
         "happy-dom": "catalog:",
@@ -127,8 +127,8 @@
       "name": "@stealthscale/example-app-web",
       "version": "1.4.0",
       "devDependencies": {
-        "@stealthscale/config-typescript": "workspace:^",
-        "@stealthscale/config-vite": "workspace:^",
+        "@stealthscale/vite-config": "workspace:^",
+        "@stealthscale/vite-config-typescript": "workspace:^",
         "@types/node": "catalog:",
         "typescript": "catalog:",
         "vite-plus": "catalog:",
@@ -141,8 +141,8 @@
         "@stealthscale/example-lib-core": "workspace:^",
       },
       "devDependencies": {
-        "@stealthscale/config-typescript": "workspace:^",
-        "@stealthscale/config-vite": "workspace:^",
+        "@stealthscale/vite-config": "workspace:^",
+        "@stealthscale/vite-config-typescript": "workspace:^",
         "@types/node": "catalog:",
         "happy-dom": "catalog:",
         "typescript": "catalog:",
@@ -153,8 +153,9 @@
       "name": "@stealthscale/example-lib-bare",
       "version": "0.0.0",
       "devDependencies": {
-        "@stealthscale/config-typescript": "workspace:^",
-        "@stealthscale/config-vite": "workspace:^",
+        "@stealthscale/vite-config": "workspace:^",
+        "@stealthscale/vite-config-react": "workspace:^",
+        "@stealthscale/vite-config-typescript": "workspace:^",
         "typescript": "catalog:",
         "vite-plus": "catalog:",
       },
@@ -169,8 +170,8 @@
         "@stealthscale/example-lib-core": "workspace:^",
       },
       "devDependencies": {
-        "@stealthscale/config-typescript": "workspace:^",
-        "@stealthscale/config-vite": "workspace:^",
+        "@stealthscale/vite-config": "workspace:^",
+        "@stealthscale/vite-config-typescript": "workspace:^",
         "@types/node": "catalog:",
         "typescript": "catalog:",
         "vite-plus": "catalog:",
@@ -180,8 +181,8 @@
       "name": "@stealthscale/example-lib-core",
       "version": "0.0.0",
       "devDependencies": {
-        "@stealthscale/config-typescript": "workspace:^",
-        "@stealthscale/config-vite": "workspace:^",
+        "@stealthscale/vite-config": "workspace:^",
+        "@stealthscale/vite-config-typescript": "workspace:^",
         "typescript": "catalog:",
         "vite-plus": "catalog:",
       },
@@ -190,8 +191,8 @@
       "name": "@stealthscale/example-lib-node",
       "version": "0.0.0",
       "devDependencies": {
-        "@stealthscale/config-typescript": "workspace:^",
-        "@stealthscale/config-vite": "workspace:^",
+        "@stealthscale/vite-config": "workspace:^",
+        "@stealthscale/vite-config-typescript": "workspace:^",
         "@types/node": "catalog:",
         "typescript": "catalog:",
         "vite-plus": "catalog:",
@@ -201,8 +202,8 @@
       "name": "@stealthscale/example-lib-tokens",
       "version": "0.0.0",
       "devDependencies": {
-        "@stealthscale/config-typescript": "workspace:^",
-        "@stealthscale/config-vite": "workspace:^",
+        "@stealthscale/vite-config": "workspace:^",
+        "@stealthscale/vite-config-typescript": "workspace:^",
         "@types/node": "catalog:",
         "happy-dom": "catalog:",
         "typescript": "catalog:",
@@ -213,9 +214,9 @@
       "name": "@stealthscale/example-lib-ui",
       "version": "0.0.0",
       "devDependencies": {
-        "@stealthscale/config-react": "workspace:^",
-        "@stealthscale/config-typescript": "workspace:^",
-        "@stealthscale/config-vite": "workspace:^",
+        "@stealthscale/vite-config": "workspace:^",
+        "@stealthscale/vite-config-react": "workspace:^",
+        "@stealthscale/vite-config-typescript": "workspace:^",
         "@types/react": "catalog:",
         "@types/react-dom": "catalog:",
         "happy-dom": "catalog:",
@@ -229,89 +230,15 @@
         "react": "catalog:",
       },
     },
-    "packages/config-core": {
-      "name": "@stealthscale/config-core",
-      "version": "0.0.0",
-      "devDependencies": {
-        "@stealthscale/config-typescript": "workspace:^",
-        "@types/node": "catalog:",
-        "typescript": "catalog:",
-        "vite-plus": "catalog:",
-      },
-      "peerDependencies": {
-        "vite-plus": "catalog:",
-      },
-    },
-    "packages/config-css": {
-      "name": "@stealthscale/config-css",
-      "version": "0.0.0",
-      "devDependencies": {
-        "@arethetypeswrong/core": "catalog:",
-        "@stealthscale/config-core": "workspace:^",
-        "@stealthscale/config-typescript": "workspace:^",
-        "@stealthscale/config-vite": "workspace:^",
-        "@types/node": "catalog:",
-        "@vitest/coverage-v8": "catalog:",
-        "publint": "catalog:",
-        "stylelint": "catalog:",
-        "stylelint-config-standard": "catalog:",
-        "stylelint-high-performance-animation": "catalog:",
-        "stylelint-order": "catalog:",
-        "stylelint-use-nesting": "catalog:",
-        "typescript": "catalog:",
-        "vite-plugin-stylelint": "catalog:",
-        "vite-plus": "catalog:",
-      },
-      "peerDependencies": {
-        "@stealthscale/config-core": "workspace:^",
-        "stylelint": "catalog:",
-        "stylelint-config-standard": "catalog:",
-        "stylelint-high-performance-animation": "catalog:",
-        "stylelint-order": "catalog:",
-        "stylelint-use-nesting": "catalog:",
-        "vite-plugin-stylelint": "catalog:",
-        "vite-plus": "catalog:",
-      },
-    },
-    "packages/config-react": {
-      "name": "@stealthscale/config-react",
-      "version": "0.0.0",
-      "devDependencies": {
-        "@arethetypeswrong/core": "catalog:",
-        "@stealthscale/config-typescript": "workspace:^",
-        "@stealthscale/config-vite": "workspace:^",
-        "@types/node": "catalog:",
-        "@vitejs/plugin-react": "catalog:",
-        "@vitest/coverage-v8": "catalog:",
-        "oxc-transform-react": "catalog:",
-        "publint": "catalog:",
-        "react": "catalog:",
-        "react-dom": "catalog:",
-        "typescript": "catalog:",
-        "vite-plus": "catalog:",
-      },
-      "peerDependencies": {
-        "@stealthscale/config-vite": "workspace:^",
-        "@vitejs/plugin-react": "catalog:",
-        "oxc-transform-react": "catalog:",
-        "react": "catalog:",
-        "react-dom": "catalog:",
-        "vite-plus": "catalog:",
-      },
-    },
-    "packages/config-typescript": {
-      "name": "@stealthscale/config-typescript",
-      "version": "0.0.0",
-    },
-    "packages/config-vite": {
-      "name": "@stealthscale/config-vite",
-      "version": "0.0.0",
+    "packages/vite-config": {
+      "name": "@stealthscale/vite-config",
+      "version": "0.1.0",
       "devDependencies": {
         "@arethetypeswrong/core": "catalog:",
         "@module-federation/vite": "catalog:",
-        "@stealthscale/config-core": "workspace:^",
-        "@stealthscale/config-typescript": "workspace:^",
-        "@stealthscale/plugin-sbom": "workspace:^",
+        "@stealthscale/vite-config-core": "workspace:^",
+        "@stealthscale/vite-config-typescript": "workspace:^",
+        "@stealthscale/vite-plugin-sbom": "workspace:^",
         "@types/node": "catalog:",
         "@vitest/browser-playwright": "catalog:",
         "@vitest/coverage-v8": "catalog:",
@@ -325,8 +252,8 @@
       },
       "peerDependencies": {
         "@module-federation/vite": "catalog:",
-        "@stealthscale/config-core": "workspace:^",
-        "@stealthscale/plugin-sbom": "workspace:^",
+        "@stealthscale/vite-config-core": "workspace:^",
+        "@stealthscale/vite-plugin-sbom": "workspace:^",
         "eslint-plugin-jsdoc": "catalog:",
         "eslint-plugin-perfectionist": "catalog:",
         "eslint-plugin-tsdoc": "catalog:",
@@ -338,31 +265,105 @@
         "happy-dom",
       ],
     },
-    "plugins/plugin-base": {
-      "name": "@stealthscale/plugin-base",
-      "version": "0.0.0",
+    "packages/vite-config-core": {
+      "name": "@stealthscale/vite-config-core",
+      "version": "0.1.0",
       "devDependencies": {
-        "@stealthscale/config-typescript": "workspace:^",
+        "@stealthscale/vite-config-typescript": "workspace:^",
+        "@types/node": "catalog:",
+        "typescript": "catalog:",
+        "vite-plus": "catalog:",
+      },
+      "peerDependencies": {
+        "vite-plus": "catalog:",
+      },
+    },
+    "packages/vite-config-css": {
+      "name": "@stealthscale/vite-config-css",
+      "version": "0.1.0",
+      "devDependencies": {
+        "@arethetypeswrong/core": "catalog:",
+        "@stealthscale/vite-config": "workspace:^",
+        "@stealthscale/vite-config-core": "workspace:^",
+        "@stealthscale/vite-config-typescript": "workspace:^",
+        "@types/node": "catalog:",
+        "@vitest/coverage-v8": "catalog:",
+        "publint": "catalog:",
+        "stylelint": "catalog:",
+        "stylelint-config-standard": "catalog:",
+        "stylelint-high-performance-animation": "catalog:",
+        "stylelint-order": "catalog:",
+        "stylelint-use-nesting": "catalog:",
+        "typescript": "catalog:",
+        "vite-plugin-stylelint": "catalog:",
+        "vite-plus": "catalog:",
+      },
+      "peerDependencies": {
+        "@stealthscale/vite-config-core": "workspace:^",
+        "stylelint": "catalog:",
+        "stylelint-config-standard": "catalog:",
+        "stylelint-high-performance-animation": "catalog:",
+        "stylelint-order": "catalog:",
+        "stylelint-use-nesting": "catalog:",
+        "vite-plugin-stylelint": "catalog:",
+        "vite-plus": "catalog:",
+      },
+    },
+    "packages/vite-config-react": {
+      "name": "@stealthscale/vite-config-react",
+      "version": "0.1.0",
+      "devDependencies": {
+        "@arethetypeswrong/core": "catalog:",
+        "@stealthscale/vite-config": "workspace:^",
+        "@stealthscale/vite-config-typescript": "workspace:^",
+        "@types/node": "catalog:",
+        "@vitejs/plugin-react": "catalog:",
+        "@vitest/coverage-v8": "catalog:",
+        "oxc-transform-react": "catalog:",
+        "publint": "catalog:",
+        "react": "catalog:",
+        "react-dom": "catalog:",
+        "typescript": "catalog:",
+        "vite-plus": "catalog:",
+      },
+      "peerDependencies": {
+        "@stealthscale/vite-config": "workspace:^",
+        "@vitejs/plugin-react": "catalog:",
+        "oxc-transform-react": "catalog:",
+        "react": "catalog:",
+        "react-dom": "catalog:",
+        "vite-plus": "catalog:",
+      },
+    },
+    "packages/vite-config-typescript": {
+      "name": "@stealthscale/vite-config-typescript",
+      "version": "0.1.0",
+    },
+    "packages/vite-plugin-base": {
+      "name": "@stealthscale/vite-plugin-base",
+      "version": "0.1.0",
+      "devDependencies": {
+        "@stealthscale/vite-config-typescript": "workspace:^",
         "@types/node": "catalog:",
         "typescript": "catalog:",
         "vite": "catalog:",
         "vite-plus": "catalog:",
       },
       "peerDependencies": {
-        "vite": "catalog:",
+        "vite": "catalog:peer",
       },
     },
-    "plugins/plugin-sbom": {
-      "name": "@stealthscale/plugin-sbom",
-      "version": "0.0.0",
+    "packages/vite-plugin-sbom": {
+      "name": "@stealthscale/vite-plugin-sbom",
+      "version": "0.1.0",
       "dependencies": {
         "@cyclonedx/cyclonedx-library": "catalog:",
         "packageurl-js": "catalog:",
         "spdx-expression-parse": "catalog:",
       },
       "devDependencies": {
-        "@stealthscale/config-typescript": "workspace:^",
-        "@stealthscale/plugin-base": "workspace:^",
+        "@stealthscale/vite-config-typescript": "workspace:^",
+        "@stealthscale/vite-plugin-base": "workspace:^",
         "@types/node": "catalog:",
         "@types/spdx-expression-parse": "catalog:",
         "typescript": "catalog:",
@@ -370,8 +371,8 @@
         "vite-plus": "catalog:",
       },
       "peerDependencies": {
-        "@stealthscale/plugin-base": "workspace:^",
-        "vite": "catalog:",
+        "@stealthscale/vite-plugin-base": "workspace:^",
+        "vite": "catalog:peer",
       },
     },
   },
@@ -411,6 +412,11 @@
     "vite": "npm:@voidzero-dev/vite-plus-core@0.3.1",
     "vite-plugin-stylelint": "^6.3.0",
     "vite-plus": "0.3.1",
+  },
+  "catalogs": {
+    "peer": {
+      "vite": "^8.0.0",
+    },
   },
   "packages": {
     "@andrewbranch/untar.js": ["@andrewbranch/untar.js@1.0.4", "", {}, "sha512-pVXSwPsLuw8IGLo2Di0EaOfsk+ntVvpkk942J/sHYIkwvtKUakEcPh7HBgZ6tuimgzKSEHgCvO4XgQ05DEbwDw=="],
@@ -667,16 +673,6 @@
 
     "@standard-schema/spec": ["@standard-schema/spec@1.1.0", "", {}, "sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w=="],
 
-    "@stealthscale/config-core": ["@stealthscale/config-core@workspace:packages/config-core"],
-
-    "@stealthscale/config-css": ["@stealthscale/config-css@workspace:packages/config-css"],
-
-    "@stealthscale/config-react": ["@stealthscale/config-react@workspace:packages/config-react"],
-
-    "@stealthscale/config-typescript": ["@stealthscale/config-typescript@workspace:packages/config-typescript"],
-
-    "@stealthscale/config-vite": ["@stealthscale/config-vite@workspace:packages/config-vite"],
-
     "@stealthscale/example-app-host": ["@stealthscale/example-app-host@workspace:examples/app-host"],
 
     "@stealthscale/example-app-react": ["@stealthscale/example-app-react@workspace:examples/app-react"],
@@ -703,9 +699,19 @@
 
     "@stealthscale/example-lib-ui": ["@stealthscale/example-lib-ui@workspace:examples/lib-ui"],
 
-    "@stealthscale/plugin-base": ["@stealthscale/plugin-base@workspace:plugins/plugin-base"],
+    "@stealthscale/vite-config": ["@stealthscale/vite-config@workspace:packages/vite-config"],
 
-    "@stealthscale/plugin-sbom": ["@stealthscale/plugin-sbom@workspace:plugins/plugin-sbom"],
+    "@stealthscale/vite-config-core": ["@stealthscale/vite-config-core@workspace:packages/vite-config-core"],
+
+    "@stealthscale/vite-config-css": ["@stealthscale/vite-config-css@workspace:packages/vite-config-css"],
+
+    "@stealthscale/vite-config-react": ["@stealthscale/vite-config-react@workspace:packages/vite-config-react"],
+
+    "@stealthscale/vite-config-typescript": ["@stealthscale/vite-config-typescript@workspace:packages/vite-config-typescript"],
+
+    "@stealthscale/vite-plugin-base": ["@stealthscale/vite-plugin-base@workspace:packages/vite-plugin-base"],
+
+    "@stealthscale/vite-plugin-sbom": ["@stealthscale/vite-plugin-sbom@workspace:packages/vite-plugin-sbom"],
 
     "@tanstack/history": ["@tanstack/history@1.162.3", "", {}, "sha512-zZTDxZxdDxZudHXGp42d221R/sEKoQPbZsW2ezpdWknHpOmJVLyiljW21pdWtKXfMnLq+Kg5VJpVBwOe18+ZzQ=="],
 

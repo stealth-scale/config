@@ -1,17 +1,28 @@
 {
-  "name": "@stealthscale/config-react",
-  "version": "0.0.0",
+  "name": "@stealthscale/vite-config-react",
+  "version": "0.1.0",
   "description": "What a stealth package that renders is configured, checked and formatted by.",
+  "keywords": [
+    "config",
+    "eslint",
+    "jsx",
+    "react",
+    "vite"
+  ],
+  "homepage": "https://github.com/stealth-scale/config/tree/main/packages/vite-config-react#readme",
+  "bugs": "https://github.com/stealth-scale/config/issues",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/stealth-scale/config.git",
-    "directory": "packages/config-react"
+    "directory": "packages/vite-config-react"
   },
   "files": [
     "dist",
     "vitest.setup.ts",
-    "web.json"
+    "web.json",
+    "LICENSE",
+    "README.md"
   ],
   "type": "module",
   "imports": {
@@ -52,8 +63,8 @@
   },
   "devDependencies": {
     "@arethetypeswrong/core": "catalog:",
-    "@stealthscale/config-typescript": "workspace:^",
-    "@stealthscale/config-vite": "workspace:^",
+    "@stealthscale/vite-config": "workspace:^",
+    "@stealthscale/vite-config-typescript": "workspace:^",
     "@types/node": "catalog:",
     "@vitejs/plugin-react": "catalog:",
     "@vitest/coverage-v8": "catalog:",
@@ -65,11 +76,14 @@
     "vite-plus": "catalog:"
   },
   "peerDependencies": {
-    "@stealthscale/config-vite": "workspace:^",
+    "@stealthscale/vite-config": "workspace:^",
     "@vitejs/plugin-react": "catalog:",
     "oxc-transform-react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "vite-plus": "catalog:"
+  },
+  "engines": {
+    "node": ">=24.0.0"
   }
 }

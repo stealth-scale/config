@@ -2,7 +2,7 @@
  * Naming a command a repository runs often enough to name.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 import { type Doing } from "#run/settings.ts";
 

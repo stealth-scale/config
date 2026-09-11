@@ -2,7 +2,7 @@
  * Where each kind of import sits, and who decides.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
  * The scope whose imports group as this repository's own rather than as a stranger's.

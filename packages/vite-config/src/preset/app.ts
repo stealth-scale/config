@@ -2,7 +2,7 @@
  * Configuring an application, which is deployed rather than published.
  */
 
-import { configuring, type Defining, type Extendable } from "@stealthscale/config-core";
+import { configuring, type Defining, type Extendable } from "@stealthscale/vite-config-core";
 
 import * as build from "#build/index.ts";
 import * as lint from "#lint/index.ts";

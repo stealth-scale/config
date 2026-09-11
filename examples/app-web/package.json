@@ -14,8 +14,8 @@
     "preview": "vp preview"
   },
   "devDependencies": {
-    "@stealthscale/config-typescript": "workspace:^",
-    "@stealthscale/config-vite": "workspace:^",
+    "@stealthscale/vite-config": "workspace:^",
+    "@stealthscale/vite-config-typescript": "workspace:^",
     "@types/node": "catalog:",
     "typescript": "catalog:",
     "vite-plus": "catalog:"

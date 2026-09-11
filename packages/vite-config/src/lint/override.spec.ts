@@ -1,7 +1,7 @@
 import { type ConfigEnv, type UserConfig } from "vite-plus";
 import { expect, test } from "vite-plus/test";
 
-import { defineConfig, type Layer, owned, remove } from "@stealthscale/config-core";
+import { defineConfig, type Layer, owned, remove } from "@stealthscale/vite-config-core";
 
 import { defaultExported, forbid, relax, undocumented } from "#lint/override.ts";
 
@@ -53,7 +53,7 @@ function overridesOf(config: UserConfig): readonly Held[] {
 }
 
 /**
- * Stands in for `@stealthscale/config-react`.
+ * Stands in for `@stealthscale/vite-config-react`.
  *
  * @returns What that package contributes.
  */
@@ -68,7 +68,7 @@ function react(): readonly Layer[] {
 }
 
 /**
- * Stands in for `@stealthscale/config-paraglide`.
+ * Stands in for `@stealthscale/vite-config-paraglide`.
  *
  * @returns What that package contributes.
  */

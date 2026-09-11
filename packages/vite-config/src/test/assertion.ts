@@ -2,7 +2,7 @@
  * What a test has to do to count as one.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
  * Refuses a test that asserts nothing, and shows a whole snapshot when one breaks.

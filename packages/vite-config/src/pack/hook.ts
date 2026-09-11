@@ -2,7 +2,7 @@
  * Running a repository's own code around a pack.
  */
 
-import { type Override, override } from "@stealthscale/config-core";
+import { type Override, override } from "@stealthscale/vite-config-core";
 
 import { type Moments } from "#pack/settings.ts";
 

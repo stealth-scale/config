@@ -5,7 +5,7 @@
 import { createRequire } from "node:module";
 import stylelint from "vite-plugin-stylelint";
 
-import { contribute, type Contribution } from "@stealthscale/config-core";
+import { contribute, type Contribution } from "@stealthscale/vite-config-core";
 
 import { all } from "#rules/index.ts";
 

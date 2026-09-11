@@ -2,7 +2,7 @@
  * Bending what this package decided, where a repository knows better than the house.
  */
 
-import { type Layer, layout, remove } from "@stealthscale/config-vite";
+import { type Layer, layout, remove } from "@stealthscale/vite-config";
 
 import { PAGE } from "#preset/page.ts";
 

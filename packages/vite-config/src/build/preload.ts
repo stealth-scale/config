@@ -2,7 +2,7 @@
  * What a build ships to make a browser fetch a chunk before it is asked for.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
  * Stops shipping the module preload polyfill.

@@ -2,8 +2,8 @@
  * The bill of materials a package publishes beside itself.
  */
 
-import { contribute, type Contribution } from "@stealthscale/config-core";
-import { sbom, type Supplier } from "@stealthscale/plugin-sbom";
+import { contribute, type Contribution } from "@stealthscale/vite-config-core";
+import { sbom, type Supplier } from "@stealthscale/vite-plugin-sbom";
 
 import { HOUSE } from "#sbom/supplier.ts";
 

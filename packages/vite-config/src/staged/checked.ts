@@ -2,7 +2,7 @@
  * What a commit does to the source files it is about to record.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
  * The files the whole toolchain has something to say about.

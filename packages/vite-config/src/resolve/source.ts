@@ -4,7 +4,7 @@
 
 import { defaultClientConditions, defaultServerConditions } from "vite-plus";
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 import { SOURCE } from "#resolve/condition.ts";
 

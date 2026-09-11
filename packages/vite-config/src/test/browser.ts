@@ -2,7 +2,7 @@
  * Running the tests in a real browser rather than against a document implementation.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
  * The browsers Playwright drives.

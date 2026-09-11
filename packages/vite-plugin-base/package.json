@@ -1,15 +1,26 @@
 {
-  "name": "@stealthscale/plugin-base",
-  "version": "0.0.0",
+  "name": "@stealthscale/vite-plugin-base",
+  "version": "0.1.0",
   "description": "What every stealth bundler plugin is written with: a typed plugin, the packages a build reached, and the files it writes.",
+  "keywords": [
+    "plugin",
+    "rolldown",
+    "rollup",
+    "vite",
+    "vite-plugin"
+  ],
+  "homepage": "https://github.com/stealth-scale/config/tree/main/packages/vite-plugin-base#readme",
+  "bugs": "https://github.com/stealth-scale/config/issues",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/stealth-scale/config.git",
-    "directory": "plugins/plugin-base"
+    "directory": "packages/vite-plugin-base"
   },
   "files": [
-    "dist"
+    "dist",
+    "LICENSE",
+    "README.md"
   ],
   "type": "module",
   "sideEffects": false,
@@ -38,13 +49,16 @@
     "test": "vp test"
   },
   "devDependencies": {
-    "@stealthscale/config-typescript": "workspace:^",
+    "@stealthscale/vite-config-typescript": "workspace:^",
     "@types/node": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vite-plus": "catalog:"
   },
   "peerDependencies": {
-    "vite": "catalog:"
+    "vite": "catalog:peer"
+  },
+  "engines": {
+    "node": ">=24.0.0"
   }
 }

@@ -2,7 +2,7 @@
  * Who supplied what a build produced.
  */
 
-import { type Supplier } from "@stealthscale/plugin-sbom";
+import { type Supplier } from "@stealthscale/vite-plugin-sbom";
 
 /**
  * The organisation this house publishes under.

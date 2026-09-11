@@ -2,7 +2,7 @@
  * Where a dev server is reached: its port, its names, and the address that follows from them.
  */
 
-import { type Preset } from "@stealthscale/config-core";
+import { type Preset } from "@stealthscale/vite-config-core";
 
 import { reached as at } from "#serving/listening.ts";
 

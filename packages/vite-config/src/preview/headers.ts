@@ -2,7 +2,7 @@
  * The headers a preview answers with, which a dev server has no reason to.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
  * What a build is served with, so a preview answers the way a deployment will.

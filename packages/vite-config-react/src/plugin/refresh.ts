@@ -4,7 +4,7 @@
 
 import react, { type Options } from "@vitejs/plugin-react";
 
-import { contribute, type Contribution } from "@stealthscale/config-vite";
+import { contribute, type Contribution } from "@stealthscale/vite-config";
 
 /**
  * Where a contribution to the list of plugins lands.

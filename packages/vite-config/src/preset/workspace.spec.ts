@@ -1,6 +1,6 @@
 import { expect, test } from "vite-plus/test";
 
-import { type Layer } from "@stealthscale/config-core";
+import { type Layer } from "@stealthscale/vite-config-core";
 
 import { workspace } from "#preset/workspace.ts";
 

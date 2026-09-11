@@ -1,4 +1,4 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "extends": "@stealthscale/config-typescript/node.json"
+  "extends": "@stealthscale/vite-config-typescript/node.json"
 }

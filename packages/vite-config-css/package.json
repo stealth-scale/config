@@ -1,15 +1,25 @@
 {
-  "name": "@stealthscale/config-css",
-  "version": "0.0.0",
+  "name": "@stealthscale/vite-config-css",
+  "version": "0.1.0",
   "description": "What a stealth package's stylesheets are checked by, as a layer a config extends.",
+  "keywords": [
+    "config",
+    "css",
+    "stylelint",
+    "vite"
+  ],
+  "homepage": "https://github.com/stealth-scale/config/tree/main/packages/vite-config-css#readme",
+  "bugs": "https://github.com/stealth-scale/config/issues",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/stealth-scale/config.git",
-    "directory": "packages/config-css"
+    "directory": "packages/vite-config-css"
   },
   "files": [
-    "dist"
+    "dist",
+    "LICENSE",
+    "README.md"
   ],
   "type": "module",
   "imports": {
@@ -36,9 +46,9 @@
   },
   "devDependencies": {
     "@arethetypeswrong/core": "catalog:",
-    "@stealthscale/config-core": "workspace:^",
-    "@stealthscale/config-typescript": "workspace:^",
-    "@stealthscale/config-vite": "workspace:^",
+    "@stealthscale/vite-config": "workspace:^",
+    "@stealthscale/vite-config-core": "workspace:^",
+    "@stealthscale/vite-config-typescript": "workspace:^",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "publint": "catalog:",
@@ -52,7 +62,7 @@
     "vite-plus": "catalog:"
   },
   "peerDependencies": {
-    "@stealthscale/config-core": "workspace:^",
+    "@stealthscale/vite-config-core": "workspace:^",
     "stylelint": "catalog:",
     "stylelint-config-standard": "catalog:",
     "stylelint-high-performance-animation": "catalog:",
@@ -60,5 +70,8 @@
     "stylelint-use-nesting": "catalog:",
     "vite-plugin-stylelint": "catalog:",
     "vite-plus": "catalog:"
+  },
+  "engines": {
+    "node": ">=24.0.0"
   }
 }

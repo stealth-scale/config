@@ -2,7 +2,7 @@
  * What a package publishes.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
  * Publishes the files named, and everything they reach.

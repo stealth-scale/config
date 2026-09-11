@@ -1,6 +1,6 @@
 import { expect, test } from "vite-plus/test";
 
-import { defineConfig, preset } from "@stealthscale/config-core";
+import { defineConfig, preset } from "@stealthscale/vite-config-core";
 
 import { imports } from "#fmt/imports.ts";
 import { generated, group, internal, skip } from "#fmt/override.ts";

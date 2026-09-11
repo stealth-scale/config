@@ -2,7 +2,7 @@
  * What a commit does to everything else it is about to record.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
  * The files the formatter has something to say about and the linter has not.

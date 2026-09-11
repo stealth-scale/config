@@ -4,7 +4,7 @@
 
 import { createRequire } from "node:module";
 
-import { contribute, type Contribution } from "@stealthscale/config-vite";
+import { contribute, type Contribution } from "@stealthscale/vite-config";
 
 /**
  * Where a contribution to the list of setup files lands.
@@ -20,7 +20,9 @@ const AT = "test.setupFiles";
  * file it compiles to in `dist`, and the export map is the one thing that answers the same from
  * both.
  */
-const SETUP = createRequire(import.meta.url).resolve("@stealthscale/config-react/vitest.setup.ts");
+const SETUP = createRequire(import.meta.url).resolve(
+  "@stealthscale/vite-config-react/vitest.setup.ts",
+);
 
 /**
  * Empties the document after every test.

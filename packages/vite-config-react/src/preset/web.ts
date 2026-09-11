@@ -2,8 +2,8 @@
  * Configuring a library that renders.
  */
 
-import { configuring, type Defining, type Layer, owned } from "@stealthscale/config-vite";
-import { layers as library } from "@stealthscale/config-vite/preset/web";
+import { configuring, type Defining, type Layer, owned } from "@stealthscale/vite-config";
+import { layers as library } from "@stealthscale/vite-config/preset/web";
 
 import * as plugin from "#plugin/index.ts";
 import * as test from "#test/index.ts";

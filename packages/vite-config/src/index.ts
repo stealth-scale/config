@@ -32,7 +32,7 @@ export {
   type Removal,
   remove,
   type Stated,
-} from "@stealthscale/config-core";
+} from "@stealthscale/vite-config-core";
 
 export * as build from "#build/index.ts";
 export * as define from "#define/index.ts";

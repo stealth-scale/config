@@ -2,7 +2,7 @@
  * What a worker is bundled as.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
  * Bundles a worker as a module rather than as one self-contained script.

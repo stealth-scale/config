@@ -2,7 +2,7 @@
  * Pinning a dev server to a port, and meaning it.
  */
 
-import { type Preset } from "@stealthscale/config-core";
+import { type Preset } from "@stealthscale/vite-config-core";
 
 import { port as serves } from "#serving/listening.ts";
 

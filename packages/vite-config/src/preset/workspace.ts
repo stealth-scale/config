@@ -2,7 +2,7 @@
  * What a workspace states once, at its root, on behalf of every package below it.
  */
 
-import { type Extendable } from "@stealthscale/config-core";
+import { type Extendable } from "@stealthscale/vite-config-core";
 
 import * as run from "#run/index.ts";
 import * as staged from "#staged/index.ts";

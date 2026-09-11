@@ -1,3 +1,3 @@
-import { defineConfig } from "@stealthscale/config-vite/preset/base";
+import { defineConfig } from "@stealthscale/vite-config/preset/base";
 
 export default defineConfig(import.meta.dirname);

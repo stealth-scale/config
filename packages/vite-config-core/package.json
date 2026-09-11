@@ -1,15 +1,26 @@
 {
-  "name": "@stealthscale/config-core",
-  "version": "0.0.0",
+  "name": "@stealthscale/vite-config-core",
+  "version": "0.1.0",
   "description": "What a layer is and how layers compose: four kinds, three passes, and the record of which one decided each value.",
+  "keywords": [
+    "compose",
+    "config",
+    "layer",
+    "vite",
+    "vite-plus"
+  ],
+  "homepage": "https://github.com/stealth-scale/config/tree/main/packages/vite-config-core#readme",
+  "bugs": "https://github.com/stealth-scale/config/issues",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/stealth-scale/config.git",
-    "directory": "packages/config-core"
+    "directory": "packages/vite-config-core"
   },
   "files": [
-    "dist"
+    "dist",
+    "LICENSE",
+    "README.md"
   ],
   "type": "module",
   "sideEffects": false,
@@ -38,12 +49,15 @@
     "test": "vp test"
   },
   "devDependencies": {
-    "@stealthscale/config-typescript": "workspace:^",
+    "@stealthscale/vite-config-typescript": "workspace:^",
     "@types/node": "catalog:",
     "typescript": "catalog:",
     "vite-plus": "catalog:"
   },
   "peerDependencies": {
     "vite-plus": "catalog:"
+  },
+  "engines": {
+    "node": ">=24.0.0"
   }
 }

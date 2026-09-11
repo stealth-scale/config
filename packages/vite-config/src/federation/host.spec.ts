@@ -1,7 +1,7 @@
 import { type UserConfig } from "vite-plus";
 import { expect, test } from "vite-plus/test";
 
-import { type Contribution, type Preset } from "@stealthscale/config-vite";
+import { type Contribution, type Preset } from "@stealthscale/vite-config";
 
 import { host, type Hosted } from "#federation/host.ts";
 

@@ -1,7 +1,7 @@
 import { type UserConfig } from "vite-plus";
 import { expect, test } from "vite-plus/test";
 
-import { type Context } from "@stealthscale/config-core";
+import { type Context } from "@stealthscale/vite-config-core";
 
 import { buildBefore, buildDone, buildPrepare, hook } from "#pack/hook.ts";
 

@@ -1,17 +1,26 @@
 {
-  "name": "@stealthscale/config-typescript",
-  "version": "0.0.0",
+  "name": "@stealthscale/vite-config-typescript",
+  "version": "0.1.0",
   "description": "The TypeScript settings every stealth package compiles under, as configs to extend.",
+  "keywords": [
+    "config",
+    "tsconfig",
+    "typescript"
+  ],
+  "homepage": "https://github.com/stealth-scale/config/tree/main/packages/vite-config-typescript#readme",
+  "bugs": "https://github.com/stealth-scale/config/issues",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/stealth-scale/config.git",
-    "directory": "packages/config-typescript"
+    "directory": "packages/vite-config-typescript"
   },
   "files": [
     "base.json",
     "node.json",
-    "web.json"
+    "web.json",
+    "LICENSE",
+    "README.md"
   ],
   "type": "module",
   "exports": {
@@ -22,5 +31,8 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "engines": {
+    "node": ">=24.0.0"
   }
 }

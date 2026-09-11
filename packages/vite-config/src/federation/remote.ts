@@ -4,7 +4,7 @@
 
 import { federation } from "@module-federation/vite";
 
-import { contribute, type Contribution } from "@stealthscale/config-core";
+import { contribute, type Contribution } from "@stealthscale/vite-config-core";
 
 import { ENTRY, type Exposed, type Shared } from "#federation/settings.ts";
 

@@ -2,7 +2,7 @@
  * Letting another origin fetch what a preview serves.
  */
 
-import { type Preset, preset } from "@stealthscale/config-core";
+import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 import { origins as allowed } from "#serving/environment.ts";
 

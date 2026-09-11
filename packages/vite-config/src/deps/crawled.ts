@@ -2,7 +2,7 @@
  * Where the dev server starts looking for what to pre-bundle.
  */
 
-import { contribute, type Contribution } from "@stealthscale/config-core";
+import { contribute, type Contribution } from "@stealthscale/vite-config-core";
 
 /**
  * Where a contribution to the list of what is crawled lands.

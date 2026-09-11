@@ -1,8 +1,8 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { pack } from "@stealthscale/config-vite";
-import { defineConfig } from "@stealthscale/config-vite/preset/web";
+import { pack } from "@stealthscale/vite-config";
+import { defineConfig } from "@stealthscale/vite-config/preset/web";
 
 import { stylesheet, TOKEN_EXPORTS } from "./src/palette.ts";
 

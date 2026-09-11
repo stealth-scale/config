@@ -2,7 +2,7 @@
  * The rules the automatic JSX runtime makes obsolete.
  */
 
-import { type Contribution, lint } from "@stealthscale/config-vite";
+import { type Contribution, lint } from "@stealthscale/vite-config";
 
 /**
  * The files the automatic runtime compiles, which is everything this package renders.
