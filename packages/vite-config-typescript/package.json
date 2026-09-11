@@ -1,6 +1,6 @@
 {
   "name": "@stealthscale/vite-config-typescript",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "The TypeScript settings every stealth package compiles under, as configs to extend.",
   "keywords": [
     "config",

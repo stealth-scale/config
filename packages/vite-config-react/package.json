@@ -1,6 +1,6 @@
 {
   "name": "@stealthscale/vite-config-react",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "What a stealth package that renders is configured, checked and formatted by.",
   "keywords": [
     "config",

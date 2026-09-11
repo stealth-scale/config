@@ -1,6 +1,6 @@
 {
   "name": "@stealthscale/vite-plugin-sbom",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A bill of materials for what a build actually reached, and the toolchain that produced it.",
   "keywords": [
     "cyclonedx",
