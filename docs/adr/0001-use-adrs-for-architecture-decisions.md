@@ -22,7 +22,7 @@ docblocks beside the code enforcing them, which is the right place for a reader 
 wrong place for a reader deciding whether to change it.
 
 A docblock moves when its file moves, and disappears when its file does. The layer kernel has
-already been extracted from `config-vite` into a package of its own, taking the module that argues
+already been extracted from `vite-config` into a package of its own, taking the module that argues
 why a preset needs no reason along with it. Delete that file and the argument goes too, which leaves
 a rule nobody can account for and the next contributor free to drop it.
 
