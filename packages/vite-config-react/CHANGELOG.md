@@ -1,5 +1,18 @@
 # @stealthscale/vite-config-react
 
+## 0.4.1
+
+### Patch Changes
+
+- [`2c6a7f1`](https://github.com/stealth-scale/config/commit/2c6a7f1c3025c450648ddb1df2e4458cc9856213) Thanks [@stealth-rklopper](https://github.com/stealth-rklopper)! - State the test environment from the tiers rather than from the workspace preset. The previous
+  release put `test.document()` at the root on the reasoning that the runner reads its environment
+  from the root config, and that is wrong: `test.projects` makes every package a project of its own,
+  and a project is configured by its own config rather than by the root's. A rendering specification
+  still met `document is not defined`, which is what the root layer was added to prevent.
+  
+  `test.cleanup()` was already in the tiers for exactly this reason, and the two belong together: a
+  package that needs a document to draw into is the same package that needs it emptied afterwards.
+
 ## 0.4.0
 
 ### Minor Changes
