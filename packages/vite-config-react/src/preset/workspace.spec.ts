@@ -16,8 +16,8 @@ test("states the format and the rules, which a root config is read for and nothi
   expect(held.some((one) => one.includes("lint.relax"))).toBe(true);
 });
 
-test("turns on all three linter plugins, at the root where the linter reads them", () => {
-  expect(workspace().filter((one) => one.name.includes("react.plugin("))).toHaveLength(3);
+test("turns the linter plugins on at the root, where the linter reads them", () => {
+  expect(workspace().filter((one) => one.name.includes("react.plugin("))).toHaveLength(2);
 });
 
 test("lays out no page, a workspace root being rooted at no application", () => {

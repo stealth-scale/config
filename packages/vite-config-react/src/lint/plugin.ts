@@ -12,10 +12,15 @@ const AT = "lint.plugins";
 /**
  * The plugins whose rules only mean something where something renders.
  *
- * All three are built into the linter and all three are off until asked for, which is why enabling
- * them is this package's job rather than the toolchain's.
+ * Both are built into the linter and both are off until asked for, which is why enabling them is
+ * this package's job rather than the toolchain's.
+ *
+ * `react-perf` is not among them. Every rule it carries asks for a value to be memoised by hand —
+ * an array, an object, a function or an element passed as a prop — and this package turns the React
+ * Compiler on, which memoises all four. A repository that turns the compiler off wants those rules
+ * back and contributes the plugin to `lint.plugins` itself.
  */
-const PLUGINS = ["react", "react-perf", "jsx-a11y"];
+const PLUGINS = ["react", "jsx-a11y"];
 
 /**
  * Turns on the rules that know what a component is.

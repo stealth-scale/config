@@ -2,14 +2,17 @@ import { expect, test } from "vite-plus/test";
 
 import { plugins } from "#lint/plugin.ts";
 
-test("turns on the three plugins whose rules know what a component is", () => {
-  expect(plugins().map((one) => one.item)).toEqual(["react", "react-perf", "jsx-a11y"]);
+test("turns on the plugins whose rules know what a component is", () => {
+  expect(plugins().map((one) => one.item)).toEqual(["react", "jsx-a11y"]);
+});
+
+test("leaves react-perf off, the compiler this package turns on memoising what it asks for", () => {
+  expect(plugins().map((one) => one.item)).not.toContain("react-perf");
 });
 
 test("contributes one at a time, so a repository can take one back by name", () => {
   expect(plugins().map((one) => one.name)).toEqual([
     "react.plugin(react)",
-    "react.plugin(react-perf)",
     "react.plugin(jsx-a11y)",
   ]);
 });
