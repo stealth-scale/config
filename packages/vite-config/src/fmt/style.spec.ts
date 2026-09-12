@@ -65,6 +65,10 @@ test("writes to a hundred columns, which is what the docblocks and the prose wra
   expect(settings().printWidth).toBe(100);
 });
 
+test("leaves a docblock that already fits alone, rather than rewrapping what the linter checks", () => {
+  expect(settings().jsdoc).toEqual({ lineWrappingStyle: "balance" });
+});
+
 test("indents with two spaces rather than a tab", () => {
   expect(settings().tabWidth).toBe(2);
   expect(settings().useTabs).toBe(false);
