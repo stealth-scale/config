@@ -91,13 +91,16 @@
     "vite-plus": "catalog:"
   },
   "peerDependencies": {
+    "@arethetypeswrong/core": "catalog:",
     "@module-federation/vite": "catalog:",
     "@stealthscale/vite-config-core": "workspace:^",
     "@stealthscale/vite-plugin-sbom": "workspace:^",
+    "@vitest/coverage-v8": "catalog:",
     "eslint-plugin-jsdoc": "catalog:",
     "eslint-plugin-perfectionist": "catalog:",
     "eslint-plugin-tsdoc": "catalog:",
     "happy-dom": "catalog:",
+    "publint": "catalog:",
     "vite-plus": "catalog:"
   },
   "peerDependenciesMeta": {

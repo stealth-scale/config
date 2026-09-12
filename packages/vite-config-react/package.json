@@ -78,6 +78,7 @@
   "peerDependencies": {
     "@stealthscale/vite-config": "workspace:^",
     "@vitejs/plugin-react": "catalog:",
+    "happy-dom": "catalog:",
     "oxc-transform-react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",

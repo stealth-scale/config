@@ -878,6 +878,10 @@ importers:
         version: 0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(@vitest/coverage-v8@4.1.11)(happy-dom@20.14.3)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.0)
 
   packages/vite-config-react:
+    dependencies:
+      happy-dom:
+        specifier: 'catalog:'
+        version: 20.14.3
     devDependencies:
       '@arethetypeswrong/core':
         specifier: 'catalog:'
