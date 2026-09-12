@@ -24,5 +24,11 @@ import * as lint from "#lint/index.ts";
  * @returns Each layer the root config needs on behalf of what renders below it.
  */
 export function workspace(): readonly Layer[] {
-  return owned("react", [fmt.imports(), lint.plugins(), lint.rules(), lint.runtime()]);
+  return owned("react", [
+    fmt.imports(),
+    lint.plugins(),
+    lint.rendered(),
+    lint.rules(),
+    lint.runtime(),
+  ]);
 }
