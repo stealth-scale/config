@@ -1,5 +1,16 @@
 # @stealthscale/vite-config
 
+## 0.1.5
+
+### Patch Changes
+
+- [`a1e8a24`](https://github.com/stealth-scale/config/commit/a1e8a245ee7c31c7036bb018cb3530ccdea33ffb) Thanks [@stealth-rklopper](https://github.com/stealth-rklopper)! - Declare the tools the layers turn on as peers: `publint` and `@arethetypeswrong/core`, which
+  `pack.quality` runs over every package that publishes, and `@vitest/coverage-v8`, which
+  `test.coverage` names as its provider. All three were devDependencies alone, so a repository taking
+  the toolchain got the layers without the tools and met `Failed to import module "publint"` on its
+  first pack and `Cannot find dependency '@vitest/coverage-v8'` on its first test run. They worked
+  here only because this repository installs them for its own packages.
+
 ## 0.1.4
 
 ### Patch Changes

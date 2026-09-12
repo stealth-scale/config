@@ -1,5 +1,25 @@
 # @stealthscale/vite-config-react
 
+## 0.4.0
+
+### Minor Changes
+
+- [`a1e8a24`](https://github.com/stealth-scale/config/commit/a1e8a245ee7c31c7036bb018cb3530ccdea33ffb) Thanks [@stealth-rklopper](https://github.com/stealth-rklopper)! - Give the runner a document to draw into. A workspace holding anything that renders needs one
+  everywhere, and the runner takes its environment from the root config — so every repository taking
+  this package had to know to state `test.environment` itself, and one that did not met
+  `document is not defined` on its first rendering specification. That reads as a broken test rather
+  than as a missing setting.
+  
+  `happy-dom` rather than jsdom, because a theme follows the reader's colour-mode preference and jsdom
+  has never implemented media queries. It is now a peer of this package rather than an optional one of
+  the toolchain, since a repository that renders is not optional about having somewhere to render. A
+  repository testing against something else takes `test.environment(happy-dom)` back by name.
+
+### Patch Changes
+
+- Updated dependencies [[`a1e8a24`](https://github.com/stealth-scale/config/commit/a1e8a245ee7c31c7036bb018cb3530ccdea33ffb)]:
+  - @stealthscale/vite-config@0.1.5
+
 ## 0.3.0
 
 ### Minor Changes

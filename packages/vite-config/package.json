@@ -1,6 +1,6 @@
 {
   "name": "@stealthscale/vite-config",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Composes a Vite+ config out of layers: presets set, contributions append, removals take back, overrides rewrite.",
   "keywords": [
     "config",
