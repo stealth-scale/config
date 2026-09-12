@@ -136,6 +136,7 @@ export const DOCBLOCK: PluginRules = {
       checkGetters: true,
       checkSetters: true,
       contexts: DOCUMENTED,
+      enableFixer: false,
       exemptOverloadedImplementations: true,
       require: {
         ClassDeclaration: true,

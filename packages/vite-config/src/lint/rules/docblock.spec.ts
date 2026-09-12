@@ -11,6 +11,12 @@ test("asks for a block on everything named, exported or not", () => {
   expect(DOCBLOCK["jsdoc-js/require-jsdoc"]).toBeDefined();
 });
 
+test("writes no block itself, the fixer's being empty and satisfying nothing", () => {
+  const [, stated] = DOCBLOCK["jsdoc-js/require-jsdoc"] as [string, { enableFixer: boolean }];
+
+  expect(stated.enableFixer).toBe(false);
+});
+
 test("requires no tag into existence, which is what manufactures filler", () => {
   for (const rule of FORCED) {
     expect(Object.keys(DOCBLOCK)).not.toContain(rule);
