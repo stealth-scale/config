@@ -17,7 +17,6 @@ const SURFACE = [
   "deps",
   "federation",
   "fmt",
-  "layout",
   "lint",
   "override",
   "pack",

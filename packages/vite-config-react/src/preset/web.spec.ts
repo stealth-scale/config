@@ -18,7 +18,7 @@ test("names every layer under this package, so a repository can take one back", 
 });
 
 test("lays out no page, a library having none to lay out", () => {
-  expect(layers().some((one) => one.name.includes("layout.page"))).toBe(false);
+  expect(layers().some((one) => one.name.includes("page"))).toBe(false);
 });
 
 test("compiles the JSX, so a component is specified under the transform it ships under", () => {

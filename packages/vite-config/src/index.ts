@@ -39,7 +39,6 @@ export * as define from "#define/index.ts";
 export * as deps from "#deps/index.ts";
 export * as federation from "#federation/index.ts";
 export * as fmt from "#fmt/index.ts";
-export * as layout from "#layout/index.ts";
 export * as lint from "#lint/index.ts";
 export * as pack from "#pack/index.ts";
 export * as preview from "#preview/index.ts";

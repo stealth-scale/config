@@ -17,8 +17,8 @@ test("names every layer under this package, so a repository can take one back", 
   }
 });
 
-test("states where the page sits, which is what an application's config is read for", () => {
-  expect(layers().map((one) => one.name)).toContain("react/layout.page(page)");
+test("names no page, an application keeping its own where Vite looks for it", () => {
+  expect(layers().some((one) => one.name.includes("page"))).toBe(false);
 });
 
 test("compiles the JSX and tears a rendered component down between tests", () => {
@@ -43,7 +43,7 @@ test("binds the application tier and this package's layers into one defineConfig
   });
 
   expect(held.plugins).toBeDefined();
-  expect(held.build?.rolldownOptions?.input).toBe("page/index.html");
+  expect(held.build?.rolldownOptions?.input).toBeUndefined();
 });
 
 test("builds rather than packs, an application being deployed rather than published", async () => {

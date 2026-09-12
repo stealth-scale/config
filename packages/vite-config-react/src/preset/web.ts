@@ -11,9 +11,8 @@ import * as test from "#test/index.ts";
 /**
  * The layers a library that renders states in its own config.
  *
- * What compiles its JSX, and what tears a rendered component down between tests. Nothing about a
- * page: a library has none, and a tier that laid one out would leave a package rooted at a
- * directory it does not have. An application reads `preset/app`, which is these plus the page.
+ * What compiles its JSX, and what tears a rendered component down between tests. An application
+ * reads `preset/app`, which states the same and is built rather than packed.
  *
  * The plugin is here even though the packer transforms JSX on its own, because the tests do not go
  * through the packer. A component specified without it is compiled by a different transform from

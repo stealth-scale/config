@@ -21,7 +21,7 @@ test("turns the linter plugins on at the root, where the linter reads them", () 
 });
 
 test("lays out no page, a workspace root being rooted at no application", () => {
-  expect(workspace().some((one) => one.name.includes("layout.page"))).toBe(false);
+  expect(workspace().some((one) => one.name.includes("page"))).toBe(false);
 });
 
 test("packs and builds nothing, a workspace root being neither published nor deployed", () => {

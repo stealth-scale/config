@@ -1,10 +1,8 @@
-import { deps, layout, preview, server } from "@stealthscale/vite-config";
+import { deps, preview, server } from "@stealthscale/vite-config";
 import { defineConfig } from "@stealthscale/vite-config/preset/app";
 
 export default defineConfig(import.meta.dirname, {
   extends: [
-    layout.page("page"),
-
     // The dev server works out what to pre-bundle by crawling from the page. It reaches what the
     // page imports; the worker is reached through a URL rather than an import, so what the worker
     // itself depends on is found only when the worker first runs. Naming it starts the crawl there

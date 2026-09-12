@@ -2,24 +2,27 @@
  * Configuring an application that renders.
  */
 
-import { configuring, type Defining, type Layer, layout, owned } from "@stealthscale/vite-config";
+import { configuring, type Defining, type Layer, owned } from "@stealthscale/vite-config";
 import { layers as application } from "@stealthscale/vite-config/preset/app";
 
 import * as plugin from "#plugin/index.ts";
-import { PAGE } from "#preset/page.ts";
 import * as test from "#test/index.ts";
 
 /**
  * The layers an application that renders states in its own config.
  *
- * These are the ones an application's config is read for: where its page sits, and what compiles
- * its JSX. A library gets the second and not the first, which is the whole of the difference
- * between this tier and `preset/web`.
+ * What compiles its JSX, and what tears a rendered component down between tests. The same as
+ * `preset/web` states, because React asks the same of an application as of a library: the
+ * difference between the two tiers is the one underneath, where an application is built and a
+ * library is packed.
+ *
+ * Nothing about where the page sits. An application keeps its `index.html` where Vite looks for it,
+ * beside the config, which is what makes one URL serve it in development and in a build.
  *
  * @returns Each layer React needs beyond what a browser application already gets.
  */
 export function layers(): readonly Layer[] {
-  return owned("react", [layout.page(PAGE), plugin.refresh(), test.cleanup(), test.document()]);
+  return owned("react", [plugin.refresh(), test.cleanup(), test.document()]);
 }
 
 /**

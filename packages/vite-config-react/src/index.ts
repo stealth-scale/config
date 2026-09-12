@@ -11,7 +11,6 @@
 export * as federation from "#federation/index.ts";
 export * as fmt from "#fmt/index.ts";
 export * as lint from "#lint/index.ts";
-export * as override from "#override.ts";
 export * as plugin from "#plugin/index.ts";
 export * as preset from "#preset/index.ts";
 export * as test from "#test/index.ts";
