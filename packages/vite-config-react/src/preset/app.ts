@@ -19,7 +19,7 @@ import * as test from "#test/index.ts";
  * @returns Each layer React needs beyond what a browser application already gets.
  */
 export function layers(): readonly Layer[] {
-  return owned("react", [layout.page(PAGE), plugin.refresh(), test.cleanup()]);
+  return owned("react", [layout.page(PAGE), plugin.refresh(), test.cleanup(), test.document()]);
 }
 
 /**

@@ -6,7 +6,6 @@ import { type Layer, owned } from "@stealthscale/vite-config";
 
 import * as fmt from "#fmt/index.ts";
 import * as lint from "#lint/index.ts";
-import * as test from "#test/index.ts";
 
 /**
  * The layers a workspace states once, at its root.
@@ -31,6 +30,5 @@ export function workspace(): readonly Layer[] {
     lint.rendered(),
     lint.rules(),
     lint.runtime(),
-    test.document(),
   ]);
 }
