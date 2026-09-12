@@ -263,9 +263,6 @@ catalogs:
     vite-plus:
       specifier: 0.3.1
       version: 0.3.1
-    vitest:
-      specifier: 4.1.11
-      version: 4.1.11
     yaml:
       specifier: ^2.9.1
       version: 2.9.1
@@ -770,9 +767,6 @@ importers:
       vite-plus:
         specifier: 'catalog:'
         version: 0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(@vitest/coverage-v8@4.1.11)(happy-dom@20.14.3)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1)
-      vitest:
-        specifier: 'catalog:'
-        version: 4.1.11(@types/node@26.5.1)(@vitest/browser-preview@4.1.11)(@vitest/coverage-v8@4.1.11)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(happy-dom@20.14.3)
 
   packages/vite-config:
     dependencies:
@@ -4583,13 +4577,12 @@ snapshots:
       '@testing-library/dom': 10.4.1
       '@testing-library/user-event': 14.6.7(@testing-library/dom@10.4.1)
       '@vitest/browser': 4.1.11(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(vitest@4.1.11)
-      vitest: 4.1.11(@types/node@26.5.1)(@vitest/browser-preview@4.1.11)(@vitest/coverage-v8@4.1.11)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(happy-dom@20.14.3)
+      vitest: 4.1.11(@types/node@26.5.1)(@vitest/browser-preview@4.1.11)(@vitest/coverage-v8@4.1.11)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.0))(happy-dom@20.14.3)
     transitivePeerDependencies:
       - bufferutil
       - msw
       - utf-8-validate
       - vite
-    optional: true
 
   '@vitest/browser@4.1.11(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.0))(vitest@4.1.11)':
     dependencies:
@@ -4617,14 +4610,13 @@ snapshots:
       pngjs: 7.0.0
       sirv: 3.0.2
       tinyrainbow: 3.1.1
-      vitest: 4.1.11(@types/node@26.5.1)(@vitest/browser-preview@4.1.11)(@vitest/coverage-v8@4.1.11)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(happy-dom@20.14.3)
+      vitest: 4.1.11(@types/node@26.5.1)(@vitest/browser-preview@4.1.11)(@vitest/coverage-v8@4.1.11)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.0))(happy-dom@20.14.3)
       ws: 8.21.3
     transitivePeerDependencies:
       - bufferutil
       - msw
       - utf-8-validate
       - vite
-    optional: true
 
   '@vitest/coverage-v8@4.1.11(@vitest/browser@4.1.11)(vitest@4.1.11)':
     dependencies:
@@ -6127,7 +6119,7 @@ snapshots:
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 26.5.1
-      '@vitest/browser-preview': 4.1.11(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(vitest@4.1.11)
+      '@vitest/browser-preview': 4.1.11(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.0))(vitest@4.1.11)
       '@vitest/coverage-v8': 4.1.11(@vitest/browser@4.1.11)(vitest@4.1.11)
       happy-dom: 20.14.3
     transitivePeerDependencies:

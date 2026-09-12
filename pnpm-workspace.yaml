@@ -40,10 +40,6 @@ catalog:
   vite: npm:@voidzero-dev/vite-plus-core@0.3.1
   vite-plugin-stylelint: ^6.3.0
   vite-plus: 0.3.1
-  # Pinned to the exact version vite-plus depends on. `vite-plus/test` is `export * from
-  # "vitest"`, so a second copy here would register tests against a runner that is not the one
-  # running them.
-  vitest: 4.1.11
   yaml: ^2.9.1
 
 # What a published package asks a consumer for. Separate from the default catalog because that
@@ -53,7 +49,6 @@ catalog:
 catalogs:
   peer:
     vite: ^8.0.0
-    vitest: ^4.1.11
 
 overrides:
   vite@*: "catalog:"

@@ -48,12 +48,10 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "typescript": "catalog:",
-    "vite-plus": "catalog:",
-    "vitest": "catalog:"
+    "vite-plus": "catalog:"
   },
   "peerDependencies": {
     "@testing-library/react": "catalog:",
-    "react": "catalog:",
-    "vitest": "catalog:peer"
+    "react": "catalog:"
   }
 }
