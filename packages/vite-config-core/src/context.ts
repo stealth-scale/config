@@ -151,7 +151,13 @@ export function rooted(from: string): string {
  * The directory the configuration declares is the answer, with one exception. A package that ships
  * no configuration of its own is built by the workspace root's, and the declared directory is then
  * the root rather than the package — so where the root's configuration is the one running and the
- * command was pointed somewhere else holding a manifest, that somewhere else is the package.
+ * command was pointed at a manifest with no configuration beside it, that manifest's directory is
+ * the package.
+ *
+ * A package with a configuration of its own is reached through that configuration. The root's is
+ * still read from its directory, for what the root alone states — lint, fmt, run — and then it
+ * answers for the root: a root tier that packs would otherwise read the package's manifest and
+ * refuse an application for publishing nothing.
  *
  * Neither answer works alone. A configuration read for a package while a command runs at the root,
  * which is what `vp test` does, has the right directory declared and the wrong one current; a
@@ -165,7 +171,24 @@ export function rooted(from: string): string {
 function configured(declared: string, root: string, from: string): string {
   if (declared !== root || from === root) return declared;
 
-  return existsSync(join(from, "package.json")) ? from : declared;
+  return existsSync(join(from, "package.json")) && !configures(from) ? from : declared;
+}
+
+/**
+ * The names a configuration is read under, which are the ones Vite+ looks for.
+ */
+const CONFIGS = ["js", "mjs", "cjs", "ts", "mts", "cts"].map(
+  (extension) => `vite.config.${extension}`,
+);
+
+/**
+ * Answers whether a directory states a configuration of its own.
+ *
+ * @param at - The directory.
+ * @returns Whether a configuration file sits in it.
+ */
+function configures(at: string): boolean {
+  return CONFIGS.some((name) => existsSync(join(at, name)));
 }
 
 /**

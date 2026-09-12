@@ -227,6 +227,14 @@ test("takes where the command runs where a package states no config and the root
   expect(contextOf(SERVING, held.root, held.at).at).toBe(held.at);
 });
 
+test("keeps the root where the command runs in a package that states a config of its own", () => {
+  const held = workspace();
+
+  writeFileSync(join(held.at, "vite.config.ts"), "export default {};\n");
+
+  expect(contextOf(SERVING, held.root, held.at).at).toBe(held.root);
+});
+
 test("keeps the root where that is both what was declared and where the command runs", () => {
   const held = workspace();
 
