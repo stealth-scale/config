@@ -1,5 +1,13 @@
 # @stealthscale/vite-config-core
 
+## 0.2.1
+
+### Patch Changes
+
+- [`057f3d3`](https://github.com/stealth-scale/config/commit/057f3d3b9cc405e60b78bfa5e0e3fe3d81f8d34b) Thanks [@stealth-rklopper](https://github.com/stealth-rklopper)! - The root's configuration answers for the root when read from a package that states a configuration
+  of its own. `vp check` and `vp lint` read it from wherever they run, and a root tier that packs was
+  reading the package's manifest instead, refusing an application for publishing nothing.
+
 ## 0.2.0
 
 ### Minor Changes
