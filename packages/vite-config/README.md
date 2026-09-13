@@ -38,25 +38,25 @@ so neither the process nor the stack can say which package is being configured.
 
 Each is a namespace on the root export, holding the layers for one part of the config.
 
-| Block        | Decides                                                         |
-| ------------ | --------------------------------------------------------------- |
-| `build`      | Output: sourcemaps, licences, manifest, preload, inventory      |
-| `define`     | What is substituted into the bundle                             |
-| `deps`       | Prebundling and what the crawl misses                           |
-| `federation` | Module federation hosts and remotes                             |
-| `fmt`        | Formatting: docblocks, imports, manifests, prose, style         |
-| `layout`     | Where the page and its entry sit                                |
-| `lint`       | The rule sets, and `relax` to turn one off with a reason        |
-| `pack`       | Packing: entry, declarations, platform, hooks, inventory        |
-| `preview`    | The preview server's port, host and reachability                |
-| `resolve`    | Conditions, and the source condition workspaces resolve through |
-| `run`        | Task caching and the CI task list                               |
-| `server`     | The dev server's port, host, proxy and reachability             |
-| `serving`    | What `server` and `preview` state in common                     |
-| `ssr`        | What is bundled into the server build                           |
-| `staged`     | What runs against staged files                                  |
-| `test`       | Files, isolation, environment, coverage, projects               |
-| `worker`     | The worker format                                               |
+| Block        | Decides                                                            |
+| ------------ | ------------------------------------------------------------------ |
+| `build`      | Output: sourcemaps, licences, manifest, preload, chunks, inventory |
+| `define`     | What is substituted into the bundle                                |
+| `deps`       | Prebundling and what the crawl misses                              |
+| `federation` | Module federation hosts and remotes                                |
+| `fmt`        | Formatting: docblocks, imports, manifests, prose, style            |
+| `layout`     | Where the page and its entry sit                                   |
+| `lint`       | The rule sets, and `relax` to turn one off with a reason           |
+| `pack`       | Packing: entry, declarations, platform, hooks, inventory           |
+| `preview`    | The preview server's port, host and reachability                   |
+| `resolve`    | Conditions, and the source condition workspaces resolve through    |
+| `run`        | Task caching and the CI task list                                  |
+| `server`     | The dev server's port, host, proxy and reachability                |
+| `serving`    | What `server` and `preview` state in common                        |
+| `ssr`        | What is bundled into the server build                              |
+| `staged`     | What runs against staged files                                     |
+| `test`       | Files, isolation, environment, coverage, projects                  |
+| `worker`     | The worker format                                                  |
 
 `lint` and `fmt` are read from the workspace root and nowhere else. Stated in a package's own config
 they compose, merge, and are then never read.

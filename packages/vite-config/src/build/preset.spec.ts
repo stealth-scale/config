@@ -15,13 +15,15 @@ test("says nothing about a page in the tier that says nothing about where it run
 
   expect(held).not.toContain("manifest");
   expect(held).not.toContain("preload");
+  expect(held).not.toContain("chunks");
 });
 
-test("writes a manifest and drops the polyfill where there is a page", () => {
+test("writes a manifest, drops the polyfill and gathers the first load where there is a page", () => {
   const held = web().map((one) => one.name);
 
   expect(held).toContain("build.manifest");
   expect(held).toContain("build.preload");
+  expect(held).toContain("build.chunks");
 });
 
 test("says who to credit for what it is made of, wherever it is deployed", () => {
