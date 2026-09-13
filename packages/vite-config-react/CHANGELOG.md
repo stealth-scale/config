@@ -1,5 +1,12 @@
 # @stealthscale/vite-config-react
 
+## 0.5.1
+
+### Patch Changes
+
+- Updated dependencies [[`99feb93`](https://github.com/stealth-scale/config/commit/99feb93aba0cd59be739827e54409cb6e2381a5a)]:
+  - @stealthscale/vite-config@0.3.0
+
 ## 0.5.0
 
 ### Minor Changes
