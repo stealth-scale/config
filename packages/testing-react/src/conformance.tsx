@@ -63,24 +63,47 @@ const MARK = "data-conformance";
  * Unmounted rather than left in the document, so one check cannot read the element another check
  * rendered.
  *
+ * Throws where nothing was rendered, which `renders` is what guards against: every caller below it
+ * has already established that the component renders, so a throw here means a component that
+ * renders with its own props and stops once it is handed children or `asChild` — rare enough to
+ * report as `only`'s own sentence rather than to carry an optional through every check.
+ *
  * @param Component - The component to mount.
  * @param props - The props to mount it with.
  * @param read - The reading to take off the element it rendered.
- * @returns The reading, or nothing where it rendered no element at all.
+ * @returns The reading.
+ * @throws Error Where it rendered no element.
  */
 function mounted<Held>(
   Component: ElementType,
   props: Readonly<Record<string, unknown>>,
   read: (element: HTMLElement) => Held,
-): Held | undefined {
+): Held {
   const { container, unmount } = render(createElement(Component, props));
 
   try {
     return read(only(container));
-  } catch {
-    return undefined;
   } finally {
     unmount();
+  }
+}
+
+/**
+ * Answers whether a component renders an element at all.
+ *
+ * The one check that cannot assume the answer to itself, and the reason every check after it can.
+ *
+ * @param Component - The component to mount.
+ * @param props - The props it requires before it renders.
+ * @returns `true` where it rendered an element.
+ */
+function renders(Component: ElementType, props: Readonly<Record<string, unknown>>): boolean {
+  try {
+    mounted(Component, props, (element) => element.tagName);
+
+    return true;
+  } catch {
+    return false;
   }
 }
 
@@ -107,11 +130,11 @@ function classNames(
   const merged = mounted(Component, { ...props, className: PROBE }, (rendered) => [
     ...rendered.classList,
   ]);
-  const own = mounted(Component, props, (rendered) => [...rendered.classList]) ?? [];
+  const own = mounted(Component, props, (rendered) => [...rendered.classList]);
 
   return [
-    ...(merged?.includes(PROBE) === true ? [] : ["does not merge className"]),
-    ...(own.every((one) => merged?.includes(one) === true)
+    ...(merged.includes(PROBE) ? [] : ["does not merge className"]),
+    ...(own.every((one) => merged.includes(one))
       ? []
       : ["replaces its own className instead of merging"]),
   ];
@@ -207,10 +230,10 @@ export function violations(
   options: ConformanceOptions = {},
 ): readonly string[] {
   const props = options.props ?? {};
+
+  if (!renders(Component, props)) return ["renders no element"];
+
   const element = mounted(Component, props, (rendered) => rendered.tagName);
-
-  if (element === undefined) return ["renders no element"];
-
   const wrong =
     options.element !== undefined && element !== options.element
       ? [`renders ${element}, not ${options.element}`]
