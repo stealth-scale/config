@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vite-plus/test";
 
-import { attr, renderedAs } from "#dom.ts";
+import { aria, attr, holds, renderedAs } from "#dom.ts";
 
 describe("attr", () => {
   it("reads the state a part reports about itself", () => {
@@ -26,6 +26,67 @@ describe("attr", () => {
     const { container } = render(<div />);
 
     expect(() => attr(container, "root", "state")).toThrow('[data-part="root"]');
+  });
+});
+
+describe("aria", () => {
+  it("reads what a part owes a screen reader", () => {
+    const { container } = render(<span aria-current="page" data-part="current-link" />);
+
+    expect(aria(container, "current-link", "aria-current")).toBe("page");
+  });
+
+  it("answers nothing where the part carries no such attribute, as reading a data one does", () => {
+    const { container } = render(<span data-part="link" />);
+
+    expect(aria(container, "link", "aria-current")).toBeUndefined();
+  });
+
+  it("says which part is missing rather than failing on nothing", () => {
+    const { container } = render(<div />);
+
+    expect(() => aria(container, "root", "aria-current")).toThrow('[data-part="root"]');
+  });
+});
+
+describe("holds", () => {
+  it("reports a part drawn inside another, which is what an anatomy states", () => {
+    const { container } = render(
+      <div data-part="arrow">
+        <div data-part="arrow-tip" />
+      </div>,
+    );
+
+    expect(holds(container, "arrow", "arrow-tip")).toBe(true);
+  });
+
+  it("reports a part drawn deeper down as held, nesting being about the tree rather than the step", () => {
+    const { container } = render(
+      <div data-part="positioner">
+        <div>
+          <div data-part="content" />
+        </div>
+      </div>,
+    );
+
+    expect(holds(container, "positioner", "content")).toBe(true);
+  });
+
+  it("reports a part drawn beside another as not held", () => {
+    const { container } = render(
+      <div>
+        <div data-part="arrow" />
+        <div data-part="content" />
+      </div>,
+    );
+
+    expect(holds(container, "arrow", "content")).toBe(false);
+  });
+
+  it("says which part is missing rather than answering false", () => {
+    const { container } = render(<div data-part="arrow" />);
+
+    expect(() => holds(container, "arrow", "arrow-tip")).toThrow('[data-part="arrow-tip"]');
   });
 });
 

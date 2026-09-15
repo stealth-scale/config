@@ -25,6 +25,46 @@ export function attr(container: ParentNode, name: string, attribute: string): st
 }
 
 /**
+ * Reads an `aria-` attribute off a named part.
+ *
+ * What a component owes a screen reader travels on these — `aria-current="page"`,
+ * `aria-expanded="false"`, `aria-describedby` — and they are a contract rather than a detail: a
+ * trail that stops marking the page you are on is broken however it looks. Separate from `attr`
+ * because that one reads the `data-` a component states about itself, and the two are different
+ * promises to different readers.
+ *
+ * Answers nothing rather than `null` where the attribute is absent, so both readers here fail the
+ * same way and a specification never has to remember which.
+ *
+ * @param container - The rendered output.
+ * @param name - The part's name.
+ * @param attribute - The attribute, with its `aria-` prefix: `aria-current`.
+ * @returns Its value, or nothing where the part carries no such attribute.
+ * @throws Error Where nothing in the output carries that part.
+ */
+export function aria(container: ParentNode, name: string, attribute: string): string | undefined {
+  return part(container, name).getAttribute(attribute) ?? undefined;
+}
+
+/**
+ * Answers whether one part is drawn inside another.
+ *
+ * Nesting is a thing an anatomy states and a specification should hold it to: an arrow's tip
+ * belongs in the arrow, a panel belongs in the positioner that places it. Written here so a
+ * specification asserts it through the anatomy rather than through a selector of its own, which is
+ * the coupling every reader in this package exists to remove.
+ *
+ * @param container - The rendered output.
+ * @param outer - The part that should hold the other.
+ * @param inner - The part that should sit inside it.
+ * @returns `true` where the inner part is drawn within the outer one.
+ * @throws Error Where nothing in the output carries either part.
+ */
+export function holds(container: ParentNode, outer: string, inner: string): boolean {
+  return part(container, outer).contains(part(container, inner));
+}
+
+/**
  * Reads the element a part rendered as, upper-cased.
  *
  * This is the polymorphism a component taking `as` or `asChild` owes: a card asked to be an

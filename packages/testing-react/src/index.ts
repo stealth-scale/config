@@ -15,5 +15,5 @@
  */
 
 export { type ConformanceOptions, violations } from "#conformance.tsx";
-export { attr, renderedAs } from "#dom.ts";
+export { aria, attr, holds, renderedAs } from "#dom.ts";
 export { only, part, parts, type Rendered } from "#part.ts";
