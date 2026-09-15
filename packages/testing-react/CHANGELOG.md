@@ -1,5 +1,17 @@
 # @stealthscale/testing-react
 
+## 0.3.0
+
+### Minor Changes
+
+- [`be64d43`](https://github.com/stealth-scale/config/commit/be64d437b98a7eb6a886941521f6a8e04d187278) Thanks [@stealth-rklopper](https://github.com/stealth-rklopper)! - Read the component contract a wrapper breaks
+  
+  - add `violations(Component, options)`: mounts once per check, answers what it does not keep
+  - always: renders an element, merges `className` without dropping its own, forwards `ref`, spreads
+    props it does not name
+  - on request: `element` names the tag, `children`, `asChild` — none of them every component's
+  - violations rather than a verdict, so nothing here asserts and the package needs no test runner
+
 ## 0.2.0
 
 ### Minor Changes
