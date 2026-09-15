@@ -1,5 +1,20 @@
 # @stealthscale/testing-react
 
+## 0.5.0
+
+### Minor Changes
+
+- [`494d106`](https://github.com/stealth-scale/config/commit/494d106601fd5b1f96e6538e84df303fe05e18ea) Thanks [@stealth-rklopper](https://github.com/stealth-rklopper)! - testing-react: read a mark drawn in SVG, not only HTML
+  
+  An icon renders an `svg`, which is not an `HTMLElement`. `only` threw on one, and `renderedAs` and
+  `violations` compared its lowercase tag name against the upper-cased name every other component
+  reports, so a conforming icon failed every check.
+  
+  - `only`, `part` and `parts` answer `Rendered`, which is `Element & HTMLOrSVGElement`; `only` still
+    throws for anything that is neither
+  - `renderedAs` and `violations` upper-case the tag name, so `element: "SVG"` reads the way
+    `element: "DIV"` does
+
 ## 0.4.0
 
 ### Minor Changes
