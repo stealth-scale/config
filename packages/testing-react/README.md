@@ -66,6 +66,7 @@ it("keeps the component contract", () => {
 | Checked                             | Always | Reported as                                     |
 | ----------------------------------- | ------ | ----------------------------------------------- |
 | renders an element at all           | yes    | `renders no element`                            |
+| does not throw rendering it         | yes    | `throws when it renders: <message>`             |
 | merges the caller's `className`     | yes    | `does not merge className`                      |
 | keeps its own `className` beside it | yes    | `replaces its own className instead of merging` |
 | forwards `ref` to what it rendered  | yes    | `does not forward ref`                          |
@@ -79,8 +80,26 @@ is the caller's business, a rule and a spacer take no children, and a component 
 element owes nothing about `asChild`. `props` passes whatever the component needs before it renders
 at all — a ratio, a label, a value.
 
-A component that renders nothing fails the first check and is asked no others, since every answer
-after it would be the same failure restated.
+A component that throws, or that renders no element to check, fails the first check and is asked no
+others, since every answer after it would be the same failure restated. The two are reported apart
+because they are different bugs.
+
+## A part that cannot be rendered alone
+
+A compound's part reads its state from a provider and throws without one, so checking it needs both
+the provider around it and a way to find it inside what that provider rendered:
+
+```tsx
+violations(CardHeader, {
+  element: "DIV",
+  subject: (container) => part(container, "header"),
+  wrapper: (children) => <CardRoot>{children}</CardRoot>,
+});
+```
+
+`wrapper` is whatever the component needs above it — a provider, a theme, a router. `subject` finds
+the element under test, and defaults to `only`, which is right for a component rendered on its own
+and wrong under a wrapper, where the first element belongs to the wrapper.
 
 Violations rather than a verdict, the way an audit is: a specification writes one assertion, and a
 failure names the prop that went missing rather than saying that `false` is not `true`. Nothing here

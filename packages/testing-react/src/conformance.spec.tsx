@@ -1,8 +1,9 @@
-import { type ReactElement, type ReactNode, type Ref } from "react";
+import { createContext, type ReactElement, type ReactNode, type Ref, use } from "react";
 
 import { describe, expect, it } from "vite-plus/test";
 
 import { violations } from "#conformance.tsx";
+import { part } from "#part.ts";
 
 /**
  * The props a component written here accepts.
@@ -176,6 +177,61 @@ function Requiring({ ratio, ...rest }: { ratio?: number } & ProbeProps): ReactEl
   return <Conforming {...rest} />;
 }
 
+/**
+ * Carries the class a part reads, so that a part rendered without its provider throws.
+ */
+const Slot = createContext<string | undefined>(undefined);
+
+/**
+ * A part of a compound, which reads its class from the provider above it.
+ *
+ * @param props - The props. `ProbeProps` documents every member.
+ * @returns The element.
+ * @throws Error Where it is rendered without its provider.
+ */
+function Part({ children, className, ref, ...rest }: ProbeProps): ReactElement {
+  const slot = use(Slot);
+
+  if (slot === undefined) throw new Error("Part cannot access its Provider.");
+
+  return (
+    <div
+      className={[slot, className].filter(Boolean).join(" ")}
+      data-part="part"
+      ref={ref}
+      {...rest}
+    >
+      {children}
+    </div>
+  );
+}
+
+/**
+ * The provider a part needs above it.
+ *
+ * @param props - The subtree.
+ * @param props.children - The subtree.
+ * @returns The subtree, with the slot in scope.
+ */
+function Root({ children }: { children?: ReactNode }): ReactElement {
+  return (
+    <section data-part="root">
+      <Slot value="own">{children}</Slot>
+    </section>
+  );
+}
+
+/**
+ * A component that throws something that is not an error.
+ *
+ * @returns Nothing; it never returns.
+ * @throws String Always.
+ */
+function Thrower(): ReactElement {
+  // eslint-disable-next-line no-throw-literal, typescript/only-throw-error -- the case is a component that throws something other than an error, which is what the reader has to say something useful about
+  throw "refused";
+}
+
 describe("violations", () => {
   it("finds none for a component that keeps every part of the contract", () => {
     const options = { asChild: true, children: true, element: "DIV" };
@@ -223,5 +279,36 @@ describe("violations", () => {
 
   it("mounts a component with the props it requires before it renders at all", () => {
     expect(violations(Requiring, { props: { ratio: 2 } })).toStrictEqual([]);
+  });
+});
+
+describe("violations, where a component cannot be rendered on its own", () => {
+  it("checks a part of a compound inside the provider it needs", () => {
+    expect(
+      violations(Part, {
+        children: true,
+        element: "DIV",
+        subject: (container) => part(container, "part"),
+        wrapper: (children) => <Root>{children}</Root>,
+      }),
+    ).toStrictEqual([]);
+  });
+
+  it("reports a component that throws as throwing, rather than as rendering nothing", () => {
+    expect(violations(Part)).toStrictEqual([
+      "throws when it renders: Part cannot access its Provider.",
+    ]);
+  });
+
+  it("reports what was thrown where it was not an error", () => {
+    expect(violations(Thrower)).toStrictEqual(["throws when it renders: refused"]);
+  });
+
+  it("reports no element where the subject is not in what was rendered", () => {
+    expect(
+      violations(Conforming, {
+        subject: (container) => part(container, "absent"),
+      }),
+    ).toStrictEqual(["renders no element"]);
   });
 });
