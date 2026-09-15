@@ -48,9 +48,7 @@ jobs:
           persist-credentials: false
       - uses: pnpm/setup@v2
         with:
-          version: 12
           runtime: node@24
-          require-lockfile: true
       - id: select-mode
         uses: changesets/action/select-mode@v2
 
@@ -69,9 +67,7 @@ jobs:
           persist-credentials: false
       - uses: pnpm/setup@v2
         with:
-          version: 12
           runtime: node@24
-          require-lockfile: true
       - uses: changesets/action/version@v2
         with:
           commit-message: "chore: bump every package and write the changelogs"
@@ -93,9 +89,7 @@ jobs:
           persist-credentials: false
       - uses: pnpm/setup@v2
         with:
-          version: 12
           runtime: node@24
-          require-lockfile: true
       # A config file is read before any task graph exists, and every package's config imports
       # other packages' builds, so the ordered packs come first; then every package builds,
       # including the two `bootstrap` does not name, since a tarball is packed from `dist`.
@@ -122,9 +116,7 @@ jobs:
           persist-credentials: false
       - uses: pnpm/setup@v2
         with:
-          version: 12
           runtime: node@24
-          require-lockfile: true
       - uses: changesets/action/publish@v2
         with:
           pack-dir-artifact-id: ${{ needs.pack.outputs.pack-dir-artifact-id }}

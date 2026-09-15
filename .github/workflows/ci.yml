@@ -30,8 +30,6 @@ jobs:
           fetch-depth: 0
       - uses: pnpm/setup@v2
         with:
-          version: 12
           runtime: node@24
           cache: true
-          require-lockfile: true
       - run: pnpm run ready
