@@ -25,11 +25,15 @@ export function attr(container: ParentNode, name: string, attribute: string): st
 }
 
 /**
- * Reads the element a part rendered as, upper-cased the way the document reports it.
+ * Reads the element a part rendered as, upper-cased.
  *
  * This is the polymorphism a component taking `as` or `asChild` owes: a card asked to be an
  * `article` is an `ARTICLE` in the page outline rather than only in the class list, which is the
  * half of it a screen reader acts on.
+ *
+ * Upper-cased here rather than left as the document reports it, because the document reports an
+ * HTML tag upper-cased and an SVG one as it was written: a mark drawn in SVG would otherwise be
+ * the one part whose name a specification has to spell differently.
  *
  * @param container - The rendered output.
  * @param name - The part's name.
@@ -37,5 +41,5 @@ export function attr(container: ParentNode, name: string, attribute: string): st
  * @throws Error Where nothing in the output carries that part.
  */
 export function renderedAs(container: ParentNode, name: string): string {
-  return part(container, name).tagName;
+  return part(container, name).tagName.toUpperCase();
 }

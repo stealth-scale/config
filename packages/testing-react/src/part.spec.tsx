@@ -85,11 +85,19 @@ describe("only", () => {
     expect(() => only(container)).toThrow("no element");
   });
 
-  it("says what it found where the render produced something the document does not call HTML", () => {
+  it("answers the mark a component drew, which is SVG rather than HTML", () => {
     const container = document.createElement("div");
 
     container.append(document.createElementNS("http://www.w3.org/2000/svg", "svg"));
 
-    expect(() => only(container)).toThrow("<svg>");
+    expect(only(container).tagName).toBe("svg");
+  });
+
+  it("says what it found where the render produced neither", () => {
+    const container = document.createElement("div");
+
+    container.append(document.createElementNS("http://www.w3.org/1998/Math/MathML", "math"));
+
+    expect(() => only(container)).toThrow("<math>");
   });
 });

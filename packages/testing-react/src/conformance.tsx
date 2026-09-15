@@ -17,7 +17,7 @@ import { createElement, type ElementType, type ReactElement, type ReactNode } fr
 
 import { render } from "@testing-library/react";
 
-import { only } from "#part.ts";
+import { only, type Rendered } from "#part.ts";
 
 /**
  * The parts of the contract that are not every component's to keep, and how to reach a component
@@ -53,7 +53,7 @@ export interface ConformanceOptions {
    * where the first element belongs to the wrapper. `part` is what a compound's slot is found
    * with.
    */
-  subject?: ((container: ParentNode) => HTMLElement) | undefined;
+  subject?: ((container: ParentNode) => Rendered) | undefined;
 
   /**
    * Renders the component inside whatever it needs above it: the provider a compound's part reads
@@ -102,7 +102,7 @@ function drawn(
  * @returns The element under test.
  * @throws Error Where it is not there.
  */
-function subjectOf(container: ParentNode, options: ConformanceOptions): HTMLElement {
+function subjectOf(container: ParentNode, options: ConformanceOptions): Rendered {
   return options.subject === undefined ? only(container) : options.subject(container);
 }
 
@@ -122,7 +122,7 @@ function subjectOf(container: ParentNode, options: ConformanceOptions): HTMLElem
 function mounted<Held>(
   Component: ElementType,
   props: Readonly<Record<string, unknown>>,
-  read: (element: HTMLElement) => Held,
+  read: (element: Rendered) => Held,
   options: ConformanceOptions,
 ): Held {
   const { container, unmount } = drawn(Component, props, options);
@@ -293,7 +293,7 @@ function optional(
     const swapped = mounted(
       Component,
       { ...props, asChild: true, children: CHILD },
-      (held) => held.tagName,
+      (held) => held.tagName.toUpperCase(),
       options,
     );
 
@@ -329,7 +329,7 @@ export function violations(
 
   if (failed !== undefined) return [failed];
 
-  const element = mounted(Component, props, (held) => held.tagName, options);
+  const element = mounted(Component, props, (held) => held.tagName.toUpperCase(), options);
   const wrong =
     options.element !== undefined && element !== options.element
       ? [`renders ${element}, not ${options.element}`]

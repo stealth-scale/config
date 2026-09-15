@@ -12,6 +12,15 @@
 const PART = "data-part";
 
 /**
+ * An element a component can have rendered as.
+ *
+ * Wider than `HTMLElement`, because a mark is drawn in SVG and an SVG element is not one. Both
+ * carry `dataset`, which is how every reader here finds what it was asked for, and the two of them
+ * together are everything a component in this design system renders.
+ */
+export type Rendered = Element & HTMLOrSVGElement;
+
+/**
  * Answers the selector matching one named part.
  *
  * @param name - The part's name, as its anatomy spells it.
@@ -33,8 +42,8 @@ function selector(name: string): string {
  * @returns The element carrying it.
  * @throws Error Where nothing in the output carries that part.
  */
-export function part(container: ParentNode, name: string): HTMLElement {
-  const found = container.querySelector<HTMLElement>(selector(name));
+export function part(container: ParentNode, name: string): Rendered {
+  const found = container.querySelector<HTMLElement | SVGElement>(selector(name));
 
   if (found === null) throw new Error(`Nothing in the rendered output carries ${selector(name)}.`);
 
@@ -54,8 +63,8 @@ export function part(container: ParentNode, name: string): HTMLElement {
  * @param name - The part's name.
  * @returns Each element carrying it, in the order the document holds them.
  */
-export function parts(container: ParentNode, name: string): readonly HTMLElement[] {
-  return [...container.querySelectorAll<HTMLElement>(selector(name))];
+export function parts(container: ParentNode, name: string): readonly Rendered[] {
+  return [...container.querySelectorAll<HTMLElement | SVGElement>(selector(name))];
 }
 
 /**
@@ -67,16 +76,18 @@ export function parts(container: ParentNode, name: string): readonly HTMLElement
  *
  * @param container - The rendered output.
  * @returns Its first element.
- * @throws Error Where the render produced no element, or produced one the document does not count
- *   as HTML.
+ * @throws Error Where the render produced no element, or produced one that is neither HTML nor
+ * SVG.
  */
-export function only(container: ParentNode): HTMLElement {
+export function only(container: ParentNode): Rendered {
   const found = container.firstElementChild;
 
   if (found === null) throw new Error("The render produced no element.");
 
-  if (!(found instanceof HTMLElement)) {
-    throw new Error(`The render produced <${found.tagName.toLowerCase()}>, which is not HTML.`);
+  if (!(found instanceof HTMLElement) && !(found instanceof SVGElement)) {
+    throw new Error(
+      `The render produced <${found.tagName.toLowerCase()}>, which is neither HTML nor SVG.`,
+    );
   }
 
   return found;
