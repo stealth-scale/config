@@ -1,5 +1,18 @@
 # @stealthscale/testing-react
 
+## 0.6.0
+
+### Minor Changes
+
+- [`5b8086c`](https://github.com/stealth-scale/config/commit/5b8086c84266aeaf969b4fb5442b14f3bd2f5a39) Thanks [@stealth-rklopper](https://github.com/stealth-rklopper)! - testing-react: read the style attribute a component set
+  
+  A count a caller works out at run time cannot be a class, so a component hands it to a custom
+  property and its recipe reads it from there. `Rendered` did not carry `style`, so no specification
+  could check that the value arrived.
+  
+  `Rendered` is now `Element & ElementCSSInlineStyle & HTMLOrSVGElement`, which every element a
+  component in this design system renders satisfies.
+
 ## 0.5.0
 
 ### Minor Changes
