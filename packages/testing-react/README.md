@@ -25,7 +25,7 @@ change that broke nothing.
 ## Reading
 
 ```ts
-import { attr, only, part, parts, renderedAs } from "@stealthscale/testing-react";
+import { attr, only, part, parts, renderedAs, violations } from "@stealthscale/testing-react";
 
 const { container } = render(<Cropper cropShape="circle" />);
 
@@ -33,15 +33,58 @@ attr(container, "root", "shape"); // "circle"
 renderedAs(container, "title"); // "H2"
 parts(container, "handle").length; // 8
 only(container); // the one element the render produced
+violations(Cropper); // [] where it keeps the component contract
 ```
 
-| Export       | Answers                               |
-| ------------ | ------------------------------------- |
-| `part`       | The one element carrying a named part |
-| `parts`      | Every element carrying it, as a list  |
-| `only`       | The single element a render produced  |
-| `attr`       | A `data-` attribute off a named part  |
-| `renderedAs` | The tag name a part rendered as       |
+| Export       | Answers                                       |
+| ------------ | --------------------------------------------- |
+| `part`       | The one element carrying a named part         |
+| `parts`      | Every element carrying it, as a list          |
+| `only`       | The single element a render produced          |
+| `attr`       | A `data-` attribute off a named part          |
+| `renderedAs` | The tag name a part rendered as               |
+| `violations` | The parts of the component contract it breaks |
+
+## The component contract
+
+A component in a design system is not only its own markup. A consumer puts a `className` on it,
+holds a `ref` to it, spreads an attribute onto it, and expects every one of those to reach the
+element that was rendered. None of it is what the component is for, all of it is what makes the
+component usable from the outside, and each is dropped the same way: by binding a recipe to an
+element and spreading nothing.
+
+`violations` mounts the component once per check and answers what it breaks:
+
+```ts
+import { violations } from "@stealthscale/testing-react";
+
+it("keeps the component contract", () => {
+  expect(violations(Box, { children: true, element: "DIV" })).toStrictEqual([]);
+});
+```
+
+| Checked                             | Always | Reported as                                     |
+| ----------------------------------- | ------ | ----------------------------------------------- |
+| renders an element at all           | yes    | `renders no element`                            |
+| merges the caller's `className`     | yes    | `does not merge className`                      |
+| keeps its own `className` beside it | yes    | `replaces its own className instead of merging` |
+| forwards `ref` to what it rendered  | yes    | `does not forward ref`                          |
+| spreads props it does not name      | yes    | `does not spread unknown props`                 |
+| renders the tag `element` names     | no     | `renders DIV, not SPAN`                         |
+| renders `children`                  | no     | `does not render children`                      |
+| honours `asChild`                   | no     | `does not honour asChild`                       |
+
+The last three are options because they are not every component's to keep: the element a box renders
+is the caller's business, a rule and a spacer take no children, and a component that renders its own
+element owes nothing about `asChild`. `props` passes whatever the component needs before it renders
+at all — a ratio, a label, a value.
+
+A component that renders nothing fails the first check and is asked no others, since every answer
+after it would be the same failure restated.
+
+Violations rather than a verdict, the way an audit is: a specification writes one assertion, and a
+failure names the prop that went missing rather than saying that `false` is not `true`. Nothing here
+asserts, so the package stays free of a test runner.
 
 ## A missing part throws
 

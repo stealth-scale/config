@@ -14,5 +14,6 @@
  * @packageDocumentation
  */
 
+export { type ConformanceOptions, violations } from "#conformance.tsx";
 export { attr, renderedAs } from "#dom.ts";
 export { only, part, parts } from "#part.ts";
