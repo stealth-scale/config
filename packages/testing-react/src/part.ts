@@ -15,10 +15,11 @@ const PART = "data-part";
  * An element a component can have rendered as.
  *
  * Wider than `HTMLElement`, because a mark is drawn in SVG and an SVG element is not one. Both
- * carry `dataset`, which is how every reader here finds what it was asked for, and the two of them
- * together are everything a component in this design system renders.
+ * carry `dataset`, which is how every reader here finds what it was asked for, and both carry
+ * `style`, which is how a component hands a runtime value to a custom property its recipe reads.
+ * The two of them together are everything a component in this design system renders.
  */
-export type Rendered = Element & HTMLOrSVGElement;
+export type Rendered = Element & ElementCSSInlineStyle & HTMLOrSVGElement;
 
 /**
  * Answers the selector matching one named part.

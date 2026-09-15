@@ -1,3 +1,5 @@
+import { type CSSProperties } from "react";
+
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vite-plus/test";
 
@@ -91,6 +93,14 @@ describe("only", () => {
     container.append(document.createElementNS("http://www.w3.org/2000/svg", "svg"));
 
     expect(only(container).tagName).toBe("svg");
+  });
+
+  it("answers the custom properties a component set, which a recipe reads at run time", () => {
+    // A count a caller worked out at run time cannot be a class, so it reaches the stylesheet
+    // through the style attribute and the recipe reads it from there.
+    const { container } = render(<div style={{ "--columns": 3 } as CSSProperties} />);
+
+    expect(only(container).style.getPropertyValue("--columns")).toBe("3");
   });
 
   it("says what it found where the render produced neither", () => {
