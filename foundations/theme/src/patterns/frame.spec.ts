@@ -1,0 +1,19 @@
+import { describe, expect, it } from "vitest";
+
+import { frame } from "#patterns/frame.ts";
+
+describe("frame", () => {
+  it("draws a landscape frame when nothing is stated", () => {
+    expect(frame()).toMatchObject({ aspectRatio: "landscape", overflow: "hidden" });
+  });
+
+  it("covers the frame with the media inside it", () => {
+    expect(frame()).toMatchObject({
+      "& > img, & > video": { blockSize: "100%", inlineSize: "100%", objectFit: "cover" },
+    });
+  });
+
+  it("takes the ratio it was given", () => {
+    expect(frame({ ratio: "square" })).toMatchObject({ aspectRatio: "square" });
+  });
+});

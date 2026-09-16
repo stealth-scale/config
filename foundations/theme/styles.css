@@ -1,0 +1,11 @@
+/*
+ * Declares the cascade order and nothing else.
+ *
+ * An application imports this subpath, and the build plugin answers the import with the compiled
+ * stylesheet before the bundler reads this file. The file exists because an export map is what a
+ * type checker and Node read, and a subpath missing from one is an error in both. A page that
+ * reaches this file has no plugin in its configuration, and the order declared here draws it
+ * unstyled rather than differently styled.
+ */
+
+@layer reset, base, tokens, recipes, utilities;
