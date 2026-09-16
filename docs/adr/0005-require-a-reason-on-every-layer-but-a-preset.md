@@ -16,20 +16,20 @@ Accepted
 
 ## Context
 
-- Four kinds of layer compose a configuration, and they do not all have the same author. A
-  configuration package states a preset on a repository's behalf, and the preset sets a coherent
-  block. The consuming repository states the other three kinds. A contribution appends an item to a
-  list. A removal takes back a named layer. An override rewrites what the merge produced.
-- Those three kinds are where a repository departs from the house answer. A departure without a
-  recorded reason is one a later reader cannot act on. Deleting it risks breaking something. Keeping
-  it means keeping a rule whose purpose is lost.
-- A field required on all four kinds gets filled in by habit, and a reason filled in by habit
-  carries no information.
+- A preset, a contribution, a removal, and an override compose a configuration. They do not all have
+  the same author. A configuration package states a preset on a repository's behalf. The preset sets
+  a coherent block. The consuming repository states the other three kinds. A contribution appends an
+  item to a list. A removal takes back a named layer. An override rewrites what the merge produced.
+- Those three kinds are where a repository departs from the house answer. A later reader cannot act
+  on a departure without a recorded reason. Deleting it risks breaking something. Keeping it means
+  keeping a rule whose purpose is lost.
+- A field required on all four kinds gets filled in by habit. A reason filled in by habit tells the
+  reader nothing.
 
 ## Decision
 
-We require `because` on contributions, removals and overrides, and we leave it off presets. A reason
-is worth asking for where a repository departs from the house answer. It is worth nothing where a
+We require `because` on contributions, removals, and overrides. We leave it off presets. A reason is
+worth asking for where a repository departs from the house answer. It is worth nothing where a
 repository takes the house answer.
 
 A preset's reason belongs to the package that states the preset, in that package's documentation.
@@ -65,7 +65,7 @@ was for.
 
 **Negative:**
 
-- The four kinds no longer look alike. A caller has to know which kind wants a reason. The type says
+- The kinds no longer look alike. A caller has to know which kind requires a reason. The type says
   so, but only once the call is written.
 - The type accepts any string. The requirement can be met without being kept.
 

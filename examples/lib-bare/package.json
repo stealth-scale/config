@@ -2,7 +2,7 @@
   "name": "@stealthscale/example-lib-bare",
   "version": "0.0.0",
   "private": true,
-  "description": "Packs a library that states no configuration of its own and names its entry on the command line.",
+  "description": "Packs a library that states no configuration of its own.",
   "files": [
     "dist"
   ],

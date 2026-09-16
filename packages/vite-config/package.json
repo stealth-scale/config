@@ -1,7 +1,7 @@
 {
   "name": "@stealthscale/vite-config",
   "version": "0.3.0",
-  "description": "Configures Vite+ for a package from one of five tiers, each composed out of named layers.",
+  "description": "Configures a package from five Vite+ tiers and a named layer for every block.",
   "keywords": [
     "config",
     "monorepo",

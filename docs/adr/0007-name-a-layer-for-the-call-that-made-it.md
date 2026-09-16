@@ -22,8 +22,8 @@ Accepted
   composed to `react/react.refresh` and `react/test.environment(happy-dom)`. The stylesheet package
   named its layers after the tool, as `stylelint.check`. Inside the block package,
   `server.port(4200)` carried its argument and `server.reachable` did not.
-- Three factories in the block package returned a layer named for a different call.
-  `lint.undocumented()` returned a layer named `lint.relax(**/*.spec.ts)`.
+- `lint.undocumented()` and two other factories in the block package returned a layer named for a
+  different call. `lint.undocumented()` returned `lint.relax(**/*.spec.ts)`.
 - No README stated any of these names. A consumer found a name by composing the config and printing
   it.
 - The argument for one grammar is in RFC-0001, with the alternatives and their costs.
@@ -48,7 +48,7 @@ We name every layer for the call a consumer writes.
 
 ## Alternatives Considered
 
-### Document the names and change nothing
+### Document the names and leave the code as it is
 
 Write the composed names into each README and hold new code to them in review.
 
@@ -57,7 +57,7 @@ no check enforces is broken by the next package.
 
 ### Prefix every layer with its package through `owned()`
 
-Keep `owned("react", …)` and accept `react/react.refresh` as the name.
+Keep `owned("react", layers)` and accept `react/react.refresh` as the name.
 
 **Why not:** the prefix doubles the package name, and the part after the slash is still the name of
 whatever call the factory delegated to. The consumer still cannot predict it.
@@ -82,8 +82,8 @@ nobody's benefit.
 
 **Negative:**
 
-- Every layer name in the React package changed. Nine factories and three presets in the block
-  package were renamed. The changesets list the old and new names.
+- Every layer name in the React package changed. The block package renamed nine factories and three
+  presets. The changesets list the old and new names.
 - A layer named for its arguments has a long name wherever the argument is an array, and a removal
   quotes the whole array.
 

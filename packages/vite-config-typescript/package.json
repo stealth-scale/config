@@ -1,7 +1,7 @@
 {
   "name": "@stealthscale/vite-config-typescript",
   "version": "0.1.1",
-  "description": "Publishes the three TypeScript configurations every stealth package compiles under.",
+  "description": "Sets the TypeScript options every stealthscale package compiles with.",
   "keywords": [
     "config",
     "tsconfig",

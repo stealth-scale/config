@@ -27,8 +27,8 @@ Accepted
 ## Decision
 
 We state the `lint` and `fmt` blocks only in the workspace root's config. A package expresses its
-own answer as the glob that selects its files. A package's second config is one the linter and the
-formatter never open.
+own answer as the glob that selects its files. The linter and the formatter never open a package's
+own config.
 
 ## Alternatives Considered
 
@@ -38,7 +38,7 @@ A package that needs a rule relaxed relaxes it in its own `vite.config.ts`, besi
 relaxation is for. Every other block already works this way. There is no rule to remember and no
 exception.
 
-**Why not:** the tools do not read it. The contributor gets no report that their `lint` block was
+**Why not:** the tools do not read it. The contributor does not learn that their `lint` block was
 skipped. Their next step is to argue with a rule they believe they already turned off.
 
 ## Consequences

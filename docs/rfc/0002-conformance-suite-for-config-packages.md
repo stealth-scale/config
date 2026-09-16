@@ -16,11 +16,11 @@ produces-adr: 0008
 ## Summary
 
 We propose a kit, `@stealthscale/testing-config`. It reads a configuration package or a plugin
-package and returns a list of the parts of the house contract that the package breaks. This is the
-same shape `@stealthscale/testing-react` has for a component. The contract covers what the manifest
-publishes, what the module exports, and what the layers are called and carry. Each package adds one
-specification that asserts an empty list. A package that drifts from the contract fails its own gate
-with a sentence that names what drifted.
+package and returns a list of the parts of the house contract that the package breaks.
+`@stealthscale/testing-react` has the same interface for a component. The contract covers what the
+manifest publishes, what the module exports, and what the layers are called and contain. Each
+package adds one specification that asserts an empty list. A package that drifts from the contract
+fails its own gate. The failure message states what drifted.
 
 ## Motivation
 
@@ -29,7 +29,7 @@ with a sentence that names what drifted.
 On 2026-09-16 the gate passed with 832 tests, full coverage, and clean attw and publint runs on
 every package. The same tree contained these defects:
 
-- Two published packages had no licence text in their tarballs.
+- The tarballs of two published packages had no licence text.
 - Three READMEs had block tables that listed exports that did not exist, or omitted exports that
   did.
 - One composed tier had layer names in three grammars.
@@ -43,7 +43,7 @@ reaches any of them.
 
 This repository becomes the one monorepo for every stealthscale package. The number of packages that
 make this promise grows from nine to every package in the company. Review checks a contract once. A
-specification checks it on every run of every package, and the failure message names the package and
+specification checks it on every run of every package. The failure message states the package and
 the promise.
 
 ### Why this layer
@@ -55,8 +55,8 @@ The check belongs in a kit, not in a linter, a script or the release workflow:
   package need a document to compose.
 - The release workflow is the last place to learn that a README is wrong.
 - A kit is imported by the package's own specification, runs under the package's own configuration,
-  and returns a list that a specification asserts on. Every other kit in this repository already has
-  that shape.
+  and returns a list that a specification asserts on. Every other kit in this repository already
+  works this way.
 
 ## Detailed design
 
@@ -183,8 +183,8 @@ export interface Conformance {
 /**
  * Finds every part of the contract a package breaks.
  *
- * Each violation is one sentence that names the export, the file or the layer, and what was
- * expected of it. The list is empty for a package that conforms.
+ * Each violation is one sentence. It identifies the export, the file or the layer, and states what
+ * was expected of it. The list is empty for a package that conforms.
  *
  * @param stated - The package under test. `Conformance` documents every member.
  * @returns Each violation, in the order the checks run.
@@ -270,7 +270,8 @@ readme.exports: README names a block layout that the barrel does not export
 tier.composes: preset/web composes twice a layer named test.environment(happy-dom)
 ```
 
-Each sentence names the thing and the expectation. A failure is fixed without opening the kit.
+Each sentence identifies the thing and states the expectation. A failure is fixed without opening
+the kit.
 
 ```mermaid
 flowchart LR
@@ -309,23 +310,24 @@ Its `skip` and `only` options select among named checks such as `componentProp`,
 
 **Why not:**
 
-- The kits in this repository assert nothing. A specification is one assertion, and a failure names
-  the breach.
-- `testing-react` returns a list of violations for that reason, and this kit takes the same shape.
+- The kits in this repository assert nothing. A specification is one assertion. A failure states the
+  breach.
+- `testing-react` returns a list of violations for that reason. This kit returns one in the same
+  way.
 - MUI's `skip` and `only` are kept, with a reason attached to each skip.
 
 ### Lint rules for package authors
 
 `eslint-plugin-eslint-plugin` lints the code of an ESLint plugin. It checks that rule metadata is
-present, that message ids are used, and that tests have the expected shape. The equivalent here
-would be a set of Oxlint plugin rules that check a factory names its layer after itself and takes a
-record with `because` first.
+present, that message ids are used, and that tests have the expected structure. The equivalent here
+would be a set of Oxlint plugin rules that check that a factory's layer is named after the factory
+and that its record has `because` first.
 
 **Why not:**
 
-- A rule sees one file. It cannot compose a tier to find two layers with one name, read a tarball's
-  file list, or compare a README to a barrel.
-- A rule can check the shape of one factory's argument. Such a rule can be added without changing
+- A rule sees one file. It cannot compose a tier to find two layers with one name. It cannot read a
+  tarball's file list or compare a README to a barrel.
+- A rule can check the form of one factory's argument. Such a rule can be added without changing
   this proposal.
 
 ### One specification at the root that scans `packages/*`
@@ -353,7 +355,7 @@ Both already run on every pack, and both read the manifest.
 
 ### Type-level checks
 
-Declare the shape of a barrel as a type and hold each barrel to it with `satisfies`.
+Declare the barrel's exports as a type and check each barrel against it with `satisfies`.
 
 **Why not:**
 
@@ -365,13 +367,13 @@ Declare the shape of a barrel as a type and hold each barrel to it with `satisfi
 
 - One new package, with a manifest, a README, a plain configuration of the node tier and its own
   specifications. It is packed on every bootstrap.
-- Eleven new specification files, one per package under `packages/`, including the two plugins and
-  the two kits.
+- One new specification file per package under `packages/`, eleven in all, including the two plugins
+  and the two kits.
 - An `arguments` table in the specification of `vite-config` with 36 entries, one for each factory
   with a required parameter. The table has to be edited when a factory's signature changes.
-- `readme.exports` parses Markdown. A README that changes the heading or the table shape passes the
-  check while checking nothing. The check reports a missing table only when a heading with `Blocks`
-  exists and no table follows it.
+- `readme.exports` parses Markdown. A README that changes the heading or the table layout passes the
+  check unread. The check reports a missing table only when a heading with `Blocks` exists and no
+  table follows it.
 - A committed specification that passes `only` checks less than it appears to. The suite reports
   `only` as a violation of its own when `CI` is set, which is one more environment read in the tree.
 - The layer checks enforce the grammar proposed for the config packages. This kit cannot be released
@@ -389,12 +391,12 @@ Declare the shape of a barrel as a type and hold each barrel to it with `satisfi
 
 ## Open questions
 
-1. Should the examples under `examples/` run the layer checks on their composed configs, given that
-   they are private and never published?
+1. Should the examples under `examples/` run the layer checks on their composed configs? They are
+   private and never published.
 
 ## Unresolved and future work
 
-- An Oxlint plugin rule for the shape of a departure's argument record is not proposed here.
+- An Oxlint plugin rule for the form of a departure's argument record is not proposed here.
 - Checking that every layer named in a README exists is not proposed here. Only namespaces are
   checked.
 - Running the suite against a packed tarball instead of the tree is not proposed here.

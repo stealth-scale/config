@@ -1,7 +1,7 @@
 # Commit messages
 
-A commit message takes the form `type(scope): summary`, and the scope is optional. The `commit-msg`
-hook runs commitlint on every commit, and `commitlint.config.ts` holds what it checks.
+Write a commit message as `type(scope): summary`. The scope is optional. The `commit-msg` hook runs
+commitlint on every commit. `commitlint.config.ts` holds what it checks.
 
 ```
 fix(vite-config-css): reject a declaration marked important
@@ -10,8 +10,7 @@ fix(vite-config-css): reject a declaration marked important
 - Cover the written and the computed spelling in check.spec.ts.
 ```
 
-The commit records what changed. Why the approach works belongs in an ADR, and the working session
-that produced the change belongs nowhere.
+Record what changed. Put why the approach works in an ADR. Leave the working session out.
 
 ## Types
 
@@ -28,27 +27,27 @@ that produced the change belongs nowhere.
 | `revert`   | An earlier commit taken back                            |
 | `test`     | A test added or corrected on its own                    |
 
-Conventional Commits also defines `style`. This repository has no use for it, because `vp fmt`
-settles formatting before a commit exists.
+Conventional Commits also defines `style`. Do not use it here. `vp fmt` settles formatting before a
+commit exists.
 
 ## Scope
 
-The scope is the directory name under `packages/`, without the `@stealthscale/` prefix, as in
-`vite-config-core` or `testing-react`. Omit the scope for a change spanning packages, for the
-workspace root and for an example.
+Write the directory name under `packages/` as the scope, without the `@stealthscale/` prefix:
+`vite-config-core`, `testing-react`. Omit the scope for a change spanning packages, for the
+workspace root, and for an example.
 
-Commitlint reads the list from the tree, so a new package is a scope as soon as it has a manifest.
+Commitlint reads the list from the tree. A new package is a scope as soon as it has a manifest.
 
 ## The summary
 
 - Write it in the imperative and in lower case.
-- Name the mechanism, not the goal. A reader who wants the goal reads the body.
-- Keep the summary itself under 60 characters. The whole header has 100, and the scope spends some
-  of them: `refactor(vite-config-typescript): ` is already 34.
+- State the mechanism, not the goal. A reader who wants the goal reads the body.
+- Keep the summary under 60 characters. The whole header has 100, and the scope spends some of them.
+  `refactor(vite-config-typescript): ` is already 34.
 - End it without a full stop.
-- Stop where the change stops. A trailing `, so …`, `, which …` or `, not …` is body material.
+- Stop where the change stops. A trailing `, so …`, `, which …`, or `, not …` belongs in the body.
 
-| Rejected                                                                                   | Written out                                                        |
+| Bad                                                                                        | Good                                                               |
 | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------ |
 | `fix(vite-config-css): improve check performance`                                          | `fix(vite-config-css): walk the selectors in one pass`             |
 | `build: pin pnpm exactly, so the action resolves no range`                                 | `build: pin pnpm exactly`                                          |
@@ -56,14 +55,14 @@ Commitlint reads the list from the tree, so a new package is a scope as soon as 
 | `feat(testing-react): register themes from installed dependencies, not only vendored ones` | `feat(testing-react): register themes from installed dependencies` |
 | `Add an option to suppress notices`                                                        | `feat(vite-config): add an option to suppress notices`             |
 
-The last two show the failure that survives every other check. The subject names the change and then
-keeps going, into the contrast or the reason.
+Rows two and four show the failure that survives every other check. The subject states the change
+and then continues into the reason or the contrast.
 
 ## The body
 
 - Write bullets, one fact per line, wrapped at 72 characters.
-- Open with one paragraph only where a reader would otherwise ask why this is a single commit.
-- Close with the measured result where there is one, and give the number.
+- Open with a paragraph only where a reader would otherwise ask why this is one commit.
+- Close with the measured result where there is one. Give the number.
 
 A whole message:
 
@@ -80,14 +79,12 @@ with 40 layers walked 800 entries to resolve 20 removals.
 Composing the app-host example falls from 240ms to 12ms.
 ```
 
-## What never appears
+## Leave these out
 
-- **Trailers.** No `Signed-off-by`, no `Co-authored-by`, no verification line and no attribution
+- **Trailers.** No `Signed-off-by`, no `Co-authored-by`, no verification line, and no attribution
   line. Delete whatever the tooling offers to append.
-- **The working session.** Which tools ran, what was tried first, and the order in which things were
-  discovered all stay out.
-- **Design rationale.** Why this approach and what it rules out are real questions, and an ADR
-  answers them.
+- **The working session.** Which tools ran, what was tried first, and the order of discovery.
+- **Design rationale.** Put why this approach and what it rules out in an ADR.
 - **A plan.** What the change leaves room for later is not part of what changed.
 
 The same change written badly:

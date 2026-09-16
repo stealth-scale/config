@@ -1,7 +1,7 @@
 {
   "name": "@stealthscale/testing",
   "version": "0.1.0",
-  "description": "Builds the scratch workspaces a specification runs a tree from, and measures a rendered element.",
+  "description": "Supplies the scratch workspaces, manifests and element measurements a specification needs.",
   "license": "MIT",
   "repository": {
     "type": "git",

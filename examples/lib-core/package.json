@@ -2,7 +2,7 @@
   "name": "@stealthscale/example-lib-core",
   "version": "0.0.0",
   "private": true,
-  "description": "Adds two money amounts on the base tier, reaching for neither node's globals nor the browser's.",
+  "description": "Adds two money amounts without touching node's globals or the browser's.",
   "files": [
     "dist"
   ],

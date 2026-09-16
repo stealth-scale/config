@@ -19,7 +19,7 @@ Accepted
 - Every package under `packages/` composes, packs or tests a Vite config.
 - On 2026-09-16 the kernel, the block package and both plugins imported `vite-plus`. They imported
   `mergeConfig`, `loadEnv`, `defineConfig`, the default resolve conditions and the `UserConfig`
-  type. Four packages peered on `vite-plus`.
+  type. All four peered on `vite-plus`.
 - `vite-plus` is a toolchain built over Vite. It depends on `vite` and on `vitest` at exact
   versions. In this workspace `vite` resolves to `@voidzero-dev/vite-plus-core`.
 - `vite` exports everything the packages imported from `vite-plus`. The one exception is the type

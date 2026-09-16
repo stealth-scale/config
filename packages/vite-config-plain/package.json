@@ -1,7 +1,7 @@
 {
   "name": "@stealthscale/vite-config-plain",
   "version": "0.1.0",
-  "description": "Configures a package to pack, resolve and test without extending a tier built on it.",
+  "description": "Packs and tests the packages the configuration tiers depend on.",
   "keywords": [
     "config",
     "vite",

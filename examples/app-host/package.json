@@ -2,7 +2,7 @@
   "name": "@stealthscale/example-app-host",
   "version": "0.0.0",
   "private": true,
-  "description": "Loads another application at run time, reading its address from a manifest the page fetches.",
+  "description": "Loads another application at run time from an address it fetches at startup.",
   "type": "module",
   "imports": {
     "#*": "./src/*"

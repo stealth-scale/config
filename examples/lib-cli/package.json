@@ -2,7 +2,7 @@
   "name": "@stealthscale/example-lib-cli",
   "version": "0.0.0",
   "private": true,
-  "description": "Installs a command named for what it does, built from a file the package also exports as a module.",
+  "description": "Adds up money amounts from the command line and exports the same function as a module.",
   "bin": {
     "tally": "./src/bin/tally.ts"
   },

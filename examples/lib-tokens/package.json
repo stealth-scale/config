@@ -2,7 +2,7 @@
   "name": "@stealthscale/example-lib-tokens",
   "version": "0.0.0",
   "private": true,
-  "description": "Writes the stylesheet it publishes during the pack, and adds the subpath that names it.",
+  "description": "Writes the stylesheet it publishes during the pack.",
   "files": [
     "dist"
   ],

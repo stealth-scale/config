@@ -22,9 +22,9 @@ Accepted
   right place for a reader at that line. It is the wrong place for a reader who is deciding whether
   to change the rule.
 - A docblock moves with its file and is deleted with its file. The layer kernel was extracted from
-  `vite-config` into its own package, and the module that explains why a preset needs no reason
-  moved with it. If that file is deleted, the explanation is deleted with it. The rule then has no
-  recorded reason, and the next contributor is free to drop it.
+  `vite-config` into its own package, and the module that explains why a preset does not require a
+  reason moved with it. If that file is deleted, the explanation is deleted with it. The rule then
+  has no recorded reason, and the next contributor is free to drop it.
 
 ## Decision
 
@@ -47,7 +47,7 @@ None. This decision is a process bootstrap.
 
 **Negative:**
 
-- Two documents argue the same decision, and nothing checks that they agree.
+- The docblock and the record argue the same decision. No check compares them.
 - Each decision of this size costs one file and one review. A docblock cost neither.
 
 **Neutral:**

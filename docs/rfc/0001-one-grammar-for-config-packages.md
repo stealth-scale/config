@@ -16,20 +16,19 @@ produces-adr: 0007
 ## Summary
 
 We propose one grammar for every configuration package and every plugin package in this repository.
-The grammar has nine rules. They state where a tier is imported from, what an add-on package
-exports, how a factory and its layer are named, how a departure from the house answer takes its
-arguments, how a compiler fragment composes, how a plugin package is shaped, how the three plain
-configurations share one file, and where a package's relaxations are written. The kernel gains one
-helper, `named()`. After the change, a consumer writes the same five lines in every package, and a
-conformance suite can check every package against the grammar.
+The grammar has nine rules. They cover the tier import, the add-on exports, factory and layer names,
+the arguments of a departure from the house answer, compiler fragments, the layout of a plugin
+package, the shared plain configuration, and where a package writes its relaxations. The kernel
+gains one helper, `named()`. After the change, a consumer writes the same five lines in every
+package. A conformance suite can then check every package against the grammar.
 
 ## Motivation
 
 ### The problem
 
-The five configuration packages export 102 functions that return a layer or a list of layers. Each
-block was written separately and settled its own conventions. A consumer cannot predict a factory
-name, an argument shape or a layer name from the ones they already know.
+The configuration packages export 102 functions that return a layer or a list of layers. Each block
+was written separately and settled its own conventions. A consumer cannot predict a factory name, an
+argument form, or a layer name from the ones they already know.
 
 **Factory names use four grammars.**
 
@@ -67,14 +66,14 @@ react/lint.relax(**/*.spec.tsx, **/*.fixtures.tsx)
 react/lint.enforce(**/*.{ts,tsx})
 ```
 
-- The `react/` prefix comes from `owned("react", ...)`.
+- The `react/` prefix comes from `owned("react", layers)`.
 - The second `react.` comes from the factory.
 - `lint.relax(...)` is the name of the call that `rendered()` delegates to. It is not the name of
   `rendered()`.
 - A consumer who removes React's document layer has to write
   `target: "react/test.environment(happy-dom)"`. No README states this name.
-- The stylesheet package names its layers `stylelint.check` and `stylelint.warn`. Those names come
-  from the tool, not from the package.
+- The stylesheet package's layers are `stylelint.check` and `stylelint.warn`. Those names come from
+  the tool, not from the package.
 - Inside `vite-config`, `server.port(4200)` carries its argument in its name. `server.reachable` and
   `server.bound` do not.
 - `pack.buildBefore(...)` returns a layer named `pack.hook(build:before)`.
@@ -82,15 +81,15 @@ react/lint.enforce(**/*.{ts,tsx})
 **The word `override` has three meanings.**
 
 - The kernel's fourth layer kind rewrites the merged config.
-- The modules `fmt/override.ts`, `lint/override.ts` and `test/override.ts` hold contributions and
-  presets. None of them holds an override.
+- The modules `fmt/override.ts`, `lint/override.ts` and `test/override.ts` contain contributions and
+  presets. Each one contains zero overrides.
 - The stylesheet package exports an `override` namespace. Its one function returns a removal and a
   contribution.
 
 **Entry points differ by package.**
 
 - A tier is imported from `@stealthscale/vite-config/preset/app`. A package that renders imports it
-  from `@stealthscale/vite-config-react/preset/app` instead. The two React tiers add the same three
+  from `@stealthscale/vite-config-react/preset/app` instead. Both React tiers add the same three
   layers on top of two different base tiers.
 - The stylesheet package has no tier. A package adds `plugin.check()` to `extends`. The example that
   does so renames the import to `stylelint`, because the name `plugin` says nothing.
@@ -100,9 +99,9 @@ react/lint.enforce(**/*.{ts,tsx})
   extends `@stealthscale/vite-config-react/web.json` instead. The second file is a whole tier that
   adds one option.
 
-**Three packages copy one plain configuration.** `vite-config-core`, `vite-plugin-base` and
-`vite-plugin-sbom` cannot take a tier, because the tiers depend on the bill of materials plugin.
-Each copy carries a comment that says a change has to be made in both places.
+**One plain configuration is copied into three packages.** `vite-config-core`, `vite-plugin-base`
+and `vite-plugin-sbom` cannot take a tier, because the tiers depend on the bill of materials plugin.
+Each copy has a comment that says a change has to be made in both places.
 
 ### Why now
 
@@ -115,9 +114,9 @@ Each copy carries a comment that says a change has to be made in both places.
 
 ### Why this layer
 
-The grammar belongs in the configuration packages and not in a style guide. A rule that no check
-enforces is broken by the next package. A separate proposal describes a conformance suite that
-checks what this document states.
+The grammar belongs in the configuration packages and not in a style guide. Without a check, the
+next package breaks the rule. A separate proposal describes a conformance suite that checks what
+this document states.
 
 ## Detailed design
 
@@ -177,7 +176,7 @@ export default defineConfig(import.meta.dirname, {
 });
 ```
 
-Every package writes the same shape:
+Every package's config has the same four parts:
 
 - one tier import,
 - one namespace import per add-on,
@@ -209,8 +208,8 @@ like the other four:
 import { layers as node } from "#preset/node.ts";
 
 /**
- * The layers a workspace root is built on: the node tier, for the linter, the formatter and the
- * packages that have no config of their own, and the layers only a root states.
+ * The layers a workspace root is built on. The node tier serves the linter, the formatter, and
+ * the packages that have no config of their own. The rest are the layers only a root states.
  */
 export function layers(): readonly Extendable[] {
   return [...node(), run.cache(), run.ci(), staged.checked(), staged.formatted(), test.projects()];
@@ -228,7 +227,7 @@ check on the example packages detects that one line.
 ### Rule 2: An add-on exports `layers()` and `workspace()`
 
 An add-on package is a package that a repository adds beside a tier. React and the stylesheet checks
-are add-ons today. Every add-on exports these two functions with the same shape:
+are add-ons today. Every add-on exports these two functions with these signatures:
 
 ```ts
 /**
@@ -239,14 +238,14 @@ export function layers(options?: Options): readonly Layer[];
 /**
  * What this add-on states once, at the workspace root.
  *
- * Empty where the add-on has nothing for a root, so a root's config has the same shape whichever
+ * Empty where the add-on has nothing for a root, so a root's config reads the same whichever
  * add-ons it lists.
  */
 export function workspace(): readonly Layer[];
 ```
 
 - The block namespaces an add-on exports today stay exported: `react.lint`, `react.fmt`,
-  `react.test`, `react.plugin` and `react.federation`. A removal names one layer inside them, and a
+  `react.test`, `react.plugin` and `react.federation`. A removal targets one layer inside them. A
   repository sometimes wants one layer without the rest.
 - `preset.workspace()` moves to the top level as `workspace()`.
 - In the stylesheet package, `plugin.check()` becomes `layers()`, `override.warn()` becomes
@@ -338,7 +337,7 @@ override. That is the line the kernel already draws. The rule has three parts:
 
 A house layer is a noun. Its reason is written in its docblock, and the tier supplies its `because`.
 `build.inventory`, `fmt.generated`, `react.plugin.refresh` and `css.check` keep their names. A
-preset is a noun whoever states it, because a preset sets a value and carries no reason.
+preset is a noun whoever states it. A preset sets a value and takes no reason.
 
 These departures are renamed:
 
@@ -410,8 +409,8 @@ The plugin's record becomes `Described`.
 
 ### Rule 8: What is copied is imported
 
-The three plain configurations in `vite-config-core`, `vite-plugin-base` and `vite-plugin-sbom`
-import one file by relative path:
+The plain configurations in `vite-config-core`, `vite-plugin-base` and `vite-plugin-sbom` import one
+file by relative path:
 
 ```ts
 // packages/plain.config.ts
@@ -432,16 +431,15 @@ import { plain } from "../plain.config.ts";
 export default defineConfig(plain);
 ```
 
-- The config loader bundles a relative import. No package is needed, and nothing has to be packed
-  first.
+- The config loader bundles a relative import. The file does not need a package or a pack step.
 - The file is at `packages/plain.config.ts` and matches no workspace glob, because it is a file and
   not a directory.
 
 ### Rule 9: A package's relaxations are written beside the package
 
 The linter and the formatter read the root config only, so every package-specific relaxation is
-stated at the root. Three relaxations exist today for thirteen examples. Under this rule a package
-that needs one writes it in its own directory as `vite.layers.ts`:
+stated at the root. The thirteen examples have three relaxations between them today. Under this rule
+a package that needs one writes it in its own directory as `vite.layers.ts`:
 
 ```ts
 // packages/foo/vite.layers.ts
@@ -463,17 +461,17 @@ export const layers: readonly Layer[] = [
 ### Migration
 
 1. `vite-config-core` gains `named()`. `vite-config` renames the factories in the tables above,
-   gives `preset/workspace` a `defineConfig`, and carries the argument into every layer name. This
-   is one minor release of each package.
+   gives `preset/workspace` a `defineConfig`, and puts the argument into every layer name. This is
+   one minor release of each package.
 2. `vite-config-react` and `vite-config-css` export `layers()` and `workspace()`, stop calling
    `owned()`, name their layers by rule 3, and delete the two React tier subpaths. This is one minor
    release of each package.
 3. The root config, the thirteen examples and the two testing packages move to the new names in the
-   same change. The tree never carries both grammars.
+   same change. Every commit has one grammar.
 
-No old name is kept as an alias. The consumers are the sibling repositories, and each one is
-rewritten once when it moves into this monorepo. Every layer name in the React package changes, and
-the changeset of each package lists the old and new names side by side.
+We do not keep an old name as an alias. The consumers are the sibling repositories. Each one is
+rewritten once when it moves into this monorepo. Every layer name in the React package changes. The
+changeset of each package lists the old and new names side by side.
 
 ### Callers
 
@@ -482,7 +480,7 @@ Inside this repository:
 - the root `vite.config.ts`,
 - the seven example applications and the six example libraries,
 - the `vite.config.ts` of each of the nine packages,
-- the three READMEs that carry a block table,
+- the three READMEs with a block table,
 - the specifications of every renamed factory.
 
 Outside this repository: every `vite.config.ts` and `tsconfig.json` in the tooling, platform,
@@ -490,14 +488,14 @@ theming, ui, product and docs repositories. Their number is an open question.
 
 ## Alternatives considered
 
-### Document the grammar and change nothing
+### Document the grammar and leave the code as it is
 
 Write the rules above into the README of `vite-config` and hold new code to them in review.
 
 **Why not:**
 
 - The READMEs of three packages disagreed with their exports after five days.
-- A rule that no check enforces is broken by the next package.
+- Without a check, the next package breaks the rule.
 - The packages about to arrive were written by the same people who wrote the current four grammars.
 
 ### One factory with options
@@ -512,8 +510,8 @@ export default defineConfig(import.meta.dirname, { tier: "web", react: true, css
 **Why not:**
 
 - An option bag hides which layers a package is built on.
-- An option bag removes removal by name, which is what lets a repository disagree with one house
-  layer and keep the rest.
+- An option bag takes away removal by name. Removal by name is what lets a repository disagree with
+  one house layer and keep the rest.
 - The house already refuses option bags for those two reasons.
 - The composer's `override()` is the same mechanism as this repository's removal and override
   layers, reached through a method instead of a list.
@@ -526,7 +524,7 @@ add-on the same subpaths, the way a Babel preset bundles plugins and other prese
 **Why not:**
 
 - Two add-ons cannot both wrap the tier a package extends. A package that renders and has
-  stylesheets has to pick one add-on to wrap and add the other as a layer. That is the mixed shape
+  stylesheets has to pick one add-on to wrap and add the other as a layer. That is the mixed form
   that exists today.
 - Babel presets contain other presets. A tier here is a list a consumer imports once.
 
@@ -538,7 +536,7 @@ because there is one package.
 **Why not:**
 
 - The React plugin, `happy-dom` and the stylelint plugins would become peers of every consumer,
-  including a node library that renders nothing.
+  including a node library with no rendering.
 - The kernel was separated from the blocks because of the cost to a consumer of installing what it
   never calls. The same cost applies here.
 
@@ -556,8 +554,8 @@ repository states explains itself.
 
 ## Drawbacks
 
-- Nine factories and three presets are renamed. Every layer name in the React package changes. A
-  consumer that removes a React layer by name has to change the target string.
+- The block package renames nine factories and three presets. Every layer name in the React package
+  changes. A consumer that removes a React layer by name has to change the target string.
 - Two subpaths are deleted from `vite-config-react`, and one namespace from `vite-config-css`.
 - No alias bridges the two grammars. A consumer moves every name in one change.
 - Every `vite.config.ts` in this repository changes: the root, thirteen examples and nine packages.
@@ -582,8 +580,8 @@ repository states explains itself.
 
 1. How many configuration files in the six sibling repositories import a React tier or remove a
    React layer by name?
-2. Should a house contribution such as `build.inventory` become a preset, given that the merge
-   concatenates `plugins`? A layer's kind would then say who stated it as well as how it merges.
+2. Should a house contribution such as `build.inventory` become a preset? The merge concatenates
+   `plugins` either way. A layer's kind would then say who stated it as well as how it merges.
 
 ## Unresolved and future work
 
@@ -591,7 +589,7 @@ repository states explains itself.
   without an import line, is not proposed here.
 - Deleting `owned()` from the kernel is not proposed here.
 - A tier that refuses a layer from an add-on written for another tier is not proposed here. Under
-  this proposal a rendering library under the node tier loses one line and reports nothing.
+  this proposal a rendering library under the node tier loses one line without a report.
 
 ## References
 

@@ -1,7 +1,7 @@
 {
   "name": "@stealthscale/testing-react",
   "version": "0.7.0",
-  "description": "Reads a rendered React component by its part markings, and checks the contract every component keeps.",
+  "description": "Reads a rendered React component and checks it against the component contract.",
   "license": "MIT",
   "repository": {
     "type": "git",

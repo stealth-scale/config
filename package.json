@@ -2,7 +2,7 @@
   "name": "@stealthscale/scale",
   "version": "0.0.0",
   "private": true,
-  "description": "Publishes every configuration a stealth repository is built, checked, tested and released under.",
+  "description": "Builds, checks, tests and releases every stealthscale package.",
   "type": "module",
   "scripts": {
     "bootstrap": "pnpm -r --filter '{packages/*}' run build",

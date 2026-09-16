@@ -57,11 +57,11 @@ this kit returns one in the same way.
 
 ### Lint rules for package authors
 
-Oxlint plugin rules that check a factory names its layer after itself and takes a record with
-`because` first.
+Oxlint plugin rules that check that a factory's layer is named after the factory and that its record
+has `because` first.
 
-**Why not:** a rule sees one file. It cannot compose a tier to find two layers with one name, read a
-tarball's file list, or compare a README to a barrel.
+**Why not:** a rule sees one file. It cannot compose a tier to find two layers with one name. It
+cannot read a tarball's file list or compare a README to a barrel.
 
 ### One specification at the root that scans every package
 
@@ -75,9 +75,9 @@ package, where the person who adds a factory edits it.
 
 **Positive:**
 
-- A package that drifts from the contract fails its own gate with a sentence that names what
+- A package that drifts from the contract fails its own gate. The failure message states what
   drifted.
-- A source file that no test imports lowers the coverage number instead of vanishing from it.
+- An untested source file lowers the coverage number instead of vanishing from it.
 
 **Negative:**
 
@@ -85,7 +85,7 @@ package, where the person who adds a factory edits it.
 - Eleven specifications, one per package. The block package's carries an `arguments` table with 36
   entries, and the table has to change when a factory's signature changes.
 - `readme.exports` parses Markdown. A README whose block table changes heading or layout passes the
-  check, because the check then reads no table.
+  check. The check does not find the table and passes the package unread.
 
 **Neutral:**
 

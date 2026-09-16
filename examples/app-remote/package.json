@@ -2,7 +2,7 @@
   "name": "@stealthscale/example-app-remote",
   "version": "0.0.0",
   "private": true,
-  "description": "Exposes one React component for another application to fetch and render at run time.",
+  "description": "Exposes one React component for another application to fetch and render.",
   "type": "module",
   "imports": {
     "#*": "./src/*"
