@@ -12,8 +12,9 @@ pnpm add -D @stealthscale/vite-config-react
 ```
 
 The package peers on `@stealthscale/vite-config`, `@testing-library/react`, `@vitejs/plugin-react`,
-`happy-dom`, `oxc-transform-react`, `react`, `react-dom`, `vite` and `vitest`. Install all nine. It
-runs on Node 26 and later.
+`happy-dom`, `oxc-transform-react`, `react`, `react-dom`, `vite` and `vitest`. Install all nine. A
+package that writes MDX installs `@mdx-js/rollup` and `@types/mdx` as well. Both are optional peers.
+It runs on Node 26 and later.
 
 ## Usage
 
@@ -25,6 +26,13 @@ import * as react from "@stealthscale/vite-config-react";
 import { defineConfig } from "@stealthscale/vite-config/preset/app";
 
 export default defineConfig(import.meta.dirname, { extends: [react.layers()] });
+```
+
+A package that writes documents in MDX asks for the compiler in the same call. The layer is left out
+unless asked for, so a package without documents installs nothing for them.
+
+```ts
+export default defineConfig(import.meta.dirname, { extends: [react.layers({ mdx: true })] });
 ```
 
 `layers()` states no rule and no format. A linter and a formatter read the root configuration only.
@@ -55,21 +63,22 @@ drops one layer by name and keeps the rest.
 
 ### Layers
 
-| Export                 | Signature                                 | What it returns                                                               |
-| ---------------------- | ----------------------------------------- | ----------------------------------------------------------------------------- |
-| `layers`               | `() => readonly Layer[]`                  | `react.plugin.refresh`, `react.test.cleanup` and `react.test.document`        |
-| `workspace`            | `() => readonly Layer[]`                  | Seven lint and format layers, every rule ordered ahead of every relaxation    |
-| `federation.installed` | `(read?: () => unknown) => string`        | The version string React's own manifest declares                              |
-| `federation.shared`    | `(version?: string) => federation.Shared` | `react` and `react-dom` as singletons, at the range of the installed major    |
-| `fmt.imports`          | `() => Override`                          | An override sorting React ahead of every other import group                   |
-| `lint.fixtures`        | `() => Contribution`                      | A relaxation lifting `react/no-multi-comp` from a specification               |
-| `lint.plugins`         | `() => readonly Contribution[]`           | One contribution per plugin, `react` first and `jsx-a11y` second              |
-| `lint.rendered`        | `() => Contribution`                      | A relaxation excusing `.spec.tsx` and `.fixtures.tsx` from the docblock rules |
-| `lint.rules`           | `() => Contribution`                      | Six React rules, declared over `**/*.{ts,tsx}`                                |
-| `lint.runtime`         | `() => Contribution`                      | A relaxation switching `react/react-in-jsx-scope` off                         |
-| `plugin.refresh`       | `(stated?: Refreshed) => Contribution`    | The React plugin, appended to whatever plugins the tier built                 |
-| `test.cleanup`         | `() => Contribution`                      | The absolute path of `./vitest.setup.ts`, appended to `test.setupFiles`       |
-| `test.document`        | `() => Preset`                            | A preset setting `test.environment` to `happy-dom`                            |
+| Export                 | Signature                                   | What it returns                                                                                                                          |
+| ---------------------- | ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `layers`               | `(stated?: Rendering) => readonly Layer[]`  | `react.plugin.refresh`, `react.test.cleanup` and `react.test.document`, plus both `plugin.mdx` layers when `mdx` is true                 |
+| `workspace`            | `() => readonly Layer[]`                    | Seven lint and format layers, every rule ordered ahead of every relaxation                                                               |
+| `federation.installed` | `(read?: () => unknown) => string`          | The version string React's own manifest declares                                                                                         |
+| `federation.shared`    | `(version?: string) => federation.Shared`   | `react` and `react-dom` as singletons, at the range of the installed major                                                               |
+| `fmt.imports`          | `() => Override`                            | An override sorting React ahead of every other import group                                                                              |
+| `lint.fixtures`        | `() => Contribution`                        | A relaxation lifting `react/no-multi-comp` from a specification                                                                          |
+| `lint.plugins`         | `() => readonly Contribution[]`             | One contribution per plugin, `react` first and `jsx-a11y` second                                                                         |
+| `lint.rendered`        | `() => Contribution`                        | A relaxation excusing `.spec.tsx` and `.fixtures.tsx` from the docblock rules                                                            |
+| `lint.rules`           | `() => Contribution`                        | Six React rules, declared over `**/*.{ts,tsx}`                                                                                           |
+| `lint.runtime`         | `() => Contribution`                        | A relaxation switching `react/react-in-jsx-scope` off                                                                                    |
+| `plugin.mdx`           | `(stated?: Documented) => readonly Layer[]` | `react.plugin.mdx`, which puts the MDX plugin ahead of every other, and `react.plugin.mdx(pack)`, which gives the packer the same plugin |
+| `plugin.refresh`       | `(stated?: Refreshed) => Contribution`      | The React plugin, appended to whatever plugins the tier built                                                                            |
+| `test.cleanup`         | `() => Contribution`                        | The absolute path of `./vitest.setup.ts`, appended to `test.setupFiles`                                                                  |
+| `test.document`        | `() => Preset`                              | A preset setting `test.environment` to `happy-dom`                                                                                       |
 
 Note: a preset replaces the environment a tier set rather than adding to it. `react.test.document`
 is a preset. A package that needs another document implementation takes the layer back by name with
@@ -91,6 +100,60 @@ those defaults. A field left undefined keeps the default.
 Note: the automatic runtime imports the factory itself. No file under this transform needs React in
 scope. `web.json` selects the default factory for the type checker, so a package that changes `from`
 states the matching `jsxImportSource` in its own tsconfig.
+
+### MDX
+
+`plugin.mdx()` compiles an `.mdx` file into a component with `@mdx-js/rollup`. It returns two
+layers. `react.plugin.mdx` is an override that puts the plugin ahead of every plugin the tree built:
+the React Compiler runs in the same `pre` phase and fails on raw MDX when it runs first, and an
+override is applied after every contribution, so the order is the same whatever a package wrote.
+`react.plugin.mdx(pack)` appends the same plugin to `pack.plugins`, because the packer reads that
+list and nothing under `plugins`. `layers({ mdx: true })` adds both.
+
+The plugin compiles `.mdx` and nothing else. At its own default it also claims `.md`, and a markdown
+file imported with `?raw` then arrives as a component rather than as a string. `Documented` has one
+field, `from`, with the same meaning and default as `Refreshed.from`. A package that changes one
+changes the other.
+
+Types come from `@types/mdx` and from `./mdx.d.ts`, which this package publishes as the `./mdx`
+export. Reference it from the `globals.d.ts` the package already includes:
+
+```ts
+/// <reference types="@stealthscale/vite-config/globals" />
+/// <reference types="@stealthscale/vite-config-react/mdx" />
+```
+
+The file declares the `*.mdx` module and types the elements a document renders against React's JSX.
+Without it, `MDXComponents` accepts any function for any element under `@types/react` 19, because
+`@types/mdx` reads a global `JSX` namespace and `@types/react` 19 declares none.
+
+Note: a document's default export is typed. A constant it exports beside it is not, and TypeScript
+reports `has no exported member`. Declare it in a sibling `<name>.d.mdx.ts`, which
+`allowArbitraryExtensions` in the base tier resolves:
+
+```ts
+export { default } from "*.mdx";
+
+export const title: string;
+```
+
+Warning: a library that re-exports an `.mdx` module from its entry gets a broken `index.d.mts` from
+`vp pack`. The declaration imports its types from the JavaScript chunk. Export a document through a
+`.tsx` module that imports it, and the declarations come out whole. An application has no such step
+and needs no wrapper.
+
+`@mdx-js/rollup` peers on `rollup` for one type and imports nothing from it. Left alone, the package
+manager installs 5 MB of `rollup` and a native binary for a bundler nothing here runs. A repository
+states two overrides in `pnpm-workspace.yaml` to drop it:
+
+```yaml
+overrides:
+  "@mdx-js/rollup>rollup": "-"
+  "@rollup/pluginutils>rollup": "-"
+```
+
+The formatter reads `.mdx` and wraps its paragraphs to the width the rest of the repository is
+written to. The linter does not read `.mdx`.
 
 ## The tsconfig fragment and the setup file
 

@@ -15,6 +15,7 @@
     "@commitlint/cli": "catalog:",
     "@stealthscale/testing": "workspace:^",
     "@stealthscale/testing-config": "workspace:^",
+    "@stealthscale/testing-theme": "workspace:^",
     "@stealthscale/vite-config": "workspace:^",
     "@stealthscale/vite-config-css": "workspace:^",
     "@stealthscale/vite-config-react": "workspace:^",
