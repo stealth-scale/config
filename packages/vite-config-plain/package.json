@@ -1,6 +1,6 @@
 {
   "name": "@stealthscale/vite-config-plain",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Packs and tests the packages the configuration tiers depend on.",
   "keywords": [
     "config",

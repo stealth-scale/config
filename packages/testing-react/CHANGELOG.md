@@ -1,5 +1,16 @@
 # @stealthscale/testing-react
 
+## 0.7.1
+
+### Patch Changes
+
+- [#17](https://github.com/stealth-scale/config/pull/17) [`2a0aaf2`](https://github.com/stealth-scale/config/commit/2a0aaf2f41b67bcee797d637f83a41a5d4840257) Thanks [@stealth-admin](https://github.com/stealth-admin)! - testing-react: publish the licence and the README, and state the node floor
+  
+  - The tarball includes `LICENSE` and `README.md`. The README lists every reader, the
+    `ConformanceOptions` fields and each phrase a violation is reported as.
+  - `engines.node` is `>=26.0.0`.
+  - `description` is a sentence naming what the package does.
+
 ## 0.7.0
 
 ### Minor Changes
