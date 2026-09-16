@@ -7,9 +7,9 @@ export default defineConfig(import.meta.dirname, {
     // page imports; the worker is reached through a URL rather than an import, so what the worker
     // itself depends on is found only when the worker first runs. Naming it starts the crawl there
     // too.
-    deps.crawled({
+    deps.crawl({
       because: "a worker is started from a URL, which no crawl follows as an import",
-      from: ["src/*.worker.ts"],
+      files: ["src/*.worker.ts"],
     }),
 
     server.port(4500),

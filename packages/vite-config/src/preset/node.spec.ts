@@ -1,4 +1,4 @@
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { CATEGORIES } from "#lint/rules/index.ts";
 import { defineConfig } from "#preset/node.ts";
@@ -12,28 +12,30 @@ import { readBack } from "#preset/preset.fixtures.ts";
  */
 const AT = new URL("../..", import.meta.url).pathname;
 
-test("gives the package node's globals, so `process` is not undefined", async () => {
-  expect((await readBack(defineConfig(AT, {}))).lint?.env).toEqual({ node: true });
-});
-
-test("withholds the browser's, so reaching for `document` is reported", async () => {
-  expect((await readBack(defineConfig(AT, {}))).lint?.env).not.toHaveProperty("browser");
-});
-
-test("carries the linting every entry shares", async () => {
-  expect((await readBack(defineConfig(AT, {}))).lint).toMatchObject({
-    categories: CATEGORIES,
-    options: { typeAware: true, typeCheck: true },
+describe("node", () => {
+  it("gives the package node's globals", async () => {
+    expect((await readBack(defineConfig(AT, {}))).lint?.env).toStrictEqual({ node: true });
   });
-});
 
-test("carries the house format whole, so a repository states none of it", async () => {
-  const held = (await readBack(defineConfig(AT, {}))).fmt;
+  it("withholds the browser globals", async () => {
+    expect((await readBack(defineConfig(AT, {}))).lint?.env).not.toHaveProperty("browser");
+  });
 
-  expect(held?.proseWrap, "fmt.prose is missing").toBe("always");
-  expect(held?.jsdoc, "fmt.docblocks is missing").toBeTruthy();
-  expect(held?.sortImports, "fmt.imports is missing").toBeTruthy();
-  expect(held?.ignorePatterns, "fmt.generated is missing").not.toHaveLength(0);
-  expect(held?.printWidth, "fmt.style is missing").toBe(100);
-  expect(held?.sortPackageJson, "fmt.manifests is missing").toBe(true);
+  it("includes the linting every entry shares", async () => {
+    expect((await readBack(defineConfig(AT, {}))).lint).toMatchObject({
+      categories: CATEGORIES,
+      options: { typeAware: true, typeCheck: true },
+    });
+  });
+
+  it("sets every field of the house format", async () => {
+    const held = (await readBack(defineConfig(AT, {}))).fmt;
+
+    expect(held?.proseWrap, "fmt.prose is missing").toBe("always");
+    expect(held?.jsdoc, "fmt.docblocks is missing").toBeTruthy();
+    expect(held?.sortImports, "fmt.imports is missing").toBeTruthy();
+    expect(held?.ignorePatterns, "fmt.generated is missing").not.toHaveLength(0);
+    expect(held?.printWidth, "fmt.style is missing").toBe(100);
+    expect(held?.sortPackageJson, "fmt.manifests is missing").toBe(true);
+  });
 });

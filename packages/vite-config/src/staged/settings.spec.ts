@@ -1,21 +1,23 @@
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { type Runs, type Staging } from "#staged/settings.ts";
 
-test("takes a rule written as nothing but its command", () => {
-  const held: Runs = "vp check --fix";
+describe("settings", () => {
+  it("takes a rule written as nothing but its command", () => {
+    const held: Runs = "vp check --fix";
 
-  expect(held).toBe("vp check --fix");
-});
+    expect(held).toBe("vp check --fix");
+  });
 
-test("takes several commands, which run in the order they were written", () => {
-  const held: Runs = ["vp fmt", "vp check"];
+  it("takes several commands", () => {
+    const held: Runs = ["vp fmt", "vp check"];
 
-  expect(held).toHaveLength(2);
-});
+    expect(held).toHaveLength(2);
+  });
 
-test("holds each glob against what runs on the staged files matching it", () => {
-  const held: Staging = { "*.ts": "vp check --fix" };
+  it("maps each glob to the command run on the staged files matching it", () => {
+    const held: Staging = { "*.ts": "vp check --fix" };
 
-  expect(Object.keys(held)).toEqual(["*.ts"]);
+    expect(Object.keys(held)).toStrictEqual(["*.ts"]);
+  });
 });

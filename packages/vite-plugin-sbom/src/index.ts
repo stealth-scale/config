@@ -49,7 +49,7 @@ export interface Supplier {
 /**
  * Describes a bill of materials.
  */
-export interface Stated {
+export interface Described {
   /**
    * Where the document is written, relative to the output directory.
    *
@@ -319,7 +319,7 @@ function toolchain(
  */
 function described(
   bom: Models.Bom,
-  stated: Stated,
+  stated: Described,
   at: string,
   components: Contrib.FromNodePackageJson.Builders.ComponentBuilder,
 ): void {
@@ -390,12 +390,12 @@ function inventory(
 /**
  * Builds the document.
  *
- * @param stated - The thing being described. `Stated` documents every member.
+ * @param stated - The thing being described. `Described` documents every member.
  * @param bundling - The build to read.
  * @param at - The directory being built.
  * @returns The document, serialised.
  */
-export function written(stated: Stated, bundling: Bundling, at: string): string {
+export function written(stated: Described, bundling: Bundling, at: string): string {
   const components = building();
   const bom = new Models.Bom();
   const installed = locked(at);
@@ -420,10 +420,10 @@ export function written(stated: Stated, bundling: Bundling, at: string): string 
  * that matters. A manifest names what was asked for; the graph holds what arrived, including what
  * arrived through something else.
  *
- * @param stated - The thing being described. `Stated` documents every member.
+ * @param stated - The thing being described. `Described` documents every member.
  * @returns The plugin.
  */
-export function sbom(stated: Stated = {}): Plugin {
+export function sbom(stated: Described = {}): Plugin {
   return plugin({
     name: "stealth:sbom",
 

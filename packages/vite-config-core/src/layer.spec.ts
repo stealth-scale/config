@@ -1,42 +1,82 @@
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
-import { applies, contribute, override, preset, remove } from "#layer.ts";
+import { applies, contribute, named, override, owned, preset, remove } from "#layer.ts";
 
 /**
  * The environment a build is read in.
  */
 const BUILDING = { command: "build", mode: "production" } as const;
 
-test("marks each kind, so the pipeline can tell them apart", () => {
-  expect(preset({ config: {}, name: "a" }).kind).toBe("preset");
-  expect(contribute({ at: "x", because: "b", item: 1, name: "a" }).kind).toBe("contribution");
-  expect(remove({ because: "b", name: "a", target: "t" }).kind).toBe("removal");
-  expect(override({ because: "b", name: "a", refine: (c) => c }).kind).toBe("override");
-});
-
-test("keeps what it was stated with", () => {
-  const held = contribute({
-    at: "test.setupFiles",
-    because: "a reason",
-    item: "./a.ts",
-    name: "s",
+describe("layer", () => {
+  it("sets kind on every layer", () => {
+    expect(preset({ config: {}, name: "a" }).kind).toBe("preset");
+    expect(contribute({ at: "x", because: "b", item: 1, name: "a" }).kind).toBe("contribution");
+    expect(remove({ because: "b", name: "a", target: "t" }).kind).toBe("removal");
+    expect(override({ because: "b", name: "a", refine: (c) => c }).kind).toBe("override");
   });
 
-  expect(held).toMatchObject({ at: "test.setupFiles", because: "a reason", item: "./a.ts" });
-});
+  it("keeps the options it was constructed with", () => {
+    const held = contribute({
+      at: "test.setupFiles",
+      because: "a reason",
+      item: "./a.ts",
+      name: "s",
+    });
 
-test("takes part everywhere when it says nothing about where", () => {
-  expect(applies(preset({ config: {}, name: "a" }), BUILDING)).toBe(true);
-});
+    expect(held).toMatchObject({ at: "test.setupFiles", because: "a reason", item: "./a.ts" });
+  });
 
-test("takes part in the command it names, and no other", () => {
-  expect(applies(preset({ apply: "build", config: {}, name: "a" }), BUILDING)).toBe(true);
-  expect(applies(preset({ apply: "serve", config: {}, name: "a" }), BUILDING)).toBe(false);
-});
+  it("applies to every command when apply is absent", () => {
+    expect(applies(preset({ config: {}, name: "a" }), BUILDING)).toBe(true);
+  });
 
-test("asks a predicate, where it was given one", () => {
-  const held = preset({ apply: (env) => env.mode === "production", config: {}, name: "a" });
+  it("applies only to the command it names", () => {
+    expect(applies(preset({ apply: "build", config: {}, name: "a" }), BUILDING)).toBe(true);
+    expect(applies(preset({ apply: "serve", config: {}, name: "a" }), BUILDING)).toBe(false);
+  });
 
-  expect(applies(held, BUILDING)).toBe(true);
-  expect(applies(held, { command: "build", mode: "test" })).toBe(false);
+  it("calls apply when it is a function", () => {
+    const held = preset({ apply: (env) => env.mode === "production", config: {}, name: "a" });
+
+    expect(applies(held, BUILDING)).toBe(true);
+    expect(applies(held, { command: "build", mode: "test" })).toBe(false);
+  });
+
+  it("renames a layer derived from another", () => {
+    const held = named("react.rendered", contribute({ at: "x", because: "b", item: 1, name: "a" }));
+
+    expect(held.name).toBe("react.rendered");
+  });
+
+  it("keeps every field but the name including the kind", () => {
+    const held = named("b", contribute({ at: "x", because: "why", item: 1, name: "a" }));
+
+    expect(held).toMatchObject({ at: "x", because: "why", item: 1, kind: "contribution" });
+  });
+
+  it("leaves the layer it was given unchanged", () => {
+    const original = preset({ config: {}, name: "a" });
+
+    named("b", original);
+
+    expect(original.name).toBe("a");
+  });
+
+  it("prefixes each name with the owner", () => {
+    const held = owned("mine", [
+      preset({ config: {}, name: "a" }),
+      preset({ config: {}, name: "b" }),
+    ]);
+
+    expect(held.map((one) => one.name)).toStrictEqual(["mine/a", "mine/b"]);
+  });
+
+  it("flattens a nested array of layers", () => {
+    const held = owned("mine", [
+      preset({ config: {}, name: "a" }),
+      [preset({ config: {}, name: "b" }), [preset({ config: {}, name: "c" })]],
+    ]);
+
+    expect(held.map((one) => one.name)).toStrictEqual(["mine/a", "mine/b", "mine/c"]);
+  });
 });

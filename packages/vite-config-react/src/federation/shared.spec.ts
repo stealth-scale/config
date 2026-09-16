@@ -1,45 +1,47 @@
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { installed, shared } from "#federation/shared.ts";
 
-test("shares React, two copies of which share no hooks", () => {
-  expect(shared()["react"]?.singleton).toBe(true);
-});
+describe("shared", () => {
+  it("shares React as a singleton", () => {
+    expect(shared()["react"]?.singleton).toBe(true);
+  });
 
-test("shares the renderer, two of which mean two roots over one tree", () => {
-  expect(shared()["react-dom"]?.singleton).toBe(true);
-});
+  it("shares the renderer as a singleton", () => {
+    expect(shared()["react-dom"]?.singleton).toBe(true);
+  });
 
-test("shares nothing else, the rest being each application's own", () => {
-  expect(Object.keys(shared()).toSorted()).toEqual(["react", "react-dom"]);
-});
+  it("shares nothing else", () => {
+    expect(Object.keys(shared()).toSorted()).toStrictEqual(["react", "react-dom"]);
+  });
 
-test("counts a whole major as the same React, a host being on a later patch than a remote", () => {
-  expect(shared("19.3.0")["react"]?.requiredVersion).toBe("^19.0.0");
-});
+  it("counts a whole major as the same React", () => {
+    expect(shared("19.3.0")["react"]?.requiredVersion).toBe("^19.0.0");
+  });
 
-test("follows the version installed rather than one written down here", () => {
-  expect(shared("20.1.4")["react"]?.requiredVersion).toBe("^20.0.0");
-});
+  it("follows the installed version rather than one written here", () => {
+    expect(shared("20.1.4")["react"]?.requiredVersion).toBe("^20.0.0");
+  });
 
-test("holds both packages to the same range, which is what makes them one React", () => {
-  const held = shared("19.3.0");
+  it("applies the same range to both packages", () => {
+    const held = shared("19.3.0");
 
-  expect(held["react"]?.requiredVersion).toBe(held["react-dom"]?.requiredVersion);
-});
+    expect(held["react"]?.requiredVersion).toBe(held["react-dom"]?.requiredVersion);
+  });
 
-test("reads the tree when nothing is passed, so a workspace upgrade needs no edit here", () => {
-  expect(shared()["react"]?.requiredVersion).toMatch(/^\^\d+\.0\.0$/u);
-});
+  it("reads the tree when nothing is passed", () => {
+    expect(shared()["react"]?.requiredVersion).toMatch(/^\^\d+\.0\.0$/u);
+  });
 
-test("reads React's version from the manifest it was pointed at", () => {
-  expect(installed(() => ({ version: "19.3.0" }))).toBe("19.3.0");
-});
+  it("reads React's version from the manifest it was pointed at", () => {
+    expect(installed(() => ({ version: "19.3.0" }))).toBe("19.3.0");
+  });
 
-test("refuses a manifest stating no version, which is React not being installed", () => {
-  expect(() => installed(() => ({}))).toThrow(/could not read React's version/u);
-});
+  it("throws for a manifest declaring no version", () => {
+    expect(() => installed(() => ({}))).toThrow(/could not read React's version/u);
+  });
 
-test("refuses whatever else a missing manifest resolves to", () => {
-  expect(() => installed(() => "not a manifest")).toThrow(/could not read React's version/u);
+  it("throws when the manifest cannot be resolved", () => {
+    expect(() => installed(() => "not a manifest")).toThrow(/could not read React's version/u);
+  });
 });

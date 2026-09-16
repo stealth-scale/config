@@ -1,12 +1,14 @@
 import { type UserConfig } from "vite-plus";
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { format } from "#worker/format.ts";
 
-test("bundles a worker as a module, so it shares chunks with the page rather than inlining them", () => {
-  expect((format().config as UserConfig).worker?.format).toBe("es");
-});
+describe("format", () => {
+  it("bundles a worker as a module", () => {
+    expect((format().config as UserConfig).worker?.format).toBe("es");
+  });
 
-test("names itself, so a repository reaching an older browser can take the layer back", () => {
-  expect(format().name).toBe("worker.format");
+  it("names the layer so a repository can remove it", () => {
+    expect(format().name).toBe("worker.format");
+  });
 });

@@ -2,7 +2,7 @@
  * What `vp staged` reads, as the block reaches it.
  */
 
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 
 /**
  * A glob against what to run on the staged files matching it.

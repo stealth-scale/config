@@ -1,7 +1,7 @@
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { workspaces } from "#workspace.ts";
 
@@ -28,71 +28,77 @@ function written(yaml: string): string {
   return at;
 }
 
-test("reads the list npm, bun and yarn each state in the manifest", () => {
-  expect(workspaces(empty(), { workspaces: ["examples/*", "packages/*"] })).toEqual([
-    "examples/*",
-    "packages/*",
-  ]);
-});
+describe("workspace", () => {
+  it("reads the array npm bun and yarn each declare in the manifest", () => {
+    expect(workspaces(empty(), { workspaces: ["examples/*", "packages/*"] })).toStrictEqual([
+      "examples/*",
+      "packages/*",
+    ]);
+  });
 
-test("reads the nested spelling too, a manifest written for one being installed by another", () => {
-  expect(workspaces(empty(), { workspaces: { packages: ["packages/*"] } })).toEqual(["packages/*"]);
-});
+  it("reads the nested spelling too", () => {
+    expect(workspaces(empty(), { workspaces: { packages: ["packages/*"] } })).toStrictEqual([
+      "packages/*",
+    ]);
+  });
 
-test("answers an empty list where the manifest states a workspace holding nothing", () => {
-  expect(workspaces(empty(), { workspaces: {} })).toEqual([]);
-});
+  it("returns an empty array when the manifest declares an empty workspace", () => {
+    expect(workspaces(empty(), { workspaces: {} })).toStrictEqual([]);
+  });
 
-test("answers an empty list where the field is neither a list nor an object", () => {
-  expect(workspaces(empty(), { workspaces: "packages/*" })).toEqual([]);
-});
+  it("returns an empty array when the field is neither an array nor an object", () => {
+    expect(workspaces(empty(), { workspaces: "packages/*" })).toStrictEqual([]);
+  });
 
-test("drops an entry that is not a name, rather than handing it on", () => {
-  expect(workspaces(empty(), { workspaces: ["packages/*", 3] })).toEqual(["packages/*"]);
-});
+  it("drops an entry that is not a string", () => {
+    expect(workspaces(empty(), { workspaces: ["packages/*", 3] })).toStrictEqual(["packages/*"]);
+  });
 
-test("answers nothing where no package manager states a workspace, which is what a package is", () => {
-  expect(workspaces(empty(), { name: "one" })).toBeUndefined();
-});
+  it("returns undefined when no package manager declares a workspace", () => {
+    expect(workspaces(empty(), { name: "one" })).toBeUndefined();
+  });
 
-test("reads the directories pnpm states beside the manifest", () => {
-  const at = written("packages:\n  - examples/*\n  - packages/*\n");
+  it("reads the directories pnpm declares beside the manifest", () => {
+    const at = written("packages:\n  - examples/*\n  - packages/*\n");
 
-  expect(workspaces(at, {})).toEqual(["examples/*", "packages/*"]);
-});
+    expect(workspaces(at, {})).toStrictEqual(["examples/*", "packages/*"]);
+  });
 
-test("reads the directories written on one line", () => {
-  const at = written('packages: ["examples/*", "packages/*"]\n');
+  it("reads the directories written on one line", () => {
+    const at = written('packages: ["examples/*", "packages/*"]\n');
 
-  expect(workspaces(at, {})).toEqual(["examples/*", "packages/*"]);
-});
+    expect(workspaces(at, {})).toStrictEqual(["examples/*", "packages/*"]);
+  });
 
-test("takes a directory as written, without its quotes or what follows a hash", () => {
-  const at = written('packages:\n  - "packages/*" # everything published\n');
+  it("takes a directory without its quotes or trailing comment", () => {
+    const at = written('packages:\n  - "packages/*" # everything published\n');
 
-  expect(workspaces(at, {})).toEqual(["packages/*"]);
-});
+    expect(workspaces(at, {})).toStrictEqual(["packages/*"]);
+  });
 
-test("stops at the next thing the file states, rather than reading it as a directory", () => {
-  const at = written("packages:\n  - packages/*\n\ncatalog:\n  typescript: ^7.0.2\n");
+  it("stops at the next key the file declares", () => {
+    const at = written("packages:\n  - packages/*\n\ncatalog:\n  typescript: ^7.0.2\n");
 
-  expect(workspaces(at, {})).toEqual(["packages/*"]);
-});
+    expect(workspaces(at, {})).toStrictEqual(["packages/*"]);
+  });
 
-test("reads past a comment sitting between the directories", () => {
-  const at = written("packages:\n  - examples/*\n  # and what publishes\n  - packages/*\n");
+  it("reads past a comment sitting between the directories", () => {
+    const at = written("packages:\n  - examples/*\n  # and what publishes\n  - packages/*\n");
 
-  expect(workspaces(at, {})).toEqual(["examples/*", "packages/*"]);
-});
+    expect(workspaces(at, {})).toStrictEqual(["examples/*", "packages/*"]);
+  });
 
-test("answers an empty list where the file states no directories at all", () => {
-  const at = written("catalog:\n  typescript: ^7.0.2\n");
+  it("returns an empty array when the file declares no directories", () => {
+    const at = written("catalog:\n  typescript: ^7.0.2\n");
 
-  expect(workspaces(at, {})).toEqual([]);
-});
+    expect(workspaces(at, {})).toStrictEqual([]);
+  });
 
-test("lets the manifest answer where a repository states both, that being the file all three read", () => {
-  const at = written("packages:\n  - from-the-file/*\n");
+  it("prefers the manifest when a repository declares both", () => {
+    const at = written("packages:\n  - from-the-file/*\n");
 
-  expect(workspaces(at, { workspaces: ["from-the-manifest/*"] })).toEqual(["from-the-manifest/*"]);
+    expect(workspaces(at, { workspaces: ["from-the-manifest/*"] })).toStrictEqual([
+      "from-the-manifest/*",
+    ]);
+  });
 });

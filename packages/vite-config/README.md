@@ -10,16 +10,16 @@ pnpm add -D @stealthscale/vite-config @stealthscale/vite-config-core
 
 ## Pick a tier
 
-A package extends exactly one. Each is a subpath export whose `defineConfig` already carries the
-layers that tier implies.
+A package extends exactly one. Each is a subpath export with the same two names: `defineConfig`,
+which already carries the layers that tier implies, and `layers()`, the list itself.
 
-| Tier                 | For                                           |
-| -------------------- | --------------------------------------------- |
-| `./preset/base`      | Publishes, says nothing about where it runs   |
-| `./preset/node`      | Publishes and runs on the console             |
-| `./preset/web`       | Publishes and runs in a browser               |
-| `./preset/app`       | Deployed rather than published                |
-| `./preset/workspace` | A workspace root: no pack, no build, no tests |
+| Tier                 | For                                                          |
+| -------------------- | ------------------------------------------------------------ |
+| `./preset/base`      | Publishes, says nothing about where it runs                  |
+| `./preset/node`      | Publishes and runs on the console                            |
+| `./preset/web`       | Publishes and runs in a browser                              |
+| `./preset/app`       | Deployed rather than published                               |
+| `./preset/workspace` | A workspace root: the node tier plus what only a root states |
 
 ```ts
 import { define, server } from "@stealthscale/vite-config";
@@ -45,7 +45,6 @@ Each is a namespace on the root export, holding the layers for one part of the c
 | `deps`       | Prebundling and what the crawl misses                              |
 | `federation` | Module federation hosts and remotes                                |
 | `fmt`        | Formatting: docblocks, imports, manifests, prose, style            |
-| `layout`     | Where the page and its entry sit                                   |
 | `lint`       | The rule sets, and `relax` to turn one off with a reason           |
 | `pack`       | Packing: entry, declarations, platform, hooks, inventory           |
 | `preview`    | The preview server's port, host and reachability                   |

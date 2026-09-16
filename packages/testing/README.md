@@ -1,6 +1,6 @@
-# @stealthscale/tool-testing
+# @stealthscale/testing
 
-A **kit**: a dev-time library another repository takes.
+A dev-time library that another repository installs.
 
 Builds a scratch workspace in the temporary directory, writes the manifests that go in it, and
 measures what a rendered element draws. A guard's spec, a package's spec, a story and a repository's
@@ -13,5 +13,5 @@ wrote them.
 ## Install
 
 ```sh
-bun add -d @stealthscale/tool-testing
+pnpm add -D @stealthscale/testing
 ```

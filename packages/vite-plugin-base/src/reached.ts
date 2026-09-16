@@ -10,9 +10,9 @@ import { type Bundling } from "#plugin.ts";
 /**
  * What a package's manifest holds.
  *
- * Every field, untyped. A manifest is whatever somebody wrote, and a plugin reading one wants
- * fields no interface here could usefully enumerate — `license`, `homepage`, `bugs`, `author`,
- * whichever a given inventory format asks for. `text` is how a field is read safely.
+ * Every field is untyped. A manifest is whatever somebody wrote, and a plugin reading one wants
+ * fields no interface here could usefully enumerate, such as `license`, `homepage`, `bugs` and
+ * `author`. Read a field through `text`, which checks the type.
  */
 export type Manifest = Readonly<Record<string, unknown>>;
 
@@ -21,7 +21,7 @@ export type Manifest = Readonly<Record<string, unknown>>;
  *
  * @param manifest - The manifest to read.
  * @param field - Which field.
- * @returns Its value, or nothing where the field is absent or is not text.
+ * @returns Its value, or nothing when the field is absent or is not text.
  */
 export function text(manifest: Manifest, field: string): string | undefined {
   const held = manifest[field];
@@ -42,8 +42,8 @@ export interface Reached {
    * The directories of the packages this one imported, each once.
    *
    * Read from what its modules imported rather than from its manifest. A manifest names what was
-   * asked for, including what the bundler dropped; this names what one package actually reached for
-   * in the build being described.
+   * asked for, including what the bundler dropped. This names what the package actually reached in
+   * the build being described.
    */
   dependsOn: ReadonlySet<string>;
 
@@ -53,7 +53,7 @@ export interface Reached {
   manifest: Manifest;
 
   /**
-   * What it is called, which the manifest had to state for this to be a package at all.
+   * The package's name, which its manifest had to declare.
    */
   named: string;
 }
@@ -61,13 +61,13 @@ export interface Reached {
 /**
  * Finds the directory of the package a file belongs to.
  *
- * Walks up from the file to the nearest manifest, which is what a resolver does and therefore the
- * only answer that agrees with the one the bundler used. Reading the path instead would have to
- * know every layout a package manager writes — bun nests a second `node_modules` inside `.bun`,
- * pnpm writes a store, npm hoists — and would be wrong on whichever it had not been told about.
+ * It walks up from the file to the nearest manifest, which is what a resolver does, so the result
+ * agrees with the one the bundler used. Reading the path instead would have to know every layout a
+ * package manager writes. Bun nests a second `node_modules` inside `.bun`, pnpm writes a store and
+ * npm hoists, and a reader would be wrong on whichever layout it had not been told about.
  *
  * @param from - A file the build reached.
- * @returns The package's directory, or nothing above the file system root.
+ * @returns The package's directory, or nothing when the walk reaches the file system root.
  */
 export function owning(from: string): string | undefined {
   for (let at = dirname(from); ;) {
@@ -82,10 +82,10 @@ export function owning(from: string): string | undefined {
 }
 
 /**
- * Reads the manifest in a directory, answering nothing where it cannot be read.
+ * Reads the manifest in a directory.
  *
  * @param at - The package's directory.
- * @returns The fields it holds, or nothing where there is no manifest or it does not parse.
+ * @returns Its fields, or nothing when there is no manifest or it does not parse.
  */
 export function manifestAt(at: string): Manifest | undefined {
   try {
@@ -100,7 +100,7 @@ export function manifestAt(at: string): Manifest | undefined {
 }
 
 /**
- * Answers whether a module came from a package rather than from the repository being built.
+ * Reports whether a module came from a package rather than from the repository being built.
  *
  * @param id - The module's resolved identifier.
  * @returns Whether it was installed.
@@ -135,15 +135,15 @@ export interface Licensed {
 /**
  * Reads the licence files a package ships.
  *
- * The text rather than the manifest's `license` field, which is a declaration: an SPDX identifier
- * somebody typed. The file beside it is the evidence, and the two disagree often enough that a
- * licence review cannot lean on the first alone.
+ * The text rather than the manifest's `license` field, which is an SPDX identifier somebody typed.
+ * The file beside it is the evidence, and the two disagree often enough that a licence review
+ * cannot rely on the field alone.
  *
  * Only the package's own directory is read, not below it. A licence deeper in the tree belongs to
  * something the package vendored, which is that thing's evidence rather than this one's.
  *
  * @param at - The package's directory.
- * @returns Each licence file, or none where the package ships no text.
+ * @returns Each licence file, or none when the package ships no text.
  */
 export function licensed(at: string): readonly Licensed[] {
   try {
@@ -156,7 +156,7 @@ export function licensed(at: string): readonly Licensed[] {
 }
 
 /**
- * A package being gathered, before the map is answered.
+ * A package being gathered, before the map is returned.
  */
 interface Made {
   /**
@@ -175,7 +175,7 @@ interface Made {
   manifest: Manifest;
 
   /**
-   * What it is called, which the manifest had to state for this to be a package at all.
+   * The package's name, which its manifest had to declare.
    */
   named: string;
 }
@@ -183,12 +183,12 @@ interface Made {
 /**
  * Every installed package the build reached, each once.
  *
- * The graph rather than the manifest, which is the whole point: a bundler inlines what it reached,
- * including what it reached through something else. A manifest names direct dependencies, so an
- * inventory built from one describes what was asked for rather than what is in the artefact —
- * `scheduler` arrives through React and appears in no application's manifest.
+ * Read from the graph rather than from the manifest. A bundler inlines what it reached, including
+ * what it reached through something else, while a manifest names direct dependencies only. An
+ * inventory built from a manifest therefore describes what was asked for rather than what is in the
+ * artefact: `scheduler` arrives through React and appears in no application's manifest.
  *
- * A module with no manifest above it is passed over. So is anything outside `node_modules`: the
+ * A module with no manifest above it is ignored, and so is anything outside `node_modules`. The
  * repository's own source is the thing being described rather than a component of it.
  *
  * @param bundling - The build to read.
@@ -198,10 +198,10 @@ export function reached(bundling: Bundling): ReadonlyMap<string, Reached> {
   const held = new Map<string, Made>();
 
   /**
-   * Answers the entry for a module's package, making it on first sight.
+   * Returns the entry for a module's package, creating it on first sight.
    *
    * @param id - A module the build reached.
-   * @returns The entry, or nothing where the module belongs to no installed package.
+   * @returns The entry, or nothing when the module belongs to no installed package.
    */
   function entry(id: string): Made | undefined {
     if (!installed(id)) return undefined;

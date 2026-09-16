@@ -1,6 +1,6 @@
 import { federation, preview, server } from "@stealthscale/vite-config";
-import { federation as react } from "@stealthscale/vite-config-react";
-import { defineConfig } from "@stealthscale/vite-config-react/preset/app";
+import * as react from "@stealthscale/vite-config-react";
+import { defineConfig } from "@stealthscale/vite-config/preset/app";
 
 /**
  * The names this application is served under while it is being worked on, beyond loopback. Stated
@@ -16,18 +16,20 @@ const ALLOWED = ["https://host.stealthscale.dev", "http://localhost:4401"];
 
 export default defineConfig(import.meta.dirname, {
   extends: [
-    // No `build.served` here, and that absence is the point. With no base the federation plugin
+    react.layers(),
+
+    // No `build.base` here, and that absence is the point. With no base the federation plugin
     // resolves this application's chunks against wherever `remoteEntry.js` was fetched from, so one
     // build runs under any origin. Setting a base pins the build to the origin it was built for,
     // which is one build per environment and a rebuild to move it.
     federation.remote({
       exposes: { "./Dashboard": "./src/dashboard.tsx" },
       name: "remote",
-      shared: react.shared(),
+      shared: react.federation.shared(),
     }),
 
-    server.reached(4402, NAMES),
-    preview.reached(4403, NAMES),
+    server.address(4402, NAMES),
+    preview.address(4403, NAMES),
     preview.shared(ALLOWED),
   ],
 });

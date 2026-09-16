@@ -2,7 +2,7 @@
  * The rules the automatic JSX runtime makes obsolete.
  */
 
-import { type Contribution, lint } from "@stealthscale/vite-config";
+import { type Contribution, lint, named } from "@stealthscale/vite-config";
 
 /**
  * The files the automatic runtime compiles, which is everything this package renders.
@@ -22,9 +22,12 @@ const FILES = ["**/*.{ts,tsx}"];
  * @returns The contribution.
  */
 export function runtime(): Contribution {
-  return lint.relax({
-    because: "the automatic JSX runtime imports React itself, so nothing has it in scope",
-    files: FILES,
-    rules: { "react/react-in-jsx-scope": "off" },
-  });
+  return named(
+    "react.lint.runtime",
+    lint.relax({
+      because: "the automatic JSX runtime imports React itself, so nothing has it in scope",
+      files: FILES,
+      rules: { "react/react-in-jsx-scope": "off" },
+    }),
+  );
 }

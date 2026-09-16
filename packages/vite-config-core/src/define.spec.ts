@@ -1,5 +1,5 @@
 import { type ConfigEnv, type UserConfig } from "vite-plus";
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { defineConfig } from "#define.ts";
 import { contribute, override, preset, remove } from "#layer.ts";
@@ -33,84 +33,88 @@ function readBack(
   return held(env);
 }
 
-test("composes the layers it extends", async () => {
-  const held = await readBack({ extends: [preset({ config: { mode: "from-layer" }, name: "a" })] });
+describe("define", () => {
+  it("composes the layers it extends", async () => {
+    const held = await readBack({
+      extends: [preset({ config: { mode: "from-layer" }, name: "a" })],
+    });
 
-  expect(held.mode).toBe("from-layer");
-});
-
-test("lets what is written beside `extends` win over what is in it", async () => {
-  const held = await readBack({
-    extends: [preset({ config: { mode: "from-layer" }, name: "a" })],
-    mode: "from-own-keys",
+    expect(held.mode).toBe("from-layer");
   });
 
-  expect(held.mode).toBe("from-own-keys");
-});
+  it("lets what is written beside `extends` win over what is in it", async () => {
+    const held = await readBack({
+      extends: [preset({ config: { mode: "from-layer" }, name: "a" })],
+      mode: "from-own-keys",
+    });
 
-test("keeps `extends` out of the config it answers", async () => {
-  const held = await readBack({ extends: [preset({ config: {}, name: "a" })], mode: "test" });
-
-  expect(held).not.toHaveProperty("extends");
-});
-
-test("takes a function, and hands it the environment", async () => {
-  const held = await readBack(({ command }) => ({
-    mode: command === "build" ? "built" : "served",
-  }));
-
-  expect(held.mode).toBe("built");
-});
-
-test("takes a promise", async () => {
-  expect((await readBack(Promise.resolve({ mode: "awaited" }))).mode).toBe("awaited");
-});
-
-test("composes with nothing extended", async () => {
-  expect((await readBack({ mode: "alone" })).mode).toBe("alone");
-});
-
-test("leaves out a layer that does not take part in this environment", async () => {
-  const held = await readBack({
-    extends: [preset({ apply: "serve", config: { mode: "serving" }, name: "a" })],
+    expect(held.mode).toBe("from-own-keys");
   });
 
-  expect(held.mode).toBeUndefined();
-});
+  it("keeps extends out of the config it returns", async () => {
+    const held = await readBack({ extends: [preset({ config: {}, name: "a" })], mode: "test" });
 
-test("appends what a contribution contributes, and takes back what a removal names", async () => {
-  const held = await readBack({
-    extends: [
-      contribute({ at: "test.setupFiles", because: "b", item: "./a.ts", name: "a" }),
-      contribute({ at: "test.setupFiles", because: "b", item: "./b.ts", name: "b" }),
-      remove({ because: "b", name: "without(b)", target: "b" }),
-    ],
+    expect(held).not.toHaveProperty("extends");
   });
 
-  expect(held).toMatchObject({ test: { setupFiles: ["./a.ts"] } });
-});
+  it("takes a function and passes it the environment", async () => {
+    const held = await readBack(({ command }) => ({
+      mode: command === "build" ? "built" : "served",
+    }));
 
-test("runs an override after everything else", async () => {
-  const held = await readBack({
-    extends: [
-      preset({ config: { mode: "set" }, name: "a" }),
-      override({
-        because: "b",
-        name: "tidy",
-        refine: (config) => ({ ...config, mode: "refined" }),
-      }),
-    ],
+    expect(held.mode).toBe("built");
   });
 
-  expect(held.mode).toBe("refined");
-});
+  it("takes a promise", async () => {
+    expect((await readBack(Promise.resolve({ mode: "awaited" }))).mode).toBe("awaited");
+  });
 
-test("flattens a builder that answers several layers", async () => {
-  const several = [
-    preset({ config: { mode: "one" }, name: "one" }),
-    preset({ config: { publicDir: "two" }, name: "two" }),
-  ];
-  const held = await readBack({ extends: [several] });
+  it("composes with nothing extended", async () => {
+    expect((await readBack({ mode: "alone" })).mode).toBe("alone");
+  });
 
-  expect(held).toMatchObject({ mode: "one", publicDir: "two" });
+  it("leaves out a layer that does not apply in this environment", async () => {
+    const held = await readBack({
+      extends: [preset({ apply: "serve", config: { mode: "serving" }, name: "a" })],
+    });
+
+    expect(held.mode).toBeUndefined();
+  });
+
+  it("appends a contribution and removes what a removal names", async () => {
+    const held = await readBack({
+      extends: [
+        contribute({ at: "test.setupFiles", because: "b", item: "./a.ts", name: "a" }),
+        contribute({ at: "test.setupFiles", because: "b", item: "./b.ts", name: "b" }),
+        remove({ because: "b", name: "without(b)", target: "b" }),
+      ],
+    });
+
+    expect(held).toMatchObject({ test: { setupFiles: ["./a.ts"] } });
+  });
+
+  it("runs an override after everything else", async () => {
+    const held = await readBack({
+      extends: [
+        preset({ config: { mode: "set" }, name: "a" }),
+        override({
+          because: "b",
+          name: "tidy",
+          refine: (config) => ({ ...config, mode: "refined" }),
+        }),
+      ],
+    });
+
+    expect(held.mode).toBe("refined");
+  });
+
+  it("flattens a builder that returns several layers", async () => {
+    const several = [
+      preset({ config: { mode: "one" }, name: "one" }),
+      preset({ config: { publicDir: "two" }, name: "two" }),
+    ];
+    const held = await readBack({ extends: [several] });
+
+    expect(held).toMatchObject({ mode: "one", publicDir: "two" });
+  });
 });

@@ -1,6 +1,6 @@
 import { createContext, type ReactElement, type ReactNode, type Ref, use } from "react";
 
-import { describe, expect, it } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { violations } from "#conformance.tsx";
 import { part } from "#part.ts";
@@ -233,17 +233,17 @@ function Thrower(): ReactElement {
 }
 
 describe("violations", () => {
-  it("finds none for a component that keeps every part of the contract", () => {
+  it("returns no violation for a component that keeps the contract", () => {
     const options = { asChild: true, children: true, element: "DIV" };
 
     expect(violations(Conforming, options)).toStrictEqual([]);
   });
 
-  it("reports a component that renders nothing, and runs no further check on it", () => {
+  it("reports a component that renders nothing", () => {
     expect(violations(Nothing)).toStrictEqual(["renders no element"]);
   });
 
-  it("names both elements where a component renders one other than the one expected", () => {
+  it("names both elements when a component renders the wrong one", () => {
     expect(violations(Conforming, { element: "SPAN" })).toStrictEqual(["renders DIV, not SPAN"]);
   });
 
@@ -261,7 +261,7 @@ describe("violations", () => {
     expect(violations(Unforwarding)).toStrictEqual(["does not forward ref"]);
   });
 
-  it("reports a component that swallows the props it does not name", () => {
+  it("reports a component that drops the props it does not name", () => {
     expect(violations(Swallowing)).toStrictEqual(["does not spread unknown props"]);
   });
 
@@ -269,20 +269,20 @@ describe("violations", () => {
     expect(violations(Childless, { children: true })).toStrictEqual(["does not render children"]);
   });
 
-  it("reports a component that keeps its own element where asChild was passed", () => {
+  it("reports a component that keeps its own element when asChild was passed", () => {
     expect(violations(Keeping, { asChild: true })).toStrictEqual(["does not honour asChild"]);
   });
 
-  it("checks neither children nor asChild unless it is asked to", () => {
+  it("checks neither children nor asChild unless asked", () => {
     expect(violations(Plain)).toStrictEqual([]);
   });
 
-  it("mounts a component with the props it requires before it renders at all", () => {
+  it("mounts a component with the props it requires", () => {
     expect(violations(Requiring, { props: { ratio: 2 } })).toStrictEqual([]);
   });
 });
 
-describe("violations, where a component cannot be rendered on its own", () => {
+describe("violationsWhenUnrenderable", () => {
   it("checks a part of a compound inside the provider it needs", () => {
     expect(
       violations(Part, {
@@ -294,17 +294,17 @@ describe("violations, where a component cannot be rendered on its own", () => {
     ).toStrictEqual([]);
   });
 
-  it("reports a component that throws as throwing, rather than as rendering nothing", () => {
+  it("reports a component that throws as throwing", () => {
     expect(violations(Part)).toStrictEqual([
       "throws when it renders: Part cannot access its Provider.",
     ]);
   });
 
-  it("reports what was thrown where it was not an error", () => {
+  it("reports what was thrown when it was not an error", () => {
     expect(violations(Thrower)).toStrictEqual(["throws when it renders: refused"]);
   });
 
-  it("reports no element where the subject is not in what was rendered", () => {
+  it("reports no element when the render omits the subject", () => {
     expect(
       violations(Conforming, {
         subject: (container) => part(container, "absent"),

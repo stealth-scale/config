@@ -2,7 +2,7 @@
  * Where a rendering file's framework imports sit.
  */
 
-import { fmt, type Override } from "@stealthscale/vite-config";
+import { fmt, named, type Override } from "@stealthscale/vite-config";
 
 /**
  * The modules that are React rather than a dependency that happens to be installed.
@@ -19,9 +19,12 @@ const REACT = ["react", "react-dom", "react-dom/*", "react/*"];
  * @returns The override.
  */
 export function imports(): Override {
-  return fmt.group({
-    because: "a file that renders is about rendering, so its framework reads first",
-    name: "react",
-    patterns: REACT,
-  });
+  return named(
+    "react.fmt.imports",
+    fmt.group({
+      because: "a file that renders is about rendering, so its framework reads first",
+      name: "react",
+      patterns: REACT,
+    }),
+  );
 }

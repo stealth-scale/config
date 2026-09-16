@@ -1,16 +1,14 @@
 /**
- * The contract every component owes whoever renders it, read as a list of what it breaks.
+ * The contract every component keeps for whoever renders it, reported as a list of violations.
  *
- * A component in a design system is not only its own markup. A consumer puts a `className` on it,
- * holds a `ref` to it, spreads an attribute onto it and expects every one of those to reach the
- * element that was rendered. None of it is what the component is for, all of it is what makes it
- * usable from the outside, and each is dropped the same way: by binding a recipe to an element and
+ * A component in a design system is more than its own markup. A consumer sets a `className` on it,
+ * takes a `ref` to it and spreads an attribute onto it, and each of those has to reach the rendered
+ * element. A component drops all three the same way, by binding a recipe to an element and
  * spreading nothing.
  *
- * Answered as a list of violations rather than as a verdict, the way an audit is. A specification
- * writes one assertion and a failure names the prop that went missing — "does not forward ref" —
- * rather than saying that `false` is not `true`. That is also what keeps this package free of a
- * test runner: nothing here asserts.
+ * A check returns violations rather than a verdict. A specification writes one assertion, and a
+ * failure names the prop that went missing rather than reporting that `false` is not `true`.
+ * Nothing here asserts, so this package needs no test runner.
  */
 
 import { createElement, type ElementType, type ReactElement, type ReactNode } from "react";
@@ -20,13 +18,12 @@ import { render } from "@testing-library/react";
 import { only, type Rendered } from "#part.ts";
 
 /**
- * The parts of the contract that are not every component's to keep, and how to reach a component
- * that cannot be rendered on its own.
+ * The optional parts of the contract, and how to reach a component that cannot render on its own.
  */
 export interface ConformanceOptions {
   /**
    * Whether it renders the child it is given in place of its own element. Default: unchecked,
-   * since a component that renders its own element owes nothing here.
+   * because a component that renders its own element has no such behaviour to check.
    */
   asChild?: boolean | undefined;
 
@@ -38,7 +35,7 @@ export interface ConformanceOptions {
 
   /**
    * The tag it should render, as the DOM reports it: `DIV`, `SPAN`, `IFRAME`. Default: unchecked,
-   * since the element a box renders is the caller's business.
+   * because the element a box renders is the caller's choice.
    */
   element?: string | undefined;
 
@@ -49,9 +46,8 @@ export interface ConformanceOptions {
 
   /**
    * Finds the element under test in what was rendered. Default: the one element the render
-   * produced, which is right for a component rendered on its own and wrong under a `wrapper`,
-   * where the first element belongs to the wrapper. `part` is what a compound's slot is found
-   * with.
+   * produced. That default is wrong under a `wrapper`, where the first element belongs to the
+   * wrapper. Use `part` to find a compound's slot.
    */
   subject?: ((container: ParentNode) => Rendered) | undefined;
 
@@ -60,7 +56,7 @@ export interface ConformanceOptions {
    * its state from, a theme, a router. Default: rendered on its own.
    *
    * A part of a compound throws without its provider rather than rendering badly, so without this
-   * the only thing a check could report is that the provider is missing — which says nothing about
+   * the only thing a check could report is that the provider is missing, which says nothing about
    * the part.
    */
   wrapper?: ((children: ReactNode) => ReactElement) | undefined;
@@ -82,7 +78,7 @@ const MARK = "data-conformance";
  * @param Component - The component to render.
  * @param props - The props to render it with.
  * @param options - The wrapper to render it inside, where it needs one.
- * @returns The rendered output and how to take it down again.
+ * @returns The rendered output and its unmount function.
  */
 function drawn(
   Component: ElementType,
@@ -100,7 +96,7 @@ function drawn(
  * @param container - The rendered output.
  * @param options - The finder, where the caller supplied one.
  * @returns The element under test.
- * @throws Error Where it is not there.
+ * @throws Error When it is not present.
  */
 function subjectOf(container: ParentNode, options: ConformanceOptions): Rendered {
   return options.subject === undefined ? only(container) : options.subject(container);
@@ -109,15 +105,15 @@ function subjectOf(container: ParentNode, options: ConformanceOptions): Rendered
 /**
  * Mounts a component once, reads one thing off the element under test, and unmounts it.
  *
- * Unmounted rather than left in the document, so one check cannot read the element another check
- * rendered.
+ * The component is unmounted rather than left in the document, so one check cannot read the
+ * element another check rendered.
  *
  * @param Component - The component to mount.
  * @param props - The props to mount it with.
  * @param read - The reading to take off the element under test.
  * @param options - The wrapper to mount it inside, and the finder for the element.
  * @returns The reading.
- * @throws Error Where the component throws, or the element under test is not there.
+ * @throws Error When the component throws, or the element under test is not present.
  */
 function mounted<Held>(
   Component: ElementType,
@@ -135,10 +131,10 @@ function mounted<Held>(
 }
 
 /**
- * Says what went wrong, whatever was thrown.
+ * Returns the message from whatever was thrown.
  *
  * @param error - The value that was thrown.
- * @returns Its message, or the value itself where it is not an error.
+ * @returns Its message, or the value itself when it is not an error.
  */
 function reason(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
@@ -147,14 +143,14 @@ function reason(error: unknown): string {
 /**
  * Checks that there is an element to check at all.
  *
- * The one check that cannot assume its own answer, and the reason every check after it can. A
- * component that throws is reported as throwing rather than as rendering nothing: the two are
- * different bugs, and a compound's part missing its provider throws.
+ * Every later check assumes there is an element to read, and this one establishes that. A
+ * component that throws is reported as throwing rather than as rendering nothing, because the two
+ * are different defects and a compound's part missing its provider throws.
  *
  * @param Component - The component to mount.
  * @param props - The props it requires before it renders.
  * @param options - The wrapper to mount it inside, and the finder for the element.
- * @returns The violation, or nothing where there is an element.
+ * @returns The violation, or nothing when there is an element.
  */
 function rendering(
   Component: ElementType,
@@ -183,14 +179,14 @@ function rendering(
 /**
  * Checks what a component does with the `className` it is passed.
  *
- * Two failures, and they are different bugs. A component that never reads the prop drops the
- * caller's class; one that reads it and assigns it drops its own. Both leave an element styled
- * wrongly, and only the second of them looks right at the call site.
+ * Two different defects. A component that never reads the prop drops the caller's class. One that
+ * reads it and assigns it drops its own. Both leave the element styled wrongly, and the second
+ * looks correct at the call site.
  *
  * @param Component - The component to check.
  * @param props - The props it requires before it renders.
  * @param options - The wrapper to mount it inside, and the finder for the element.
- * @returns Each violation, empty where it merges.
+ * @returns Each violation, empty when it merges.
  */
 function classNames(
   Component: ElementType,
@@ -216,14 +212,14 @@ function classNames(
 /**
  * Checks what a component passes on rather than keeps.
  *
- * The `ref` has to reach the element that was rendered, and an attribute the component has never
- * heard of has to reach it too. Both are how a consumer reaches past the component's own interface
- * to the DOM under it, which every wrapper in a design system is expected to allow.
+ * The `ref` has to reach the rendered element, and so does an attribute the component does not
+ * declare. Both are how a consumer reaches past the component's own interface to the DOM beneath
+ * it, which every wrapper in a design system allows.
  *
  * @param Component - The component to check.
  * @param props - The props it requires before it renders.
  * @param options - The wrapper to mount it inside, and the finder for the element.
- * @returns Each violation, empty where it passes both on.
+ * @returns Each violation, empty when it passes both on.
  */
 function forwarding(
   Component: ElementType,
@@ -261,15 +257,15 @@ function forwarding(
 const CHILD: ReactNode = createElement("a", { href: "#conformance" });
 
 /**
- * Checks the two parts of the contract that are not every component's to keep.
+ * Checks the two optional parts of the contract.
  *
- * A rule and a spacer take no children, and a component that renders its own element owes nothing
- * about `asChild`. Neither is checked unless the caller says the component offers it.
+ * A rule and a spacer take no children, and a component that renders its own element has no
+ * `asChild` behaviour. Neither is checked unless the caller declares that the component offers it.
  *
  * @param Component - The component to check.
  * @param props - The props it requires before it renders.
  * @param options - Which of the two to check, the wrapper, and the finder for the element.
- * @returns Each violation, empty where it keeps the ones it was asked about.
+ * @returns Each violation, empty when it keeps the ones it was asked about.
  */
 function optional(
   Component: ElementType,
@@ -307,17 +303,16 @@ function optional(
  * Finds every part of the contract a component breaks.
  *
  * Each check mounts the component on its own and reads one thing off the element under test. A
- * component that throws, or that renders no element to check, fails the first and is asked no
- * others, since every answer after it would be the same failure restated.
+ * component that throws, or that renders no element, fails the first check and runs no others,
+ * because every later result would restate that failure.
  *
  * A compound's part is checked by naming the provider it needs as `wrapper` and the slot as
- * `subject`: without the first it throws, and without the second the element under test would be
- * the wrapper's rather than the part's.
+ * `subject`. Without the first the part throws. Without the second the element under test would be
+ * the wrapper's.
  *
  * @param Component - The component to check.
- * @param options - The parts of the contract that are not every component's to keep, and how to
- *   reach a component that cannot be rendered on its own. `ConformanceOptions` documents every
- *   member.
+ * @param options - The optional parts of the contract, and how to reach a component that cannot
+ *   render on its own. `ConformanceOptions` documents every member.
  * @returns Each violation, in the order the checks run. Empty for a component that conforms.
  */
 export function violations(

@@ -1,15 +1,17 @@
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { imports } from "#fmt/imports.ts";
 
-test("names react and react-dom, which the toolchain cannot name on its own behalf", () => {
-  expect(imports().name).toBe("fmt.group(react)");
-});
+describe("imports", () => {
+  it("names the layer for the call a consumer wrote", () => {
+    expect(imports().name).toBe("react.fmt.imports");
+  });
 
-test("is an override, because the group and the order have to change together", () => {
-  expect(imports().kind).toBe("override");
-});
+  it("is an override layer", () => {
+    expect(imports().kind).toBe("override");
+  });
 
-test("says why, so a later reader can weigh it", () => {
-  expect(imports().because).toContain("renders");
+  it("gives a reason a later reader can weigh", () => {
+    expect(imports().because).toContain("renders");
+  });
 });

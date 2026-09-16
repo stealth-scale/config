@@ -1,10 +1,10 @@
-import { describe, expect, it } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import * as testing from "#index.ts";
 
-describe("the package barrel", () => {
-  it("exports the scratch workspace, the manifest builders and the measurements", () => {
-    expect(Object.keys(testing).toSorted()).toEqual([
+describe("testing", () => {
+  it("exports the workspace manifest and measurement helpers", () => {
+    expect(Object.keys(testing).toSorted()).toStrictEqual([
       "manifest",
       "packageFiles",
       "pixels",

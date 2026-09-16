@@ -44,6 +44,6 @@ export function cleanup(): Contribution {
     at: AT,
     because: "a mounted component outlives the test that mounted it",
     item: SETUP,
-    name: "react.cleanup",
+    name: "react.test.cleanup",
   });
 }

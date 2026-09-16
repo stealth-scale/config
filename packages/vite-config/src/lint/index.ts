@@ -14,6 +14,7 @@ export {
   type LintOverride,
   relax,
   type Ruled,
+  specified,
   undocumented,
-} from "#lint/override.ts";
+} from "#lint/departure.ts";
 export * as preset from "#lint/preset.ts";

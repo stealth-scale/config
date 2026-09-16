@@ -1,40 +1,64 @@
 # @stealthscale/vite-config-react
 
-What a package that renders adds on top of [`@stealthscale/vite-config`](../vite-config): the JSX
-transform, the React lint rules, the page directory, and React as a federation singleton.
+What a package that renders adds beside a tier from [`@stealthscale/vite-config`](../vite-config):
+the JSX transform, a document for rendering tests, the React lint rules, and React as a federation
+singleton.
 
 ```bash
 pnpm add -D @stealthscale/vite-config-react @stealthscale/vite-config
 ```
 
-## Tiers
+## In a package
 
-Two subpath exports, each the matching `@stealthscale/vite-config` tier plus what React needs.
+A package extends a tier from `@stealthscale/vite-config` and adds `layers()` beside it:
 
 ```ts
-import { defineConfig } from "@stealthscale/vite-config-react/preset/app";
+import { defineConfig } from "@stealthscale/vite-config/preset/web";
+import * as react from "@stealthscale/vite-config-react";
 
 export default defineConfig(import.meta.dirname, {
-  extends: [],
+  extends: [react.layers()],
 });
 ```
 
-| Tier           | For                                |
-| -------------- | ---------------------------------- |
-| `./preset/web` | A component library that publishes |
-| `./preset/app` | An application that is deployed    |
+`layers()` composes to three layers, each named for the call that produces it on its own:
+
+| Layer                  | What it does                                    |
+| ---------------------- | ----------------------------------------------- |
+| `react.plugin.refresh` | Compiles JSX and refreshes a component in place |
+| `react.test.cleanup`   | Empties the document after every test           |
+| `react.test.document`  | Gives the runner a document to draw into        |
+
+A removal takes any one of them back by that name.
+
+## At a workspace root
+
+A root adds `workspace()`, because the formatter and the linter read the root config only:
+
+```ts
+import { defineConfig } from "@stealthscale/vite-config/preset/workspace";
+import * as react from "@stealthscale/vite-config-react";
+
+export default defineConfig(import.meta.dirname, {
+  extends: [react.workspace()],
+});
+```
+
+`workspace()` composes to `react.fmt.imports`, `react.lint.plugins(react)`,
+`react.lint.plugins(jsx-a11y)`, `react.lint.rules`, `react.lint.runtime`, `react.lint.rendered` and
+`react.lint.fixtures`. A removal takes any one of them back by that name.
 
 ## Blocks
 
-| Namespace    | Exports                           | What it does                                            |
-| ------------ | --------------------------------- | ------------------------------------------------------- |
-| `plugin`     | `refresh`, `FACTORY`, `Refreshed` | The React plugin and fast refresh                       |
-| `lint`       | `plugins`, `rules`, `runtime`     | The React, hooks and a11y rule sets                     |
-| `fmt`        | `imports`                         | Where React imports sort                                |
-| `test`       | `cleanup`                         | Unmounts between tests                                  |
-| `federation` | `shared`, `installed`             | React and React DOM as singletons across federated apps |
-| `preset`     | `workspace`                       | What a workspace root adds for React                    |
-| `override`   | `page`                            | Moves the page directory                                |
+Each layer is also reachable on its own, under the block it belongs to.
+
+| Namespace    | Exports                                               | What it does                                            |
+| ------------ | ----------------------------------------------------- | ------------------------------------------------------- |
+| `plugin`     | `refresh`, `FACTORY`, `Refreshed`                     | The React plugin and fast refresh                       |
+| `lint`       | `plugins`, `fixtures`, `rendered`, `rules`, `runtime` | The React and a11y rule sets, and what they excuse      |
+| `fmt`        | `imports`                                             | Where React imports sort                                |
+| `test`       | `cleanup`, `document`                                 | A document to render into, emptied between tests        |
+| `federation` | `shared`, `installed`                                 | React and React DOM as singletons across federated apps |
 
 ## Federation
 
@@ -54,8 +78,16 @@ resolvable.
 
 ## Types for a page
 
+`web.json` is a fragment that adds the JSX option. A consumer lists the tier first and the fragment
+after it:
+
 ```json
-{ "extends": "@stealthscale/vite-config-react/web.json" }
+{
+  "extends": [
+    "@stealthscale/vite-config-typescript/web.json",
+    "@stealthscale/vite-config-react/web.json"
+  ]
+}
 ```
 
 ## Licence

@@ -7,7 +7,7 @@
  * to report the layer by and a reason to justify it.
  */
 
-import { type ConfigEnv, type UserConfig } from "vite-plus";
+import { type ConfigEnv, type UserConfig } from "vite";
 
 import { type Context } from "#context.ts";
 
@@ -296,6 +296,23 @@ export function owned(name: string, layers: readonly Extendable[]): readonly Lay
   return layers.flatMap((held) =>
     isLayer(held) ? [mint<Layer>({ ...held, name: `${name}/${held.name}` })] : owned(name, held),
   );
+}
+
+/**
+ * Gives a layer the name of the factory that returned it, where that factory built it from
+ * another.
+ *
+ * A layer is named by the call a consumer wrote, and a removal targets that name. A factory that
+ * delegates to another factory would otherwise hand back a layer named for a call the consumer
+ * never wrote.
+ *
+ * @typeParam Of - The kind of layer being renamed.
+ * @param name - The name the consumer wrote.
+ * @param layer - The layer another factory returned.
+ * @returns The same layer under that name.
+ */
+export function named<Of extends Layer>(name: string, layer: Of): Of {
+  return mint<Of>({ ...layer, name });
 }
 
 /**

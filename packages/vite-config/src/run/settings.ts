@@ -2,7 +2,7 @@
  * The task runner's own settings, as the block reaches them.
  */
 
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 
 /**
  * What a repository states about running its tasks.

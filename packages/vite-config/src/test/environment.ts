@@ -2,7 +2,7 @@
  * What a test runs inside.
  */
 
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 
 import { type Preset, preset } from "@stealthscale/vite-config-core";
 

@@ -2,7 +2,7 @@
  * The linter's own plugins the rules are named under.
  */
 
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 
 /**
  * The plugins a stealth package's rules are written against.
@@ -28,4 +28,5 @@ export const JS_PLUGINS = [
   { name: "jsdoc-js", specifier: "eslint-plugin-jsdoc" },
   { name: "perfectionist", specifier: "eslint-plugin-perfectionist" },
   { name: "tsdoc", specifier: "eslint-plugin-tsdoc" },
+  { name: "vitest-js", specifier: "@vitest/eslint-plugin" },
 ];

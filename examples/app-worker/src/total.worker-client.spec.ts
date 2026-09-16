@@ -1,4 +1,4 @@
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { type Amount } from "@stealthscale/example-lib-core";
 
@@ -28,25 +28,27 @@ function standing(answer?: Amount): { sent: Amount[][]; worker: Totaller } {
   };
 }
 
-test("answers with what the worker replied", async () => {
-  const held = standing({ cents: 425, currency: "EUR" });
+describe("total.worker-client", () => {
+  it("answers with what the worker replied", async () => {
+    const held = standing({ cents: 425, currency: "EUR" });
 
-  await expect(totalled(held.worker, [{ cents: 425, currency: "EUR" }])).resolves.toEqual({
-    cents: 425,
-    currency: "EUR",
+    await expect(totalled(held.worker, [{ cents: 425, currency: "EUR" }])).resolves.toStrictEqual({
+      cents: 425,
+      currency: "EUR",
+    });
   });
-});
 
-test("sends the worker exactly what it was given", async () => {
-  const held = standing();
+  it("sends the worker exactly what it was given", async () => {
+    const held = standing();
 
-  await totalled(held.worker, [{ cents: 1, currency: "EUR" }]);
+    await totalled(held.worker, [{ cents: 1, currency: "EUR" }]);
 
-  expect(held.sent).toEqual([[{ cents: 1, currency: "EUR" }]]);
-});
+    expect(held.sent).toStrictEqual([[{ cents: 1, currency: "EUR" }]]);
+  });
 
-test("answers nothing where the worker had nothing to total", async () => {
-  const held = standing();
+  it("answers nothing where the worker had nothing to total", async () => {
+    const held = standing();
 
-  await expect(totalled(held.worker, [])).resolves.toBeUndefined();
+    await expect(totalled(held.worker, [])).resolves.toBeUndefined();
+  });
 });

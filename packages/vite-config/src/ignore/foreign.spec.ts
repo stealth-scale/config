@@ -1,12 +1,19 @@
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { FOREIGN } from "#ignore/foreign.ts";
 
-test("names what was installed, built, reported, and the repository's own bookkeeping", () => {
-  expect(FOREIGN).toEqual(["**/node_modules/**", "**/.git/**", "**/dist/**", "**/coverage/**"]);
-});
+describe("foreign", () => {
+  it("names the installed built reported and bookkeeping directories", () => {
+    expect(FOREIGN).toStrictEqual([
+      "**/node_modules/**",
+      "**/.git/**",
+      "**/dist/**",
+      "**/coverage/**",
+    ]);
+  });
 
-test("keeps the two a runner walks past on its own, since naming the list replaces it", () => {
-  expect(FOREIGN).toContain("**/node_modules/**");
-  expect(FOREIGN).toContain("**/.git/**");
+  it("keeps the two directories a runner already walks past", () => {
+    expect(FOREIGN).toContain("**/node_modules/**");
+    expect(FOREIGN).toContain("**/.git/**");
+  });
 });

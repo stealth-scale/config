@@ -2,7 +2,7 @@
  * Resolving a workspace package to its source rather than to a `dist` it has not built yet.
  */
 
-import { defaultClientConditions, defaultServerConditions } from "vite-plus";
+import { defaultClientConditions, defaultServerConditions } from "vite";
 
 import { type Preset, preset } from "@stealthscale/vite-config-core";
 

@@ -2,7 +2,7 @@
  * Running a repository's own code around a pack.
  */
 
-import { type Override, override } from "@stealthscale/vite-config-core";
+import { named, type Override, override } from "@stealthscale/vite-config-core";
 
 import { type Moments } from "#pack/settings.ts";
 
@@ -64,7 +64,24 @@ export function hook(stated: Hooked): Override {
  *
  * @typeParam At - Which moment.
  */
-type Runs<At extends keyof Moments> = NonNullable<Moments[At]>;
+export type Runs<At extends keyof Moments> = NonNullable<Moments[At]>;
+
+/**
+ * Describes code a repository runs at one moment of the pack.
+ *
+ * @typeParam At - Which moment.
+ */
+export interface Scheduled<At extends keyof Moments> {
+  /**
+   * Why this repository needs it.
+   */
+  because: string;
+
+  /**
+   * The code to run at that moment.
+   */
+  runs: Runs<At>;
+}
 
 /**
  * Runs code before the packer starts, which is before it empties the output directory.
@@ -73,39 +90,45 @@ type Runs<At extends keyof Moments> = NonNullable<Moments[At]>;
  * writing into `dist`: the directory is emptied between this and `buildBefore`, so a file written
  * here is deleted before the bundle is made.
  *
- * @param because - Why this repository needs it.
- * @param runs - The code to run.
+ * @param stated - The code, and why. `Scheduled` documents every member.
  * @returns The override.
  */
-export function buildPrepare(because: string, runs: Runs<"build:prepare">): Override {
-  return hook({ because, hooks: { "build:prepare": runs } });
+export function buildPrepare(stated: Scheduled<"build:prepare">): Override {
+  return named(
+    "pack.buildPrepare",
+    hook({ because: stated.because, hooks: { "build:prepare": stated.runs } }),
+  );
 }
 
 /**
  * Runs code before each bundle, once the output directory has been emptied.
  *
- * The moment for an artefact the package ships and no bundler produces — a stylesheet solved from a
- * recipe, a file written from a schema. Writing it here is what puts it on disk in time for the
- * packer to find it.
+ * The moment for an artefact the package publishes and no bundler produces: a stylesheet solved
+ * from a recipe, a file written from a schema. Writing it here is what puts it on disk in time for
+ * the packer to find it.
  *
- * @param because - Why this repository needs it.
- * @param runs - The code to run.
+ * @param stated - The code, and why. `Scheduled` documents every member.
  * @returns The override.
  */
-export function buildBefore(because: string, runs: Runs<"build:before">): Override {
-  return hook({ because, hooks: { "build:before": runs } });
+export function buildBefore(stated: Scheduled<"build:before">): Override {
+  return named(
+    "pack.buildBefore",
+    hook({ because: stated.because, hooks: { "build:before": stated.runs } }),
+  );
 }
 
 /**
  * Runs code once the chunks exist.
  *
  * The moment for reading what was built rather than adding to it: an inventory of the output, a
- * check on what landed, a copy taken somewhere else.
+ * check on what was written, a copy taken somewhere else.
  *
- * @param because - Why this repository needs it.
- * @param runs - The code to run.
+ * @param stated - The code, and why. `Scheduled` documents every member.
  * @returns The override.
  */
-export function buildDone(because: string, runs: Runs<"build:done">): Override {
-  return hook({ because, hooks: { "build:done": runs } });
+export function buildDone(stated: Scheduled<"build:done">): Override {
+  return named(
+    "pack.buildDone",
+    hook({ because: stated.because, hooks: { "build:done": stated.runs } }),
+  );
 }

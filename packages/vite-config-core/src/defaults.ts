@@ -2,7 +2,7 @@
  * Binding a set of defaults to `defineConfig`, so a config states only what is true of itself.
  */
 
-import { type UserConfigExport } from "vite-plus";
+import { type UserConfigExport } from "vite";
 
 import { defineConfig as composed, type Config, type ConfigFn } from "#define.ts";
 import { type Extendable } from "#layer.ts";

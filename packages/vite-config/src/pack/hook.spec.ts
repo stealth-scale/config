@@ -1,5 +1,5 @@
 import { type UserConfig } from "vite-plus";
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { type Context } from "@stealthscale/vite-config-core";
 
@@ -44,77 +44,81 @@ function refined(config: UserConfig, hooks: Record<string, () => void>): Record<
   return (held.pack as { hooks: Record<string, unknown> }).hooks;
 }
 
-test("runs the code it was given at the moment it named", () => {
-  expect(refined({}, { "build:before": one })["build:before"]).toBe(one);
-});
+describe("hook", () => {
+  it("runs the code it was given at the moment it named", () => {
+    expect(refined({}, { "build:before": one })["build:before"]).toBe(one);
+  });
 
-test("keeps a hook another layer already asked for", () => {
-  const held = refined({ pack: { hooks: { "build:before": one } } }, { "build:done": two });
+  it("keeps a hook another layer already asked for", () => {
+    const held = refined({ pack: { hooks: { "build:before": one } } }, { "build:done": two });
 
-  expect(held["build:before"]).toBe(one);
-  expect(held["build:done"]).toBe(two);
-});
+    expect(held["build:before"]).toBe(one);
+    expect(held["build:done"]).toBe(two);
+  });
 
-test("wins over a hook stated for the same moment, the later layer being the nearer one", () => {
-  const held = refined({ pack: { hooks: { "build:before": one } } }, { "build:before": two });
+  it("wins over a hook stated for the same moment", () => {
+    const held = refined({ pack: { hooks: { "build:before": one } } }, { "build:before": two });
 
-  expect(held["build:before"]).toBe(two);
-});
+    expect(held["build:before"]).toBe(two);
+  });
 
-test("adds hooks to a config that named none", () => {
-  expect(refined({ pack: {} }, { "build:prepare": one })["build:prepare"]).toBe(one);
-});
+  it("adds hooks to a config that named none", () => {
+    expect(refined({ pack: {} }, { "build:prepare": one })["build:prepare"]).toBe(one);
+  });
 
-test("passes over hooks stated as a function, which nothing could merge with", () => {
-  const held = refined({ pack: { hooks: one } }, { "build:before": one });
+  it("ignores hooks declared as a function", () => {
+    const held = refined({ pack: { hooks: one } }, { "build:before": one });
 
-  expect(held["build:before"]).toBe(one);
-});
+    expect(held["build:before"]).toBe(one);
+  });
 
-test("leaves the rest of the pack settings alone", () => {
-  const held = hook({ because: "why", hooks: {} }).refine(ANY, { pack: { dts: true } });
+  it("leaves the rest of the pack settings alone", () => {
+    const held = hook({ because: "why", hooks: {} }).refine(ANY, { pack: { dts: true } });
 
-  expect((held.pack as { dts: boolean }).dts).toBe(true);
-});
+    expect((held.pack as { dts: boolean }).dts).toBe(true);
+  });
 
-test("leaves the rest of the config alone", () => {
-  const held = hook({ because: "why", hooks: {} }).refine(ANY, { test: { globals: true } });
+  it("leaves the rest of the config alone", () => {
+    const held = hook({ because: "why", hooks: {} }).refine(ANY, { test: { globals: true } });
 
-  expect(held.test?.globals).toBe(true);
-});
+    expect(held.test?.globals).toBe(true);
+  });
 
-test("passes over a packer configured as a list, every layer here describing one package", () => {
-  const held = hook({ because: "why", hooks: {} }).refine(ANY, { pack: [{ dts: true }] });
+  it("ignores a packer configured as a list", () => {
+    const held = hook({ because: "why", hooks: {} }).refine(ANY, { pack: [{ dts: true }] });
 
-  expect((held.pack as { dts?: boolean }).dts).toBeUndefined();
-});
+    expect((held.pack as { dts?: boolean }).dts).toBeUndefined();
+  });
 
-test("carries the reason, this being the least legible layer a config can hold", () => {
-  expect(hook({ because: "a theme writes its stylesheet", hooks: {} }).because).toBe(
-    "a theme writes its stylesheet",
-  );
-});
+  it("keeps the reason", () => {
+    expect(hook({ because: "a theme writes its stylesheet", hooks: {} }).because).toBe(
+      "a theme writes its stylesheet",
+    );
+  });
 
-test("names the moments it runs at, which is what reaches past the layers", () => {
-  const held = hook({ because: "why", hooks: { "build:before": one, "build:done": two } });
+  it("names the moments it runs at", () => {
+    const held = hook({ because: "why", hooks: { "build:before": one, "build:done": two } });
 
-  expect(held.name).toBe("pack.hook(build:before, build:done)");
-});
+    expect(held.name).toBe("pack.hook(build:before, build:done)");
+  });
 
-test("states one moment at a time, which is how a repository states them", () => {
-  expect(buildPrepare("why", one).name).toBe("pack.hook(build:prepare)");
-  expect(buildBefore("why", one).name).toBe("pack.hook(build:before)");
-  expect(buildDone("why", one).name).toBe("pack.hook(build:done)");
-});
+  it("names each moment for the call a repository wrote", () => {
+    expect(buildPrepare({ because: "why", runs: one }).name).toBe("pack.buildPrepare");
+    expect(buildBefore({ because: "why", runs: one }).name).toBe("pack.buildBefore");
+    expect(buildDone({ because: "why", runs: one }).name).toBe("pack.buildDone");
+  });
 
-test("runs the code at the moment its name says", () => {
-  const held = buildBefore("why", one).refine(ANY, {}) as {
-    pack: { hooks: Record<string, unknown> };
-  };
+  it("runs the code at the moment its name says", () => {
+    const held = buildBefore({ because: "why", runs: one }).refine(ANY, {}) as {
+      pack: { hooks: Record<string, unknown> };
+    };
 
-  expect(held.pack.hooks["build:before"]).toBe(one);
-});
+    expect(held.pack.hooks["build:before"]).toBe(one);
+  });
 
-test("carries the reason each was given, one moment at a time", () => {
-  expect(buildDone("a theme reads what it built", one).because).toBe("a theme reads what it built");
+  it("keeps the reason each was given", () => {
+    expect(buildDone({ because: "a theme reads what it built", runs: one }).because).toBe(
+      "a theme reads what it built",
+    );
+  });
 });

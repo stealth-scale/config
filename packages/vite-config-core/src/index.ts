@@ -23,6 +23,7 @@ export {
   type Contribution,
   type Extendable,
   type Layer,
+  named,
   override,
   type Override,
   owned,

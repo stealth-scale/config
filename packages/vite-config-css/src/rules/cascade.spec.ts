@@ -1,12 +1,14 @@
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { CASCADE } from "#rules/cascade.ts";
 
-test("refuses a declaration that wins over the cascade instead of taking part in it", () => {
-  expect(CASCADE["declaration-no-important"]).toBe(true);
-});
+describe("cascade", () => {
+  it("rejects a declaration marked important", () => {
+    expect(CASCADE["declaration-no-important"]).toBe(true);
+  });
 
-test("refuses a rule that never applies, whether written that way or arrived at", () => {
-  expect(CASCADE["no-descending-specificity"]).toBe(true);
-  expect(CASCADE["no-duplicate-selectors"]).toBe(true);
+  it("rejects a rule that never applies however it was written", () => {
+    expect(CASCADE["no-descending-specificity"]).toBe(true);
+    expect(CASCADE["no-duplicate-selectors"]).toBe(true);
+  });
 });

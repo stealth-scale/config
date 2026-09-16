@@ -1,18 +1,21 @@
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { reachable } from "#server/reachable.ts";
 import { answered } from "#vite.fixtures.ts";
 
-test("answers to the names it was given, under the dev server's own key", async () => {
-  const held = await answered(reachable(["app1.example.test"]));
+describe("reachable", () => {
+  it("accepts the names it was given under the dev server key", async () => {
+    const held = await answered(reachable(["app1.example.test"]));
 
-  expect(held.server?.allowedHosts).toEqual(["app1.example.test"]);
-});
+    expect(held.server?.allowedHosts).toStrictEqual(["app1.example.test"]);
+  });
 
-test("leaves the preview alone, which keeps its own list", async () => {
-  expect((await answered(reachable(["a.example.test"]))).preview).toBeUndefined();
-});
+  it("leaves the preview alone", async () => {
+    expect((await answered(reachable(["a.example.test"]))).preview).toBeUndefined();
+  });
 
-test("is named the same whatever a machine arranged, so a repository can take it back", () => {
-  expect(reachable(["a.example.test"]).name).toBe("server.reachable");
+  it("names the layer for the names it was written with", () => {
+    expect(reachable(["a.example.test"]).name).toBe("server.reachable(a.example.test)");
+    expect(reachable().name).toBe("server.reachable");
+  });
 });

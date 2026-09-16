@@ -1,8 +1,8 @@
 import { join } from "node:path";
 
 import { federation, preview, server } from "@stealthscale/vite-config";
-import { federation as react } from "@stealthscale/vite-config-react";
-import { defineConfig } from "@stealthscale/vite-config-react/preset/app";
+import * as react from "@stealthscale/vite-config-react";
+import { defineConfig } from "@stealthscale/vite-config/preset/app";
 
 /**
  * The names this application is served under while it is being worked on, beyond loopback. Stated
@@ -13,6 +13,8 @@ const NAMES = ["app2.stealthscale.dev"];
 
 export default defineConfig(import.meta.dirname, {
   extends: [
+    react.layers(),
+
     // The same remote app-host loads, from a second application with a router in front of it. What
     // a remote is loaded into is the remote's business not at all: it exposes modules, and whether
     // one arrives under a route or straight onto a page is the host's own decision.
@@ -22,11 +24,11 @@ export default defineConfig(import.meta.dirname, {
     federation.host({
       name: "tanstack",
       remotes: ["remote"],
-      shared: react.shared(),
+      shared: react.federation.shared(),
       stubs: { "remote/Dashboard": join(import.meta.dirname, "src/remote.fixtures.tsx") },
     }),
 
-    server.reached(4404, NAMES),
-    preview.reached(4405, NAMES),
+    server.address(4404, NAMES),
+    preview.address(4405, NAMES),
   ],
 });

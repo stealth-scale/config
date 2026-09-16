@@ -1,14 +1,16 @@
 /**
- * Writes the manifests a scratch workspace needs: a root with its workspace globs, and a package
- * with its fields, so a specification builds a tree in a few lines and reads as the tree it
- * describes.
+ * Builds the manifests a scratch workspace needs.
+ *
+ * A root manifest carries the workspace globs. A package manifest carries the fields the code under
+ * test reads.
  */
 
 import { type ScratchFiles } from "#scratch.ts";
 
 /**
- * Holds the fields of a scratch manifest. Beyond the name, a field is whatever the specification
- * needs the code under test to read.
+ * The fields of a scratch manifest.
+ *
+ * Only `name` is required. Every other field is whatever the code under test reads.
  */
 export interface ManifestFields {
   /**
@@ -55,7 +57,7 @@ export function packageFiles(
 }
 
 /**
- * Builds the root manifest of a workspace: private, named `root`, with the globs given.
+ * Builds the root manifest of a workspace, which is private and named `root`.
  *
  * @param workspaces - The workspace globs: `core/*`, `tools/*`.
  * @param fields - Other root fields, such as a catalog or devDependencies. Default: none.

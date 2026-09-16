@@ -77,9 +77,13 @@ to a temporary file outside its own package before it runs.
 
 ## Exports
 
-`contextOf`, `configuring`, `defineConfig`, `contribute`, `override`, `owned`, `preset`, `remove`,
-and the types `Apply`, `Config`, `ConfigFn`, `Context`, `Contribution`, `Defining`, `Extendable`,
-`Layer`, `Manifest`, `Override`, `Preset`, `Removal`, `Stated`.
+`contextOf`, `configuring`, `defineConfig`, `contribute`, `named`, `override`, `owned`, `preset`,
+`remove`, and the types `Apply`, `Config`, `ConfigFn`, `Context`, `Contribution`, `Defining`,
+`Extendable`, `Layer`, `Manifest`, `Override`, `Preset`, `Removal`, `Stated`.
+
+`named(name, layer)` gives a layer the name of the factory that returned it, where that factory
+built it from another. A layer is named by the call a consumer wrote, and a removal targets that
+name.
 
 ## Licence
 

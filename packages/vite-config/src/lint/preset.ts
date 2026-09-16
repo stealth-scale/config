@@ -2,12 +2,12 @@
  * How a stealth package is linted.
  */
 
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 
 import { type Layer, preset } from "@stealthscale/vite-config-core";
 
 import { GENERATED } from "#ignore/generated.ts";
-import { defaultExported, undocumented } from "#lint/override.ts";
+import { defaultExported, specified, undocumented } from "#lint/departure.ts";
 import * as rules from "#lint/rules/index.ts";
 
 /**
@@ -49,6 +49,19 @@ const UNDOCUMENTED = ["**/*.spec.ts", "**/*.fixtures.ts"];
 const RENDERED = ["**/*.spec.tsx", "**/*.fixtures.tsx"];
 
 /**
+ * What states behaviour as named cases.
+ *
+ * Narrower than {@link UNDOCUMENTED}, which also covers fixtures. A fixture builds the values a
+ * specification reads and declares no case of its own.
+ */
+const SPECIFIED = ["**/*.spec.ts"];
+
+/**
+ * The same, where the package renders.
+ */
+const SPECIFIED_RENDERED = ["**/*.spec.tsx"];
+
+/**
  * What is true of a package wherever it runs, beside the rules themselves.
  *
  * `typeAware` is the only decision made here rather than among the rules: it is about what the
@@ -81,6 +94,7 @@ export function base(): readonly Layer[] {
     }),
     defaultExported(DEFAULT_EXPORTED),
     undocumented(UNDOCUMENTED),
+    specified(SPECIFIED),
   ];
 }
 
@@ -97,6 +111,7 @@ export function node(): readonly Layer[] {
     }),
     defaultExported(DEFAULT_EXPORTED),
     undocumented(UNDOCUMENTED),
+    specified(SPECIFIED),
   ];
 }
 
@@ -113,5 +128,6 @@ export function web(): readonly Layer[] {
     }),
     defaultExported(DEFAULT_EXPORTED),
     undocumented([...UNDOCUMENTED, ...RENDERED]),
+    specified([...SPECIFIED, ...SPECIFIED_RENDERED]),
   ];
 }

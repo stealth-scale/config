@@ -2,7 +2,7 @@
  * What a file that renders answers to beyond what every file does.
  */
 
-import { type Contribution, lint } from "@stealthscale/vite-config";
+import { type Contribution, lint, named } from "@stealthscale/vite-config";
 
 /**
  * The files these reach, which is everything a package that renders compiles.
@@ -35,9 +35,12 @@ const RULES = {
  * @returns The contribution.
  */
 export function rules(): Contribution {
-  return lint.enforce({
-    because: "it renders, so a rule about rendering applies to it",
-    files: FILES,
-    rules: RULES,
-  });
+  return named(
+    "react.lint.rules",
+    lint.enforce({
+      because: "it renders, so a rule about rendering applies to it",
+      files: FILES,
+      rules: RULES,
+    }),
+  );
 }

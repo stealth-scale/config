@@ -1,7 +1,7 @@
 import { type ReactElement, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 
-import { expect, test, vi } from "vite-plus/test";
+import { describe, expect, test, vi } from "vitest";
 
 import { Dashboard } from "#dashboard.tsx";
 
@@ -26,12 +26,14 @@ function drawn(element: ReactElement): Promise<string> {
   });
 }
 
-test("draws what the other application answered, reached by the name the config gave it", async () => {
-  await expect(
-    drawn(
-      <Suspense fallback={"Loading."}>
-        <Dashboard count={7} />
-      </Suspense>,
-    ),
-  ).resolves.toContain("7 open");
+describe("dashboard", () => {
+  test("draws what the other application answered, reached by the name the config gave it", async () => {
+    await expect(
+      drawn(
+        <Suspense fallback={"Loading."}>
+          <Dashboard count={7} />
+        </Suspense>,
+      ),
+    ).resolves.toContain("7 open");
+  });
 });

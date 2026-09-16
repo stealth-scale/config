@@ -1,29 +1,44 @@
 # @stealthscale/vite-config-css
 
 Checks a stylesheet against four rule sets, during the build that compiles it. Depends on
-[`@stealthscale/vite-config-core`](../vite-config-core) alone — it mints layers and names no Vite
+[`@stealthscale/vite-config-core`](../vite-config-core) alone. It produces layers and names no Vite
 key of its own, so installing it pulls in the kernel and nothing else.
 
 ```bash
 pnpm add -D @stealthscale/vite-config-css @stealthscale/vite-config-core
 ```
 
+## In a package
+
+A package extends a tier from `@stealthscale/vite-config` and adds `layers()` beside it:
+
 ```ts
-import { plugin } from "@stealthscale/vite-config-css";
 import { defineConfig } from "@stealthscale/vite-config/preset/web";
+import * as css from "@stealthscale/vite-config-css";
 
 export default defineConfig(import.meta.dirname, {
-  extends: [plugin.check()],
+  extends: [css.layers()],
 });
 ```
 
+`layers()` composes to one layer, `css.check`, which runs Stylelint as part of the build and fails
+it on what it finds. `layers()` takes the same record `check` does: `also` and `except` for globs,
+and `rules` for what the repository answers to beyond the shared set.
+
+## At a workspace root
+
+`workspace()` composes to no layers. A stylesheet is checked while the package that imports it is
+built, and nothing about that is read from the root. The function exists so a root's config has one
+shape whichever add-ons it lists.
+
 ## Exports
 
-| Namespace  | Exports                                            | What it does                          |
-| ---------- | -------------------------------------------------- | ------------------------------------- |
-| `plugin`   | `check`, `Checked`                                 | Runs Stylelint as part of the build   |
-| `rules`    | `all`, `ANIMATION`, `CASCADE`, `ORDER`, `SELECTOR` | The four rule sets, together or apart |
-| `override` | `warn`                                             | Reports instead of failing            |
+| Export      | What it does                                                      |
+| ----------- | ----------------------------------------------------------------- |
+| `layers`    | The check, as a layer beside a tier                               |
+| `warn`      | Takes the check back by name and puts a reporting one in place    |
+| `workspace` | Nothing, for a root's config to have one shape                    |
+| `rules`     | `all`, `ANIMATION`, `CASCADE`, `ORDER`, `SELECTOR`, the rule sets |
 
 ## The rule sets
 
@@ -34,17 +49,18 @@ export default defineConfig(import.meta.dirname, {
 | `ORDER`     | The order declarations are written in                 |
 | `SELECTOR`  | What a selector may reach and how specific it may get |
 
-`rules.all()` is the four together, which is what `plugin.check()` uses.
+`rules.all()` is the four together, which is what the check uses.
 
 ## Failing versus reporting
 
-`plugin.check()` fails the build. `override.warn()` reports and carries on, which is what a
-repository adopting the rule sets on an existing stylesheet wants until the backlog is gone.
+`css.check` fails the build. `warn` reports and carries on, which is what a repository adopting the
+rule sets on an existing stylesheet wants until the backlog is gone. It takes a reason, because it
+is a departure from the house answer.
 
 ```ts
-import { override } from "@stealthscale/vite-config-css";
+import * as css from "@stealthscale/vite-config-css";
 
-override.warn(); // same rules, exit code unchanged
+css.warn({ because: "the theme package has 40 violations to work through" });
 ```
 
 ## Peers

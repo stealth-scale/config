@@ -25,6 +25,6 @@ import { origins as allowed } from "#serving/environment.ts";
 export function shared(origins: readonly string[] = []): Preset {
   return preset({
     config: (context) => ({ preview: { cors: { origin: [...allowed(context, origins)] } } }),
-    name: "preview.shared",
+    name: origins.length === 0 ? "preview.shared" : `preview.shared(${origins.join(", ")})`,
   });
 }

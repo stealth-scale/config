@@ -1,7 +1,8 @@
 /**
- * Builds a scratch workspace in the temporary directory for a specification that reads a tree: a
- * guard, a generator, a release step. The spec writes the files it needs, runs the code under test
- * against the directory, and removes it.
+ * Builds a scratch workspace in the temporary directory for a specification that reads a tree.
+ *
+ * The specification writes the files it needs, runs the code under test against the directory, and
+ * removes the directory afterwards.
  */
 
 import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -30,17 +31,18 @@ function walk(directory: string, prefix: string): string[] {
 }
 
 /**
- * Owns a temporary directory for a specification: writes into it, reads from it, lists it and
- * removes it. `scratchWorkspace` creates one.
+ * Owns a temporary directory for a specification, writing into it and reading back from it.
+ *
+ * `scratchWorkspace` creates one. A specification never constructs this directly.
  */
 export class ScratchWorkspace {
   /**
-   * Holds the absolute path of the directory.
+   * The absolute path of the directory.
    */
   readonly root: string;
 
   /**
-   * Wraps a directory that already exists. `scratchWorkspace` calls this; a specification does not.
+   * Wraps a directory that already exists. Only `scratchWorkspace` calls this.
    *
    * @param root - The absolute path of the directory.
    */

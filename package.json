@@ -5,18 +5,25 @@
   "description": "Every configuration a stealth repository is built, checked, tested and released under.",
   "type": "module",
   "scripts": {
-    "bootstrap": "cd packages/vite-plugin-base && vp pack && cd ../vite-plugin-sbom && vp pack && cd ../vite-config-core && vp pack && cd ../vite-config && vp pack && cd ../vite-config-react && vp pack && cd ../vite-config-css && vp pack",
+    "bootstrap": "pnpm -r --filter '{packages/*}' run build",
+    "prepare": "lefthook install",
     "ready": "pnpm run bootstrap && vp run ci"
   },
   "devDependencies": {
     "@changesets/changelog-github": "catalog:",
     "@changesets/cli": "catalog:",
+    "@commitlint/cli": "catalog:",
+    "@stealthscale/testing-config": "workspace:^",
+    "@stealthscale/vite-config": "workspace:^",
+    "@stealthscale/vite-config-css": "workspace:^",
     "@stealthscale/vite-config-react": "workspace:^",
     "@stealthscale/vite-config-typescript": "workspace:^",
     "@types/node": "catalog:",
+    "@vitest/eslint-plugin": "catalog:",
     "eslint-plugin-jsdoc": "catalog:",
     "eslint-plugin-perfectionist": "catalog:",
     "eslint-plugin-tsdoc": "catalog:",
+    "lefthook": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vite-plus": "catalog:"
@@ -34,7 +41,7 @@
     }
   },
   "engines": {
-    "node": ">=24.0.0"
+    "node": ">=26.0.0"
   },
   "packageManager": "pnpm"
 }

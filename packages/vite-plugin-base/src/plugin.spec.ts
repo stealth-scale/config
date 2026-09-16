@@ -1,4 +1,4 @@
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { type Bundling, plugin } from "#plugin.ts";
 
@@ -33,33 +33,35 @@ function running(held: ReturnType<typeof plugin>, root?: string): void {
   hooks.generateBundle?.call(building());
 }
 
-test("is named what the bundler will report it as", () => {
-  expect(plugin({ name: "stealth:probe", writes: () => {} }).name).toBe("stealth:probe");
-});
+describe("plugin", () => {
+  it("names the plugin as the bundler reports it", () => {
+    expect(plugin({ name: "stealth:probe", writes: () => {} }).name).toBe("stealth:probe");
+  });
 
-test("hands the build over as an argument, so nothing downstream writes `this`", () => {
-  let held: unknown;
+  it("passes the build as an argument", () => {
+    let held: unknown;
 
-  running(plugin({ name: "probe", writes: (bundling) => void (held = bundling) }));
+    running(plugin({ name: "probe", writes: (bundling) => void (held = bundling) }));
 
-  expect(held).toBeDefined();
-});
+    expect(held).toBeDefined();
+  });
 
-test("tells a plugin the directory the bundler settled on", () => {
-  let held = "";
+  it("gives a plugin the directory the bundler resolved", () => {
+    let held = "";
 
-  running(
-    plugin({ name: "probe", writes: (_bundling, at) => void (held = at) }),
-    "/repository/packages/one",
-  );
+    running(
+      plugin({ name: "probe", writes: (_bundling, at) => void (held = at) }),
+      "/repository/packages/one",
+    );
 
-  expect(held).toBe("/repository/packages/one");
-});
+    expect(held).toBe("/repository/packages/one");
+  });
 
-test("falls back to where the command runs, for a bundler that resolves no config", () => {
-  let held = "";
+  it("falls back to the working directory when the bundler resolves no config", () => {
+    let held = "";
 
-  running(plugin({ name: "probe", writes: (_bundling, at) => void (held = at) }));
+    running(plugin({ name: "probe", writes: (_bundling, at) => void (held = at) }));
 
-  expect(held).toBe(process.cwd());
+    expect(held).toBe(process.cwd());
+  });
 });

@@ -1,30 +1,32 @@
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { ENTRY, type Exposed, type Remotes, type Shared, UNSET } from "#federation/settings.ts";
 
-test("names the entry without a hash, a host having to know it before it loads anything", () => {
-  expect(ENTRY).toBe("remoteEntry.js");
-  expect(ENTRY).not.toMatch(/-[A-Za-z0-9_]{8}\./u);
-});
+describe("settings", () => {
+  it("names the entry without a hash", () => {
+    expect(ENTRY).toBe("remoteEntry.js");
+    expect(ENTRY).not.toMatch(/-[A-Za-z0-9_]{8}\./u);
+  });
 
-test("maps each imported name to the module behind it", () => {
-  const held: Exposed = { "./Dashboard": "./src/dashboard.tsx" };
+  it("maps each imported name to the module behind it", () => {
+    const held: Exposed = { "./Dashboard": "./src/dashboard.tsx" };
 
-  expect(held["./Dashboard"]).toBe("./src/dashboard.tsx");
-});
+    expect(held["./Dashboard"]).toBe("./src/dashboard.tsx");
+  });
 
-test("names each remote and says nothing about where it is", () => {
-  const held: Remotes = ["remote"];
+  it("names each remote without stating where it is", () => {
+    const held: Remotes = ["remote"];
 
-  expect(held).toEqual(["remote"]);
-});
+    expect(held).toStrictEqual(["remote"]);
+  });
 
-test("stands an unregistered remote at a name that never resolves", () => {
-  expect(UNSET).toContain(".invalid");
-});
+  it("stands an unregistered remote at a name that never resolves", () => {
+    expect(UNSET).toContain(".invalid");
+  });
 
-test("says of a shared dependency whether there is one instance and which versions do", () => {
-  const held: Shared = { react: { requiredVersion: "^19.0.0", singleton: true } };
+  it("declares whether a shared dependency is a singleton and which versions qualify", () => {
+    const held: Shared = { react: { requiredVersion: "^19.0.0", singleton: true } };
 
-  expect(held["react"]?.singleton).toBe(true);
+    expect(held["react"]?.singleton).toBe(true);
+  });
 });

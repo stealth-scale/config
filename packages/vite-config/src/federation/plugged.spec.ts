@@ -1,4 +1,4 @@
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { type Loaded, plugged } from "#federation/plugged.ts";
 
@@ -34,26 +34,28 @@ function refusing(): Promise<Loaded> {
   } as unknown as Loaded);
 }
 
-test("hands the options to the plugin and answers what it built", async () => {
-  const held = (await plugged(STATED, loading)) as unknown as {
-    name: string;
-    options: typeof STATED;
-  };
+describe("plugged", () => {
+  it("passes the options to the plugin and returns what it built", async () => {
+    const held = (await plugged(STATED, loading)) as unknown as {
+      name: string;
+      options: typeof STATED;
+    };
 
-  expect(held.name).toBe("federation");
-  expect(held.options).toStrictEqual(STATED);
-});
+    expect(held.name).toBe("federation");
+    expect(held.options).toStrictEqual(STATED);
+  });
 
-test("says what to install when reaching the package fails", async () => {
-  await expect(plugged(STATED, () => Promise.reject(new Error("not installed")))).rejects.toThrow(
-    /@module-federation\/vite installed/u,
-  );
-});
+  it("throws naming what to install when the package cannot be resolved", async () => {
+    await expect(plugged(STATED, () => Promise.reject(new Error("not installed")))).rejects.toThrow(
+      /@module-federation\/vite installed/u,
+    );
+  });
 
-test("reaches for the real package when nothing hands it one, and finds it here", async () => {
-  await expect(plugged(STATED)).resolves.toBeDefined();
-});
+  it("resolves the real package when it is given no loader", async () => {
+    await expect(plugged(STATED)).resolves.toBeDefined();
+  });
 
-test("lets the plugin's own complaint through rather than blaming the install", async () => {
-  await expect(plugged(STATED, refusing)).rejects.toThrow("remotes must be an object");
+  it("rethrows the plugin's own error rather than reporting a missing install", async () => {
+    await expect(plugged(STATED, refusing)).rejects.toThrow("remotes must be an object");
+  });
 });

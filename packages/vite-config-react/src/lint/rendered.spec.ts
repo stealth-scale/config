@@ -1,4 +1,4 @@
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { rendered } from "#lint/rendered.ts";
 
@@ -11,19 +11,21 @@ function override(): { files: string[]; rules: Record<string, unknown> } {
   return rendered().item as { files: string[]; rules: Record<string, unknown> };
 }
 
-test("appends to the linter's overrides rather than replacing them", () => {
-  expect(rendered().at).toBe("lint.overrides");
-});
+describe("rendered", () => {
+  it("appends to the linter's overrides rather than replacing them", () => {
+    expect(rendered().at).toBe("lint.overrides");
+  });
 
-test("excuses the two spellings a specification writes markup in, and nothing else", () => {
-  expect(override().files).toEqual(["**/*.spec.tsx", "**/*.fixtures.tsx"]);
-});
+  it("excuses the two spellings a specification writes markup in and nothing else", () => {
+    expect(override().files).toStrictEqual(["**/*.spec.tsx", "**/*.fixtures.tsx"]);
+  });
 
-test("turns the docblock rules off, which is what the plain spelling is already excused", () => {
-  expect(override().rules["jsdoc-js/require-jsdoc"]).toBe("off");
-  expect(override().rules["jsdoc-js/match-description"]).toBe("off");
-});
+  it("turns the docblock rules off", () => {
+    expect(override().rules["jsdoc-js/require-jsdoc"]).toBe("off");
+    expect(override().rules["jsdoc-js/match-description"]).toBe("off");
+  });
 
-test("names itself, so a repository holding its scenes to the standard can take it back", () => {
-  expect(rendered().name).toContain("lint.relax");
+  it("names the layer for the call a consumer wrote", () => {
+    expect(rendered().name).toBe("react.lint.rendered");
+  });
 });

@@ -1,4 +1,4 @@
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { SORT } from "#lint/rules/sort.ts";
 
@@ -15,30 +15,32 @@ const REFUSED = [
   "sort-variable-declarations",
 ];
 
-test("settles each sorter one way, so none is argued per file", () => {
-  for (const [rule, severity] of Object.entries(SORT)) {
-    expect(Array.isArray(severity), `${rule} carries no options`).toBe(true);
-    expect((severity as unknown[])[0]).toBe("error");
-  }
-});
+describe("sort", () => {
+  it("configures each sorter one way", () => {
+    for (const [rule, severity] of Object.entries(SORT)) {
+      expect(Array.isArray(severity), `${rule} carries no options`).toBe(true);
+      expect((severity as unknown[])[0]).toBe("error");
+    }
+  });
 
-test("sorts nothing whose order is its data", () => {
-  for (const rule of REFUSED) {
-    expect(Object.keys(SORT)).not.toContain(`perfectionist/${rule}`);
-  }
-});
+  it("sorts nothing whose order is its data", () => {
+    for (const rule of REFUSED) {
+      expect(Object.keys(SORT)).not.toContain(`perfectionist/${rule}`);
+    }
+  });
 
-test("leaves import order to the formatter, which already sorts it on every save", () => {
-  expect(Object.keys(SORT)).not.toContain("perfectionist/sort-imports");
-});
+  it("leaves import order to the formatter", () => {
+    expect(Object.keys(SORT)).not.toContain("perfectionist/sort-imports");
+  });
 
-test("keeps a deliberate grouping, except among members a docblock already separates", () => {
-  const grouped = SORT["perfectionist/sort-objects"] as [string, { partitionByNewLine: boolean }];
-  const throughout = SORT["perfectionist/sort-interfaces"] as [
-    string,
-    { partitionByNewLine: boolean },
-  ];
+  it("keeps a deliberate grouping except among members a docblock already separates", () => {
+    const grouped = SORT["perfectionist/sort-objects"] as [string, { partitionByNewLine: boolean }];
+    const throughout = SORT["perfectionist/sort-interfaces"] as [
+      string,
+      { partitionByNewLine: boolean },
+    ];
 
-  expect(grouped[1].partitionByNewLine).toBe(true);
-  expect(throughout[1].partitionByNewLine).toBe(false);
+    expect(grouped[1].partitionByNewLine).toBe(true);
+    expect(throughout[1].partitionByNewLine).toBe(false);
+  });
 });

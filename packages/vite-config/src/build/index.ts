@@ -9,11 +9,11 @@
  * package's maps are the packer's to decide.
  */
 
+export { base } from "#build/base.ts";
 export { chunks } from "#build/chunks.ts";
 export { inventory } from "#build/inventory.ts";
 export { licences } from "#build/licences.ts";
 export { manifest } from "#build/manifest.ts";
 export { preload } from "#build/preload.ts";
 export * as preset from "#build/preset.ts";
-export { served } from "#build/served.ts";
 export { sourcemaps } from "#build/sourcemaps.ts";

@@ -1,5 +1,5 @@
 import { type UserConfig } from "vite-plus";
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { checked } from "#staged/checked.ts";
 
@@ -12,21 +12,23 @@ function staged(): Record<string, unknown> {
   return (checked().config as UserConfig).staged as Record<string, unknown>;
 }
 
-test("runs the same command a repository runs by hand, over the files that changed", () => {
-  expect(Object.values(staged())).toEqual(["vp check --fix"]);
-});
+describe("checked", () => {
+  it("runs the same command a repository runs by hand over the changed files", () => {
+    expect(Object.values(staged())).toStrictEqual(["vp check --fix"]);
+  });
 
-test("fixes what it can, so the diff under review is the one the tools agree on", () => {
-  expect(Object.values(staged()).join()).toContain("--fix");
-});
+  it("fixes what it can", () => {
+    expect(Object.values(staged()).join()).toContain("--fix");
+  });
 
-test("matches source and nothing else, the rest having no lint or types to check", () => {
-  const [glob] = Object.keys(staged());
+  it("matches source and nothing else", () => {
+    const [glob] = Object.keys(staged());
 
-  expect(glob).toContain("ts,tsx");
-  expect(glob).not.toContain("md");
-});
+    expect(glob).toContain("ts,tsx");
+    expect(glob).not.toContain("md");
+  });
 
-test("names itself, so a repository checking differently can take the layer back", () => {
-  expect(checked().name).toBe("staged.checked");
+  it("names the layer so a repository can remove it", () => {
+    expect(checked().name).toBe("staged.checked");
+  });
 });

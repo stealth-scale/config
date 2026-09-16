@@ -24,6 +24,7 @@ export {
   type Extendable,
   type Layer,
   type Manifest,
+  named,
   override,
   type Override,
   owned,

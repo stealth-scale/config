@@ -20,6 +20,7 @@ export { type PluginRules, type Rules } from "#lint/rules/rules.ts";
 export { SAFETY } from "#lint/rules/safety.ts";
 export { SIZE } from "#lint/rules/size.ts";
 export { SORT } from "#lint/rules/sort.ts";
+export { SPEC } from "#lint/rules/spec.ts";
 export { STYLE } from "#lint/rules/style.ts";
 
 /**

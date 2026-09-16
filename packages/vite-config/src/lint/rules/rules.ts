@@ -2,7 +2,7 @@
  * What a rule group is.
  */
 
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 
 /**
  * A rule name against what the linter should do about it.

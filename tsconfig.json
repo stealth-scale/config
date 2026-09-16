@@ -2,5 +2,5 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "_comment": "The root's own files. Each package has its own tsconfig extending the same environment config directly; there is no repository-wide base, because the condition that used to live in one is now shared by every stealth repository and ships with the settings.",
   "extends": "@stealthscale/vite-config-typescript/node.json",
-  "include": ["vite.config.ts"]
+  "include": ["commitlint.config.ts", "vite.config.ts"]
 }

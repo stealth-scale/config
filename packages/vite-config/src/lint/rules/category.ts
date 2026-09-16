@@ -2,7 +2,7 @@
  * Which whole categories of finding fail rather than warn.
  */
 
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 
 /**
  * The categories a stealth package fails on.

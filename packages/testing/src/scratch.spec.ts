@@ -1,6 +1,6 @@
 import { existsSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { describe, expect, it } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { scratchWorkspace, withScratchWorkspace, withScratchWorkspaceAsync } from "#scratch.ts";
 
@@ -10,32 +10,35 @@ describe("scratchWorkspace", () => {
 
     expect(workspace.root.startsWith(tmpdir())).toBe(true);
     expect(existsSync(workspace.root)).toBe(true);
-    expect(workspace.files()).toEqual([]);
+    expect(workspace.files()).toStrictEqual([]);
+
     workspace.remove();
   });
 
-  it("writes the files it is given, creating their directories", () => {
+  it("writes the files it is given and creates their directories", () => {
     const workspace = scratchWorkspace({
       "packages/leaf/src/index.ts": "export {}\n",
       "README.md": "# root\n",
     });
 
     expect(workspace.read("packages/leaf/src/index.ts")).toBe("export {}\n");
-    expect(workspace.files()).toEqual(["README.md", "packages/leaf/src/index.ts"]);
+    expect(workspace.files()).toStrictEqual(["README.md", "packages/leaf/src/index.ts"]);
+
     workspace.remove();
   });
 
-  it("overwrites a file on a second write and lists every file sorted", () => {
+  it("overwrites a file on a second write", () => {
     const workspace = scratchWorkspace({ "a/c.txt": "two", "b.txt": "one" });
 
     workspace.write({ "a/a.txt": "four", "b.txt": "three" });
 
     expect(workspace.read("b.txt")).toBe("three");
-    expect(workspace.files()).toEqual(["a/a.txt", "a/c.txt", "b.txt"]);
+    expect(workspace.files()).toStrictEqual(["a/a.txt", "a/c.txt", "b.txt"]);
+
     workspace.remove();
   });
 
-  it("resolves a relative path inside the root, and refuses one that leaves it", () => {
+  it("resolves a relative path inside the root and throws for one that leaves it", () => {
     const workspace = scratchWorkspace();
 
     expect(workspace.path("a/b.txt")).toBe(`${workspace.root}/a/b.txt`);
@@ -44,20 +47,23 @@ describe("scratchWorkspace", () => {
     expect(() => {
       workspace.write({ "../outside.txt": "" });
     }).toThrow("leaves the scratch workspace");
+
     workspace.remove();
   });
 
   it("throws when a file to read is missing", () => {
     const workspace = scratchWorkspace();
 
-    expect(() => workspace.read("missing.txt")).toThrow();
+    expect(() => workspace.read("missing.txt")).toThrow("ENOENT");
+
     workspace.remove();
   });
 
-  it("removes the directory, and does nothing on a second call", () => {
+  it("removes the directory and does nothing on a second call", () => {
     const workspace = scratchWorkspace({ "a.txt": "" });
 
     workspace.remove();
+
     expect(existsSync(workspace.root)).toBe(false);
     expect(() => {
       workspace.remove();
@@ -66,7 +72,7 @@ describe("scratchWorkspace", () => {
 });
 
 describe("withScratchWorkspace", () => {
-  it("runs the function against the workspace, returns its result and removes the directory", () => {
+  it("runs the function against the workspace and returns its result", () => {
     let root = "";
 
     const files = withScratchWorkspace({ "a.txt": "" }, (workspace) => {
@@ -74,7 +80,7 @@ describe("withScratchWorkspace", () => {
       return workspace.files();
     });
 
-    expect(files).toEqual(["a.txt"]);
+    expect(files).toStrictEqual(["a.txt"]);
     expect(existsSync(root)).toBe(false);
   });
 
@@ -92,7 +98,7 @@ describe("withScratchWorkspace", () => {
 });
 
 describe("withScratchWorkspaceAsync", () => {
-  it("awaits the function, resolves to its result and removes the directory", async () => {
+  it("awaits the function and resolves to its result", async () => {
     let root = "";
 
     const files = await withScratchWorkspaceAsync({ "a.txt": "" }, async (workspace) => {
@@ -101,7 +107,7 @@ describe("withScratchWorkspaceAsync", () => {
       return workspace.files();
     });
 
-    expect(files).toEqual(["a.txt"]);
+    expect(files).toStrictEqual(["a.txt"]);
     expect(existsSync(root)).toBe(false);
   });
 

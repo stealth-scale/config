@@ -4,7 +4,7 @@
 
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { type ConfigEnv, loadEnv } from "vite-plus";
+import { type ConfigEnv, loadEnv } from "vite";
 
 import { workspaces } from "#workspace.ts";
 

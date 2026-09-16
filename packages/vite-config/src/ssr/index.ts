@@ -10,5 +10,5 @@
  * repository that states it has to keep it in step with its own dependencies.
  */
 
-export { bundled, type Bundled } from "#ssr/bundled.ts";
+export { bundle, type Bundled } from "#ssr/bundle.ts";
 export { runtime } from "#ssr/runtime.ts";

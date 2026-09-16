@@ -66,6 +66,21 @@ export function manifest(injected: Injected = {}): Preset {
 
       return { define: held };
     },
-    name: "define.manifest",
+    name: `define.manifest${asked(injected)}`,
   });
+}
+
+/**
+ * Spells the constants asked for beyond the two always given, so the name carries the call.
+ *
+ * @param injected - The constants asked for.
+ * @returns The parenthesised list, or nothing where nothing beyond the two was asked for.
+ */
+function asked(injected: Injected): string {
+  const held = [
+    injected.commit === true ? "commit" : "",
+    injected.builtAt === true ? "builtAt" : "",
+  ].filter((one) => one !== "");
+
+  return held.length === 0 ? "" : `(${held.join(", ")})`;
 }

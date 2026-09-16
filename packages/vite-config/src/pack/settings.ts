@@ -2,7 +2,7 @@
  * The packer's own settings, as the block reaches them.
  */
 
-import { type PackUserConfig } from "vite-plus/pack";
+import { type UserConfig } from "vite";
 
 /**
  * One packer configuration.
@@ -10,8 +10,11 @@ import { type PackUserConfig } from "vite-plus/pack";
  * A config may hold a list of them, for a build producing several packages at once. Every layer
  * here describes one, because the block is composed into a package's own config and that is the
  * only place which knows what the package publishes.
+ *
+ * Read off the config's own field rather than imported from the toolchain, so nothing here names
+ * the toolchain.
  */
-export type Packing = PackUserConfig;
+export type Packing = Exclude<NonNullable<UserConfig["pack"]>, readonly unknown[]>;
 
 /**
  * What the packer runs around a build, against the moment it runs.

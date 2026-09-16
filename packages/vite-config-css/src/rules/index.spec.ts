@@ -1,4 +1,4 @@
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { all, ANIMATION, CASCADE, ORDER, SELECTOR } from "#rules/index.ts";
 
@@ -24,29 +24,31 @@ async function standard(): Promise<Record<string, unknown>> {
   return held.default.rules;
 }
 
-test("gathers every domain beside it, so adding one is not also a thing to remember", () => {
-  expect(Object.keys(all()).toSorted()).toEqual(
-    [
-      ...Object.keys(SELECTOR),
-      ...Object.keys(CASCADE),
-      ...Object.keys(ORDER),
-      ...Object.keys(ANIMATION),
-    ].toSorted(),
-  );
-});
+describe("vite-config-css", () => {
+  it("gathers every rule domain beside it", () => {
+    expect(Object.keys(all()).toSorted()).toStrictEqual(
+      [
+        ...Object.keys(SELECTOR),
+        ...Object.keys(CASCADE),
+        ...Object.keys(ORDER),
+        ...Object.keys(ANIMATION),
+      ].toSorted(),
+    );
+  });
 
-test("states nothing the shared set already states", async () => {
-  const held = await standard();
+  it("declares nothing the shared set already declares", async () => {
+    const held = await standard();
 
-  for (const name of Object.keys(all())) {
-    expect(Object.keys(held), `${name} is already in the shared set`).not.toContain(name);
-  }
-});
+    for (const name of Object.keys(all())) {
+      expect(Object.keys(held), `${name} is already in the shared set`).not.toContain(name);
+    }
+  });
 
-test("leans on the shared set for the rest of the guide rather than restating it", async () => {
-  const held = await standard();
+  it("defers to the shared set for the rest of the guide", async () => {
+    const held = await standard();
 
-  for (const name of SHARED) {
-    expect(Object.keys(held), `${name} is no longer in the shared set`).toContain(name);
-  }
+    for (const name of SHARED) {
+      expect(Object.keys(held), `${name} is no longer in the shared set`).toContain(name);
+    }
+  });
 });

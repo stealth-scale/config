@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { type UserConfig } from "vite-plus";
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { projects } from "#test/projects.ts";
 import { answered, told } from "#vite.fixtures.ts";
@@ -69,54 +69,60 @@ function resolving(stated: Parameters<typeof told>[0]): () => unknown {
   return () => (typeof held === "function" ? held(told(stated)) : held);
 }
 
-test("takes the packages from the manifest rather than from a second list", () => {
-  const held = block(["apps/*", "libs/*"], ["apps/one", "libs/two"]);
+describe("projects", () => {
+  it("takes the packages from the manifest rather than from a second list", () => {
+    const held = block(["apps/*", "libs/*"], ["apps/one", "libs/two"]);
 
-  expect(held.projects).toEqual(["apps/one", "libs/two"]);
-});
-
-test("names the package's directory, so one with no config of its own is still a project", () => {
-  expect(block(["apps/*"], ["apps/bare"]).projects).toEqual(["apps/bare"]);
-});
-
-test("passes over a skeleton directory, which holds no manifest and so is no package yet", () => {
-  const held = block(["apps/*"], ["apps/real", "apps/planned/"]);
-
-  expect(held.projects).toEqual(["apps/real"]);
-});
-
-test("answers them in one order however the file system lists them", () => {
-  const held = block(["apps/*"], ["apps/zeta", "apps/alpha"]);
-
-  expect(held.projects).toEqual(["apps/alpha", "apps/zeta"]);
-});
-
-test("stops the root looking for its own tests, which all belong to a package", () => {
-  expect(block(["apps/*"], ["apps/one"]).include).toEqual([]);
-});
-
-test("refuses a root declaring no workspace, which is not a root at all", () => {
-  const held = resolving({
-    at: "/repository",
-    manifest: { name: "@acme/thing" },
-    root: "/repository",
+    expect(held.projects).toStrictEqual(["apps/one", "libs/two"]);
   });
 
-  expect(held).toThrow(/found no workspaces/u);
-});
+  it("names the package's directory", () => {
+    expect(block(["apps/*"], ["apps/bare"]).projects).toStrictEqual(["apps/bare"]);
+  });
 
-test("states nothing for a package taking the root's config, which is not the root", () => {
-  const held = resolving({ at: "/repository/packages/one", root: "/repository" });
+  it("ignores a skeleton directory", () => {
+    const held = block(["apps/*"], ["apps/real", "apps/planned/"]);
 
-  expect(held()).toEqual({});
-});
+    expect(held.projects).toStrictEqual(["apps/real"]);
+  });
 
-test("refuses a root calling its workspace empty", () => {
-  const held = resolving({ at: "/repository", manifest: { workspaces: [] }, root: "/repository" });
+  it("returns them in one order however the file system lists them", () => {
+    const held = block(["apps/*"], ["apps/zeta", "apps/alpha"]);
 
-  expect(held).toThrow(/found no workspaces/u);
-});
+    expect(held.projects).toStrictEqual(["apps/alpha", "apps/zeta"]);
+  });
 
-test("refuses a workspace naming somewhere nothing lives, rather than testing nothing", () => {
-  expect(() => block(["apps/*"])).toThrow(/found no packages/u);
+  it("stops the root looking for its own tests", () => {
+    expect(block(["apps/*"], ["apps/one"]).include).toStrictEqual([]);
+  });
+
+  it("throws for a root declaring no workspace", () => {
+    const held = resolving({
+      at: "/repository",
+      manifest: { name: "@acme/thing" },
+      root: "/repository",
+    });
+
+    expect(held).toThrow(/found no workspaces/u);
+  });
+
+  it("contributes nothing for a package using the root config", () => {
+    const held = resolving({ at: "/repository/packages/one", root: "/repository" });
+
+    expect(held()).toStrictEqual({});
+  });
+
+  it("throws for a root declaring an empty workspace", () => {
+    const held = resolving({
+      at: "/repository",
+      manifest: { workspaces: [] },
+      root: "/repository",
+    });
+
+    expect(held).toThrow(/found no workspaces/u);
+  });
+
+  it("throws for a workspace naming a directory that does not exist", () => {
+    expect(() => block(["apps/*"])).toThrow(/found no packages/u);
+  });
 });

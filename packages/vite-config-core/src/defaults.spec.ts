@@ -1,4 +1,4 @@
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { readBack } from "#core.fixtures.ts";
 import { configuring } from "#defaults.ts";
@@ -16,44 +16,48 @@ const defineConfig = configuring(() => [
   preset({ config: { mode: "from-default", publicDir: "held" }, name: "a-default" }),
 ]);
 
-test("carries its defaults where the caller extends nothing", async () => {
-  expect((await readBack(defineConfig(AT, {}))).publicDir).toBe("held");
-});
+describe("defaults", () => {
+  it("applies its defaults when the caller extends nothing", async () => {
+    expect((await readBack(defineConfig(AT, {}))).publicDir).toBe("held");
+  });
 
-test("carries them where the caller passes nothing at all", async () => {
-  expect((await readBack(defineConfig(AT))).publicDir).toBe("held");
-});
+  it("applies its defaults when the caller passes nothing", async () => {
+    expect((await readBack(defineConfig(AT))).publicDir).toBe("held");
+  });
 
-test("puts them beneath what the caller extends, so the caller's layers win", async () => {
-  const held = await readBack(
-    defineConfig(AT, { extends: [preset({ config: { mode: "from-caller" }, name: "theirs" })] }),
-  );
+  it("puts them beneath what the caller extends", async () => {
+    const held = await readBack(
+      defineConfig(AT, { extends: [preset({ config: { mode: "from-caller" }, name: "theirs" })] }),
+    );
 
-  expect(held.mode).toBe("from-caller");
-});
+    expect(held.mode).toBe("from-caller");
+  });
 
-test("keeps what the caller extends as well as the defaults", async () => {
-  const held = await readBack(
-    defineConfig(AT, { extends: [preset({ config: { base: "/theirs/" }, name: "theirs" })] }),
-  );
+  it("keeps what the caller extends as well as the defaults", async () => {
+    const held = await readBack(
+      defineConfig(AT, { extends: [preset({ config: { base: "/theirs/" }, name: "theirs" })] }),
+    );
 
-  expect(held).toMatchObject({ base: "/theirs/", publicDir: "held" });
-});
+    expect(held).toMatchObject({ base: "/theirs/", publicDir: "held" });
+  });
 
-test("lets the caller's own keys win over a default", async () => {
-  expect((await readBack(defineConfig(AT, { mode: "from-own-keys" }))).mode).toBe("from-own-keys");
-});
+  it("lets the caller's own keys override a default", async () => {
+    expect((await readBack(defineConfig(AT, { mode: "from-own-keys" }))).mode).toBe(
+      "from-own-keys",
+    );
+  });
 
-test("takes a function, and hands it what is being configured", async () => {
-  const held = await readBack(
-    defineConfig(AT, ({ command }) => ({ base: command === "build" ? "/built/" : "/served/" })),
-  );
+  it("takes a function", async () => {
+    const held = await readBack(
+      defineConfig(AT, ({ command }) => ({ base: command === "build" ? "/built/" : "/served/" })),
+    );
 
-  expect(held).toMatchObject({ base: "/built/", publicDir: "held" });
-});
+    expect(held).toMatchObject({ base: "/built/", publicDir: "held" });
+  });
 
-test("takes a promise", async () => {
-  const held = await readBack(defineConfig(AT, Promise.resolve({ base: "/awaited/" })));
+  it("takes a promise", async () => {
+    const held = await readBack(defineConfig(AT, Promise.resolve({ base: "/awaited/" })));
 
-  expect(held).toMatchObject({ base: "/awaited/", publicDir: "held" });
+    expect(held).toMatchObject({ base: "/awaited/", publicDir: "held" });
+  });
 });

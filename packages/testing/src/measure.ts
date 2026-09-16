@@ -1,6 +1,7 @@
 /**
- * Reads geometry off a rendered element, so a specification asserts what a reader would see rather
- * than what a class name promises.
+ * Reads geometry off a rendered element.
+ *
+ * A specification asserts the position a reader sees rather than the class name that produced it.
  */
 
 /**
@@ -8,22 +9,22 @@
  */
 export interface Box {
   /**
-   * Holds the distance from the viewport's left edge to the element's, in pixels.
+   * The distance from the viewport's left edge to the element's left edge, in pixels.
    */
   left: number;
 
   /**
-   * Holds the distance from the viewport's left edge to the element's right edge, in pixels.
+   * The distance from the viewport's left edge to the element's right edge, in pixels.
    */
   right: number;
 }
 
 /**
- * Names what a measurement needs of an element: its box, and nothing else.
+ * A measurement needs only an element's box.
  *
- * Structural rather than `Element`, for two reasons. This package compiles without the DOM library,
- * and a specification states the boxes it is measuring instead of laying out a document, which
- * jsdom reports as zero anyway. A real element satisfies it, because `DOMRect` carries both edges.
+ * Structural rather than `Element` for two reasons. This package compiles without the DOM library,
+ * and a specification supplies the boxes it is measuring rather than laying out a document, which
+ * jsdom measures as zero. A real element satisfies it because `DOMRect` has both edges.
  */
 export interface Measured {
   /**
@@ -37,9 +38,9 @@ export interface Measured {
 /**
  * Reads a CSS length as a number.
  *
- * `getComputedStyle` answers in `px` strings. A comparison against `NaN` is false rather than loud,
- * so a measurement that failed to parse would pass while measuring nothing. The conversion lives
- * here once, and a length with no number in it reads as `0`.
+ * `getComputedStyle` returns `px` strings. A comparison against `NaN` is false rather than an
+ * error, so a measurement that failed to parse would pass having measured nothing. A length with no
+ * number in it returns `0` instead.
  *
  * @param length - A computed length, with its unit.
  * @returns The number in front of the unit. `0` for a length with no number.
@@ -51,11 +52,10 @@ export function pixels(length: string): number {
 }
 
 /**
- * Measures how far apart two elements sit in the inline direction.
+ * Measures the inline distance between two elements.
  *
- * Zero means flush: a shared border rather than a gap, which is the claim a segmented control
- * makes. Reading it from the boxes rather than from a class catches the day the rounding and the
- * border stop agreeing.
+ * Zero means the two are flush, which a segmented control requires. Measuring the boxes reports a
+ * disagreement between the rounding and the border that a class name would hide.
  *
  * @param first - The left-hand element in a row.
  * @param second - The element after it.

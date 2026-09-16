@@ -1,7 +1,7 @@
 import { type ReactElement } from "react";
 import { createRoot } from "react-dom/client";
 
-import { expect, test, vi } from "vite-plus/test";
+import { describe, expect, test, vi } from "vitest";
 
 import { Reports } from "#reports.tsx";
 
@@ -29,10 +29,12 @@ function drawn(element: ReactElement): Promise<string> {
   });
 }
 
-test("draws what the other application answered, once it has", async () => {
-  await expect(drawn(<Reports />)).resolves.toContain("3 open");
-});
+describe("reports", () => {
+  test("draws what the other application answered, once it has", async () => {
+    await expect(drawn(<Reports />)).resolves.toContain("3 open");
+  });
 
-test("shows nothing of its own once the other application has answered", async () => {
-  await expect(drawn(<Reports />)).resolves.not.toContain("Loading");
+  test("shows nothing of its own once the other application has answered", async () => {
+    await expect(drawn(<Reports />)).resolves.not.toContain("Loading");
+  });
 });

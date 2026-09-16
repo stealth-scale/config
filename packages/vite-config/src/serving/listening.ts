@@ -2,7 +2,7 @@
  * What the dev server and the preview server both state, stated once.
  */
 
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 
 import { type Preset, preset } from "@stealthscale/vite-config-core";
 
@@ -66,8 +66,21 @@ export function bound(where: Serving, at: boolean | readonly string[] | string):
 
       return held === undefined ? {} : stating(where, { host: held });
     },
-    name: `${where}.bound`,
+    name: `${where}.bound${spelled(typeof at === "object" ? at : [String(at)])}`,
   });
+}
+
+/**
+ * Spells the arguments that tell two calls of one factory apart.
+ *
+ * A layer is named by the call a consumer wrote, so the name carries the arguments and nothing
+ * else. Where there are none, the name is the factory path alone.
+ *
+ * @param args - The arguments, each as text.
+ * @returns The parenthesised list, or nothing where the list is empty.
+ */
+function spelled(args: readonly string[]): string {
+  return args.length === 0 ? "" : `(${args.join(", ")})`;
 }
 
 /**
@@ -94,7 +107,7 @@ export function port(where: Serving, at: number): Preset {
 export function reachable(where: Serving, names: readonly string[]): Preset {
   return preset({
     config: (context) => stating(where, { allowedHosts: [...hosts(context, names)] }),
-    name: `${where}.reachable`,
+    name: `${where}.reachable${spelled(names)}`,
   });
 }
 
@@ -102,7 +115,7 @@ export function reachable(where: Serving, names: readonly string[]): Preset {
  * States the port, the names and the address together, which is how they are true.
  *
  * The three answer one question between them: where this server is reached. Stated apart they are
- * three lines a config repeats per application, and two of them are the same list — a name the
+ * three lines a config repeats per application, and two of them are the same list. A name the
  * server answers to is a name that resolves to loopback, so binding follows from answering.
  *
  * Each is still its own layer underneath, named as it always was, so a repository disagreeing with
@@ -113,7 +126,7 @@ export function reachable(where: Serving, names: readonly string[]): Preset {
  * @param names - The names it answers to, beyond loopback.
  * @returns The three layers, in the order they compose.
  */
-export function reached(
+export function address(
   where: Serving,
   at: number,
   names: readonly string[] = [],

@@ -10,5 +10,5 @@
  * list somebody has to keep in step.
  */
 
-export { crawled, type Crawled } from "#deps/crawled.ts";
-export { prebundled, type Prebundled } from "#deps/prebundled.ts";
+export { crawl, type Crawled } from "#deps/crawl.ts";
+export { prebundle, type Prebundled } from "#deps/prebundle.ts";

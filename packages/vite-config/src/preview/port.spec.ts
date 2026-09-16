@@ -1,20 +1,22 @@
 import { type UserConfig } from "vite-plus";
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { port } from "#preview/port.ts";
 
-test("serves the build at the port it was given", () => {
-  expect((port(4300).config as UserConfig).preview?.port).toBe(4300);
-});
+describe("port", () => {
+  it("serves the build at the port it was given", () => {
+    expect((port(4300).config as UserConfig).preview?.port).toBe(4300);
+  });
 
-test("refuses to move off it, whatever was pointed at it reaching this and not another", () => {
-  expect((port(4300).config as UserConfig).preview?.strictPort).toBe(true);
-});
+  it("fails rather than moving to another port", () => {
+    expect((port(4300).config as UserConfig).preview?.strictPort).toBe(true);
+  });
 
-test("leaves the dev server alone, an application being previewed while it is served", () => {
-  expect((port(4300).config as UserConfig).server).toBeUndefined();
-});
+  it("changes nothing on the dev server", () => {
+    expect((port(4300).config as UserConfig).server).toBeUndefined();
+  });
 
-test("names the port, so a config says which server was pinned where", () => {
-  expect(port(4300).name).toBe("preview.port(4300)");
+  it("names the port", () => {
+    expect(port(4300).name).toBe("preview.port(4300)");
+  });
 });

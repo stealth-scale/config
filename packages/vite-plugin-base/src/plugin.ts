@@ -9,9 +9,9 @@ export { type Plugin };
 /**
  * What a hook is handed to reach the build it is running inside.
  *
- * Read off the plugin's own hook rather than written out, so a change to what the bundler passes is
- * a type error here rather than a plugin that reads a field nothing sets. Vite's `Plugin` extends
- * rolldown's, which is what makes a plugin written against this one work under either.
+ * This type is read off the plugin's own hook rather than written out, so a change to what the
+ * bundler passes is a type error here rather than a plugin reading a field nothing sets. Vite's
+ * `Plugin` extends rolldown's, so a plugin written against this one works under either.
  */
 export type Bundling = ThisParameterType<
   Extract<NonNullable<Plugin["generateBundle"]>, (...args: never[]) => unknown>
@@ -32,15 +32,15 @@ interface Resolved {
  */
 export interface Stated {
   /**
-   * What it is called, which is what the bundler reports it as.
+   * The name the bundler reports the plugin as.
    */
   name: string;
 
   /**
    * What it does once the chunks exist and before they are written.
    *
-   * The one moment a plugin here needs. The module graph is complete, so what the build reached is
-   * knowable; the output has not been written, so a file can still be added to it.
+   * The one moment a plugin here needs. The module graph is complete, so what the build reached
+   * can be read. The output has not been written, so a file can still be added to it.
    *
    * @param bundling - The build it is running inside.
    * @param at - The directory being built, which the bundler resolved.
@@ -50,14 +50,14 @@ export interface Stated {
 }
 
 /**
- * States a plugin, with the build handed over as an argument.
+ * Builds a plugin that passes the build to its hook as an argument.
  *
  * The bundler calls a hook with the build as `this`, which an arrow function cannot reach and a
- * plain one is easy to get wrong in. Binding it once here means every plugin written against this
- * takes the build as an ordinary argument and nothing downstream writes `this` at all.
+ * plain function is easy to get wrong. Binding it once here lets every plugin written against this
+ * take the build as an ordinary argument, and nothing downstream reads `this`.
  *
  * @param stated - The plugin. `Stated` documents every member.
- * @returns The plugin, as any rolldown or Vite build will take one.
+ * @returns The plugin, in the shape any rolldown or Vite build accepts.
  */
 export function plugin(stated: Stated): Plugin {
   let at = process.cwd();
@@ -66,9 +66,9 @@ export function plugin(stated: Stated): Plugin {
     /**
      * Remembers what the bundler resolved as the directory being built.
      *
-     * Asked of the build rather than of the plugin's caller. The working directory is the workspace
-     * root under a task runner, so a plugin reading that describes the wrong package; the bundler
-     * has already worked out the right answer and this is where it says so.
+     * This is read from the build rather than from the plugin's caller. Under a task runner the
+     * working directory is the workspace root, so a plugin reading that describes the wrong
+     * package. The bundler has already resolved the right directory.
      *
      * @param config - The resolved configuration.
      */
@@ -77,9 +77,9 @@ export function plugin(stated: Stated): Plugin {
     },
 
     /**
-     * Hands the build to what was stated, so nothing downstream reaches for `this`.
+     * Passes the build to the stated hook, so nothing downstream reads `this`.
      *
-     * @returns A promise where the plugin answered one, and nothing otherwise.
+     * @returns A promise when the plugin returned one, and nothing otherwise.
      */
     generateBundle(this: Bundling): Promise<void> | void {
       return stated.writes(this, at);

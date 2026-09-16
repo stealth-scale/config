@@ -8,7 +8,7 @@ import {
   mergeConfig,
   type UserConfig,
   type UserConfigExport,
-} from "vite-plus";
+} from "vite";
 
 import { resolved } from "#compose.ts";
 import { type Context, contextOf } from "#context.ts";

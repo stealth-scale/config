@@ -1,7 +1,7 @@
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { type Bundling } from "@stealthscale/vite-plugin-base";
 
@@ -118,248 +118,252 @@ function firstOf(held: unknown, ...path: readonly string[]): unknown {
   return Array.isArray(found) ? found[0] : undefined;
 }
 
-test("describes the package it was pointed at, keyed by a package URL", () => {
-  const held = document({}, workspace({ version: "1.2.3" }));
+describe("vite-plugin-sbom", () => {
+  it("describes the package it was given keyed by a package URL", () => {
+    const held = document({}, workspace({ version: "1.2.3" }));
 
-  expect(field(held, "metadata", "component", "purl")).toBe("pkg:npm/%40acme/one@1.2.3");
-});
+    expect(field(held, "metadata", "component", "purl")).toBe("pkg:npm/%40acme/one@1.2.3");
+  });
 
-test("says whether the thing described is deployed or installed", () => {
-  const held = workspace();
+  it("records whether the subject is deployed or installed", () => {
+    const held = workspace();
 
-  expect(field(document({ type: "application" }, held), "metadata", "component", "type")).toBe(
-    "application",
-  );
-  expect(field(document({ type: "library" }, held), "metadata", "component", "type")).toBe(
-    "library",
-  );
-});
+    expect(field(document({ type: "application" }, held), "metadata", "component", "type")).toBe(
+      "application",
+    );
+    expect(field(document({ type: "library" }, held), "metadata", "component", "type")).toBe(
+      "library",
+    );
+  });
 
-test("records the bundler that actually ran, without being told which", () => {
-  const tools = field(document({}, workspace()), "metadata", "tools", "components");
-  const named = Array.isArray(tools) ? tools.map((one: unknown) => field(one, "name")) : [];
+  it("records the bundler that actually ran", () => {
+    const tools = field(document({}, workspace()), "metadata", "tools", "components");
+    const named = Array.isArray(tools) ? tools.map((one: unknown) => field(one, "name")) : [];
 
-  expect(named).toContain("rolldown");
-  expect(named).toContain("vite");
-});
+    expect(named).toContain("rolldown");
+    expect(named).toContain("vite");
+  });
 
-test("lists what the build reached, which a manifest does not name", () => {
-  const held = workspace({}, { name: "held", version: "2.0.0" });
+  it("lists what the build reached", () => {
+    const held = workspace({}, { name: "held", version: "2.0.0" });
 
-  expect(field(first(document({}, held, [held.module])), "purl")).toBe("pkg:npm/held@2.0.0");
-});
+    expect(field(first(document({}, held, [held.module])), "purl")).toBe("pkg:npm/held@2.0.0");
+  });
 
-test("attaches the licence text a package ships, encoded", () => {
-  const held = workspace({}, { name: "held", version: "2.0.0" });
-  const one = firstOf(first(document({}, held, [held.module])), "evidence", "licenses");
-  const text = field(one, "license", "text");
-  const content = field(text, "content");
+  it("attaches the encoded licence text a package ships", () => {
+    const held = workspace({}, { name: "held", version: "2.0.0" });
+    const one = firstOf(first(document({}, held, [held.module])), "evidence", "licenses");
+    const text = field(one, "license", "text");
+    const content = field(text, "content");
 
-  expect(field(text, "encoding")).toBe("base64");
-  expect(Buffer.from(typeof content === "string" ? content : "", "base64").toString()).toContain(
-    "MIT License",
-  );
-});
+    expect(field(text, "encoding")).toBe("base64");
+    expect(Buffer.from(typeof content === "string" ? content : "", "base64").toString()).toContain(
+      "MIT License",
+    );
+  });
 
-test("says where a package came from where that is not the default registry", () => {
-  const held = workspace(
-    {},
-    { name: "held", version: "2.0.0" },
-    `    "held": ["held@github:acme/held#abc", {}, "acme", "${INTEGRITY}"],`,
-  );
-  const one = first(document({}, held, [held.module]));
+  it("records where a package came from when it is not the default registry", () => {
+    const held = workspace(
+      {},
+      { name: "held", version: "2.0.0" },
+      `    "held": ["held@github:acme/held#abc", {}, "acme", "${INTEGRITY}"],`,
+    );
+    const one = first(document({}, held, [held.module]));
 
-  expect(field(one, "purl")).toContain("vcs_url=github");
-  expect(field(firstOf(one, "hashes"), "alg")).toBe("SHA-512");
-});
+    expect(field(one, "purl")).toContain("vcs_url=github");
+    expect(field(firstOf(one, "hashes"), "alg")).toBe("SHA-512");
+  });
 
-test("passes over an integrity it cannot read rather than failing the build", () => {
-  const held = workspace(
-    {},
-    { name: "held", version: "2.0.0" },
-    '    "held": ["held@2.0.0", "", {}, "sha512-tooshort"],',
-  );
+  it("ignores an integrity it cannot read rather than failing the build", () => {
+    const held = workspace(
+      {},
+      { name: "held", version: "2.0.0" },
+      '    "held": ["held@2.0.0", "", {}, "sha512-tooshort"],',
+    );
 
-  expect(field(first(document({}, held, [held.module])), "hashes")).toBeUndefined();
-});
+    expect(field(first(document({}, held, [held.module])), "hashes")).toBeUndefined();
+  });
 
-test("says nothing extra for a package that came from the default registry", () => {
-  const held = workspace(
-    {},
-    { name: "held", version: "2.0.0" },
-    `    "held": ["held@2.0.0", "", {}, "${INTEGRITY}"],`,
-  );
+  it("records nothing extra for a package from the default registry", () => {
+    const held = workspace(
+      {},
+      { name: "held", version: "2.0.0" },
+      `    "held": ["held@2.0.0", "", {}, "${INTEGRITY}"],`,
+    );
 
-  expect(field(first(document({}, held, [held.module])), "purl")).toBe("pkg:npm/held@2.0.0");
-});
+    expect(field(first(document({}, held, [held.module])), "purl")).toBe("pkg:npm/held@2.0.0");
+  });
 
-test("carries an identity only where one was asked for", () => {
-  const held = workspace();
+  it("includes an identity only when one was asked for", () => {
+    const held = workspace();
 
-  expect(field(document({ serialNumber: true }, held), "serialNumber")).toContain("urn:uuid:");
-  expect(field(document({}, held), "serialNumber")).toBeUndefined();
-  expect(field(document({ timestamp: true }, held), "metadata", "timestamp")).toBeDefined();
-  expect(field(document({}, held), "metadata", "timestamp")).toBeUndefined();
-});
+    expect(field(document({ serialNumber: true }, held), "serialNumber")).toContain("urn:uuid:");
+    expect(field(document({}, held), "serialNumber")).toBeUndefined();
+    expect(field(document({ timestamp: true }, held), "metadata", "timestamp")).toBeDefined();
+    expect(field(document({}, held), "metadata", "timestamp")).toBeUndefined();
+  });
 
-test("names the supplier where one was given", () => {
-  const stated = { supplier: { name: "Acme", url: ["https://acme.test"] } };
+  it("names the supplier when one was given", () => {
+    const stated = { supplier: { name: "Acme", url: ["https://acme.test"] } };
 
-  expect(field(document(stated, workspace()), "metadata", "supplier", "name")).toBe("Acme");
-});
+    expect(field(document(stated, workspace()), "metadata", "supplier", "name")).toBe("Acme");
+  });
 
-test("writes one copy by default and every path it was given", () => {
-  const held = workspace();
-  const emitted: string[] = [];
-  const bundling = {
-    emitFile: (one: { fileName: string }) => void emitted.push(one.fileName),
-    getModuleIds: () => [],
-    getModuleInfo: () => ({ importedIds: [] }),
-  } as unknown as Bundling;
+  it("writes one copy by default and every path it was given", () => {
+    const held = workspace();
+    const emitted: string[] = [];
+    const bundling = {
+      emitFile: (one: { fileName: string }) => void emitted.push(one.fileName),
+      getModuleIds: () => [],
+      getModuleInfo: () => ({ importedIds: [] }),
+    } as unknown as Bundling;
 
-  const run = (paths?: readonly string[]): void => {
-    const one = sbom(paths === undefined ? {} : { paths }) as unknown as {
-      configResolved: (config: { root: string }) => void;
-      generateBundle: (this: Bundling) => void;
+    const run = (paths?: readonly string[]): void => {
+      const one = sbom(paths === undefined ? {} : { paths }) as unknown as {
+        configResolved: (config: { root: string }) => void;
+        generateBundle: (this: Bundling) => void;
+      };
+
+      one.configResolved({ root: held.at });
+      one.generateBundle.call(bundling);
     };
 
-    one.configResolved({ root: held.at });
-    one.generateBundle.call(bundling);
-  };
+    run();
 
-  run();
-  expect(emitted).toEqual(["cyclonedx/bom.json"]);
+    expect(emitted).toStrictEqual(["cyclonedx/bom.json"]);
 
-  emitted.length = 0;
-  run(["a.json", "b.json"]);
-  expect(emitted).toEqual(["a.json", "b.json"]);
-});
+    emitted.length = 0;
+    run(["a.json", "b.json"]);
 
-test("records the tools the package declares it is built with", () => {
-  const held = workspace({ devDependencies: { held: "1" } }, { name: "held", version: "2.0.0" });
-  const tools = field(document({}, held), "metadata", "tools", "components");
-  const named = Array.isArray(tools) ? tools.map((one: unknown) => field(one, "name")) : [];
+    expect(emitted).toStrictEqual(["a.json", "b.json"]);
+  });
 
-  expect(named).toContain("held");
-});
+  it("records the tools the package declares it is built with", () => {
+    const held = workspace({ devDependencies: { held: "1" } }, { name: "held", version: "2.0.0" });
+    const tools = field(document({}, held), "metadata", "tools", "components");
+    const named = Array.isArray(tools) ? tools.map((one: unknown) => field(one, "name")) : [];
 
-test("passes over a declared tool that is not installed", () => {
-  const held = workspace({ devDependencies: { nowhere: "1" } });
-  const tools = field(document({}, held), "metadata", "tools", "components");
-  const named = Array.isArray(tools) ? tools.map((one: unknown) => field(one, "name")) : [];
+    expect(named).toContain("held");
+  });
 
-  expect(named).not.toContain("nowhere");
-});
+  it("ignores a declared tool that is not installed", () => {
+    const held = workspace({ devDependencies: { nowhere: "1" } });
+    const tools = field(document({}, held), "metadata", "tools", "components");
+    const named = Array.isArray(tools) ? tools.map((one: unknown) => field(one, "name")) : [];
 
-test("draws an edge between two packages the build reached", () => {
-  const root = mkdtempSync(join(tmpdir(), "stealth-sbom-"));
-  const at = join(root, "packages", "one");
-  const paths = ["held", "deeper"].map((named) => join(root, "node_modules", named));
+    expect(named).not.toContain("nowhere");
+  });
 
-  mkdirSync(at, { recursive: true });
-  writeFileSync(join(at, "package.json"), JSON.stringify({ name: "@acme/one" }));
-  writeFileSync(join(root, "bun.lock"), '{\n  "packages": {\n  },\n}\n');
+  it("draws an edge between two packages the build reached", () => {
+    const root = mkdtempSync(join(tmpdir(), "stealth-sbom-"));
+    const at = join(root, "packages", "one");
+    const paths = ["held", "deeper"].map((named) => join(root, "node_modules", named));
 
-  for (const [index, one] of paths.entries()) {
-    mkdirSync(one, { recursive: true });
-    writeFileSync(
-      join(one, "package.json"),
-      JSON.stringify({ name: index === 0 ? "held" : "deeper", version: "1.0.0" }),
+    mkdirSync(at, { recursive: true });
+    writeFileSync(join(at, "package.json"), JSON.stringify({ name: "@acme/one" }));
+    writeFileSync(join(root, "bun.lock"), '{\n  "packages": {\n  },\n}\n');
+
+    for (const [index, one] of paths.entries()) {
+      mkdirSync(one, { recursive: true });
+      writeFileSync(
+        join(one, "package.json"),
+        JSON.stringify({ name: index === 0 ? "held" : "deeper", version: "1.0.0" }),
+      );
+      writeFileSync(join(one, "index.js"), "");
+    }
+
+    const modules = paths.map((one) => join(one, "index.js"));
+    const held = JSON.parse(
+      written({}, building(modules, { [modules[0] ?? ""]: [modules[1] ?? ""] }), at),
+    ) as unknown;
+    const edges = field(held, "dependencies");
+    const drawn = Array.isArray(edges)
+      ? edges.filter((one: unknown) => field(one, "dependsOn") !== undefined)
+      : [];
+
+    expect(drawn).toHaveLength(1);
+    expect(field(drawn[0], "ref")).toBe("pkg:npm/held@1.0.0");
+  });
+
+  it("reads a licence the manifest declares beside its text", () => {
+    const held = workspace({}, { license: "MIT", name: "held", version: "2.0.0" });
+    const one = firstOf(first(document({}, held, [held.module])), "licenses");
+
+    expect(field(one, "license", "id")).toBe("MIT");
+  });
+
+  it("reads a compound licence as the expression it is", () => {
+    const held = workspace({}, { license: "(MIT OR Apache-2.0)", name: "held", version: "2.0.0" });
+    const one = firstOf(first(document({}, held, [held.module])), "licenses");
+
+    expect(field(one, "expression")).toBe("(MIT OR Apache-2.0)");
+  });
+
+  it("writes a document even when the package has no manifest", () => {
+    const root = mkdtempSync(join(tmpdir(), "stealth-sbom-"));
+    const held = JSON.parse(written({}, building(), root)) as unknown;
+
+    expect(field(held, "metadata", "component")).toBeUndefined();
+    expect(field(held, "bomFormat")).toBe("CycloneDX");
+  });
+
+  it("names a package that declares no version", () => {
+    const held = workspace({}, { name: "held" });
+
+    expect(field(first(document({}, held, [held.module])), "purl")).toBe("pkg:npm/held");
+  });
+
+  it("reads where a package came from when the manager wrote it into the package", () => {
+    const held = workspace(
+      {},
+      {
+        _resolved: "https://npm.acme.test/held/-/held-2.0.0.tgz",
+        name: "held",
+        version: "2.0.0",
+      },
     );
-    writeFileSync(join(one, "index.js"), "");
-  }
 
-  const modules = paths.map((one) => join(one, "index.js"));
-  const held = JSON.parse(
-    written({}, building(modules, { [modules[0] ?? ""]: [modules[1] ?? ""] }), at),
-  ) as unknown;
-  const edges = field(held, "dependencies");
-  const drawn = Array.isArray(edges)
-    ? edges.filter((one: unknown) => field(one, "dependsOn") !== undefined)
-    : [];
+    expect(field(first(document({}, held, [held.module])), "purl")).toContain("repository_url=");
+  });
 
-  expect(drawn).toHaveLength(1);
-  expect(field(drawn[0], "ref")).toBe("pkg:npm/held@1.0.0");
-});
+  it("ignores a package the builder will not describe and any edge to it", () => {
+    const root = mkdtempSync(join(tmpdir(), "stealth-sbom-"));
+    const at = join(root, "packages", "one");
+    const paths = ["held", "nameless"].map((named) => join(root, "node_modules", named));
 
-test("reads a licence the manifest declares, beside the text beneath it", () => {
-  const held = workspace({}, { license: "MIT", name: "held", version: "2.0.0" });
-  const one = firstOf(first(document({}, held, [held.module])), "licenses");
+    mkdirSync(at, { recursive: true });
+    writeFileSync(join(at, "package.json"), JSON.stringify({ name: "@acme/one" }));
+    writeFileSync(join(root, "bun.lock"), '{\n  "packages": {\n  },\n}\n');
 
-  expect(field(one, "license", "id")).toBe("MIT");
-});
+    for (const [index, one] of paths.entries()) {
+      mkdirSync(one, { recursive: true });
+      writeFileSync(
+        join(one, "package.json"),
+        JSON.stringify({ name: index === 0 ? "held" : "", version: "1.0.0" }),
+      );
+      writeFileSync(join(one, "index.js"), "");
+    }
 
-test("reads a compound licence as the expression it is, rather than as a name", () => {
-  const held = workspace({}, { license: "(MIT OR Apache-2.0)", name: "held", version: "2.0.0" });
-  const one = firstOf(first(document({}, held, [held.module])), "licenses");
+    const modules = paths.map((one) => join(one, "index.js"));
+    const held = JSON.parse(
+      written({}, building(modules, { [modules[0] ?? ""]: [modules[1] ?? ""] }), at),
+    ) as unknown;
+    const components = field(held, "components");
 
-  expect(field(one, "expression")).toBe("(MIT OR Apache-2.0)");
-});
+    expect(Array.isArray(components) ? components.length : 0).toBe(1);
+    expect(field(first(held), "dependencies")).toBeUndefined();
+  });
 
-test("writes a document even where the package being described has no manifest", () => {
-  const root = mkdtempSync(join(tmpdir(), "stealth-sbom-"));
-  const held = JSON.parse(written({}, building(), root)) as unknown;
-
-  expect(field(held, "metadata", "component")).toBeUndefined();
-  expect(field(held, "bomFormat")).toBe("CycloneDX");
-});
-
-test("names a package that states no version, which a purl allows", () => {
-  const held = workspace({}, { name: "held" });
-
-  expect(field(first(document({}, held, [held.module])), "purl")).toBe("pkg:npm/held");
-});
-
-test("reads where a package came from where the manager wrote it into the package", () => {
-  const held = workspace(
-    {},
-    {
-      _resolved: "https://npm.acme.test/held/-/held-2.0.0.tgz",
-      name: "held",
-      version: "2.0.0",
-    },
-  );
-
-  expect(field(first(document({}, held, [held.module])), "purl")).toContain("repository_url=");
-});
-
-test("passes over a package the builder will not describe, and any edge to it", () => {
-  const root = mkdtempSync(join(tmpdir(), "stealth-sbom-"));
-  const at = join(root, "packages", "one");
-  const paths = ["held", "nameless"].map((named) => join(root, "node_modules", named));
-
-  mkdirSync(at, { recursive: true });
-  writeFileSync(join(at, "package.json"), JSON.stringify({ name: "@acme/one" }));
-  writeFileSync(join(root, "bun.lock"), '{\n  "packages": {\n  },\n}\n');
-
-  for (const [index, one] of paths.entries()) {
-    mkdirSync(one, { recursive: true });
-    writeFileSync(
-      join(one, "package.json"),
-      JSON.stringify({ name: index === 0 ? "held" : "", version: "1.0.0" }),
+  it("reads the tarball a registry install recorded when it is the only record", () => {
+    const held = workspace(
+      {},
+      {
+        dist: { tarball: "https://npm.acme.test/held/-/held-2.0.0.tgz" },
+        name: "held",
+        version: "2.0.0",
+      },
     );
-    writeFileSync(join(one, "index.js"), "");
-  }
 
-  const modules = paths.map((one) => join(one, "index.js"));
-  const held = JSON.parse(
-    written({}, building(modules, { [modules[0] ?? ""]: [modules[1] ?? ""] }), at),
-  ) as unknown;
-  const components = field(held, "components");
-
-  expect(Array.isArray(components) ? components.length : 0).toBe(1);
-  expect(field(first(held), "dependencies")).toBeUndefined();
-});
-
-test("reads the tarball a registry install recorded, where that is the only record", () => {
-  const held = workspace(
-    {},
-    {
-      dist: { tarball: "https://npm.acme.test/held/-/held-2.0.0.tgz" },
-      name: "held",
-      version: "2.0.0",
-    },
-  );
-
-  expect(field(first(document({}, held, [held.module])), "purl")).toContain("repository_url=");
+    expect(field(first(document({}, held, [held.module])), "purl")).toContain("repository_url=");
+  });
 });

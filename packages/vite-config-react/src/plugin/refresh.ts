@@ -124,6 +124,6 @@ export function refresh(stated: Refreshed = {}): Contribution {
     at: AT,
     because: "a package that renders has to compile JSX before anything can run it",
     item: react(options(stated)),
-    name: "react.refresh",
+    name: "react.plugin.refresh",
   });
 }

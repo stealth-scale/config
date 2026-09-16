@@ -1,7 +1,7 @@
 import { type CSSProperties } from "react";
 
 import { render } from "@testing-library/react";
-import { describe, expect, it } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { only, part, parts } from "#part.ts";
 
@@ -15,13 +15,13 @@ function Nothing(): null {
 }
 
 describe("part", () => {
-  it("finds the piece of the anatomy carrying the name", () => {
+  it("returns the part carrying the name", () => {
     const { container } = render(<article data-part="root" />);
 
     expect(part(container, "root").tagName).toBe("ARTICLE");
   });
 
-  it("finds it below the top of the output, an anatomy being a tree", () => {
+  it("returns a part below the top of the output", () => {
     const { container } = render(
       <div data-part="root">
         <span data-part="indicator" />
@@ -31,13 +31,13 @@ describe("part", () => {
     expect(part(container, "indicator").tagName).toBe("SPAN");
   });
 
-  it("names the part it could not find, rather than answering nothing", () => {
+  it("throws naming the part it could not find", () => {
     const { container } = render(<div data-part="root" />);
 
     expect(() => part(container, "trigger")).toThrow('[data-part="trigger"]');
   });
 
-  it("answers the first where a component drew the part more than once", () => {
+  it("returns the first when a component drew the part more than once", () => {
     const { container } = render(
       <div>
         <span data-part="item" id="one" />
@@ -50,7 +50,7 @@ describe("part", () => {
 });
 
 describe("parts", () => {
-  it("answers every element under the name, in the order the document holds them", () => {
+  it("returns every element under the name in document order", () => {
     const { container } = render(
       <div>
         <span data-part="item" id="one" />
@@ -58,36 +58,36 @@ describe("parts", () => {
       </div>,
     );
 
-    expect(parts(container, "item").map((one) => one.id)).toEqual(["one", "two"]);
+    expect(parts(container, "item").map((one) => one.id)).toStrictEqual(["one", "two"]);
   });
 
-  it("answers a list rather than the collection, so a specification can map over it", () => {
+  it("returns an array rather than a NodeList", () => {
     const { container } = render(<span data-part="item" />);
 
     expect(Array.isArray(parts(container, "item"))).toBe(true);
   });
 
-  it("answers none where the component drew none, which is a thing to assert", () => {
+  it("returns an empty array when the component drew none", () => {
     const { container } = render(<div data-part="root" />);
 
-    expect(parts(container, "item")).toEqual([]);
+    expect(parts(container, "item")).toStrictEqual([]);
   });
 });
 
 describe("only", () => {
-  it("answers the one element the render produced", () => {
+  it("returns the one element the render produced", () => {
     const { container } = render(<article />);
 
     expect(only(container).tagName).toBe("ARTICLE");
   });
 
-  it("says the render produced nothing rather than answering nothing", () => {
+  it("throws when the render produced nothing", () => {
     const { container } = render(<Nothing />);
 
     expect(() => only(container)).toThrow("no element");
   });
 
-  it("answers the mark a component drew, which is SVG rather than HTML", () => {
+  it("returns the SVG mark a component drew", () => {
     const container = document.createElement("div");
 
     container.append(document.createElementNS("http://www.w3.org/2000/svg", "svg"));
@@ -95,7 +95,7 @@ describe("only", () => {
     expect(only(container).tagName).toBe("svg");
   });
 
-  it("answers the custom properties a component set, which a recipe reads at run time", () => {
+  it("returns the custom properties a component set", () => {
     // A count a caller worked out at run time cannot be a class, so it reaches the stylesheet
     // through the style attribute and the recipe reads it from there.
     const { container } = render(<div style={{ "--columns": 3 } as CSSProperties} />);
@@ -103,7 +103,7 @@ describe("only", () => {
     expect(only(container).style.getPropertyValue("--columns")).toBe("3");
   });
 
-  it("says what it found where the render produced neither", () => {
+  it("throws naming what it found when the render produced neither", () => {
     const container = document.createElement("div");
 
     container.append(document.createElementNS("http://www.w3.org/1998/Math/MathML", "math"));

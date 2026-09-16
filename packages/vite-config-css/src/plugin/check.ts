@@ -105,6 +105,6 @@ export function check(stated: Checked = {}): Contribution {
       ...(stated.also === undefined ? {} : { include: [...stated.also] }),
       ...(stated.except === undefined ? {} : { exclude: [...stated.except] }),
     }),
-    name: "stylelint.check",
+    name: "css.check",
   });
 }

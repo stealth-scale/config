@@ -8,7 +8,7 @@
  * Overrides run last, on a config nothing else will touch.
  */
 
-import { mergeConfig, type UserConfig } from "vite-plus";
+import { mergeConfig, type UserConfig } from "vite";
 
 import { type Context } from "#context.ts";
 import {

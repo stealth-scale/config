@@ -1,7 +1,7 @@
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { type Context } from "@stealthscale/vite-config-core";
 
@@ -73,48 +73,50 @@ function metadata(stated: Partial<Context> = {}): Record<string, unknown> {
   return document("cyclonedx/bom.json", stated)["metadata"] as Record<string, unknown>;
 }
 
-test("appends to the packer's plugins rather than replacing them", () => {
-  expect(inventory().at).toBe("pack.plugins");
-});
+describe("inventory", () => {
+  it("appends to the packer's plugins rather than replacing them", () => {
+    expect(inventory().at).toBe("pack.plugins");
+  });
 
-test("takes part in the build only, a dev server packing nothing", () => {
-  expect(inventory().apply).toBe("build");
-});
+  it("applies to the build and not to the dev server", () => {
+    expect(inventory().apply).toBe("build");
+  });
 
-test("names itself, so a package publishing no inventory can take the layer back", () => {
-  expect(inventory().name).toBe("pack.inventory");
-});
+  it("names the layer so a repository can remove it", () => {
+    expect(inventory().name).toBe("pack.inventory");
+  });
 
-test("writes one document, nothing serving a tarball the second path is for", () => {
-  expect([...written().keys()]).toEqual(["cyclonedx/bom.json"]);
-});
+  it("writes one document", () => {
+    expect([...written().keys()]).toStrictEqual(["cyclonedx/bom.json"]);
+  });
 
-test("describes a library, which is what a tarball is", () => {
-  expect((metadata()["component"] as Record<string, unknown>)["type"]).toBe("library");
-});
+  it("describes a library", () => {
+    expect((metadata()["component"] as Record<string, unknown>)["type"]).toBe("library");
+  });
 
-test("supplies the house, so a report has somewhere to go without asking", () => {
-  expect((metadata()["supplier"] as Record<string, unknown>)["name"]).toBe("Stealth Scale B.V.");
-});
+  it("supplies the house", () => {
+    expect((metadata()["supplier"] as Record<string, unknown>)["name"]).toBe("Stealth Scale B.V.");
+  });
 
-test("supplies whoever the repository names instead, where it names one", () => {
-  const source = written({}, { name: "Acme", url: ["https://acme.example"] });
-  const held = JSON.parse(source.get("cyclonedx/bom.json") ?? "{}") as Record<string, unknown>;
-  const supplier = (held["metadata"] as Record<string, unknown>)["supplier"];
+  it("supplies the author the repository names instead", () => {
+    const source = written({}, { name: "Acme", url: ["https://acme.example"] });
+    const held = JSON.parse(source.get("cyclonedx/bom.json") ?? "{}") as Record<string, unknown>;
+    const supplier = (held["metadata"] as Record<string, unknown>)["supplier"];
 
-  expect((supplier as Record<string, unknown>)["name"]).toBe("Acme");
-});
+    expect((supplier as Record<string, unknown>)["name"]).toBe("Acme");
+  });
 
-test("carries a serial number and a timestamp for a release", () => {
-  const held = document("cyclonedx/bom.json", { mode: "production" });
+  it("includes a serial number and a timestamp for a release", () => {
+    const held = document("cyclonedx/bom.json", { mode: "production" });
 
-  expect(held["serialNumber"]).toBeDefined();
-  expect((held["metadata"] as Record<string, unknown>)["timestamp"]).toBeDefined();
-});
+    expect(held["serialNumber"]).toBeDefined();
+    expect((held["metadata"] as Record<string, unknown>)["timestamp"]).toBeDefined();
+  });
 
-test("carries neither in development, so two runs of one commit are the same file", () => {
-  const held = document("cyclonedx/bom.json");
+  it("includes neither in development", () => {
+    const held = document("cyclonedx/bom.json");
 
-  expect(held["serialNumber"]).toBeUndefined();
-  expect((held["metadata"] as Record<string, unknown>)["timestamp"]).toBeUndefined();
+    expect(held["serialNumber"]).toBeUndefined();
+    expect((held["metadata"] as Record<string, unknown>)["timestamp"]).toBeUndefined();
+  });
 });

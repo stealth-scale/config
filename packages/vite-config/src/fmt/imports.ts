@@ -11,7 +11,7 @@ import { type Preset, preset } from "@stealthscale/vite-config-core";
  * regex written here would be read as a literal and match nothing.
  *
  * A default rather than the only answer: a repository publishing under another scope says so with
- * `fmt.internal`, and both prefixes then count.
+ * `fmt.own`, and both prefixes then count.
  */
 const INTERNAL = "@stealthscale/";
 

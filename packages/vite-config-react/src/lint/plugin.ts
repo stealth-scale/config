@@ -38,7 +38,7 @@ export function plugins(): readonly Contribution[] {
       at: AT,
       because: "its rules only mean something where something renders",
       item: held,
-      name: `react.plugin(${held})`,
+      name: `react.lint.plugins(${held})`,
     }),
   );
 }

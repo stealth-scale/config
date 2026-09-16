@@ -1,4 +1,4 @@
-import { expect, test, vi } from "vite-plus/test";
+import { describe, expect, it, vi } from "vitest";
 
 import { endpoints, join } from "#endpoints.ts";
 
@@ -7,7 +7,7 @@ import { endpoints, join } from "#endpoints.ts";
  */
 const registered: unknown[][] = [];
 
-vi.mock("@module-federation/runtime", () => ({
+vi.mock(import("@module-federation/runtime"), () => ({
   registerRemotes: (held: unknown[]): void => {
     registered.push(held);
   },
@@ -25,48 +25,50 @@ function serving(body: unknown, ok = true): void {
   );
 }
 
-test("reads every endpoint the deployment named", async () => {
-  serving([{ entry: "https://app1.example.test/remoteEntry.js", name: "remote" }]);
+describe("endpoints", () => {
+  it("reads every endpoint the deployment named", async () => {
+    serving([{ entry: "https://app1.example.test/remoteEntry.js", name: "remote" }]);
 
-  await expect(endpoints("/remotes.json")).resolves.toEqual([
-    { entry: "https://app1.example.test/remoteEntry.js", name: "remote" },
-  ]);
-});
+    await expect(endpoints("/remotes.json")).resolves.toStrictEqual([
+      { entry: "https://app1.example.test/remoteEntry.js", name: "remote" },
+    ]);
+  });
 
-test("passes over an entry missing either half, the pair being what makes it one", async () => {
-  serving([{ name: "remote" }, { entry: "https://a.test/e.js" }, 7, null]);
+  it("ignores an entry missing either half", async () => {
+    serving([{ name: "remote" }, { entry: "https://a.test/e.js" }, 7, null]);
 
-  await expect(endpoints("/remotes.json")).resolves.toEqual([]);
-});
+    await expect(endpoints("/remotes.json")).resolves.toStrictEqual([]);
+  });
 
-test("answers nothing where the deployment named nothing", async () => {
-  serving([]);
+  it("returns undefined when the deployment named nothing", async () => {
+    serving([]);
 
-  await expect(endpoints("/remotes.json")).resolves.toEqual([]);
-});
+    await expect(endpoints("/remotes.json")).resolves.toStrictEqual([]);
+  });
 
-test("answers nothing where the file holds something other than a list", async () => {
-  serving({ remote: "https://a.test/e.js" });
+  it("returns undefined when the file holds something other than an array", async () => {
+    serving({ remote: "https://a.test/e.js" });
 
-  await expect(endpoints("/remotes.json")).resolves.toEqual([]);
-});
+    await expect(endpoints("/remotes.json")).resolves.toStrictEqual([]);
+  });
 
-test("refuses a deployment serving no such file, which is an incomplete one", async () => {
-  serving(undefined, false);
+  it("throws when the deployment serves no such file", async () => {
+    serving(undefined, false);
 
-  await expect(endpoints("/remotes.json")).rejects.toThrow(/was answered 404/u);
-});
+    await expect(endpoints("/remotes.json")).rejects.toThrow(/was answered 404/u);
+  });
 
-test("tells the runtime where each application is, in the shape it takes", () => {
-  join([{ entry: "https://app1.example.test/remoteEntry.js", name: "remote" }]);
+  it("gives the runtime each application location in the shape it expects", () => {
+    join([{ entry: "https://app1.example.test/remoteEntry.js", name: "remote" }]);
 
-  expect(registered.at(-1)).toEqual([
-    { entry: "https://app1.example.test/remoteEntry.js", name: "remote", type: "module" },
-  ]);
-});
+    expect(registered.at(-1)).toStrictEqual([
+      { entry: "https://app1.example.test/remoteEntry.js", name: "remote", type: "module" },
+    ]);
+  });
 
-test("tells it nothing where the deployment named nothing", () => {
-  join([]);
+  it("gives the runtime nothing when the deployment named nothing", () => {
+    join([]);
 
-  expect(registered.at(-1)).toEqual([]);
+    expect(registered.at(-1)).toStrictEqual([]);
+  });
 });

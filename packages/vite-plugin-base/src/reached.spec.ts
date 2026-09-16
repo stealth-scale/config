@@ -1,7 +1,7 @@
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { type Bundling } from "#plugin.ts";
 import { licensed, manifestAt, owning, reached, text } from "#reached.ts";
@@ -44,147 +44,149 @@ function building(imports: Readonly<Record<string, readonly string[]>>): Bundlin
   } as unknown as Bundling;
 }
 
-test("reads a text field, and nothing where it is not text", () => {
-  expect(text({ name: "held" }, "name")).toBe("held");
-  expect(text({ name: 3 }, "name")).toBeUndefined();
-});
+describe("reached", () => {
+  it("reads a text field and returns undefined when it is not text", () => {
+    expect(text({ name: "held" }, "name")).toBe("held");
+    expect(text({ name: 3 }, "name")).toBeUndefined();
+  });
 
-test("finds the package a file belongs to by walking up to its manifest", () => {
-  const held = packaged("one");
+  it("finds the package a file belongs to by walking up to its manifest", () => {
+    const held = packaged("one");
 
-  expect(owning(held.module)).toBe(held.at);
-});
+    expect(owning(held.module)).toBe(held.at);
+  });
 
-test("answers nothing for a file with no manifest above it at all", () => {
-  expect(owning("/nonexistent-3f9a/deeper/file.js")).toBeUndefined();
-});
+  it("returns undefined for a file with no manifest above it", () => {
+    expect(owning("/nonexistent-3f9a/deeper/file.js")).toBeUndefined();
+  });
 
-test("reads a manifest, and nothing where the directory holds none", () => {
-  const held = packaged("one", { version: "1.2.3" });
+  it("reads a manifest and returns undefined when the directory has none", () => {
+    const held = packaged("one", { version: "1.2.3" });
 
-  expect(manifestAt(held.at)?.["version"]).toBe("1.2.3");
-  expect(manifestAt(join(held.at, "nowhere"))).toBeUndefined();
-});
+    expect(manifestAt(held.at)?.["version"]).toBe("1.2.3");
+    expect(manifestAt(join(held.at, "nowhere"))).toBeUndefined();
+  });
 
-test("answers nothing where the manifest parses to something that is not an object", () => {
-  const held = packaged("one");
+  it("returns undefined when the manifest parses to a non-object", () => {
+    const held = packaged("one");
 
-  writeFileSync(join(held.at, "package.json"), "null");
+    writeFileSync(join(held.at, "package.json"), "null");
 
-  expect(manifestAt(held.at)).toBeUndefined();
-});
+    expect(manifestAt(held.at)).toBeUndefined();
+  });
 
-test("reads one package once however many of its modules the build reached", () => {
-  const one = packaged("one");
+  it("reads one package once however many of its modules the build reached", () => {
+    const one = packaged("one");
 
-  writeFileSync(join(one.at, "second.js"), "");
+    writeFileSync(join(one.at, "second.js"), "");
 
-  const second = join(one.at, "second.js");
+    const second = join(one.at, "second.js");
 
-  expect(reached(building({ [one.module]: [], [second]: [] })).size).toBe(1);
-});
+    expect(reached(building({ [one.module]: [], [second]: [] })).size).toBe(1);
+  });
 
-test("passes over an import from outside node_modules", () => {
-  const one = packaged("one");
-  const found = reached(building({ [one.module]: ["/repository/src/main.ts"] }));
+  it("ignores an import from outside node_modules", () => {
+    const one = packaged("one");
+    const found = reached(building({ [one.module]: ["/repository/src/main.ts"] }));
 
-  expect([...(found.get(one.at)?.dependsOn ?? [])]).toEqual([]);
-});
+    expect([...(found.get(one.at)?.dependsOn ?? [])]).toStrictEqual([]);
+  });
 
-test("answers nothing where the manifest does not parse", () => {
-  const held = packaged("one");
+  it("returns undefined when the manifest does not parse", () => {
+    const held = packaged("one");
 
-  writeFileSync(join(held.at, "package.json"), "{ not json");
+    writeFileSync(join(held.at, "package.json"), "{ not json");
 
-  expect(manifestAt(held.at)).toBeUndefined();
-});
+    expect(manifestAt(held.at)).toBeUndefined();
+  });
 
-test("gathers every installed package the build reached", () => {
-  const one = packaged("one");
-  const other = packaged("other");
+  it("gathers every installed package the build reached", () => {
+    const one = packaged("one");
+    const other = packaged("other");
 
-  expect(
-    [...reached(building({ [one.module]: [], [other.module]: [] })).keys()].toSorted(),
-  ).toEqual([one.at, other.at].toSorted());
-});
+    expect(
+      [...reached(building({ [one.module]: [], [other.module]: [] })).keys()].toSorted(),
+    ).toStrictEqual([one.at, other.at].toSorted());
+  });
 
-test("passes over anything outside node_modules, which is the source being described", () => {
-  expect(reached(building({ "/repository/src/main.ts": [] })).size).toBe(0);
-});
+  it("ignores anything outside node_modules", () => {
+    expect(reached(building({ "/repository/src/main.ts": [] })).size).toBe(0);
+  });
 
-test("passes over a package whose manifest names nothing", () => {
-  const held = packaged("one");
+  it("ignores a package whose manifest names nothing", () => {
+    const held = packaged("one");
 
-  writeFileSync(join(held.at, "package.json"), JSON.stringify({ version: "1.0.0" }));
+    writeFileSync(join(held.at, "package.json"), JSON.stringify({ version: "1.0.0" }));
 
-  expect(reached(building({ [held.module]: [] })).size).toBe(0);
-});
+    expect(reached(building({ [held.module]: [] })).size).toBe(0);
+  });
 
-test("records what one package imported from another", () => {
-  const one = packaged("one");
-  const other = packaged("other");
-  const found = reached(building({ [one.module]: [other.module], [other.module]: [] }));
+  it("records what one package imported from another", () => {
+    const one = packaged("one");
+    const other = packaged("other");
+    const found = reached(building({ [one.module]: [other.module], [other.module]: [] }));
 
-  expect([...(found.get(one.at)?.dependsOn ?? [])]).toEqual([other.at]);
-});
+    expect([...(found.get(one.at)?.dependsOn ?? [])]).toStrictEqual([other.at]);
+  });
 
-test("does not record a package as importing itself", () => {
-  const one = packaged("one");
+  it("does not record a package as importing itself", () => {
+    const one = packaged("one");
 
-  writeFileSync(join(one.at, "second.js"), "");
+    writeFileSync(join(one.at, "second.js"), "");
 
-  const found = reached(building({ [one.module]: [join(one.at, "second.js")] }));
+    const found = reached(building({ [one.module]: [join(one.at, "second.js")] }));
 
-  expect([...(found.get(one.at)?.dependsOn ?? [])]).toEqual([]);
-});
+    expect([...(found.get(one.at)?.dependsOn ?? [])]).toStrictEqual([]);
+  });
 
-test("reads the licence text a package ships", () => {
-  const held = packaged("one", {}, "MIT License\n\nPermission is hereby granted");
+  it("reads the licence text a package ships", () => {
+    const held = packaged("one", {}, "MIT License\n\nPermission is hereby granted");
 
-  expect(licensed(held.at)[0]?.named).toBe("LICENSE");
-  expect(licensed(held.at)[0]?.text).toContain("Permission is hereby granted");
-});
+    expect(licensed(held.at)[0]?.named).toBe("LICENSE");
+    expect(licensed(held.at)[0]?.text).toContain("Permission is hereby granted");
+  });
 
-test("answers none where the package ships no licence text", () => {
-  expect(licensed(packaged("one").at)).toEqual([]);
-});
+  it("returns none when the package ships no licence text", () => {
+    expect(licensed(packaged("one").at)).toStrictEqual([]);
+  });
 
-test("answers none where the directory cannot be read at all", () => {
-  expect(licensed("/nonexistent-3f9a")).toEqual([]);
-});
+  it("returns none when the directory cannot be read", () => {
+    expect(licensed("/nonexistent-3f9a")).toStrictEqual([]);
+  });
 
-test("passes over a module under node_modules with no manifest above it", () => {
-  const root = mkdtempSync(join(tmpdir(), "stealth-reached-"));
-  const at = join(root, "node_modules");
+  it("ignores a module under node_modules with no manifest above it", () => {
+    const root = mkdtempSync(join(tmpdir(), "stealth-reached-"));
+    const at = join(root, "node_modules");
 
-  mkdirSync(at, { recursive: true });
-  writeFileSync(join(at, "loose.js"), "");
+    mkdirSync(at, { recursive: true });
+    writeFileSync(join(at, "loose.js"), "");
 
-  expect(reached(building({ [join(at, "loose.js")]: [] })).size).toBe(0);
-});
+    expect(reached(building({ [join(at, "loose.js")]: [] })).size).toBe(0);
+  });
 
-test("reads a build that knows nothing about a module it listed", () => {
-  const one = packaged("one");
-  const bundling = {
-    getModuleIds: () => [one.module],
-    getModuleInfo: () => null,
-  } as unknown as Bundling;
+  it("reads a build that knows nothing about a module it listed", () => {
+    const one = packaged("one");
+    const bundling = {
+      getModuleIds: () => [one.module],
+      getModuleInfo: () => null,
+    } as unknown as Bundling;
 
-  expect(reached(bundling).size).toBe(1);
-});
+    expect(reached(bundling).size).toBe(1);
+  });
 
-test("passes over an import made by something that is not an installed package", () => {
-  const one = packaged("one");
-  const held = reached(building({ "/repository/src/main.ts": [one.module] }));
+  it("ignores an import made by something other than an installed package", () => {
+    const one = packaged("one");
+    const held = reached(building({ "/repository/src/main.ts": [one.module] }));
 
-  expect(held.size).toBe(1);
-  expect([...(held.get(one.at)?.dependsOn ?? [])]).toEqual([]);
-});
+    expect(held.size).toBe(1);
+    expect([...(held.get(one.at)?.dependsOn ?? [])]).toStrictEqual([]);
+  });
 
-test("passes over a package whose manifest the build cannot read", () => {
-  const one = packaged("one");
+  it("ignores a package whose manifest the build cannot read", () => {
+    const one = packaged("one");
 
-  writeFileSync(join(one.at, "package.json"), "{ not json");
+    writeFileSync(join(one.at, "package.json"), "{ not json");
 
-  expect(reached(building({ [one.module]: [] })).size).toBe(0);
+    expect(reached(building({ [one.module]: [] })).size).toBe(0);
+  });
 });

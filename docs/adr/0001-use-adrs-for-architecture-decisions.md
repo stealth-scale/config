@@ -16,42 +16,41 @@ Accepted
 
 ## Context
 
-This repository decides things that constrain every repository built on it: where a layer is stated,
-what requires a reason, what separates one tier from another. Those arguments are written into
-docblocks beside the code enforcing them, which is the right place for a reader at that line and the
-wrong place for a reader deciding whether to change it.
-
-A docblock moves when its file moves, and disappears when its file does. The layer kernel has
-already been extracted from `vite-config` into a package of its own, taking the module that argues
-why a preset needs no reason along with it. Delete that file and the argument goes too, which leaves
-a rule nobody can account for and the next contributor free to drop it.
+- This repository decides things that constrain every repository built on it: where a layer is
+  stated, which layers require a reason, and what separates one tier from another.
+- Those arguments are written in docblocks beside the code that enforces them. A docblock is the
+  right place for a reader at that line. It is the wrong place for a reader who is deciding whether
+  to change the rule.
+- A docblock moves with its file and is deleted with its file. The layer kernel was extracted from
+  `vite-config` into its own package, and the module that explains why a preset needs no reason
+  moved with it. If that file is deleted, the explanation is deleted with it. The rule then has no
+  recorded reason, and the next contributor is free to drop it.
 
 ## Decision
 
-We will record architecture decisions as ADRs under `docs/adr/`, because a decision still in force
-after its file is gone needs a home independent of that file.
+We record architecture decisions as ADRs under `docs/adr/`. A decision that is still in force after
+its file is gone needs a home that does not depend on that file.
 
-A docblock keeps its argument, because the two answer different readers. Somebody reading that line
-needs what the docblock says; somebody proposing to change the rule needs what the record says.
+A docblock keeps its own explanation, because the two documents serve different readers. The reader
+at the line needs the docblock. The reader who proposes a change needs the record.
 
 ## Alternatives Considered
 
-None. This is a process bootstrap.
+None. This decision is a process bootstrap.
 
 ## Consequences
 
 **Positive:**
 
-- Deleting the code that enforced a decision no longer deletes the reason for it.
-- A contributor who wants a rule relaxed can read what it cost before proposing the change.
+- Deleting the code that enforces a decision no longer deletes the reason for the decision.
+- A contributor who wants a rule relaxed can read what the rule cost before proposing the change.
 
 **Negative:**
 
-- Two documents now argue the same decision, and nothing checks that they still agree.
-- Every decision of this size costs a file and a review, which is friction the docblock did not
-  have.
+- Two documents argue the same decision, and nothing checks that they agree.
+- Each decision of this size costs one file and one review. A docblock cost neither.
 
 **Neutral:**
 
-- The practice is older than the directory. Decisions were already argued in docblocks; the records
-  give them a location independent of the source tree.
+- The practice is older than the directory. Decisions were already argued in docblocks. The records
+  give them a location outside the source tree.

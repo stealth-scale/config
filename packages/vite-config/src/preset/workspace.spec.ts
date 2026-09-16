@@ -1,47 +1,69 @@
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { type Layer } from "@stealthscale/vite-config-core";
 
-import { workspace } from "#preset/workspace.ts";
+import { readBack } from "#preset/preset.fixtures.ts";
+import { defineConfig, layers } from "#preset/workspace.ts";
 
 /**
- * Names every layer the set hands over.
+ * Where the config under specification is: this package's own root.
+ *
+ * A config file sits at a package root, and the tier reads the manifest beside it. Naming this
+ * directory instead would hand the layers a directory holding no manifest at all.
+ */
+const AT = new URL("../..", import.meta.url).pathname;
+
+/**
+ * Names every layer the tier hands over.
  *
  * @returns Each name, flattened.
  */
 function names(): string[] {
-  const flat: Layer[] = workspace().flatMap((held) =>
+  const flat: Layer[] = layers().flatMap((held) =>
     Array.isArray(held) ? (held as Layer[]) : [held as Layer],
   );
 
   return flat.map((one) => one.name);
 }
 
-test("states what the task runner reads once for the whole tree", () => {
-  const held = names();
+describe("workspace", () => {
+  it("declares what the task runner reads once for the whole tree", () => {
+    const held = names();
 
-  expect(held).toContain("run.cache");
-  expect(held).toContain("run.ci");
-});
+    expect(held).toContain("run.cache");
+    expect(held).toContain("run.ci");
+  });
 
-test("states what happens before a commit, there being one hook per repository", () => {
-  const held = names();
+  it("declares what happens before a commit", () => {
+    const held = names();
 
-  expect(held).toContain("staged.checked");
-  expect(held).toContain("staged.formatted");
-});
+    expect(held).toContain("staged.checked");
+    expect(held).toContain("staged.formatted");
+  });
 
-test("states the projects, which is what a root has instead of tests of its own", () => {
-  expect(names()).toContain("test.projects");
-});
+  it("declares the projects", () => {
+    expect(names()).toContain("test.projects");
+  });
 
-test("leaves the names unowned, so a repository takes one back by the name it knows", () => {
-  for (const name of names()) expect(name).not.toContain("/");
-});
+  it("takes the node tier underneath", () => {
+    const held = names();
 
-test("packs nothing and builds nothing, a root config being no package", () => {
-  const held = names().join();
+    expect(held).toContain("lint.node");
+    expect(held).toContain("pack.published");
+  });
 
-  expect(held).not.toContain("pack.");
-  expect(held).not.toContain("build.");
+  it("leaves the layer names unowned", () => {
+    for (const name of names()) {
+      const [path] = name.split("(");
+
+      expect(path, `${name} carries an owner`).not.toContain("/");
+    }
+  });
+
+  it("binds the layers into one defineConfig", async () => {
+    const held = await readBack(defineConfig(AT, {}));
+
+    expect(held.run?.tasks).toHaveProperty("ci");
+    expect(held.staged).toBeDefined();
+  });
 });

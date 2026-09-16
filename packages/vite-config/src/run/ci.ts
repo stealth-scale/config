@@ -26,9 +26,10 @@ const PROVING = ["vp run -r build", "vp check", "vp test --run"];
  * direction nobody notices: the workflow keeps passing while it stops checking something. Naming
  * them here puts them where they can be run the same way on a laptop.
  *
- * Never cached. Every step inside it is, so a second run costs almost nothing; but the point of
- * this one is to prove the tree from nothing, and a cached answer to that question answers a
- * different question.
+ * Not cached, and the setting reaches the check and the test steps, which therefore run every
+ * time. The builds are package scripts inlined from `vp run -r build`, and they keep the
+ * workspace's script cache, so a second run replays them. A run that must rebuild as well passes
+ * `--no-cache`.
  *
  * Installing dependencies and auditing them are deliberately absent. Both need the package manager
  * by name, which is the repository's choice rather than the house's, and a workflow has already

@@ -1,7 +1,8 @@
 import { define, server } from "@stealthscale/vite-config";
-import { plugin as stylelint } from "@stealthscale/vite-config-css";
-import { defineConfig } from "@stealthscale/vite-config-react/preset/app";
+import * as css from "@stealthscale/vite-config-css";
+import * as react from "@stealthscale/vite-config-react";
+import { defineConfig } from "@stealthscale/vite-config/preset/app";
 
 export default defineConfig(import.meta.dirname, {
-  extends: [stylelint.check(), define.manifest(), server.port(4300)],
+  extends: [react.layers(), css.layers(), define.manifest(), server.port(4300)],
 });
