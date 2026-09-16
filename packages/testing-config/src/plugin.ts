@@ -3,13 +3,14 @@
  *
  * @remarks
  *   A plugin is called rather than read, because its name and its hooks are decided when the
- *   factory runs. A package exporting several factories is asked only that one of them produces a
- *   plugin, and every plugin it does produce is held to the naming rule.
+ *   factory runs. A package exporting several factories, at the top level or inside a namespace,
+ *   is asked only that one of them produces a plugin, and every plugin it does produce is held to
+ *   the naming rule.
  */
 
 import { reason } from "#layers.ts";
 import { type Published } from "#manifest.ts";
-import { type Arguments, callable, record } from "#module.ts";
+import { type Arguments, callable, constant, record } from "#module.ts";
 
 /**
  * Prefixes the name every plugin in this repository answers to.
@@ -17,9 +18,14 @@ import { type Arguments, callable, record } from "#module.ts";
 const HOUSE = "stealth:";
 
 /**
- * Lists the two hooks a value carries before it passes as a house plugin.
+ * Lists the hook a value carries before it passes as a house plugin.
+ *
+ * @remarks
+ *   A plugin reads its root from the resolved configuration, because under a task runner the
+ *   working directory is the workspace root. Nothing else is asked of the hook set: a plugin that
+ *   writes at `generateBundle` and one that serves at `load` are both house plugins.
  */
-const HOOKS = ["configResolved", "generateBundle"];
+const HOOKS = ["configResolved"];
 
 /**
  * Reports a plugin named for something other than its factory, or missing one of the base hooks.
@@ -64,30 +70,55 @@ function returned(
 }
 
 /**
+ * Calls every factory in a namespace and in the namespaces it holds, and records each plugin that
+ * is misnamed or missing a hook.
+ *
+ * @remarks
+ *   The path gains a segment at each level, so a plugin exported as `theme.runtime` is asked to be
+ *   named `stealth:theme.runtime`. A constant holding an object is passed over rather than walked.
+ * @returns How many plugins the walk found.
+ */
+function visited(
+  prefix: string,
+  namespace: Readonly<Record<string, unknown>>,
+  supplied: Arguments,
+  violations: string[],
+): number {
+  let plugins = 0;
+
+  for (const [name, value] of Object.entries(namespace)) {
+    const path = prefix === "" ? name : `${prefix}.${name}`;
+
+    if (callable(value)) {
+      const result = returned(path, value, supplied);
+
+      if (result instanceof Error) violations.push(`${path} throws when called: ${result.message}`);
+      else if (record(result) && typeof result["name"] === "string") {
+        plugins += 1;
+        violations.push(...shaped(path, result));
+      }
+    } else if (record(value) && !constant(name)) {
+      plugins += visited(path, value, supplied, violations);
+    }
+  }
+
+  return plugins;
+}
+
+/**
  * Reports a barrel holding no plugin at all, and every plugin whose name or hooks are wrong.
  *
  * @remarks
- *   Each callable export is called, so an export with a side effect performs it during the check.
- *   Anything coming back as an object with a string `name` is taken for a plugin.
+ *   Each callable export is called, at the top level and inside every namespace, so an export with
+ *   a side effect performs it during the check. Anything coming back as an object with a string
+ *   `name` is taken for a plugin.
  */
 export function named(
   module: Readonly<Record<string, unknown>>,
   supplied: Arguments,
 ): readonly string[] {
   const violations: string[] = [];
-  let plugins = 0;
-
-  for (const [path, value] of Object.entries(module)) {
-    if (!callable(value)) continue;
-
-    const result = returned(path, value, supplied);
-
-    if (result instanceof Error) violations.push(`${path} throws when called: ${result.message}`);
-    else if (record(result) && typeof result["name"] === "string") {
-      plugins += 1;
-      violations.push(...shaped(path, result));
-    }
-  }
+  const plugins = visited("", module, supplied, violations);
 
   return plugins === 0 ? [...violations, "no export returns a plugin"] : violations;
 }
