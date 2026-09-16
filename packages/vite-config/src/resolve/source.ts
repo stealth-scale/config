@@ -1,5 +1,5 @@
 /**
- * Resolving a workspace package to its source rather than to a `dist` it has not built yet.
+ * Points both of Vite's resolvers at a workspace package's source.
  */
 
 import { defaultClientConditions, defaultServerConditions } from "vite";
@@ -9,23 +9,14 @@ import { type Preset, preset } from "@stealthscale/vite-config-core";
 import { SOURCE } from "#resolve/condition.ts";
 
 /**
- * Reads every workspace package as source.
+ * Resolves a workspace import to source by placing the source condition ahead
+ * of the defaults.
  *
- * A package in a workspace exports two things under one name: its built entry, and the source that
- * entry is built from. Which one a caller gets is decided by a condition, and this sets it — so a
- * clean checkout type-checks and tests before anything has been built, an edit is seen by the
- * package importing it without a rebuild, and going to a definition arrives at the file to change.
- *
- * Not split by environment, and so not among this block's presets: the condition is the same
- * wherever the package runs. Both resolvers are set because they are separate — `resolve` reaches
- * the browser's and `ssr.resolve` the one node runs under, which is the one a specification loads a
- * sibling package through.
- *
- * Vite's own conditions are kept, because setting this key replaces the list rather than extending
- * it, and a package shipping separate browser and node entries would start resolving to the wrong
- * one.
- *
- * @returns The preset.
+ * @remarks
+ *   The browser and the node resolvers are given separate lists, because Vite's
+ *   own defaults differ between the two and each has to keep its own below the
+ *   source condition. A dependency from outside this workspace declares no such
+ *   condition and resolves exactly as it would have.
  */
 export function source(): Preset {
   return preset({

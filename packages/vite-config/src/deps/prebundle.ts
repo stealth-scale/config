@@ -1,45 +1,37 @@
 /**
- * Naming the dependencies the dev server cannot find by crawling.
+ * Declares a dependency the scan cannot find by reading imports statically.
  */
 
 import { contribute, type Contribution } from "@stealthscale/vite-config-core";
 
 /**
- * Where a contribution to the list of what is pre-bundled is appended.
+ * Directs every contribution here at the list of specifiers Vite converts up front.
  */
 const AT = "optimizeDeps.include";
 
 /**
- * Describes dependencies the crawler will not reach on its own.
+ * Gathers the specifiers to convert up front with the reason the scan overlooks each one.
  */
 export interface Prebundled {
   /**
-   * Why the crawler misses them, kept with the contribution so a later reader can weigh it.
+   * Records what hides these imports from a static read of the source.
    */
   because: string;
 
   /**
-   * The specifiers, each as it is imported. A deep import is named in full, and a glob reaches a
-   * family of them.
+   * Repeats each specifier exactly as an import writes it, deep subpath and all.
    */
   deps: readonly string[];
 }
 
 /**
- * Pre-bundles a dependency the dev server would otherwise find halfway through a session.
+ * Converts each specifier to ESM up front, whether or not the scan turned it up.
  *
- * The server converts every dependency to one ES module up front, so a package shipping a hundred
- * files is one request rather than a hundred. It finds them by crawling from the page, which
- * reaches everything the page imports statically and nothing else: a dependency imported only
- * behind a dynamic import, or only from a module a plugin produces, is discovered when something
- * first asks for it, and discovering one mid-session means re-optimising and reloading the page
- * under whoever was using it.
- *
- * One contribution per specifier, each named for the specifier it carries, so a later module can
- * take back exactly one rather than the set.
- *
- * @param stated - The specifiers, and why the crawler misses them.
- * @returns One contribution for each specifier.
+ * @remarks
+ *   A dependency reached only through a dynamic `import()` or a computed
+ *   specifier is discovered mid-session, and the discovery costs a page reload.
+ *   A specifier named here is dealt with before the server answers anything.
+ * @returns One contribution per specifier, and nothing at all for an empty list.
  */
 export function prebundle(stated: Prebundled): readonly Contribution[] {
   return stated.deps.map((held) =>

@@ -1,5 +1,5 @@
 /**
- * Configuring a workspace root, which states once what every package below it shares.
+ * Configures the root of a repository rather than a package inside it.
  */
 
 import { configuring, type Defining, type Extendable } from "@stealthscale/vite-config-core";
@@ -10,28 +10,23 @@ import * as staged from "#staged/index.ts";
 import * as test from "#test/index.ts";
 
 /**
- * The layers a workspace root is built on.
+ * Lists the node tier plus everything only a workspace root gets to declare.
  *
- * The node tier underneath, for three reasons. The linter and the formatter read the root config
- * and nowhere else, so the root has to carry them. A package with no config of its own is built
- * through the root's, so the root has to carry the pack layers too. And the root's own files, its
- * config among them, run on node.
- *
- * On top of that, what only a root states. The task runner's cache and its continuous integration
- * task describe the whole tree. What happens to a file before it is committed is arranged once per
- * repository, because there is one hook. The list of projects is what the root has instead of tests
- * of its own.
- *
- * Every layer here is the toolchain's own, under its own name, so a repository takes one back by
- * the name it already knows.
- *
- * @returns Each layer a root is built on, in the order they compose.
+ * @remarks
+ *   A task table, a commit hook and the project list are read once for the
+ *   whole tree. Declaring any of the three inside a package has every package
+ *   repeat it while the runner reads the root's copy regardless.
  */
 export function layers(): readonly Extendable[] {
   return [...node(), run.cache(), run.ci(), staged.checked(), staged.formatted(), test.projects()];
 }
 
 /**
- * Composes a config for a workspace root.
+ * Composes the Vite configuration a repository root is defined with.
+ *
+ * @remarks
+ *   Every layer reaching this tier carries an unowned name, with no path in it.
+ *   A repository can therefore remove one by the name it reads in the
+ *   configuration rather than by guessing which package minted it.
  */
 export const defineConfig: Defining = configuring(layers);

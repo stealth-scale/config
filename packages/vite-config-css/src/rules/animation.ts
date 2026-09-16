@@ -1,18 +1,15 @@
 /**
- * What a stylesheet may animate without making the browser redo its work.
+ * Limits a stylesheet's animations to properties the compositor can run.
  */
 
 /**
- * The refusal that keeps an animation off the main thread.
+ * Refuses an animation of a property the browser cannot run on the compositor.
  *
- * A browser can animate `transform` and `opacity` on the compositor, without touching layout or
- * paint. Animating anything else — a width, a margin, a colour — makes it recalculate on every
- * frame, which is where a smooth animation on a developer's machine becomes a stuttering one on a
- * phone.
- *
- * Not Google's, and not fixable by a tool: the fix is a different animation, which only the author
- * can write. It is here because it is the one class of CSS fault that costs something at run time
- * and says nothing at build time.
+ * @remarks
+ *   Animating anything beyond a transform or an opacity puts layout or paint
+ *   on the main thread for every frame, which is what drops an animation below
+ *   the display's refresh rate on a mid-range device. The rule reads a
+ *   transition as well as a keyframe.
  */
 export const ANIMATION = {
   "plugin/no-low-performance-animation-properties": true,

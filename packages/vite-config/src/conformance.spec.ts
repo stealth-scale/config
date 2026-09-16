@@ -11,34 +11,16 @@ import * as node from "#preset/node.ts";
 import * as web from "#preset/web.ts";
 import * as workspace from "#preset/workspace.ts";
 
-/**
- * The package directory, which the tiers read the manifest beside.
- */
 const AT = join(import.meta.dirname, "..");
 
-/**
- * A reason, as every departure carries one.
- */
 const BECAUSE = "a reason a reviewer can weigh";
 
-/**
- * A hook that does nothing, as a packer hook the specification never runs.
- *
- * @returns Nothing.
- */
 function nothing(): undefined {
   return undefined;
 }
 
-/**
- * The context the serving helpers read a host list from.
- */
 const CONTEXT = contextOf({ command: "build", mode: "production" }, AT);
 
-/**
- * What each factory with required parameters is called with, keyed by the path a consumer
- * writes.
- */
 const ARGUMENTS: Arguments = {
   "build.base": ["/app/"],
   "deps.crawl": [{ because: BECAUSE, files: ["src/late.ts"] }],

@@ -1,3 +1,8 @@
+/**
+ * Proves a development server's address layers arrive together and stay
+ * separable.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { address } from "#server/address.ts";

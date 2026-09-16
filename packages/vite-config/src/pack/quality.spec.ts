@@ -3,11 +3,6 @@ import { describe, expect, it } from "vitest";
 
 import { quality } from "#pack/quality.ts";
 
-/**
- * Reads back the checks the layer turns on.
- *
- * @returns The packer's two checks, as stated.
- */
 function checked(): { attw: { excludeEntrypoints: RegExp[] }; publint: boolean } {
   return (quality().config as UserConfig).pack as {
     attw: { excludeEntrypoints: RegExp[] };

@@ -1,3 +1,7 @@
+/**
+ * Checks the coverage and setup departures a repository states for itself.
+ */
+
 import { type UserConfig } from "vite-plus";
 import { describe, expect, it } from "vitest";
 

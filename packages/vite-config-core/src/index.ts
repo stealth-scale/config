@@ -1,16 +1,11 @@
 /**
- * What a layer is, and how layers become one config.
+ * Defines a layer and composes a list of them into one Vite config.
  *
- * Four kinds, each minted by its own function so that a bare object is never mistaken for one: a
- * preset sets a block, a contribution appends one item to a list, a removal takes one back, and an
- * override rewrites what is left. Three passes turn a list of them into a config, and a record of
- * which layer decided each value is kept alongside it.
- *
- * Nothing here names a key of a Vite+ configuration or knows what a block is, and a module that
- * does either belongs in the package owning that block. Reading a file is not on that list: what is
- * being configured — a directory, a manifest, an environment — is the one thing every block would
- * otherwise have to work out for itself, so the kernel works it out once.
- *
+ * @remarks
+ *   Three passes settle the result: every preset merges, then every
+ *   contribution appends, then every override rewrites. Two layers of
+ *   different kinds never compete on their position in the array, and only a
+ *   removal reads that position at all.
  * @packageDocumentation
  */
 

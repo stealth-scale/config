@@ -1,3 +1,7 @@
+/**
+ * Checks how a machine's host names beat the ones a repository declares.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { bound, hosts, origins } from "#serving/environment.ts";

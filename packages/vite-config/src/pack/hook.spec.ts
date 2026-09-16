@@ -5,9 +5,6 @@ import { type Context } from "@stealthscale/vite-config-core";
 
 import { buildBefore, buildDone, buildPrepare, hook } from "#pack/hook.ts";
 
-/**
- * What a refinement is handed, which this layer never reads.
- */
 const ANY: Context = {
   at: "/repository/packages/one",
   command: "build",
@@ -17,27 +14,14 @@ const ANY: Context = {
   root: "/repository",
 };
 
-/**
- * Stands in for a repository's own code, told apart by identity rather than by what it does.
- */
 function one(): void {
   return undefined;
 }
 
-/**
- * Stands in for a second piece of it.
- */
 function two(): void {
   return undefined;
 }
 
-/**
- * Runs a layer's refinement over a config and answers the hooks it left.
- *
- * @param config - The config as the layers composed it.
- * @param hooks - The hooks to add.
- * @returns The hooks on the refined config.
- */
 function refined(config: UserConfig, hooks: Record<string, () => void>): Record<string, unknown> {
   const held = hook({ because: "a theme writes its stylesheet", hooks }).refine(ANY, config);
 

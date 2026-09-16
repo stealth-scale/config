@@ -2,38 +2,18 @@ import { describe, expect, it } from "vitest";
 
 import { named, peer } from "#plugin.ts";
 
-/**
- * Builds a plugin as the house base returns it.
- *
- * @param name - The plugin name.
- * @returns The plugin.
- */
 function plugin(name: string): Record<string, unknown> {
   return { configResolved: hook, generateBundle: hook, name };
 }
 
-/**
- * A hook that does nothing, as the house base attaches to every plugin.
- */
 function hook(): undefined {
   return undefined;
 }
 
-/**
- * A factory that returns a plugin with the house name and neither hook.
- *
- * @returns The plugin.
- */
 function hookless(): Record<string, unknown> {
   return { name: "stealth:sbom" };
 }
 
-/**
- * A factory that returns a plugin with the given name.
- *
- * @param name - The plugin name.
- * @returns The factory.
- */
 function factory(name: string): () => Record<string, unknown> {
   return () => plugin(name);
 }

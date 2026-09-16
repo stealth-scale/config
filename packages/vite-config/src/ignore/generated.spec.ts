@@ -1,3 +1,8 @@
+/**
+ * Proves the generated globs name written-by-tool files and nothing installed
+ * or built.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { GENERATED } from "#ignore/generated.ts";

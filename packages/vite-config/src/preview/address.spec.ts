@@ -1,3 +1,8 @@
+/**
+ * Proves a preview server's address layers arrive together and stay under its
+ * own key.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { address } from "#preview/address.ts";

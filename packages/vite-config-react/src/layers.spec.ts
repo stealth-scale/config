@@ -1,3 +1,7 @@
+/**
+ * Drives the package-level call against both tiers a rendering package is built on.
+ */
+
 import { type ConfigEnv, type UserConfig } from "vite-plus";
 import { describe, expect, it } from "vitest";
 
@@ -6,17 +10,8 @@ import { defineConfig as library } from "@stealthscale/vite-config/preset/web";
 
 import { layers } from "#layers.ts";
 
-/**
- * Where the config under specification is: this package's own root.
- *
- * A config file sits at a package root, and the tier reads the manifest beside it. Naming this
- * directory instead would hand the layers a directory holding no manifest at all.
- */
 const AT = new URL("..", import.meta.url).pathname;
 
-/**
- * The environment a build is read in.
- */
 const BUILDING: ConfigEnv = { command: "build", mode: "production" };
 
 describe("layers", () => {

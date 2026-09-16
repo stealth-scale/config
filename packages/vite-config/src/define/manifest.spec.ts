@@ -7,14 +7,6 @@ import { type Manifest } from "@stealthscale/vite-config-core";
 import { type Injected, manifest } from "#define/manifest.ts";
 import { answered } from "#vite.fixtures.ts";
 
-/**
- * Reads back the constants a config would be built with.
- *
- * @param stated - What the package's own manifest holds.
- * @param injected - What to ask for beyond the two always given.
- * @param env - The variables the build runs in.
- * @returns Each constant's name against the text it is replaced by.
- */
 function definedBy(
   stated: Manifest,
   injected: Injected = {},
@@ -25,27 +17,14 @@ function definedBy(
   return held.define as Record<string, string>;
 }
 
-/**
- * The subpath a package reaches the declarations by.
- */
 const SUBPATH = "./globals";
 
-/**
- * Reads the constants the shipped declarations promise.
- *
- * @returns Every name `globals.d.ts` declares.
- */
 function declared(): string[] {
   const source = readFileSync(new URL("../../globals.d.ts", import.meta.url).pathname, "utf8");
 
   return [...source.matchAll(/declare const (\S+):/gu)].map(([, name]) => name ?? "");
 }
 
-/**
- * Reads this package's own manifest.
- *
- * @returns Its parsed contents.
- */
 function own(): Record<string, unknown> {
   return JSON.parse(
     readFileSync(new URL("../../package.json", import.meta.url).pathname, "utf8"),

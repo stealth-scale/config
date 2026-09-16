@@ -1,3 +1,7 @@
+/**
+ * Proves the runner caches a script as readily as a task.
+ */
+
 import { type UserConfig } from "vite-plus";
 import { describe, expect, it } from "vitest";
 

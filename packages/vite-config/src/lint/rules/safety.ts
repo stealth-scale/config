@@ -1,14 +1,16 @@
 /**
- * What is refused whatever the package does.
+ * Refuses the constructs that hide a failure from the compiler or the reader.
  */
 
 import { type Rules } from "#lint/rules/rules.ts";
 
 /**
- * The refusals every package carries.
+ * Denies the escapes from the type checker, and the logging nobody reads.
  *
- * `no-console` allows the two streams a failure is reported on; a package whose output is the
- * console says so in an override rather than here.
+ * @remarks
+ *   `console.error` and `console.warn` stay, because those two streams are how
+ *   a tool reports a failure to the console that started it. Anything else on
+ *   `console` is debugging somebody forgot to take out.
  */
 export const SAFETY: Rules = {
   "no-console": ["error", { allow: ["error", "warn"] }],

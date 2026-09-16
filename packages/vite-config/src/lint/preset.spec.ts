@@ -1,3 +1,7 @@
+/**
+ * Specifies what each tier puts in the block and which departures it brings.
+ */
+
 import { type UserConfig } from "vite-plus";
 import { describe, expect, it } from "vitest";
 
@@ -7,24 +11,12 @@ import { GENERATED } from "#ignore/generated.ts";
 import { base, node, web } from "#lint/preset.ts";
 import * as rules from "#lint/rules/index.ts";
 
-/**
- * Reads the `lint` block the preset among some layers sets.
- *
- * @param layers - What one of the entries answered.
- * @returns Its lint block.
- */
 function blockOf(layers: readonly Layer[]): NonNullable<UserConfig["lint"]> {
   const held = layers.find((one) => one.kind === "preset") as Preset;
 
   return (held.config as UserConfig).lint as NonNullable<UserConfig["lint"]>;
 }
 
-/**
- * Reads what every layer an entry answered is called.
- *
- * @param layers - What one of the entries answered.
- * @returns Their names.
- */
 function namesOf(layers: readonly Layer[]): readonly string[] {
   return layers.map((one) => one.name);
 }

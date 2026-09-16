@@ -1,31 +1,35 @@
 /**
- * The configuration a package is packed under when it cannot extend a tier.
+ * Spells out the blocks a tier composes, for a package that cannot extend one.
  *
- * Every tier in `@stealthscale/vite-config` is built on the kernel and packs through the bill of
- * materials plugin, so the kernel and the plugins are packed before any tier exists. They use this
- * configuration instead. It repeats the node tier's `pack`, `resolve`, `ssr` and `test` blocks, and
- * `index.spec.ts` fails when the two stop agreeing.
- *
+ * @remarks
+ *   The tier packages are packed before any tier exists to extend, so each of them states the node
+ *   tier's blocks here instead of composing them.
  * @packageDocumentation
  */
 
 import { defaultClientConditions, defaultServerConditions, type UserConfig } from "vite";
 
 /**
- * The condition every stealth repository resolves its own packages through.
+ * The export condition carrying a package's unbuilt TypeScript source.
  *
- * `@stealthscale/vite-config` publishes the same string as `resolve.SOURCE`, and the shared
- * tsconfig names it in `customConditions`. `index.spec.ts` fails when the three stop agreeing.
+ * @remarks
+ *   The condition sits ahead of Vite's defaults, so a specification importing a sibling workspace
+ *   package compiles that package's source instead of resolving whatever it last built.
  */
 const SOURCE = "stealth-source";
 
 /**
- * The directories excluded from every test run.
+ * Lists the directories the specification glob never descends into.
  */
 const FOREIGN = ["**/node_modules/**", "**/.git/**", "**/dist/**", "**/coverage/**"];
 
 /**
- * The configuration the kernel and the plugins are packed under.
+ * Configures a package that packs and tests without extending a tier.
+ *
+ * @remarks
+ *   A specification in this package compares every block against what the node tier composes, so
+ *   the two cannot drift apart unnoticed. A package that can reach a tier extends the tier and
+ *   leaves this value alone.
  */
 export const plain: UserConfig = {
   pack: {

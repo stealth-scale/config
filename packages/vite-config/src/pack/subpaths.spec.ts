@@ -4,14 +4,6 @@ import { describe, expect, it } from "vitest";
 import { type Packed } from "#pack/carry.ts";
 import { subpaths } from "#pack/subpaths.ts";
 
-/**
- * Runs the layer's callback the way the packer would.
- *
- * @param exports - The subpaths the repository worked out.
- * @param built - The map the packer wrote from what it built.
- * @param pkg - The manifest as it stands on disk.
- * @returns The map the packer writes instead.
- */
 function published(
   exports: Record<string, string>,
   built: Record<string, unknown>,

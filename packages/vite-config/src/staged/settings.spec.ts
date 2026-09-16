@@ -1,3 +1,7 @@
+/**
+ * Proves the staged-files types accept each form a repository writes.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { type Runs, type Staging } from "#staged/settings.ts";

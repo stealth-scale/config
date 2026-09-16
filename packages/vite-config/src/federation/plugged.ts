@@ -1,41 +1,49 @@
 /**
- * Reaching the federation plugin, which a repository installs only if it federates.
+ * Resolves the federation plugin, which this package depends on only optionally.
+ *
+ * @remarks
+ *   A repository that federates nothing should not carry a bundler plugin it
+ *   never runs, so the package is an optional peer and the import waits until a
+ *   layer actually needs it.
  */
 
 /**
- * What the plugin is called with, as the package that ships it declares.
+ * Describes the options the federation plugin accepts.
+ *
+ * @remarks
+ *   The shape is read off the plugin rather than restated here, so a change to
+ *   the plugin's own options is a type error in this package instead of a
+ *   mismatch nobody notices until a build runs.
  */
 type Federating = Parameters<typeof import("@module-federation/vite").federation>[0];
 
 /**
- * What it answers.
+ * Mirrors what the federation plugin returns once it is configured.
  */
 type Federated = ReturnType<typeof import("@module-federation/vite").federation>;
 
 /**
- * The package that ships the plugin, as far as this module reads it.
+ * Stands for the plugin package a loader resolves.
+ *
+ * @remarks
+ *   A test supplies its own loader so the suite runs without the optional peer
+ *   installed, and this is the shape such a loader has to satisfy.
  */
 export type Loaded = typeof import("@module-federation/vite");
 
 /**
- * Builds the federation plugin, importing it at the moment a config asks for one.
+ * Configures the federation plugin, resolving its package on first use.
  *
- * `@module-federation/vite` is an optional peer, so importing it at the top of a module makes it
- * required in practice: the barrel is what every consumer loads, and a static import in anything
- * the barrel re-exports fails the load for a repository that federates nothing. Reaching for it
- * here means only a config that states a host or a remote has to have it installed.
- *
- * Only the import is guarded. The plugin's own complaint about the options it was handed is the
- * answer a caller needs, and reporting it as a missing package would send them to install something
- * they already have.
- *
- * Which loader it calls is an argument so that the failure a repository without that package meets
- * is reachable from a specification here, where it is installed.
- *
- * @param stated - The plugin's own options, passed through.
- * @param load - How to reach the package. The real import unless a specification says otherwise.
- * @returns The plugin, once the package has loaded.
- * @throws Error Where the optional package is not installed.
+ * @remarks
+ *   A missing install and a rejected set of options both fail here, and only the
+ *   first is rewritten. An error the plugin raises about the options travels on
+ *   untouched, so a typo is not reported as a dependency that was never
+ *   installed.
+ * @param stated - The options handed straight to the plugin.
+ * @param load - Resolves the plugin package. A caller overrides it to avoid
+ *   depending on the optional peer.
+ * @returns The bundler plugins the options configure.
+ * @throws {@link Error} When the plugin package cannot be resolved.
  */
 export async function plugged(
   stated: Federating,

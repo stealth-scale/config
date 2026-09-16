@@ -1,11 +1,13 @@
+/**
+ * Checks which files the docblock excuse reaches and which rules it turns off.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { rendered } from "#lint/rendered.ts";
 
 /**
- * Reads back the override the contribution carries.
- *
- * @returns The paths it applies to, against the rules it changes for them.
+ * Unwraps the linter override the layer carries.
  */
 function override(): { files: string[]; rules: Record<string, unknown> } {
   return rendered().item as { files: string[]; rules: Record<string, unknown> };

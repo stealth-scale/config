@@ -1,3 +1,7 @@
+/**
+ * Checks that the formatter writes the doc comment shape the linter accepts.
+ */
+
 import { type UserConfig } from "vite-plus";
 import { describe, expect, it } from "vitest";
 
@@ -5,9 +9,7 @@ import { docblocks } from "#fmt/docblock.ts";
 import { DOCBLOCK } from "#lint/rules/docblock.ts";
 
 /**
- * Reads the docblock settings the preset sets.
- *
- * @returns Those settings.
+ * Reaches the doc comment block the layer states.
  */
 function settings(): Record<string, unknown> {
   const held = (docblocks().config as UserConfig).fmt?.jsdoc;

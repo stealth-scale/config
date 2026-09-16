@@ -1,10 +1,10 @@
 /**
- * How a specification is written, as rules a linter can check.
+ * Configures the vitest rules that make a specification its own documentation.
  *
- * A specification states behaviour as named cases. `describe` names the subject once and each `it`
- * states one case, so the two read together as one sentence: "layer sets kind on every layer". The
- * rules here hold that shape and the grammar of both titles. Whether the cases cover the branches
- * is not checkable, and `docs/standards/test-names.md` states it instead.
+ * @remarks
+ *   A specification carries no doc comments, so its titles have to carry the
+ *   same information. Each pattern is stated with a sentence beside it, and the
+ *   linter prints that sentence rather than the regular expression.
  */
 
 import vitest from "@vitest/eslint-plugin";
@@ -12,19 +12,17 @@ import vitest from "@vitest/eslint-plugin";
 import { type PluginRules } from "#lint/rules/rules.ts";
 
 /**
- * The name the plugin's rules are addressed by.
- *
- * Oxlint carries a `vitest` implementation of its own and reserves the name, so the plugin from npm
- * loads under a second one. The same split `jsdoc-js` already loads under.
+ * The prefix this configuration loads the vitest plugin's rules under.
  */
 const ALIAS = "vitest-js";
 
 /**
- * The grammar of a subject's title.
+ * Requires a describe title to be one unbroken word, and says why.
  *
- * The subject is the thing under test, so its title is that thing's name and nothing else. A title
- * carrying a space is a sentence about the subject rather than the subject, which leaves the case
- * titles beneath it with no sentence to complete.
+ * @remarks
+ *   The pattern refuses whitespace and nothing else, so an identifier, a
+ *   package name and a file name all pass. A title written as a phrase fails,
+ *   because the case titles underneath it are what finish the sentence.
  */
 const SUBJECT_TITLE = [
   String.raw`^\S+$`,
@@ -32,10 +30,12 @@ const SUBJECT_TITLE = [
 ];
 
 /**
- * The grammar of a case's title.
+ * Requires a case title to open on a lower-case word and carry no comma.
  *
- * Lower case because the sentence opens with the subject rather than here, and comma-free because
- * the clause after a comma is the reason the case exists rather than a second thing it checks.
+ * @remarks
+ *   The clause after a comma is why a case exists, and that belongs in the doc
+ *   comment above the thing under test. A title states what is checked, and the
+ *   describe title above it supplies the subject.
  */
 const CASE_TITLE = [
   String.raw`^[a-z][^,]*$`,
@@ -43,7 +43,12 @@ const CASE_TITLE = [
 ];
 
 /**
- * The opener that restates what the runner has already said.
+ * Turns away a case title that opens on the word `should`.
+ *
+ * @remarks
+ *   The pattern is anchored, so `should` anywhere later in a title is left
+ *   alone. A third-person verb already reads as a sentence, and the word only
+ *   moves the claim one step further from what the case asserts.
  */
 const NO_SHOULD = [
   String.raw`^should\b`,
@@ -51,42 +56,32 @@ const NO_SHOULD = [
 ];
 
 /**
- * The words that claim an assertion instead of describing one.
+ * The words a title reaches for when it has not said what is being checked.
  */
 const HOLLOW = ["correctly", "properly", "works"];
 
 /**
- * What a specification is named.
- *
- * The plugin looks for `.test.`, which is one of the two spellings vitest collects. A package here
- * writes one specification per source file, named after it, so the two sit side by side.
+ * The name every specification file has to match.
  */
 const SPEC_FILENAME = String.raw`.*\.spec\.[tj]sx?$`;
 
 /**
- * When a case states how many assertions it makes.
+ * Asks for a declared assertion count only where a callback holds an expect.
  *
- * Only where an assertion sits inside a callback, which is the case the count exists for: a
- * callback that never runs takes its assertions with it, and the case passes having checked
- * nothing.
- *
- * A loop is not that case. `onlyFunctionsWithExpectInLoop` reports a `for` over a constant array,
- * which always runs, and a count written there is a second number to keep true. A case asserting in
- * its own body cannot fail this way either.
+ * @remarks
+ *   A hook and a helper are left alone by this. Without it, every callback in
+ *   the file would be asked to declare a count it has no assertions to reach.
  */
 const COUNTED_WHERE_DEFERRED = { onlyFunctionsWithExpectInCallback: true };
 
 /**
- * Every rule the plugin publishes, each one an error.
+ * Rewrites the plugin's whole published rule list into two severities.
  *
- * `configs.all` states them as warnings and turns five off, each of those five being one side of a
- * pair whose other side contradicts it. A warning does not fail `vp check`, so a rule stated as one
- * is a rule that does not run. The five stay off.
- *
- * Read from the plugin rather than listed here, so a rule an upgrade adds is on without anybody
- * noticing that it exists.
- *
- * @returns Every published rule, renamed to the alias and raised to an error.
+ * @remarks
+ *   A rule the plugin ships off stays off, and every other one becomes an
+ *   error, so a rule added in a later release arrives already denied. Each name
+ *   is moved from the plugin's own prefix onto the alias it is loaded under
+ *   here.
  */
 function published(): PluginRules {
   const stated = Object.entries(vitest.configs.all.rules);
@@ -100,12 +95,13 @@ function published(): PluginRules {
 }
 
 /**
- * The specification standard, rule by rule.
+ * Applies every vitest rule, then states the house position on nine of them.
  *
- * Everything the plugin publishes, and then the decisions its defaults cannot make. A case is
- * written `it` and sits under the one `describe` that names the subject. A case whose body branches
- * is two cases, because the branch decides at run time which behaviour is checked, so neither is
- * named and the coverage reported belongs to whichever side the input took.
+ * @remarks
+ *   The entries written after the spread win, so a rule needing different
+ *   options is reconfigured in place rather than appearing twice. Two of the
+ *   nine are turned back off, because both would report on a specification this
+ *   house considers well written.
  */
 export const SPEC: PluginRules = {
   ...published(),

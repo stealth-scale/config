@@ -1,3 +1,7 @@
+/**
+ * Specifies which names the lint entry point publishes and which it holds back.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import * as lint from "#lint/index.ts";

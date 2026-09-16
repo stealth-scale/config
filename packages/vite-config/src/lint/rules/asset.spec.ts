@@ -1,3 +1,7 @@
+/**
+ * Specifies which unassigned imports the asset group allows and which it refuses.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { ASSET } from "#lint/rules/asset.ts";

@@ -7,12 +7,6 @@ import { defineConfig } from "@stealthscale/vite-config/preset/node";
 
 import { plain } from "#index.ts";
 
-/**
- * Composes the node tier for this package under a production build.
- *
- * @returns The composed configuration.
- * @throws {@link TypeError} When the tier does not export a function of the environment.
- */
 async function tier(): Promise<UserConfig> {
   const exported = defineConfig(new URL("..", import.meta.url).pathname);
 
@@ -25,13 +19,6 @@ async function tier(): Promise<UserConfig> {
   return composed;
 }
 
-/**
- * Narrows a block the toolchain types as either one block or an array of them.
- *
- * @param held - The block as the toolchain types it.
- * @returns The single block this package declares.
- * @throws {@link TypeError} When the block is absent or an array.
- */
 function one<Block>(held: Block | Block[] | undefined): Block {
   if (held === undefined || Array.isArray(held)) {
     throw new TypeError("expected one block");

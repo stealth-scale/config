@@ -1,3 +1,7 @@
+/**
+ * Specifies which linter categories are denied and which are left alone.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { CATEGORIES } from "#lint/rules/category.ts";

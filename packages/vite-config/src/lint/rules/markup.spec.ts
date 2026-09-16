@@ -1,3 +1,7 @@
+/**
+ * Specifies the markup and cookie APIs the browser tier turns away.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { MARKUP } from "#lint/rules/markup.ts";

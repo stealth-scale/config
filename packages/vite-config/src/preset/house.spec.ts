@@ -1,3 +1,7 @@
+/**
+ * Proves the house layers reach every tier and decide nothing a tier should.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { layers as app } from "#preset/app.ts";
@@ -7,10 +11,8 @@ import { layers as node } from "#preset/node.ts";
 import { layers as web } from "#preset/web.ts";
 
 /**
- * Names every layer a tier is built on, however deeply the tier nested them.
- *
- * @param of - The tier's layers.
- * @returns Every name in it.
+ * Flattens a nested layer list to whatever depth it reaches and lists what each
+ * is called.
  */
 function names(of: readonly unknown[]): string[] {
   return of.flatMap((held) =>

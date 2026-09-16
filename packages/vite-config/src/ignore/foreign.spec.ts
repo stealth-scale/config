@@ -1,3 +1,7 @@
+/**
+ * Proves the foreign globs name every tree a tool should walk past.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { FOREIGN } from "#ignore/foreign.ts";

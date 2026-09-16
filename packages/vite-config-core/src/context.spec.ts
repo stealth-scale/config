@@ -1,3 +1,11 @@
+/**
+ * Covers where the root is found, which directory is configured, and what the environment holds.
+ *
+ * @remarks
+ *   Each case lays a repository out in a temporary directory, because the code
+ *   under test answers by looking at the file system and has nothing to inject.
+ */
+
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -7,20 +15,20 @@ import { describe, expect, it, vi } from "vitest";
 import { contextOf, rooted } from "#context.ts";
 
 /**
- * The environment Vite+ resolves before a configuration is read.
+ * A development server run, which is the invocation these cases are read under.
  */
 const SERVING: ConfigEnv = { command: "serve", mode: "development" };
 
 /**
- * Lays out a repository in a temporary directory and answers where its package sits.
+ * Lays a two-level repository out on disk and reports both of its directories.
  *
- * Written to disk rather than mocked, because what is being specified is a walk up real directories
- * and a file read at the end of it: a mocked file system would specify the mock.
- *
- * @param manifest - What the root's manifest holds.
- * @param env - The `.env` file to write at the root, or nothing to write none.
- * @param own - The `.env` file to write at the package, or nothing to write none.
- * @returns The root, and a package directory two levels below it.
+ * @remarks
+ *   The package below always carries a manifest, so a case that wants a
+ *   directory with none has to name one that was never created.
+ * @param manifest - What the root manifest declares.
+ * @param env - The contents of a `.env` at the root, or nothing to write none.
+ * @param own - The contents of a `.env` in the package, or nothing to write
+ *   none.
  */
 function laid(
   manifest: Record<string, unknown>,
@@ -41,11 +49,7 @@ function laid(
 }
 
 /**
- * Lays out a workspace, since most of what follows wants one.
- *
- * @param env - The `.env` file to write at the root, or nothing to write none.
- * @param own - The `.env` file to write at the package, or nothing to write none.
- * @returns The root, and the package below it.
+ * Lays out a repository whose root manifest declares a workspace.
  */
 function workspace(env?: string, own?: string): { readonly at: string; readonly root: string } {
   return laid({ workspaces: ["packages/*"] }, env, own);
@@ -169,10 +173,9 @@ describe("context", () => {
   });
 
   /**
-   * Lays out a workspace pnpm's way, which states the directories beside the manifest.
+   * Lays out a repository that declares its workspace in a pnpm file alone.
    *
-   * @param yaml - What `pnpm-workspace.yaml` holds.
-   * @returns The root, and the package below it.
+   * @param yaml - The contents of the `pnpm-workspace.yaml` written at the root.
    */
   function pnpm(yaml: string): { readonly at: string; readonly root: string } {
     const held = laid({});

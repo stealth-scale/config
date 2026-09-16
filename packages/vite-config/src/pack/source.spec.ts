@@ -5,22 +5,11 @@ import { describe, expect, it } from "vitest";
 import { source } from "#pack/source.ts";
 import { SOURCE } from "#resolve/condition.ts";
 
-/**
- * What a manifest holds that matters here.
- */
 interface Packaged {
   files?: string[];
   publishConfig?: { exports: Record<string, string> };
 }
 
-/**
- * Every package under `packages`, against its manifest.
- *
- * Found rather than listed. A list would name directories, and a directory is renamed whenever the
- * package in it is — so the list would go stale by saying nothing rather than by failing.
- *
- * @returns Each package's directory against what its manifest holds.
- */
 function packaged(): ReadonlyArray<readonly [string, Packaged]> {
   const at = new URL("../../..", import.meta.url).pathname;
 
@@ -36,9 +25,6 @@ describe("source", () => {
     expect(held.exports.devExports).toBe(SOURCE);
   });
 
-  /**
-   * What a package manager ships whether or not the manifest names it.
-   */
   const ALWAYS = ["package.json"];
 
   it("ships whatever the published map points at in every published package", () => {

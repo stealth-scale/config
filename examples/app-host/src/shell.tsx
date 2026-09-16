@@ -1,5 +1,5 @@
 /**
- * The page the host owns, and the hole it leaves for what it loads.
+ * Draws the page the host owns, and the region it hands to whatever it loads.
  */
 
 import { type ReactElement, type ReactNode } from "react";
@@ -7,23 +7,22 @@ import { type ReactElement, type ReactNode } from "react";
 import { Panel } from "@stealthscale/example-lib-ui";
 
 /**
- * Describes what the host draws around.
+ * Carries what the host surrounds.
  */
 export interface ShellProps {
   /**
-   * What the loaded application drew, or what to show while it has not.
+   * Supplies whatever the loaded application drew, or a placeholder until it does.
    */
   children: ReactNode;
 }
 
 /**
- * Draws the host's own page around whatever it was handed.
+ * Frames the host's own panel around a named region the loaded application draws into.
  *
- * The loaded application arrives as an element rather than being imported here, so what this draws
- * can be specified without a remote running.
- *
- * @param props - The element to draw inside. `ShellProps` documents every member.
- * @returns The element.
+ * @remarks
+ *   Children arrive as an element rather than being imported here, so this renders under the test
+ *   runner with no remote running. The region carries an id, which is how a test on the finished
+ *   page finds what the remote drew.
  */
 export function Shell({ children }: ShellProps): ReactElement {
   return (

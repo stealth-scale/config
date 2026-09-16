@@ -1,17 +1,16 @@
+/**
+ * Checks the transform's defaults, what a caller may change, and that the shipped tsconfig agrees.
+ */
+
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 import { FACTORY, options, refresh } from "#plugin/refresh.ts";
 
-/**
- * A file kind the plugin does not compile until it is asked to.
- */
 const MDX = /\.mdx$/u;
 
 /**
- * Reads the tsconfig this package ships.
- *
- * @returns Its compiler options.
+ * Reads the compiler options out of the tsconfig fragment this package publishes.
  */
 function shipped(): Record<string, unknown> {
   const source = readFileSync(new URL("../../web.json", import.meta.url).pathname, "utf8");

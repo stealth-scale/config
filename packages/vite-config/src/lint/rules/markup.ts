@@ -1,25 +1,27 @@
 /**
- * What a package the browser runs may not do to the document.
+ * Refuses the browser APIs that turn a string into markup or into a session.
+ *
+ * @remarks
+ *   No rule here names a framework. A package rendering through React and a
+ *   package touching the DOM directly are held to the same list, so the group
+ *   survives a change of framework untouched.
  */
 
 import { type Rules } from "#lint/rules/rules.ts";
 
 /**
- * Says the same thing wherever markup is assigned rather than built.
+ * The reason given for refusing the two properties that parse what is assigned.
  */
 const PARSED =
   "Assigning markup parses it. Build the element, or sanitise it where that is the job.";
 
 /**
- * The refusals that only mean anything in a browser.
+ * Refuses each route a string takes to the parser, and the document cookie.
  *
- * Assigning a string to one of these parses it, which is the shortest path from a value to an XSS
- * hole. A package whose job is to render untrusted text sanitises first and argues for the
- * exception in its own override.
- *
- * Nothing here names a framework. A rule about React belongs to the package that configures React,
- * because this one cannot depend on it without making every later config package impossible to
- * add.
+ * @remarks
+ *   The cookie entry names `document` as its object, so a field called `cookie`
+ *   on anything else is left alone. Every entry carries a message, because a
+ *   refusal offering no reason gets worked around instead of understood.
  */
 export const MARKUP: Rules = {
   "no-restricted-properties": [

@@ -1,15 +1,16 @@
 /**
- * The other application's component, as this one reaches it.
+ * Reaches the component another application exposes, under the name this one registered it as.
  */
 
 import { lazy } from "react";
 
 /**
- * Fetched when the page first draws it.
+ * Draws the remote's dashboard, fetching it the first time the page renders it.
  *
- * `remote/` is the name this application gave that remote in its config, not a package and not a
- * path: nothing resolves it at build time, and the entry is fetched from wherever the remote is
- * deployed when this import is first reached.
+ * @remarks
+ *   The `remote/` prefix is neither a package nor a path. Nothing resolves it during the build, and
+ *   the entry is fetched from wherever that application is deployed when this import is first
+ *   reached. A render outside a Suspense boundary therefore throws.
  */
 export const Dashboard = lazy(async () => {
   const held = await import("remote/Dashboard");

@@ -1,3 +1,8 @@
+/**
+ * Proves a preview server binds where it was told and leaves the development
+ * server alone.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { bound } from "#preview/bound.ts";

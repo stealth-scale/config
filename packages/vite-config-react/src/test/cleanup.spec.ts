@@ -1,3 +1,7 @@
+/**
+ * Checks that the setup file the layer points at exists and is published with the package.
+ */
+
 import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 

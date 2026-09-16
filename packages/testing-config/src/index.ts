@@ -1,12 +1,11 @@
 /**
- * Reads a config or plugin package in a specification and lists what it breaks of the house
- * contract.
+ * Publishes the contract check a config, plugin or library package runs against itself.
  *
- * A package promises its consumers what its manifest publishes, what its barrel exports, and what
- * its layers are called and carry. No unit specification reaches any of those. A package adds one
- * specification that asserts an empty list, and fails its own gate with the sentence that names
- * what drifted.
- *
+ * @remarks
+ *   A breach is reported as a sentence naming the check, the thing and the expectation, so a
+ *   specification asserting on an empty array says what broke without anyone reaching for a
+ *   debugger. The package under check is read from the directory a caller names and imported by
+ *   the specification, never resolved from its published name.
  * @packageDocumentation
  */
 

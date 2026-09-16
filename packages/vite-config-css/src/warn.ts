@@ -1,5 +1,6 @@
 /**
- * Reporting on stylesheets without failing the build.
+ * Demotes the stylesheet check to a reporting one while a repository works
+ * through a backlog of violations.
  */
 
 import { type Layer, named, remove } from "@stealthscale/vite-config-core";
@@ -7,31 +8,28 @@ import { type Layer, named, remove } from "@stealthscale/vite-config-core";
 import { check, type Checked } from "#plugin/check.ts";
 
 /**
- * Describes a repository that reports on its stylesheets rather than failing on them.
+ * Records why a repository reports stylesheet violations instead of failing on them.
+ *
+ * @remarks
+ *   Everything the check itself takes is accepted here too, so demoting the
+ *   check keeps the globs and rules a repository had already configured.
  */
 export interface Warned extends Checked {
   /**
-   * Why this repository reports rather than fails, kept with the removal so a later reader can
-   * weigh it.
+   * Why this repository departs from a failing check. It is recorded against
+   * the removal and read back when somebody asks what took the check away.
    */
   because: string;
 }
 
 /**
- * Reports on stylesheets without failing the build.
+ * Takes the failing check back by name and states a reporting one in its place.
  *
- * Two layers rather than one: the plugin is built once with the answers it is given, so changing
- * one of them means taking the check back by name and putting another in its place. Whatever else
- * was asked for is restated here, because a repository turning failures into warnings is not also
- * asking for its rules back. Both layers carry this call's name, so a repository that takes
- * `css.warn` back is left with neither.
- *
- * A temporary state by construction. Nothing that only warns gets fixed, so the reason for reaching
- * for this is the reason to stop.
- *
- * @param stated - Why, and everything else the repository asked for. `Warned` documents every
- *   member.
- * @returns The removal and what replaces it, in that order.
+ * @remarks
+ *   The removal names `css.check`, which composition resolves against the
+ *   layers stated above it. A config listing this before `layers()`, or
+ *   without it, fails to load rather than quietly reporting nothing.
+ * @returns The removal, then the replacement, in the order a config keeps.
  */
 export function warn(stated: Warned): readonly Layer[] {
   const { because, ...checked } = stated;

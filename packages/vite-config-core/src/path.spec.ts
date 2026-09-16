@@ -1,3 +1,7 @@
+/**
+ * Covers what a dotted path grows, creates and replaces on the way to a list.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { appended } from "#path.ts";

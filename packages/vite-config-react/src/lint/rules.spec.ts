@@ -1,11 +1,13 @@
+/**
+ * Checks each React rule the layer declares, and that none of them is set to off.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { rules } from "#lint/rules.ts";
 
 /**
- * Reads the rules the contribution carries.
- *
- * @returns Each rule against what the linter should do about it.
+ * Unwraps the rule map the layer declares.
  */
 function stated(): Record<string, unknown> {
   const held = rules().item as { rules: Record<string, unknown> };

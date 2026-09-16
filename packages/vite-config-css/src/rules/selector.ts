@@ -1,18 +1,15 @@
 /**
- * What a selector may reach for, which decides how a stylesheet can be reused.
+ * Limits how far a selector reaches and how specific it becomes.
  */
 
 /**
- * The refusals that keep a selector reusable.
+ * Caps a selector at no id and refuses a class qualified by an element.
  *
- * An id is unique to a page, so a rule keyed on one can only ever style one element and cannot be
- * reused where the same thing appears twice. A class qualified by a type — `div.card` — ties the
- * style to the element it was first written against, so moving the class to a `section` silently
- * stops it applying. Both are Google's, and both are about the same thing: a selector that says
- * more than it needs to.
- *
- * Class naming is already checked by the shared set, which asks for the hyphen-separated names
- * Google asks for, so nothing here repeats it.
+ * @remarks
+ *   One id outranks any number of classes, so a stylesheet holding one starts
+ *   an escalation the cascade cannot settle. Qualifying a class with a tag
+ *   ties a style to the markup, and a component that later renders a different
+ *   element loses the style without an error anywhere.
  */
 export const SELECTOR = {
   "selector-max-id": 0,

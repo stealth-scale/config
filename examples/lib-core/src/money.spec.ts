@@ -1,3 +1,7 @@
+/**
+ * Pins down which pairs of amounts have a sum and which are refused.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { added } from "#money.ts";

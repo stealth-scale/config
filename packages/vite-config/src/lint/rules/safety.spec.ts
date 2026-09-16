@@ -1,3 +1,7 @@
+/**
+ * Specifies the console calls that stay and the pedantic rule that does not.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { CATEGORIES } from "#lint/rules/category.ts";

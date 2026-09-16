@@ -1,12 +1,14 @@
+/**
+ * Checks the relaxation against the tsconfig setting that justifies it.
+ */
+
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 import { runtime } from "#lint/runtime.ts";
 
 /**
- * Reads the tsconfig this package ships.
- *
- * @returns Its compiler options.
+ * Reads the compiler options out of the tsconfig fragment this package publishes.
  */
 function shipped(): Record<string, unknown> {
   const source = readFileSync(new URL("../../web.json", import.meta.url).pathname, "utf8");

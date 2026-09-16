@@ -1,3 +1,12 @@
+/**
+ * Covers the scratch directory's lifetime, its path guard and its two wrappers.
+ *
+ * @remarks
+ *   Every case that builds a workspace by hand removes it again, and each wrapper is checked once
+ *   on a return and once on a throw. A case that skipped either would leave a directory in `tmpdir`
+ *   that no later run reports.
+ */
+
 import { existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { describe, expect, it } from "vitest";

@@ -1,14 +1,14 @@
 /**
- * What no tool should walk into, because nobody wrote it here.
+ * Excludes the directories holding nothing this repository wrote.
  */
 
 /**
- * The directories holding something other than this repository's source.
+ * The globs matching installed, built, reported and bookkeeping trees.
  *
- * Installed, built, reported, or the repository's own bookkeeping. None of it was written by hand
- * here, so nothing a tool says about it is anybody's to act on.
- *
- * Named rather than assumed because naming a list replaces it: a runner walks past the first two on
- * its own, and stating where a test lives takes that back unless the list is given in full.
+ * @remarks
+ *   A coverage report and a test run both walk from the repository root, and
+ *   either would descend into every installed package given the chance. These
+ *   are ordinary globs rather than one runner's built-in defaults, so the same
+ *   four exclusions reach a tool that ships with none.
  */
 export const FOREIGN = ["**/node_modules/**", "**/.git/**", "**/dist/**", "**/coverage/**"];

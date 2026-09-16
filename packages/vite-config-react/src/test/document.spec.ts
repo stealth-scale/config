@@ -1,3 +1,7 @@
+/**
+ * Checks which document implementation the runner is given, and under which layer name.
+ */
+
 import { type UserConfig } from "vite-plus";
 import { describe, expect, it } from "vitest";
 

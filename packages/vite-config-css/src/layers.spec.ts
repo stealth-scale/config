@@ -1,3 +1,7 @@
+/**
+ * Covers what a package extending a tier gets back from the call.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { layers } from "#layers.ts";

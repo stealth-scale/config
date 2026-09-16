@@ -1,12 +1,14 @@
+/**
+ * Proves the staged formatting matches what the checker does not read.
+ */
+
 import { type UserConfig } from "vite-plus";
 import { describe, expect, it } from "vitest";
 
 import { formatted } from "#staged/formatted.ts";
 
 /**
- * Reads back the staged rules the layer states.
- *
- * @returns Each glob against what runs on it.
+ * Reads the glob table out of a freshly built layer.
  */
 function staged(): Record<string, unknown> {
   return (formatted().config as UserConfig).staged as Record<string, unknown>;

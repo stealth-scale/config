@@ -1,11 +1,10 @@
 /**
- * Turning a list of layers into one config, in the order the list states.
+ * Turns a list of layers into the one config a build runs on.
  *
- * Four kinds run in three passes rather than one, because two of them are not order-independent and
- * pretending otherwise would hide it. Presets settle first, so a contribution always appends to a
- * list that already exists. Contributions and removals then run in the order they were written,
- * which is what makes a removal above the contribution it names a mistake rather than a surprise.
- * Overrides run last, on a config nothing else will touch.
+ * @remarks
+ *   The three passes are presets, then contributions, then overrides. A layer
+ *   never sees what a later pass does, so a contribution cannot read a value an
+ *   override is about to rewrite.
  */
 
 import { mergeConfig, type UserConfig } from "vite";
@@ -23,26 +22,23 @@ import {
 import { appended } from "#path.ts";
 
 /**
- * Where a preset sits relative to the others.
+ * The weight each enforcement carries when presets are sorted.
  */
 const ORDER: Record<NonNullable<Preset["enforce"]>, number> = { post: 1, pre: -1 };
 
 /**
- * Flattens whatever nesting a caller wrote into one list of layers.
- *
- * @param extended - The layers, nested to any depth.
- * @returns Every layer, in the order written.
+ * Walks a nest of extends entries and returns the layers in reading order.
  */
 export function flattened(extended: readonly Extendable[]): readonly Layer[] {
   return extended.flatMap((held) => (isLayer(held) ? [held] : flattened(held)));
 }
 
 /**
- * Reads what a preset sets, which may be stated or computed.
+ * Settles one preset into the config it stands for.
  *
- * @param context - The command, the mode and the repository around them.
- * @param preset - Whichever preset is being read.
- * @returns The config it sets.
+ * @remarks
+ *   A preset stating a plain object is handed straight back. One stating a
+ *   function is called with the context and may answer with a promise.
  */
 async function setBy(context: Context, preset: Preset): Promise<UserConfig> {
   const held = await (typeof preset.config === "function" ? preset.config(context) : preset.config);
@@ -51,13 +47,13 @@ async function setBy(context: Context, preset: Preset): Promise<UserConfig> {
 }
 
 /**
- * Settles every preset, in enforce order.
+ * Merges every preset into a single config, in enforcement order.
  *
- * The merge is Vite+'s own, whose rules are specified already and carry years of edge cases.
- *
- * @param context - The command, the mode and the repository around them.
- * @param presets - The presets taking part.
- * @returns The config they agree on.
+ * @remarks
+ *   A preset stating no enforcement sorts with `pre`, and the sort is stable,
+ *   so two such presets keep the order the array gave them. The configs are
+ *   settled concurrently, which means one preset's function cannot depend on
+ *   another's having run.
  */
 async function settled(context: Context, presets: readonly Preset[]): Promise<UserConfig> {
   const ordered = presets.toSorted(
@@ -70,20 +66,14 @@ async function settled(context: Context, presets: readonly Preset[]): Promise<Us
 }
 
 /**
- * Walks the layers in the order they were written, applying each removal to what came before it.
+ * Applies every removal and returns the layers still standing.
  *
- * Every kind can be taken back, not only a contribution. A preset a framework package states and an
- * override it adds are as much its decisions as the item it appends, and a repository disagreeing
- * with one of them has the same thing to say about it. Taking a preset back by name is also the
- * only alternative to restating the keys it set, which is the work the preset existed to do.
- *
- * Order still decides: a removal reaches what is written above it and nothing below. That is what
- * keeps a config readable from the top, and what makes a removal in the wrong place an error rather
- * than a silence.
- *
- * @param layers - Every layer taking part, in order.
- * @returns The layers that survived, in the order they were written.
- * @throws Error When a removal names nothing stated above it.
+ * @remarks
+ *   A removal reaches the last matching layer above it, so the nearer of two
+ *   layers sharing a name goes first. Reaching nothing is an error rather than
+ *   a no-op, because a removal written above what it names would otherwise
+ *   pass while doing nothing.
+ * @throws {@link Error} When a removal names a layer that nothing above it stated.
  */
 export function surviving(layers: readonly Layer[]): readonly Layer[] {
   const held: Layer[] = [];
@@ -109,12 +99,14 @@ export function surviving(layers: readonly Layer[]): readonly Layer[] {
 }
 
 /**
- * Composes every layer into one config.
+ * Composes every layer that applies into one config for this environment.
  *
- * @param context - The command, the mode and the repository around them.
- * @param extended - The layers, nested to any depth.
- * @returns The config every layer agreed on.
- * @throws Error When a removal names nothing stated above it.
+ * @remarks
+ *   Layers the environment rules out are dropped before removals run, so a
+ *   removal aimed at a layer that does not apply here throws rather than
+ *   quietly matching nothing. What the caller wrote beside `extends` is not
+ *   merged in here, so the result is what the layers alone decided.
+ * @throws {@link Error} When a removal names a layer that nothing above it stated.
  */
 export async function resolved(
   context: Context,

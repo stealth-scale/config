@@ -1,19 +1,17 @@
 /**
- * Which whole categories of finding fail rather than warn.
+ * Sets the severity of each category the linter groups its own rules under.
  */
 
 import { type UserConfig } from "vite";
 
 /**
- * The categories a stealth package fails on.
+ * Denies the four categories that name a defect and leaves the rest untouched.
  *
- * A finding is a warning by default, and a warning does not fail `vp check` — so a repository could
- * carry every one of them and still report itself green. `correctness`, `pedantic`, `perf` and
- * `suspicious` name defects; `style` and `restriction` name positions, and a house that denies
- * those spends its attention arguing about them.
- *
- * `pedantic` is bearable only because `SAFETY` turns one rule inside it off. With that rule on it
- * reports five times as much as the other three together, none of it about the code.
+ * @remarks
+ *   A rule under `correctness`, `pedantic`, `perf` or `suspicious` reports code
+ *   that is wrong on its own terms. `restriction` and `style` report a position
+ *   somebody holds, and this house states those one rule at a time so that each
+ *   arrives with a reason.
  */
 export const CATEGORIES: NonNullable<NonNullable<UserConfig["lint"]>["categories"]> = {
   correctness: "error",

@@ -1,5 +1,5 @@
 /**
- * The names a dev server answers to.
+ * Lists the hostnames a development server answers to.
  */
 
 import { type Preset } from "@stealthscale/vite-config-core";
@@ -7,19 +7,14 @@ import { type Preset } from "@stealthscale/vite-config-core";
 import { reachable as answers } from "#serving/listening.ts";
 
 /**
- * Answers to the names given, beyond the loopback ones every server answers to.
+ * Admits each named host to the development server and turns away every other
+ * Host header.
  *
- * The dev server's half of `preview.reachable`, and needed for the same reason: a request whose
- * `Host` header the server does not recognise is refused with a `403`, because a name somebody else
- * controls can be pointed at this machine.
- *
- * `server.origin` belongs beside this wherever another origin loads what this one serves. The dev
- * server writes relative URLs for its own assets, and a page on another origin resolves those
- * against itself.
- *
- * @param names - The host names to answer to, each without a scheme or a port. What the repository
- *   knows about itself, which `STEALTH_HOSTS` overrides where a machine needs its own.
- * @returns The preset.
+ * @remarks
+ *   Vite refuses an unrecognised Host header so that a page in another tab
+ *   cannot rebind DNS and read a developer's source. The STEALTH_HOSTS
+ *   environment variable replaces this list outright where a machine has
+ *   arranged names the source never knew.
  */
 export function reachable(names: readonly string[] = []): Preset {
   return answers("server", names);

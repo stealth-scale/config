@@ -1,5 +1,5 @@
 /**
- * The commands a package installs.
+ * Declares the executables a package installs for whoever depends on it.
  */
 
 import { type Preset, preset } from "@stealthscale/vite-config-core";
@@ -7,19 +7,12 @@ import { type Preset, preset } from "@stealthscale/vite-config-core";
 import { type Commands } from "#pack/settings.ts";
 
 /**
- * Installs a command under the name it is run by.
+ * Publishes each named command, built from the source file stated against it.
  *
- * The packer works this out on its own by looking for a shebang, and names whatever it finds after
- * the package with its scope stripped. That is right until the two differ — a package named for
- * where it sits in a tree, installing a command named for what it does — and then the command is
- * published under a name nobody types and nothing reports it.
- *
- * Named source files rather than built ones. Under the source condition the `bin` field points at
- * source while the repository is being worked on and `publishConfig.bin` points at the build, which
- * is the same split the export map already gets.
- *
- * @param stated - Each command name against the file behind it, relative to the package.
- * @returns The preset.
+ * @remarks
+ *   The layer carries the command names in its own name, so a repository can see from a resolved
+ *   configuration which call put an executable there.
+ * @param stated - Each command name, against the source file it is built from.
  */
 export function command(stated: Commands): Preset {
   return preset({

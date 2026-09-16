@@ -1,3 +1,7 @@
+/**
+ * Proves a development server's host list lands under its own key.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { reachable } from "#server/reachable.ts";

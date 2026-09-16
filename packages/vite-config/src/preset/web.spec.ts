@@ -1,3 +1,7 @@
+/**
+ * Proves the web tier grants the browser's globals and withholds node's.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { CATEGORIES } from "#lint/rules/index.ts";
@@ -5,10 +9,7 @@ import { readBack } from "#preset/preset.fixtures.ts";
 import { defineConfig } from "#preset/web.ts";
 
 /**
- * Where the config under specification is: this package's own root.
- *
- * A config file sits at a package root, and the tier reads the manifest beside it. Naming this
- * directory instead would hand the layers a directory holding no manifest at all.
+ * The package root, which is where a tier expects to find a manifest.
  */
 const AT = new URL("../..", import.meta.url).pathname;
 

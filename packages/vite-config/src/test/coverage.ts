@@ -1,5 +1,5 @@
 /**
- * What coverage counts, what it does not, and how much of it is enough.
+ * How much of a package the suite has to reach, and what is not counted.
  */
 
 import { type Preset, preset } from "@stealthscale/vite-config-core";
@@ -8,30 +8,17 @@ import { FOREIGN } from "#ignore/foreign.ts";
 import { GENERATED } from "#ignore/generated.ts";
 
 /**
- * The source files coverage counts, whether or not a test loaded them.
- *
- * The provider's default counts only the files the tests imported. Under that default a source file
- * with no test is absent from the report, and a package with no specifications reports full
- * coverage of nothing. Naming the source here puts every file in the report at zero until a test
- * reaches it. The glob is written from any depth, because a workspace root measures every
- * package's source from its own directory.
+ * The files counted whether or not a test ever loads them.
  */
 const COUNTED = ["**/src/**"];
 
 /**
- * What is not source, and so is not something coverage can be low on.
+ * The files taken back out of the count.
  *
- * A specification is the measurement rather than the thing measured. A fixture exists to be read by
- * one. A config is run once by a tool and has no branches worth covering. A declaration holds no
- * statements at all.
- *
- * An entry point runs the program: `main.tsx` mounts the application, a file under `bin` is the
- * command, and a worker file is the worker. Each one has a side effect at module scope and no
- * branch of its own, and what it calls is covered where it is written.
- *
- * What was installed or built is here for a different reason: a specification reaching a sibling
- * package reaches its `dist`, and a repository asking to see uncovered files reaches its own —
- * neither is source anybody wrote.
+ * @remarks
+ *   Each entry is either the measurement itself or a file with nothing to
+ *   assert about: the entry point that starts a program, a worker body, a type
+ *   declaration, or something a tool wrote.
  */
 const UNCOUNTED = [
   "**/*.spec.{ts,tsx}",
@@ -46,17 +33,12 @@ const UNCOUNTED = [
 ];
 
 /**
- * How much of what is counted has to be reached.
+ * The share of each counted file a package has to reach.
  *
- * All of it. A threshold below a hundred is a number somebody picked, and the next person cannot
- * tell whether the gap between it and a hundred is deliberate or left over. At a hundred the
- * question is asked at the line that is not covered, where somebody can answer it — by writing the
- * test, or by saying in the config which files are not worth counting.
- *
- * Checked over the package rather than per file, so one small file with an awkward branch does not
- * have to be perfect while a large one hides behind an average. A repository that cannot hold to it
- * lowers it with `test.override.covering`, and the lowered number is then a decision with a name on
- * it.
+ * @remarks
+ *   Every number is 100, so measuring the package rather than each file changes
+ *   nothing but the report: a shortfall is named once for the package instead
+ *   of once for every file under the line.
  */
 const ENOUGH = {
   branches: 100,
@@ -67,13 +49,12 @@ const ENOUGH = {
 };
 
 /**
- * Counts what a test reached, and leaves out what was never source.
+ * Measures coverage on every run and holds the package to all of it.
  *
- * On for every run, which is not the runner's own default. The threshold is the gate, and a gate
- * that closes only when somebody asks for it is no gate. The cost is a slower run, and what is
- * stated here is what the number means.
- *
- * @returns The preset.
+ * @remarks
+ *   The counter is the engine's own rather than an instrumented build, so what
+ *   a test executes is what would ship. The terminal gets a summary and the
+ *   detail goes to a report, because four numbers are what a person reads.
  */
 export function coverage(): Preset {
   return preset({

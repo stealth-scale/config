@@ -1,3 +1,7 @@
+/**
+ * Checks a browser run against a driver that never launches anything.
+ */
+
 import { type ConfigEnv } from "vite-plus";
 import { describe, expect, it } from "vitest";
 
@@ -7,22 +11,21 @@ import { readBack } from "#preset/preset.fixtures.ts";
 import { type Browsed, browser, browsing, type Driver, driver } from "#test/browser.ts";
 
 /**
- * Where the config under specification is, which every `defineConfig` states for itself.
+ * The directory the config under test claims to be configuring.
  */
 const AT = import.meta.dirname;
 
 /**
- * The environment a test run is read in.
+ * The environment a test run arrives in.
  */
 const RUNNING: ConfigEnv = { command: "serve", mode: "test" };
 
 /**
- * Stands in for the driver, which this repository installs for nothing.
+ * Stands in for the Playwright module, recording what it was configured with.
  *
- * Answers what the block hands the runner rather than a running browser, so what is read back is
- * the options this layer passed. Whether Playwright accepts them is Playwright's contract.
- *
- * @returns The driver, as far as the block reads it.
+ * @remarks
+ *   The provider is handed back as a plain object rather than a launcher, so a
+ *   check reads the options a layer passed without a browser being downloaded.
  */
 function driving(): Promise<Driver> {
   return Promise.resolve({
@@ -31,10 +34,7 @@ function driving(): Promise<Driver> {
 }
 
 /**
- * Reads the browser block back once the layers have composed.
- *
- * @param stated - What the repository asked for.
- * @returns That block.
+ * Resolves a browser layer and returns the browser block it settled on.
  */
 async function block(stated: Browsed = {}): Promise<Record<string, unknown>> {
   const held = await readBack(defineConfig(AT, { extends: [browsing(stated, driving)] }), RUNNING);

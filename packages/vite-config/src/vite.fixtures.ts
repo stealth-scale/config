@@ -1,5 +1,5 @@
 /**
- * Standing in for what a layer is handed, and reading back what it states.
+ * Evaluates a layer for a test that has no Vite running around it.
  */
 
 import { type UserConfig } from "vite-plus";
@@ -7,14 +7,13 @@ import { type UserConfig } from "vite-plus";
 import { type Context, type Preset } from "@stealthscale/vite-config-core";
 
 /**
- * States what a layer is told, with whatever a test wants to differ.
+ * Describes a package inside a repository, with every field open to being
+ * restated.
  *
- * Stated rather than read, so no test turns on a `.env` file, on the shell it was started from, or
- * on a manifest written to a temporary directory. Two tests wanting different answers can then run
- * in either order.
- *
- * @param stated - Whatever differs from an ordinary package being served.
- * @returns The context to hand a layer.
+ * @remarks
+ *   The two paths put the package two directories below the root, which is the
+ *   shape a layer reading a workspace has to cope with. A test needing one
+ *   field different states that field and inherits the rest.
  */
 export function told(stated: Partial<Context> = {}): Context {
   return {
@@ -29,11 +28,16 @@ export function told(stated: Partial<Context> = {}): Context {
 }
 
 /**
- * Reads back the config a preset states, given what it is told.
+ * Reads what a layer contributes, whether it holds a plain object or a function
+ * of the context.
  *
- * @param layer - The preset to read.
- * @param stated - Whatever differs from an ordinary package being served.
- * @returns The config it states.
+ * @remarks
+ *   The two forms are indistinguishable from the type alone, and a test that
+ *   guessed wrong would assert against a function instead of a configuration.
+ *   Both come back the same way here, so an assertion is written once whichever
+ *   form the layer chose.
+ * @param layer - The layer to read.
+ * @param stated - The context fields to restate before reading it.
  */
 export function answered(
   layer: Preset,

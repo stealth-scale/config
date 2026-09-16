@@ -1,3 +1,7 @@
+/**
+ * Holds this package to the contract every library package in the repository keeps.
+ */
+
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 

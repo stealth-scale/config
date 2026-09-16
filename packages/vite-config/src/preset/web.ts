@@ -1,5 +1,5 @@
 /**
- * Configuring a package that publishes and runs in a browser.
+ * Configures a published package that runs in a browser.
  */
 
 import { configuring, type Defining, type Extendable } from "@stealthscale/vite-config-core";
@@ -10,23 +10,22 @@ import { house } from "#preset/house.ts";
 import * as test from "#test/index.ts";
 
 /**
- * The layers a library the browser runs is built on.
+ * Lists the layers a browser library is linted, packed and tested with.
  *
- * A library rather than an application: it is packed and installed by something else, which is what
- * the `pack` layers are for and why nothing here decides anything about a page. An application
- * reads `preset/app` instead.
- *
- * Answered as a list as well as bound below, so that a config package for a framework composes
- * these with its own rather than sitting beside them. Sitting beside them is what lets a repository
- * pair the wrong tier with the right framework and lose half its rules without being told.
- *
- * @returns Each layer the tier is built on, in the order they compose.
+ * @remarks
+ *   The browser's globals are in scope, node's are withheld, and a test runs
+ *   against a DOM rather than a bare runtime. A package needing both sets of
+ *   globals is two packages.
  */
 export function layers(): readonly Extendable[] {
   return [...house(), lint.preset.web(), pack.preset.web(), test.preset.web()];
 }
 
 /**
- * Composes a config for a library the browser runs.
+ * Composes the Vite configuration of a package published for a browser.
+ *
+ * @remarks
+ *   The output is packed rather than built, so a consumer receives modules to
+ *   bundle alongside its own code instead of a bundle it has to load whole.
  */
 export const defineConfig: Defining = configuring(layers);

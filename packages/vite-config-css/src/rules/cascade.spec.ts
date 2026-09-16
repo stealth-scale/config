@@ -1,3 +1,7 @@
+/**
+ * Reads back each rule the cascade set turns on.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { CASCADE } from "#rules/cascade.ts";

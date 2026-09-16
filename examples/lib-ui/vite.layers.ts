@@ -1,10 +1,17 @@
+/**
+ * Excuses one file of this package from the coverage the workspace root
+ * measures.
+ *
+ * @remarks
+ *   Coverage is measured once across the whole workspace, so a file left out of
+ *   it has to be named at the root. The glob is written from the root and the
+ *   reason is written here, beside the code it excuses.
+ */
+
 import { type Extendable, test } from "@stealthscale/vite-config";
 
 /**
- * What the root states on this package's behalf.
- *
- * Coverage is measured once across the whole run, so a file left out of it is named at the root.
- * The glob is written from the root, and the reason is written here, beside the code it excuses.
+ * The layers the root merges in on this package's behalf.
  */
 export const layers: readonly Extendable[] = [
   test.omit({

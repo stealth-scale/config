@@ -1,13 +1,11 @@
+/**
+ * Pins the surface this package publishes, so a block cannot be added without a decision.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import * as published from "#index.ts";
 
-/**
- * What a repository that renders reaches for.
- *
- * A block's namespace joins this list when that block exists, which is what the exact comparison
- * below is for: a surface grows because somebody meant it to.
- */
 const SURFACE = ["federation", "fmt", "layers", "lint", "plugin", "test", "workspace"];
 
 describe("vite-config-react", () => {

@@ -1,45 +1,54 @@
 /**
- * Builds the manifests a scratch workspace needs.
+ * Writes the manifests a scratch workspace is built out of.
  *
- * A root manifest carries the workspace globs. A package manifest carries the fields the code under
- * test reads.
+ * @remarks
+ *   Nothing here touches the disk. Each function returns file contents keyed by path, so a spec
+ *   spreads several of them into one object and hands that to a workspace to write.
  */
 
 import { type ScratchFiles } from "#scratch.ts";
 
 /**
- * The fields of a scratch manifest.
+ * The fields a generated manifest declares.
  *
- * Only `name` is required. Every other field is whatever the code under test reads.
+ * @remarks
+ *   The index signature takes any further field and writes it through unread, so a misspelled
+ *   `dependencies` reaches the manifest and the package manager that reads it stays quiet.
  */
 export interface ManifestFields {
   /**
-   * Names the package.
+   * The name the package resolves under.
    */
   readonly name: string;
 
+  /**
+   * Any further manifest field, serialised as it is given.
+   */
   readonly [field: string]: unknown;
 }
 
 /**
- * Serialises a manifest the way a package manager writes one: two-space indentation and a final
- * newline.
+ * Serialises manifest fields as the JSON text a package manager reads.
  *
- * @param fields - The fields to write. `version` defaults to `0.0.0`.
- * @returns The JSON text.
+ * @remarks
+ *   The version is `0.0.0` unless the fields carry one, which keeps a spec from declaring a version
+ *   it does not care about. The text ends in a newline, so a spec may compare it to a file written
+ *   by a formatter.
  */
 export function manifest(fields: ManifestFields): string {
   return `${JSON.stringify({ version: "0.0.0", ...fields }, null, 2)}\n`;
 }
 
 /**
- * Builds the files of one package under a directory: its manifest, and any other files at paths
- * relative to that directory.
+ * Places a package's manifest and the rest of its files under one directory.
  *
- * @param directory - The package's directory, relative to the workspace root.
- * @param fields - The fields to write into the manifest.
- * @param files - Other files of the package, relative to its directory. Default: none.
- * @returns Every file of the package, keyed relative to the workspace root.
+ * @remarks
+ *   Every key in `files` is read as a path inside the package, and one that already names the
+ *   directory nests it twice rather than failing.
+ * @param directory - Where the package sits below the workspace root, without a trailing slash.
+ * @param fields - The manifest fields for this package.
+ * @param files - Further file contents, keyed by a path inside the package.
+ * @returns Each file keyed by its path from the workspace root, the manifest first.
  */
 export function packageFiles(
   directory: string,
@@ -57,11 +66,11 @@ export function packageFiles(
 }
 
 /**
- * Builds the root manifest of a workspace, which is private and named `root`.
+ * Declares a workspace root over the globs its packages live under.
  *
- * @param workspaces - The workspace globs: `core/*`, `tools/*`.
- * @param fields - Other root fields, such as a catalog or devDependencies. Default: none.
- * @returns The root `package.json`.
+ * @remarks
+ *   The root is called `root` and marked private, so a spec cannot publish it by accident. The
+ *   extra fields are merged over both, which is how a caller renames the root or adds a catalog.
  */
 export function workspaceFiles(
   workspaces: readonly string[],

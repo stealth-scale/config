@@ -1,3 +1,7 @@
+/**
+ * Proves two proxy routes coexist, and that a later route naming a path wins.
+ */
+
 import { resolveConfig, type ResolvedConfig, type UserConfig } from "vite-plus";
 import { describe, expect, it } from "vitest";
 
@@ -7,15 +11,13 @@ import { readBack } from "#preset/preset.fixtures.ts";
 import { proxy } from "#server/proxy.ts";
 
 /**
- * Where the config under specification is, which every `defineConfig` states for itself.
+ * The directory a composed config is resolved against.
  */
 const AT = import.meta.dirname;
 
 /**
- * Resolves a config the way a running server does, which is where a default settles.
- *
- * @param config - What a repository stated.
- * @returns The config with every default filled in.
+ * Resolves a config the way Vite does when it starts, so the preview proxy
+ * table appears.
  */
 function running(config: UserConfig): Promise<ResolvedConfig> {
   return resolveConfig({ ...config, configFile: false }, "serve");

@@ -1,14 +1,16 @@
+/**
+ * Proves a preview server's allowed origins are copied, and that the
+ * environment overrides them.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { shared } from "#preview/shared.ts";
 import { answered } from "#vite.fixtures.ts";
 
 /**
- * Reads back the origins a layer allows.
- *
- * @param origins - The origins stated.
- * @param env - The variables the machine holds.
- * @returns The origins the preview answers.
+ * Reads back the origins a layer permits, under an environment a caller
+ * supplies.
  */
 async function allowed(
   origins: readonly string[],

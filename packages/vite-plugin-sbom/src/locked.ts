@@ -1,5 +1,11 @@
 /**
- * Where each package came from, which only the lockfile knows.
+ * Recovers the integrity and the origin of each installed package from the workspace lockfile.
+ *
+ * @remarks
+ *   A package manager writes little into an installed package and bun writes nothing at all, so the
+ *   lockfile is the only surviving record of what was actually fetched. Nothing here throws: a
+ *   lockfile that is missing, unparseable or in an unrecognised format yields no records, and a
+ *   build is never failed over a file nothing else in it reads.
  */
 
 import { existsSync, readFileSync } from "node:fs";
@@ -7,39 +13,47 @@ import { dirname, join } from "node:path";
 import { parseAllDocuments } from "yaml";
 
 /**
- * What a lockfile records about one installed package.
+ * Preserves what a lockfile pinned for one installed package.
+ *
+ * @remarks
+ *   Every field is optional because the formats disagree over what is worth keeping, and because a
+ *   package taken from the default registry at an ordinary version has no origin worth recording.
  */
 export interface Installed {
   /**
-   * Its subresource integrity, as `sha512-<base64>`.
+   * The subresource integrity string the manager checked the download against.
    */
   integrity?: string;
 
   /**
-   * The registry it came from, where that is not the default one.
+   * The address the package was fetched from, where that was not the default registry.
    */
   registry?: string;
 
   /**
-   * How it was asked for, where that was not a plain version: `github:owner/repo#sha`, a git
-   * remote, a tarball URL, a path.
+   * The version, or the reference such as a git commit that stands where a version would.
    */
   resolution?: string;
 }
 
 /**
- * Reads one package manager's lockfile.
+ * A function that reads one lockfile format out of a candidate workspace root.
  *
- * Answers nothing where that manager's lockfile is not the one in this repository, which is what
- * lets the readers be tried in turn.
+ * @remarks
+ *   Undefined means the format is absent from that directory, which is how the upward search tells
+ *   a workspace root from any directory above the package. An empty map means the lockfile is
+ *   present and pins nothing, and ends the search where it stands.
  */
 type Reader = (root: string) => ReadonlyMap<string, Installed> | undefined;
 
 /**
- * Reads a lockfile that allows trailing commas, which `bun.lock` does.
+ * Parses a document that JSON almost describes, dropping the trailing commas bun writes.
  *
- * @param at - The file to read.
- * @returns Its contents, or nothing where it cannot be read or parsed.
+ * @remarks
+ *   The bun lockfile is JSONC by choice, and no parser already in this tree reads it. Removing a
+ *   comma before a closing bracket covers the one deviation bun actually produces; a comment in the
+ *   file would still defeat this.
+ * @returns The parsed document, or undefined when the file cannot be read or does not parse.
  */
 function relaxed(at: string): unknown {
   try {
@@ -50,24 +64,26 @@ function relaxed(at: string): unknown {
 }
 
 /**
- * Answers whether a string is a subresource integrity.
+ * Reports whether a value is a digest, narrowing it to the string an algorithm prefix opens.
  *
- * @param held - The value to test.
- * @returns Whether it names a hash.
+ * @remarks
+ *   Both formats put the digest in a slot that also carries registry addresses and empty strings.
+ *   The prefix is the only thing separating them, so a digest written without one is passed over
+ *   rather than stored as an integrity nothing can verify.
  */
 function integral(held: unknown): held is string {
   return typeof held === "string" && /^sha\d{3}-/u.test(held);
 }
 
 /**
- * Reads one of `bun.lock`'s package entries.
+ * Turns one bun lockfile row into the name it installs and what it pins under that name.
  *
- * The entry is a tuple whose shape differs by where the package came from: a registry package
- * carries its registry in the second slot, a git one carries its dependencies there instead. Read
- * by what each slot holds rather than by position, since position is not stable between the two.
- *
- * @param held - The entry, as the lockfile holds it.
- * @returns The package's name against what the entry records, or nothing where it is unreadable.
+ * @remarks
+ *   A row's first field packs the name and the resolution together, and the split takes the last
+ *   `@` so that a scoped name survives it. The digest is looked for in the final field and the
+ *   registry in the second, since bun leaves the second empty for a default registry install.
+ * @returns The package name and what the row pins, or undefined for a row whose first field names
+ *   no resolution.
  */
 function entry(held: readonly unknown[]): readonly [string, Installed] | undefined {
   const first = held[0];
@@ -94,13 +110,12 @@ function entry(held: readonly unknown[]): readonly [string, Installed] | undefin
 }
 
 /**
- * Reads `bun.lock`.
+ * Gathers what bun.lock pins for each package listed in it.
  *
- * Bun writes no install metadata into the packages themselves — no `_resolved`, no `dist` — so the
- * lockfile is the only place recording where anything came from.
- *
- * @param root - The workspace root.
- * @returns Each package it records, or nothing where this workspace is not bun's.
+ * @remarks
+ *   A file present but holding no packages returns an empty map rather than undefined, which stops
+ *   the upward search at a workspace root whose lockfile has simply been emptied.
+ * @returns One record per readable row, or undefined where the directory holds no bun.lock.
  */
 function bun(root: string): ReadonlyMap<string, Installed> | undefined {
   const at = join(root, "bun.lock");
@@ -125,14 +140,11 @@ function bun(root: string): ReadonlyMap<string, Installed> | undefined {
 }
 
 /**
- * Splits a pnpm package key into what it names and which version.
+ * Cuts a pnpm package key into the name and whatever stands where its version would.
  *
- * Keyed as `name@version`, and the name may itself begin with an `@`, so the last separator is the
- * one that divides them. A package installed from anywhere but a registry carries its source where
- * the version would be.
- *
- * @param key - The key as the lockfile writes it.
- * @returns The name and what follows it, or nothing where the key divides nowhere.
+ * @remarks
+ *   The cut is made at the last `@`, so `@types/node@26.5.1` keeps its scope. A key holding no `@`
+ *   past its first character pins no version, and describes nothing this can record.
  */
 function divided(key: string): readonly [string, string] | undefined {
   const at = key.lastIndexOf("@");
@@ -143,11 +155,15 @@ function divided(key: string): readonly [string, string] | undefined {
 }
 
 /**
- * Reads what one pnpm entry records about where its package came from.
+ * Combines a pnpm key's version with its resolution block into the record kept for that package.
  *
- * @param version - Whichever text followed the name in the key.
- * @param resolution - The entry's `resolution` mapping.
- * @returns The record.
+ * @remarks
+ *   An ordinary version from the default registry is already carried by the package URL, so it is
+ *   left out here and recorded only where the key holds a reference instead of a version, or where
+ *   the entry names an archive of its own.
+ * @param version - The text after the last `@` in the key, which is a version for a registry
+ *   install and a reference for anything else.
+ * @param resolution - The entry's resolution block, whose fields differ by how it was installed.
  */
 function resolved(version: string, resolution: Readonly<Record<string, unknown>>): Installed {
   const integrity = resolution["integrity"];
@@ -164,11 +180,12 @@ function resolved(version: string, resolution: Readonly<Record<string, unknown>>
 }
 
 /**
- * Reads one of a pnpm lockfile's package entries.
+ * Reads one pnpm packages entry from its key and the value written under it.
  *
- * @param key - The key it is filed under, which is its name and where it came from.
- * @param one - The entry itself.
- * @returns Its name and record, or nothing where the entry states no resolution.
+ * @remarks
+ *   An entry is kept only where the key divides and a resolution block sits beneath it. An entry
+ *   carrying platform fields and nothing else pins no download, and is left out of the result.
+ * @returns The package name and what the entry pins, or undefined where either half is missing.
  */
 function record(key: string, one: unknown): readonly [string, Installed] | undefined {
   const split = divided(key);
@@ -182,10 +199,12 @@ function record(key: string, one: unknown): readonly [string, Installed] | undef
 }
 
 /**
- * Reads the `packages` map of one document into the entries gathered so far.
+ * Adds every readable entry of one parsed document to the records collected so far.
  *
- * @param held - The document, as an ordinary object.
- * @param found - The map to add to.
+ * @remarks
+ *   A name met twice keeps whatever the later document said about it. pnpm puts the packages that
+ *   make up its own installation in a document ahead of the dependency set, and this ordering is
+ *   what lets the real set win.
  */
 function gathered(held: unknown, found: Map<string, Installed>): void {
   const packages: unknown =
@@ -201,17 +220,13 @@ function gathered(held: unknown, found: Map<string, Installed>): void {
 }
 
 /**
- * Reads `pnpm-lock.yaml`.
+ * Gathers what pnpm-lock.yaml pins, across every document the file holds.
  *
- * Parsed rather than scanned. A pnpm entry nests its resolution as a mapping and quotes its keys,
- * and getting either subtly wrong loses the hash for a package rather than failing where somebody
- * would notice.
- *
- * Every document, because the file holds more than one: pnpm writes the build it installed itself
- * with ahead of a `---`, and the lockfile proper after it.
- *
- * @param root - The workspace root.
- * @returns Each package it records, or nothing where this workspace is not pnpm's.
+ * @remarks
+ *   The file can carry more than one YAML document and a `packages` key can appear in each of them.
+ *   A reader stopping at the first document would describe the packages pnpm is installed from
+ *   rather than the ones the repository depends on.
+ * @returns One record per readable entry, or undefined where the directory holds no pnpm-lock.yaml.
  */
 function pnpm(root: string): ReadonlyMap<string, Installed> | undefined {
   const at = join(root, "pnpm-lock.yaml");
@@ -230,19 +245,18 @@ function pnpm(root: string): ReadonlyMap<string, Installed> | undefined {
 }
 
 /**
- * The lockfiles this knows how to read, tried in turn.
- *
- * One function each, answering nothing where its own lockfile is absent. Another manager is another
- * entry here: npm's lockfile is a nested tree, so it needs its own reading and nothing else has to
- * change.
+ * The lockfile formats that can be read, in the order they are tried.
  */
 const READERS: readonly Reader[] = [bun, pnpm];
 
 /**
- * Finds the workspace root above a package, which is where a lockfile sits.
+ * Climbs from a directory to the nearest ancestor holding a lockfile one reader recognises.
  *
- * @param from - The package's directory.
- * @returns The nearest directory holding a lockfile this can read, or nothing.
+ * @remarks
+ *   A package inside a workspace keeps no lockfile of its own, and the climb stops at the first
+ *   directory that has one rather than at the outermost.
+ * @returns The directory holding the lockfile, or undefined when the climb reaches the filesystem
+ *   root without finding one.
  */
 function rooted(from: string): string | undefined {
   for (let at = from; ;) {
@@ -257,14 +271,15 @@ function rooted(from: string): string | undefined {
 }
 
 /**
- * Reads what the repository's lockfile says about every package in it.
+ * Collects what the workspace lockfile pins for every package installed under it.
  *
- * A manifest cannot answer this. It says what a package is, not where this copy of it came from,
- * and the difference is what tells a public package apart from one of the same name inside a
- * company registry — which a scanner would otherwise look up and answer about the wrong thing.
- *
- * @param from - Any directory inside the workspace.
- * @returns Each package's install record, by name, or an empty map where no lockfile was found.
+ * @remarks
+ *   A repository holding two lockfiles is read by whichever reader comes first, and the other is
+ *   ignored rather than merged into it. A record is keyed by package name alone, so where two
+ *   versions of one package are installed side by side only one of them survives.
+ * @param from - A directory inside the workspace. The search for a lockfile climbs from here.
+ * @returns One record per installed package, and an empty map where no lockfile was found or none
+ *   could be read.
  */
 export function locked(from: string): ReadonlyMap<string, Installed> {
   const root = rooted(from);

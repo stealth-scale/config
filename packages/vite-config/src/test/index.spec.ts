@@ -1,3 +1,7 @@
+/**
+ * Checks that the test layers a package reaches for are published.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import * as suite from "#test/index.ts";

@@ -1,15 +1,15 @@
 /**
- * What a tool wrote, which every other tool walks past.
+ * Excludes the files a tool wrote rather than a person.
  */
 
 /**
- * What a tool wrote rather than a person.
+ * The globs matching generated source, under either spelling this repository
+ * uses.
  *
- * Nothing here is anybody's to change: the way to change it is to change the tool or its input, and
- * the file is overwritten on the next run either way. A linter reporting a finding in one asks for
- * a fix that cannot be kept, and a formatter rewriting one starts a fight it loses on the next run.
- * `node_modules` and a build directory are already walked past, so neither is named here.
- *
- * The conventional spellings for a written file, and a directory of them.
+ * @remarks
+ *   The formatter, the linter and the coverage report all read this one list,
+ *   so a generated file is never reformatted into a diff nor counted against a
+ *   threshold nobody can move. Nothing installed or built is named here; the
+ *   foreign list covers those.
  */
 export const GENERATED: readonly string[] = ["**/*.gen.*", "**/generated/**"];

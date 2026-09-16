@@ -1,5 +1,5 @@
 /**
- * The `lint` block, as a package that renders needs it.
+ * Gathers the linting block a repository root reaches through `lint`.
  */
 
 export { fixtures } from "#lint/fixtures.ts";

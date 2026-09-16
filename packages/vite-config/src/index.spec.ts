@@ -2,12 +2,6 @@ import { describe, expect, it } from "vitest";
 
 import * as published from "#index.ts";
 
-/**
- * What a config is written with, and what another config package builds layers with.
- *
- * A block's namespace joins this list when that block exists, which is what the exact comparison
- * below is for: a surface grows because somebody meant it to.
- */
 const SURFACE = [
   "build",
   "configuring",
@@ -35,12 +29,6 @@ const SURFACE = [
   "worker",
 ];
 
-/**
- * How layers are composed, and where a contribution finds its list.
- *
- * Every one of these is machinery `defineConfig` uses. Published, each becomes API that cannot
- * change without a major version, for nobody's benefit.
- */
 const WITHHELD = ["appended", "flattened", "isLayer", "resolved", "surviving"];
 
 describe("vite-config", () => {

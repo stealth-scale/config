@@ -104,8 +104,6 @@ describe("renderedAs", () => {
   });
 
   it("returns an SVG mark under the same name as an HTML one", () => {
-    // The document reports an HTML tag upper-cased and an SVG one as it was written, which would
-    // otherwise make an icon the one part a specification names in lower case.
     const { container } = render(<svg data-part="icon" />);
 
     expect(renderedAs(container, "icon")).toBe("SVG");

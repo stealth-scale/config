@@ -1,12 +1,15 @@
+/**
+ * Proves the proving task runs its three commands in order and caches none of
+ * it.
+ */
+
 import { type UserConfig } from "vite-plus";
 import { describe, expect, it } from "vitest";
 
 import { ci } from "#run/ci.ts";
 
 /**
- * Reads back the task the layer states.
- *
- * @returns The `ci` task.
+ * Reads the proving task out of a freshly built layer.
  */
 function proving(): { cache: false; command: string[] } {
   return (ci().config as UserConfig).run?.tasks?.["ci"] as { cache: false; command: string[] };

@@ -1,3 +1,7 @@
+/**
+ * Proves the house supplier carries the entity a generated SBOM has to name.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { HOUSE } from "#sbom/supplier.ts";

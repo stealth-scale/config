@@ -1,3 +1,8 @@
+/**
+ * Proves the workspace tier adds what only a repository root declares, under
+ * removable names.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { type Layer } from "@stealthscale/vite-config-core";
@@ -6,17 +11,12 @@ import { readBack } from "#preset/preset.fixtures.ts";
 import { defineConfig, layers } from "#preset/workspace.ts";
 
 /**
- * Where the config under specification is: this package's own root.
- *
- * A config file sits at a package root, and the tier reads the manifest beside it. Naming this
- * directory instead would hand the layers a directory holding no manifest at all.
+ * The package root, which is where a tier expects to find a manifest.
  */
 const AT = new URL("../..", import.meta.url).pathname;
 
 /**
- * Names every layer the tier hands over.
- *
- * @returns Each name, flattened.
+ * Flattens the workspace tier's layers one level and lists what each is called.
  */
 function names(): string[] {
   const flat: Layer[] = layers().flatMap((held) =>

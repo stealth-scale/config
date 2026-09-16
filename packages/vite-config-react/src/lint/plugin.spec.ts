@@ -1,3 +1,7 @@
+/**
+ * Checks which linter plugins a root loads, and which one it deliberately leaves out.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { plugins } from "#lint/plugin.ts";

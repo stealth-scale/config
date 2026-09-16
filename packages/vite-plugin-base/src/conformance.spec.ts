@@ -1,3 +1,12 @@
+/**
+ * Holds this package to the contract every published library here keeps.
+ *
+ * @remarks
+ *   The manifest and the entry point are checked together, so an export the
+ *   package declares but does not deliver fails here rather than in the first
+ *   consumer to install it.
+ */
+
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 

@@ -1,5 +1,5 @@
 /**
- * The address a preview listens on.
+ * Decides which interface a preview server binds.
  */
 
 import { type Preset } from "@stealthscale/vite-config-core";
@@ -7,25 +7,14 @@ import { type Preset } from "@stealthscale/vite-config-core";
 import { bound as listens } from "#serving/listening.ts";
 
 /**
- * Listens on the address given rather than on IPv6 loopback alone.
+ * Binds a preview server to an interface, and to loopback when hosts are named
+ * instead.
  *
- * A server left alone binds `::1`, which is `localhost` and nothing else. A name that resolves to
- * `127.0.0.1` — which is what a wildcard record pointed at a developer's own machine usually gives
- * — then reaches nothing at all, and the failure is a refused connection rather than a refused
- * request, so it looks like the server is down.
- *
- * Needed once anything is reached by a real name, which for two applications joined at run time is
- * immediately: they have to be two origins, and names are the only way to get two origins that
- * behave in development the way they will in production.
- *
- * `true` listens on every interface, which puts the server on the network the machine is on. That
- * is a decision about where a person is working rather than about the application, so it is asked
- * for rather than assumed.
- *
- * @param at - The address to listen on, or `true` for every interface. A list of names instead
- *   works the address out from them and from the machine's own environment, which is what an
- *   application that states the names it is served under passes.
- * @returns The preset.
+ * @remarks
+ *   The development server keeps whatever address it was given, so showing the
+ *   build to a phone on the same network does not also put the source within
+ *   reach. An empty list contributes no configuration and leaves Vite's own
+ *   default standing.
  */
 export function bound(at: boolean | readonly string[] | string = []): Preset {
   return listens("preview", at);

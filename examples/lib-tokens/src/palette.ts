@@ -1,12 +1,15 @@
 /**
- * The colours this library defines, and what it writes them out as.
+ * Defines the design tokens and turns them into the stylesheet the package ships.
+ *
+ * @remarks
+ *   The tokens live here as data rather than in a `.css` file, so the build can
+ *   both write the stylesheet and hand the same values to TypeScript. One
+ *   definition then feeds a consumer that reads a custom property and one that
+ *   reads a string.
  */
 
 /**
- * Each token against the colour it stands for.
- *
- * The one place the values are written. Everything this package ships is worked out from here, so
- * adding a colour is one edit rather than one edit and a stylesheet somebody has to remember.
+ * Every custom property the stylesheet declares, keyed by its own name.
  */
 export const PALETTE: Readonly<Record<string, string>> = {
   "--ink": "#1a1a1a",
@@ -15,24 +18,26 @@ export const PALETTE: Readonly<Record<string, string>> = {
 };
 
 /**
- * The subpaths this package publishes beyond what the packer builds.
+ * Maps the subpath a consumer imports onto the file the build leaves behind.
  *
- * Named here rather than in the config, because this module is what decides that the stylesheet
- * exists and what it is called. A second copy in the config would be a list to keep in step, and
- * the failure when it drifted would be a subpath pointing at a file nothing writes any more.
+ * @remarks
+ *   The build writes the stylesheet and the manifest advertises it, and both
+ *   read this map. Stating the pair once means a renamed output cannot leave
+ *   the export map pointing at a file that is no longer written.
  */
 export const TOKEN_EXPORTS: Readonly<Record<string, string>> = {
   "./tokens.css": "./dist/tokens.css",
 };
 
 /**
- * Writes the palette as a stylesheet, which no bundler would produce.
+ * Writes the palette out as a `:root` rule a browser can load.
  *
- * A custom property is not a module and cannot be imported, so the values have to reach a browser
- * as text. Generating it from the same object the types come from is what keeps the stylesheet and
- * the module saying the same thing.
- *
- * @returns The text a browser reads the colours from.
+ * @remarks
+ *   The declarations land on `:root` so a custom property is inherited by every
+ *   element and a consumer can override one on a narrower selector. Nothing is
+ *   escaped, so a token name or colour holding a brace produces a stylesheet
+ *   that does not parse.
+ * @returns The rule as CSS text, ending in a newline.
  */
 export function stylesheet(): string {
   const rules = Object.entries(PALETTE).map(([token, colour]) => `  ${token}: ${colour};`);

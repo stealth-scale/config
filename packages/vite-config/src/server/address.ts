@@ -1,5 +1,5 @@
 /**
- * Where a dev server is reached: its port, its names, and the address that follows from them.
+ * Opens a development server on its whole listening address in one call.
  */
 
 import { type Preset } from "@stealthscale/vite-config-core";
@@ -7,19 +7,15 @@ import { type Preset } from "@stealthscale/vite-config-core";
 import { address as at } from "#serving/listening.ts";
 
 /**
- * States where the dev server is reached, in one layer set rather than three.
+ * Opens a development server on a fixed port and admits each host named.
  *
- * `server.port`, `server.reachable` and `server.bound` answer one question between them, and an
- * application states all three or none: a name the server answers to is a name that resolves to
- * loopback, so the address follows from the names rather than being a separate decision.
- *
- * Each of the three is still its own layer under its own name, so a repository that disagrees with
- * one takes that one back.
- *
- * @param port - The port to serve at.
- * @param names - The names it answers to, beyond loopback. What the repository knows about itself,
- *   which `STEALTH_HOSTS` overrides where a machine needs its own.
- * @returns The layers, in the order they compose.
+ * @remarks
+ *   The three layers come back separately rather than merged into one, so a
+ *   repository can drop the host list by name and keep the port it was given.
+ * @param port - The port to bind. A port already taken fails the start.
+ * @param names - The hostnames a browser may use. An empty list leaves the
+ *   server on the address Vite would have chosen and admits nothing by name.
+ * @returns The port, the host list and the bind address, in that order.
  */
 export function address(port: number, names: readonly string[] = []): readonly Preset[] {
   return at("server", port, names);

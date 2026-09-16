@@ -1,5 +1,5 @@
 /**
- * What this application draws, on a server first and in a browser after.
+ * Draws the one component the server pass renders and the browser pass hydrates.
  */
 
 import { type ReactElement } from "react";
@@ -7,24 +7,22 @@ import { type ReactElement } from "react";
 import { Panel } from "@stealthscale/example-lib-ui";
 
 /**
- * Describes what the summary reports.
+ * Carries the subject a summary prints.
  */
 export interface SummaryProps {
   /**
-   * What the summary is about.
+   * The thing being summarised, printed as it was given.
    */
   subject: string;
 }
 
 /**
- * Reports its subject inside the shared panel.
+ * Draws a titled panel naming the subject it was handed.
  *
- * Nothing here knows which side it is drawn on, which is the whole point: the server renders it to
- * text and the browser renders the same component over that text. A component that reached for
- * `document` would render on one side and throw on the other.
- *
- * @param props - The subject. `SummaryProps` documents every member.
- * @returns The element.
+ * @remarks
+ *   Both passes render this component, so it reads nothing off the document and nothing off a
+ *   clock. A value that differs between the two makes React throw the server's markup away and
+ *   draw the tree again in the browser.
  */
 export function Summary(props: SummaryProps): ReactElement {
   return <Panel title="Summary">{`Rendered on a server: ${props.subject}.`}</Panel>;

@@ -1,3 +1,7 @@
+/**
+ * Checks that the selector set still refuses an id and a qualified class.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { SELECTOR } from "#rules/selector.ts";

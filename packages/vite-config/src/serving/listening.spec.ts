@@ -1,3 +1,7 @@
+/**
+ * Checks where each of the two servers listens, and what it answers to.
+ */
+
 import { type UserConfig } from "vite-plus";
 import { describe, expect, it } from "vitest";
 
@@ -7,19 +11,17 @@ import { bound, port, reachable, type Serving } from "#serving/listening.ts";
 import { answered } from "#vite.fixtures.ts";
 
 /**
- * Both servers, since everything here is true of each.
+ * The two servers every layer here is expected to behave the same way for.
  */
 const BOTH: readonly Serving[] = ["preview", "server"];
 
 /**
- * Reads back the block a layer wrote, under whichever of the two keys it wrote it.
+ * Resolves a layer and reads back the block filed under one of the servers.
  *
- * Read without awaiting, because every layer here states its config outright.
- *
- * @param layer - The layer to read.
- * @param where - Which server it was speaking about.
- * @param stated - Whatever differs from an ordinary package being served.
- * @returns That server's block, or nothing where the layer stated none.
+ * @remarks
+ *   Asking for the server a layer was not written for is how a check proves the
+ *   other one was left alone, so an absent block is an answer rather than a
+ *   failure.
  */
 function block(
   layer: Preset,

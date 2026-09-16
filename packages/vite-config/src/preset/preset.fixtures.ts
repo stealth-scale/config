@@ -1,23 +1,26 @@
 /**
- * Reading a defined config back, which every preset's specification has to do.
+ * Lets a test read back the configuration a tier's defineConfig produced.
  */
 
 import { type ConfigEnv, type UserConfig } from "vite-plus";
 
 /**
- * The environment a build is read in.
+ * The command and mode a configuration is evaluated under unless a test names
+ * another.
  */
 export const BUILDING: ConfigEnv = { command: "build", mode: "production" };
 
 /**
- * Reads a defined config back, the way Vite+ does.
+ * Evaluates what a defineConfig call returned and hands back the configuration
+ * it produced.
  *
- * A config composed of layers is always answered as a function of the environment, so calling it is
- * what a specification has to do to see the result.
- *
- * @param held - What `defineConfig` answered.
- * @param env - The environment to read it in.
- * @returns The composed config.
+ * @remarks
+ *   A tier returns a function rather than an object, because a layer is
+ *   entitled to read the command and the mode before deciding anything. A test
+ *   asserting on a key has to run that function first, and this is the single
+ *   cast that does it.
+ * @param held - The value a defineConfig call returned.
+ * @param env - The command and mode to evaluate under.
  */
 export function readBack(held: unknown, env: ConfigEnv = BUILDING): Promise<UserConfig> {
   return (held as (given: ConfigEnv) => Promise<UserConfig>)(env);

@@ -1,12 +1,15 @@
+/**
+ * Proves the preview headers are sent, copied, and stop short of a deployment's
+ * own.
+ */
+
 import { type UserConfig } from "vite-plus";
 import { describe, expect, it } from "vitest";
 
 import { headers } from "#preview/headers.ts";
 
 /**
- * Reads back the headers a preview answers with.
- *
- * @returns Each header against its value.
+ * Reads the header table out of a freshly built layer.
  */
 function answered(): Record<string, string> {
   return (headers().config as UserConfig).preview?.headers as Record<string, string>;

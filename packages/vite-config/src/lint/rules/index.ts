@@ -1,5 +1,10 @@
 /**
- * Every rule a stealth package is linted by, gathered from the domains beside this file.
+ * Gathers the rule groups into the set each tier applies.
+ *
+ * @remarks
+ *   Every rule is named in exactly one group, and the groups are spread in a
+ *   fixed order. A rule appearing in two would be settled silently by that
+ *   order, which is a sign the groups are drawn in the wrong place.
  */
 
 import { ASSET } from "#lint/rules/asset.ts";
@@ -24,31 +29,33 @@ export { SPEC } from "#lint/rules/spec.ts";
 export { STYLE } from "#lint/rules/style.ts";
 
 /**
- * What every package is held to, wherever it runs.
+ * Collects the rules that hold wherever the code ends up running.
  *
- * @returns The rules.
+ * @remarks
+ *   Nothing in this set names a host API. A package can be moved between the
+ *   console and the browser without any of these findings changing.
  */
 export function base(): PluginRules {
   return { ...SIZE, ...SAFETY, ...STYLE, ...DOCBLOCK, ...SORT, ...ASSET };
 }
 
 /**
- * What a package the console runs is held to.
+ * Collects the rules for a package the console runs.
  *
- * The same as the base for now. Node's own relaxation — a package whose output _is_ the console —
- * is a property of that package rather than of node, so it is stated as an override over its own
- * paths rather than granted to everything running there.
- *
- * @returns The rules.
+ * @remarks
+ *   Nothing is added to the base set. This tier differs from the base tier in
+ *   the environment its preset declares, not in the rules it applies.
  */
 export function node(): PluginRules {
   return base();
 }
 
 /**
- * What a package the browser runs is held to.
+ * Collects the rules for a package the browser runs.
  *
- * @returns The rules, with what only means anything against a document.
+ * @remarks
+ *   The markup group is added last and is the only group naming a DOM API. A
+ *   package the console runs is never held to it.
  */
 export function web(): PluginRules {
   return { ...base(), ...MARKUP };

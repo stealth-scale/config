@@ -1,12 +1,14 @@
+/**
+ * Proves the staged check matches source alone and fixes what it can.
+ */
+
 import { type UserConfig } from "vite-plus";
 import { describe, expect, it } from "vitest";
 
 import { checked } from "#staged/checked.ts";
 
 /**
- * Reads back the staged rules the layer states.
- *
- * @returns Each glob against what runs on it.
+ * Reads the glob table out of a freshly built layer.
  */
 function staged(): Record<string, unknown> {
   return (checked().config as UserConfig).staged as Record<string, unknown>;

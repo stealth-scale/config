@@ -1,93 +1,113 @@
 /**
- * Walks the barrel of a config package and sorts its exports into factories, namespaces and
- * constants.
+ * Walks an imported barrel into the factories and namespaces the later checks work from.
+ *
+ * @remarks
+ *   The barrel is walked as a value and not read as source, so a namespace is whatever the module
+ *   exports as an object and a factory is whatever it exports as a function. A constant is
+ *   recognised by its name alone and never opened.
  */
 
 /**
- * A function a consumer calls for a layer, with the path they write to reach it.
+ * Pairs a callable export with the path it sits at in the barrel.
+ *
+ * @remarks
+ *   The path is what a consumer writes at a call site, such as `lint.relax`, and it is the key
+ *   arguments and layer names are matched under.
  */
 export interface Factory {
   /**
-   * The function itself.
+   * The exported function, called with whatever the specification supplies.
    */
   readonly call: (...args: readonly unknown[]) => unknown;
 
   /**
-   * The path a consumer writes: `lint.relax`, `layers`, `test.preset.node`.
+   * Where the function sits in the barrel, dotted from the top level down.
    */
   readonly path: string;
 }
 
 /**
- * The arguments each factory is called with, keyed by the path a consumer writes.
+ * Maps each factory's path to the arguments it is called with.
+ *
+ * @remarks
+ *   A factory with required parameters and no entry here goes uncalled and is reported. Supplying
+ *   an empty array for one is the way to call it with nothing on purpose.
  */
 export type Arguments = Readonly<Record<string, readonly unknown[]>>;
 
 /**
- * The result of walking a barrel.
+ * Groups what the walk made of a barrel into factories, namespaces, and what fits neither.
+ *
+ * @remarks
+ *   Namespaces are collected at the top level only, because the README's block table names those
+ *   and not the exports nested inside them.
  */
 export interface Walked {
   /**
-   * Every factory, in the order the barrel exports them.
+   * Every callable export worth calling, at whatever depth it was found.
    */
   readonly factories: readonly Factory[];
 
   /**
-   * The top-level namespaces. A README block table has to name each one.
+   * The top-level namespaces, under the names the README's block table uses.
    */
   readonly namespaces: readonly string[];
 
   /**
-   * Each export that is neither a function, a namespace nor a constant.
+   * Every export that is neither a function, a namespace nor a constant.
    */
   readonly violations: readonly string[];
 }
 
 /**
- * The two top-level functions that compose layers for a consumer.
+ * The top-level factories called whether or not a specification supplies arguments.
  *
- * Any other top-level function is called only when the specification supplies its arguments. A
- * minting function re-exported from the kernel has no entry and is left alone; a departure such
- * as `css.warn` has one and is checked like a factory in a block.
+ * @remarks
+ *   Both compose the layers a consumer gets by extending a package, so their output is checked in
+ *   every specification. Any other top-level function is called only against a supplied entry,
+ *   which leaves a minting function re-exported from the kernel alone.
  */
 const COMPOSING: ReadonlySet<string> = new Set(["layers", "workspace"]);
 
 /**
- * Returns true when a value is a function.
+ * Reports whether a value can be called at all.
  *
- * @param value - The value to test.
- * @returns Whether the value can be called.
+ * @remarks
+ *   A class passes this and is then called without `new`, which throws and surfaces as a factory
+ *   that throws rather than as an export of the wrong kind.
  */
 export function callable(value: unknown): value is (...args: readonly unknown[]) => unknown {
   return typeof value === "function";
 }
 
 /**
- * Returns true when a value is a plain object, as a namespace and a layer both are.
+ * Reports whether a value is a plain object rather than an array or null.
  *
- * @param value - The value to test.
- * @returns Whether the value is an object and not an array.
+ * @remarks
+ *   An array is excluded because a barrel exporting one is neither a namespace nor a factory, and
+ *   null is excluded because `typeof` alone calls it an object.
  */
 export function record(value: unknown): value is Readonly<Record<string, unknown>> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 /**
- * Returns true when an export name is written in capitals, as a constant's is.
+ * Reports whether an export name is written the way the house writes a constant.
  *
- * @param name - The export name.
- * @returns Whether the name is all capitals, digits and underscores.
+ * @remarks
+ *   The name decides this and the value is never consulted, so a constant holding an object is
+ *   left where it is rather than walked as a namespace.
  */
 function constant(name: string): boolean {
   return /^[A-Z][A-Z0-9_]*$/u.test(name);
 }
 
 /**
- * Walks one namespace and collects the factories under it.
+ * Gathers the factories inside one namespace, and the exports that belong on neither list.
  *
- * @param path - The path a consumer writes to reach the namespace.
- * @param namespace - The namespace object.
- * @returns The factories under the namespace, and each export the namespace may not hold.
+ * @remarks
+ *   The descent goes as deep as the namespaces nest and the path gains a segment at each level.
+ *   A namespace found here is not listed as one, because only a top-level namespace is a block.
  */
 function within(path: string, namespace: Readonly<Record<string, unknown>>): Walked {
   const collected: Factory[] = [];
@@ -110,12 +130,13 @@ function within(path: string, namespace: Readonly<Record<string, unknown>>): Wal
 }
 
 /**
- * Walks a barrel and collects its factories and namespaces.
+ * Splits a barrel into the factories to call, the blocks to match against the README, and the
+ * exports that are neither.
  *
- * @param module - The barrel, as returned by `await import("#index.ts")`.
- * @param supplied - The arguments the specification supplies, keyed by path. A top-level function
- *   with an entry here is a factory; one without is a helper.
- * @returns The factories, the namespaces, and each export the barrel may not hold.
+ * @remarks
+ *   A top-level function is picked up only where it composes layers or the caller supplied
+ *   arguments for it. Everything inside a namespace is picked up whether or not it can be called
+ *   yet, so an uncallable one is reported instead of being passed over.
  */
 export function walked(module: Readonly<Record<string, unknown>>, supplied: Arguments): Walked {
   const collected: Factory[] = [];
@@ -141,12 +162,12 @@ export function walked(module: Readonly<Record<string, unknown>>, supplied: Argu
 }
 
 /**
- * Checks that every export is one a config barrel may hold, and that every factory can be called
- * with the arguments the specification supplies.
+ * Reports an export the walk could not place, and a factory nothing in the specification can call.
  *
- * @param barrel - The walked barrel.
- * @param supplied - The arguments the specification supplies, keyed by path.
- * @returns Each violation.
+ * @remarks
+ *   A factory is only as checked as its arguments allow, so omitting one from `arguments` is
+ *   itself the breach. Adding a required parameter to a factory breaks every specification that
+ *   had been calling it with nothing.
  */
 export function factories(barrel: Walked, supplied: Arguments): readonly string[] {
   const uncallable = barrel.factories
@@ -157,14 +178,12 @@ export function factories(barrel: Walked, supplied: Arguments): readonly string[
 }
 
 /**
- * Derives the prefix of a package's layer names from the package name.
+ * Derives the prefix a package's layer names carry from the package's published name.
  *
- * `@stealthscale/vite-config-react` names its layers `react.…`, and `@stealthscale/vite-config`
- * names them with no prefix at all. The scope and the `vite-config-` or `vite-plugin-` stem are
- * dropped, and whatever follows the stem is the prefix.
- *
- * @param name - The package name.
- * @returns The prefix, or an empty string for the package that holds the blocks.
+ * @remarks
+ *   The scope goes, and so does a leading `vite-config` or `vite-plugin`. The name
+ *   `@stealthscale/vite-config-react` yields `react`, and `@stealthscale/vite-config` yields an
+ *   empty string, which asks for layer names with no prefix at all.
  */
 export function prefixOf(name: string): string {
   return name.replace(/^@[^/]+\//u, "").replace(/^vite-(?:config|plugin)(?:-|$)/u, "");

@@ -2,9 +2,6 @@ import { describe, expect, it } from "vitest";
 
 import * as published from "#index.ts";
 
-/**
- * The runtime surface a specification imports.
- */
 const SURFACE = ["isLayer", "layersOf", "prefixOf", "publishedOf", "violations", "walked"];
 
 describe("index", () => {

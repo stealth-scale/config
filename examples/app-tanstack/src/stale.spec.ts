@@ -2,12 +2,6 @@ import { describe, expect, it } from "vitest";
 
 import { stale, type Staleness, watching } from "#stale.ts";
 
-/**
- * Stands in for the page and for where the attempt is recorded.
- *
- * @param already - Whether this page has reloaded once already.
- * @returns The stand-in, and a count of the reloads asked for.
- */
 function standing(already = false): {
   asked: number[];
   held: Staleness["held"];

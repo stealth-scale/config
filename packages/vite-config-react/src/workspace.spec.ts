@@ -1,3 +1,7 @@
+/**
+ * Checks the root-level call for its layer names, their order, and what it leaves out.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { workspace } from "#workspace.ts";

@@ -1,5 +1,5 @@
 /**
- * What a specification that draws its own fixtures is excused.
+ * Lets a rendering specification declare every component it drives in one file.
  */
 
 import { type Contribution, lint, named } from "@stealthscale/vite-config";
@@ -7,14 +7,12 @@ import { type Contribution, lint, named } from "@stealthscale/vite-config";
 import { RENDERED } from "#lint/rendered.ts";
 
 /**
- * Lets a rendered specification declare more than one component.
+ * Lifts the one-component-per-file limit from a specification and its fixtures.
  *
- * The rule keeps a component library navigable, where a file is found by the component it
- * declares. A specification's components are fixtures rather than library components: they are
- * read beside the test that drives them, and splitting each into a file of its own puts the
- * fixture further from the assertion it exists for.
- *
- * @returns The contribution.
+ * @remarks
+ *   The limit exists so fast refresh can replace a module and keep state, and neither applies to a
+ *   file the runner imports once. Splitting a fixture out into a file of its own would separate it
+ *   from the assertion that explains what it is for.
  */
 export function fixtures(): Contribution {
   return named(

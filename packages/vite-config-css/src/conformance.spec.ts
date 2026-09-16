@@ -1,3 +1,8 @@
+/**
+ * Holds the package against the contract every config package in this
+ * repository keeps.
+ */
+
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 

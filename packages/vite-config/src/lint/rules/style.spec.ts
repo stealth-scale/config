@@ -1,3 +1,7 @@
+/**
+ * Specifies that every style choice is stated and none of them is off.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { STYLE } from "#lint/rules/style.ts";

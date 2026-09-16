@@ -4,33 +4,16 @@ import { packageFiles, type ScratchFiles, withScratchWorkspace } from "@stealths
 
 import { engines, exports, files, peers, type Published, publishedOf } from "#manifest.ts";
 
-/**
- * The manifest fields every scratch package shares.
- */
 const BASE = {
   engines: { node: ">=26.0.0" },
   files: ["dist", "LICENSE", "README.md"],
   name: "@acme/leaf",
 };
 
-/**
- * The files every scratch package carries beside its manifest.
- */
 const CARRIED = { LICENSE: "MIT\n", "README.md": "# leaf\n", "src/index.ts": "export {};\n" };
 
-/**
- * A conditional subpath as a stealth package writes it.
- */
 const CONDITIONAL = { default: "./dist/index.mjs", "stealth-source": "./src/index.ts" };
 
-/**
- * Writes a scratch workspace with one package and runs a check against it.
- *
- * @param fields - The package manifest fields beyond the shared ones.
- * @param run - The check to run, given the parsed manifest and the package directory.
- * @param extra - The files to write beside the manifest, on top of the shared ones.
- * @returns The violations the check returned.
- */
 function checked(
   fields: Record<string, unknown>,
   run: (published: Published, at: string) => readonly string[],

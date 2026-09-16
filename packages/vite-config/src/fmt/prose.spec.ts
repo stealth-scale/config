@@ -1,3 +1,7 @@
+/**
+ * Checks that prose is wrapped, and wrapped the way a doc comment is.
+ */
+
 import { type UserConfig } from "vite-plus";
 import { describe, expect, it } from "vitest";
 

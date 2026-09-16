@@ -1,3 +1,12 @@
+/**
+ * Pins down what a panel draws, from an empty body to several children.
+ *
+ * @remarks
+ *   The markup is rendered on the server, which needs no DOM and settles in one
+ *   pass. The component holds no state, so nothing a browser would add to the
+ *   run is being checked here.
+ */
+
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { describe, expect, test } from "vitest";

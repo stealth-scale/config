@@ -1,27 +1,32 @@
 /**
- * Checks that the block table in a README names the namespaces the barrel exports.
+ * Compares the block table in a package's README against the namespaces its barrel exports.
+ *
+ * @remarks
+ *   The README is scanned as lines rather than parsed as Markdown, so a table inside a fenced
+ *   example counts as the table. A package with no README, or one whose README names no blocks,
+ *   is left alone.
  */
 
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 /**
- * The heading that introduces the block table.
+ * Matches the heading the block table sits under.
  */
 const HEADING = /^#{1,6} .*\bBlocks\b/u;
 
 /**
- * Any heading. The search for the table stops at the first one after the block heading.
+ * Matches any heading, which is where the search for that table stops.
  */
 const ANY_HEADING = /^#{1,6} /u;
 
 /**
- * Finds the first table under a heading.
+ * Collects the body rows of the first table under a heading.
  *
- * @param lines - The README, one line per entry.
- * @param heading - The index of the heading line.
- * @returns The body rows of the table, without the header row and the rule, or `undefined` when
- *   no table follows the heading.
+ * @remarks
+ *   The scan ends at the next heading, or at the first line after the table that is not a row.
+ *   The header and divider rows are dropped. Undefined means the heading stands with no table
+ *   beneath it.
  */
 function tableAfter(lines: readonly string[], heading: number): readonly string[] | undefined {
   const rows: string[] = [];
@@ -36,25 +41,21 @@ function tableAfter(lines: readonly string[], heading: number): readonly string[
 }
 
 /**
- * Reads the first cell of a table row, without its code marks.
+ * Takes the first cell of a table row, stripped of its backticks.
  *
- * @param row - The table row.
- * @returns The text of the first cell.
+ * @remarks
+ *   The row is split on every pipe it holds, so a cell containing an escaped pipe reads short.
  */
 function first(row: string): string {
   return row.split("|").slice(1, 2).join("").trim().replaceAll("`", "");
 }
 
 /**
- * Checks the block table in a README against the namespaces the barrel exports.
+ * Reports a block the README names that the barrel lacks, and a namespace the table leaves out.
  *
- * The table is the first one under a heading that contains the word `Blocks`, and its first
- * column is read as the namespace names. A README without such a heading passes, because the
- * check is about drift between a table and a barrel and not about having a table.
- *
- * @param at - The package directory.
- * @param namespaces - The namespaces the barrel exports.
- * @returns Each violation.
+ * @remarks
+ *   Only top-level namespaces are compared, so a function exported beside them is not expected in
+ *   the table. A README missing the heading documents nothing and breaks nothing.
  */
 export function exports(at: string, namespaces: readonly string[]): readonly string[] {
   const path = join(at, "README.md");

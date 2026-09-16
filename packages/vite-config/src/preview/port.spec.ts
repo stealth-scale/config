@@ -1,3 +1,7 @@
+/**
+ * Proves a fixed preview port reaches the preview alone.
+ */
+
 import { type UserConfig } from "vite-plus";
 import { describe, expect, it } from "vitest";
 

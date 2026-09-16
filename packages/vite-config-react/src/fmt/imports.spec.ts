@@ -1,3 +1,7 @@
+/**
+ * Checks the import group for its name, its kind, and the reason it carries.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { imports } from "#fmt/imports.ts";

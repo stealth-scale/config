@@ -1,9 +1,13 @@
+/**
+ * Covers what each constructor puts on a layer and which environments it answers to.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { applies, contribute, named, override, owned, preset, remove } from "#layer.ts";
 
 /**
- * The environment a build is read in.
+ * A production build, which is the environment every case here is tested against.
  */
 const BUILDING = { command: "build", mode: "production" } as const;
 

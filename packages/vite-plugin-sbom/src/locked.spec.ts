@@ -1,3 +1,11 @@
+/**
+ * Covers what each lockfile format yields, and what it declines to record.
+ *
+ * @remarks
+ *   Each case writes a real lockfile into a temporary directory rather than stubbing the reader,
+ *   because what is under test is the text two package managers actually write.
+ */
+
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -6,13 +14,9 @@ import { describe, expect, it } from "vitest";
 import { locked } from "#locked.ts";
 
 /**
- * Writes a workspace holding a lockfile, and returns a directory inside it.
+ * Lays out a workspace whose root holds a bun lockfile listing the given rows.
  *
- * Written with the trailing commas bun writes, since reading past those is half of what the reader
- * is for.
- *
- * @param packages - The `packages` object, as JSON text without its braces.
- * @returns A directory two levels below the lockfile.
+ * @returns The package directory below the root, so a case reads from inside the workspace.
  */
 function workspace(packages: string): string {
   const root = mkdtempSync(join(tmpdir(), "stealth-locked-"));
@@ -25,11 +29,12 @@ function workspace(packages: string): string {
 }
 
 /**
- * Writes a workspace holding a pnpm lockfile, and returns a directory inside it.
+ * Lays out a workspace whose root holds a pnpm lockfile carrying the given entries.
  *
- * @param yaml - What follows `packages:`, indented as the lockfile indents it.
- * @param ahead - A document to write before the lockfile proper, as pnpm writes one.
- * @returns A directory two levels below the lockfile.
+ * @param yaml - The body written under the `packages` key of the final document.
+ * @param ahead - A whole document placed before that one, which is where pnpm records its own
+ *   installation.
+ * @returns The package directory below the root, so a case reads from inside the workspace.
  */
 function pnpm(yaml: string, ahead?: string): string {
   const root = mkdtempSync(join(tmpdir(), "stealth-locked-"));

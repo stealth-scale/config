@@ -1,3 +1,7 @@
+/**
+ * Covers which layers survive a removal and what each pass contributes.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { resolved, surviving } from "#compose.ts";
@@ -5,20 +9,18 @@ import { BUILDING } from "#core.fixtures.ts";
 import { contribute, type Contribution, preset, type Removal, remove } from "#layer.ts";
 
 /**
- * States one contribution, since only its name matters here.
+ * Builds a contribution whose name is also the item it appends.
  *
- * @param name - What to call it.
- * @returns The contribution.
+ * @remarks
+ *   The two are the same string so an assertion can read the surviving names
+ *   and the appended items interchangeably.
  */
 function added(name: string): Contribution {
   return contribute({ at: "test.setupFiles", because: "a reason", item: name, name });
 }
 
 /**
- * Takes one back.
- *
- * @param target - The contribution to take back.
- * @returns The removal.
+ * Builds a removal aimed at one name, called after the name it takes back.
  */
 function taken(target: string): Removal {
   return remove({ because: "a reason", name: `without(${target})`, target });

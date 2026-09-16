@@ -1,3 +1,7 @@
+/**
+ * Checks the departures a repository takes from the house formatting rules.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { defineConfig, preset } from "@stealthscale/vite-config-core";
@@ -8,15 +12,16 @@ import { GENERATED } from "#ignore/generated.ts";
 import { readBack } from "#preset/preset.fixtures.ts";
 
 /**
- * Where the config under specification is, which every `defineConfig` states for itself.
+ * The directory the config under test claims to be configuring.
  */
 const AT = import.meta.dirname;
 
 /**
- * Reads the import settings back once the layers have composed.
+ * Composes a set of layers and hands back the import order they settled on.
  *
- * @param layers - What a repository extends.
- * @returns Those settings.
+ * @remarks
+ *   A group is an override, so it only shows its work once the whole config has
+ *   resolved. Reading the layer on its own would show nothing.
  */
 async function sorted(layers: readonly unknown[]): Promise<Record<string, unknown>> {
   const held = await readBack(defineConfig(AT, { extends: layers as never }));

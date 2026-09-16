@@ -4,24 +4,12 @@ import { describe, expect, it } from "vitest";
 import { published } from "#pack/published.ts";
 import { answered, told } from "#vite.fixtures.ts";
 
-/**
- * Reads back the entry map a layer states, given the export map a manifest declares.
- *
- * @param exports - The export map.
- * @returns The entry map.
- */
 function entry(exports: Readonly<Record<string, unknown>>): Record<string, string> {
   const held = answered(published(), { manifest: { exports, name: "held" } }) as UserConfig;
 
   return (held.pack as { entry: Record<string, string> }).entry;
 }
 
-/**
- * Resolves the layer against a manifest, for the cases that refuse one.
- *
- * @param manifest - Whatever the manifest holds.
- * @returns What the layer does when it is resolved.
- */
 function resolving(manifest: Parameters<typeof told>[0]): () => unknown {
   const held = published().config;
 

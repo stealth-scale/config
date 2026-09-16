@@ -1,12 +1,14 @@
+/**
+ * Checks which files the runner collects and which directories it skips.
+ */
+
 import { type UserConfig } from "vite-plus";
 import { describe, expect, it } from "vitest";
 
 import { files } from "#test/files.ts";
 
 /**
- * Reads the test block the preset sets.
- *
- * @returns That block.
+ * Picks the runner block out of the layer.
  */
 function block(): NonNullable<UserConfig["test"]> {
   return (files().config as UserConfig).test as NonNullable<UserConfig["test"]>;

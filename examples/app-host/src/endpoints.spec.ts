@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { endpoints, join } from "#endpoints.ts";
 
 /**
- * What the federation runtime was told, in place of telling it.
+ * Collects what the federation runtime was handed, one array per call.
  */
 const registered: unknown[][] = [];
 
@@ -14,10 +14,10 @@ vi.mock(import("@module-federation/runtime"), () => ({
 }));
 
 /**
- * Answers a fetch with the given body, the way a deployment serving the file would.
+ * Answers every fetch with one body, the way a deployment serving the file would.
  *
- * @param body - What the file holds.
- * @param ok - Whether the file is there at all.
+ * @param body - What the file holds, parsed.
+ * @param ok - Whether the deployment serves the file at all.
  */
 function serving(body: unknown, ok = true): void {
   vi.stubGlobal("fetch", () =>

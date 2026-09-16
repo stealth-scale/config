@@ -1,5 +1,5 @@
 /**
- * What every stealth package answers to, whatever it is and wherever it runs.
+ * Gathers the layers every tier shares, whatever the package turns out to be.
  */
 
 import { type Extendable } from "@stealthscale/vite-config-core";
@@ -8,14 +8,13 @@ import * as fmt from "#fmt/index.ts";
 import * as resolve from "#resolve/index.ts";
 
 /**
- * The layers no tier decides, because none of them turn on what a package is.
+ * Lists the formatting and resolution layers common to every tier.
  *
- * How a file is formatted and how a workspace package resolves to its own source are true of a
- * library, an application, a browser and a console alike. Stated once here so that a tier is the
- * difference between packages rather than a copy of what they share, and so that adding a tier
- * cannot quietly leave one of these out.
- *
- * @returns Each layer every tier is built on, in the order they compose.
+ * @remarks
+ *   Nothing here answers what a package is or where it runs. A layer that would
+ *   answer either belongs to a tier instead, and that restraint is what makes
+ *   this list safe to spread into all of them without a tier having to undo
+ *   anything.
  */
 export function house(): readonly Extendable[] {
   return [

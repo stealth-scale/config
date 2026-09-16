@@ -2,9 +2,6 @@ import { describe, expect, it } from "vitest";
 
 import { rendered } from "#server.ts";
 
-/**
- * A page of the shape a build produces, holding the slot and nothing else of interest.
- */
 const PAGE = '<html><body><div id="root"><!--app--></div></body></html>';
 
 describe("server", () => {

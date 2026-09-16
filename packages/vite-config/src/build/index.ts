@@ -1,12 +1,10 @@
 /**
- * The `build` block: what `vp build` writes, and what a reader of that output can work out.
+ * Collects the layers that configure a production build of an application.
  *
- * Read from the package's own config. A build acts on one application, and the workspace root has
- * none, so nothing here is shared the way the formatter and the linter are.
- *
- * A package that publishes rather than deploys is packed instead, and reads the `pack` block. The
- * two do not overlap: `build.sourcemap` is about an application's own output, and a published
- * package's maps are the packer's to decide.
+ * @remarks
+ *   Every layer here concerns an artefact somebody downloads: how it is split, where it is served
+ *   from, and what a reader can find out about it afterwards. What a library publishes is
+ *   configured by the packer instead.
  */
 
 export { base } from "#build/base.ts";

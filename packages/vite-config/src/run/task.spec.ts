@@ -1,3 +1,8 @@
+/**
+ * Proves a declared task reaches the runner's table under the name it was
+ * given.
+ */
+
 import { type UserConfig } from "vite-plus";
 import { describe, expect, it } from "vitest";
 

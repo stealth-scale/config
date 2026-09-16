@@ -1,10 +1,6 @@
 /**
- * What a stealth package that renders is built, checked and formatted by.
- *
- * Every layer here is one the toolchain cannot state on its own behalf, because stating it would
- * mean naming React, and a configuration that names one framework is one no other framework can be
- * added beside. A package extends a tier from `@stealthscale/vite-config` and adds `layers()`
- * beside it. A workspace root adds `workspace()`.
+ * Supplies what a package that renders adds on top of a tier from `@stealthscale/vite-config`,
+ * through {@link layers} in a package and {@link workspace} at the repository root.
  *
  * @packageDocumentation
  */

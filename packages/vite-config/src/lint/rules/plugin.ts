@@ -1,14 +1,11 @@
 /**
- * The linter's own plugins the rules are named under.
+ * Resolves the linter plugins every rule group is written against.
  */
 
 import { type UserConfig } from "vite";
 
 /**
- * The plugins a stealth package's rules are written against.
- *
- * All built in, so none is installed and none goes quiet when something is not. A rule needing a
- * plugin from npm belongs in `jsPlugins`, where its absence is visible.
+ * Lists the plugins the linter already ships, turned on by name alone.
  */
 export const PLUGINS: NonNullable<NonNullable<UserConfig["lint"]>["plugins"]> = [
   "typescript",
@@ -19,10 +16,12 @@ export const PLUGINS: NonNullable<NonNullable<UserConfig["lint"]>["plugins"]> = 
 ];
 
 /**
- * The plugins fetched from npm, which the linter does not carry.
+ * Lists the plugins loaded from npm, each under the name its rules go by.
  *
- * Named rather than loaded silently: a rule whose plugin is missing is reported as a failure to
- * load rather than quietly never running, so a repository that has not installed these is told.
+ * @remarks
+ *   The alias is not the package name. `eslint-plugin-jsdoc` is loaded as
+ *   `jsdoc-js`, so its rules are configured as `jsdoc-js/require-jsdoc` and not
+ *   under the prefix the plugin's own documentation shows.
  */
 export const JS_PLUGINS = [
   { name: "jsdoc-js", specifier: "eslint-plugin-jsdoc" },

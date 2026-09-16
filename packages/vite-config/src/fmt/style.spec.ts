@@ -1,3 +1,7 @@
+/**
+ * Checks the house whitespace, and that the editor is told the same thing.
+ */
+
 import { readFileSync } from "node:fs";
 import { type UserConfig } from "vite-plus";
 import { describe, expect, it } from "vitest";
@@ -5,29 +9,32 @@ import { describe, expect, it } from "vitest";
 import { style } from "#fmt/style.ts";
 
 /**
- * The section of `.editorconfig` every file falls under.
+ * The editorconfig section that applies to every file.
  */
 const EVERY = "*";
 
 /**
- * The section a quote style belongs to, since a quote is only a choice in code.
+ * The section naming the files a quote style applies to.
  */
 const CODE = "*.{ts,tsx,mts,cts,js,jsx,mjs,cjs}";
 
 /**
- * The section prose falls under, which the formatter rewraps.
+ * The section naming the files written as prose.
  */
 const PROSE = "*.{md,mdx,yml,yaml}";
 
 /**
- * The section a written file falls under, which nothing should tidy.
+ * The section naming the files no editor is allowed to tidy.
  */
 const WRITTEN = "{*.gen.*,pnpm-lock.yaml}";
 
 /**
- * What an editor is told, read off the file the repository ships.
+ * Parses the repository's editorconfig into sections and their settings.
  *
- * @returns Each section against the settings stated under it.
+ * @remarks
+ *   The parser handles the subset this file asserts on: a section header, a
+ *   comment, and a key on one line. An editorconfig using anything else would
+ *   be read as fewer settings rather than reported as unreadable.
  */
 function editor(): Record<string, Record<string, string>> {
   const source = readFileSync(
@@ -53,9 +60,7 @@ function editor(): Record<string, Record<string, string>> {
 }
 
 /**
- * Reads the measurements the preset sets.
- *
- * @returns Those measurements.
+ * Takes the formatting block the layer states.
  */
 function settings(): NonNullable<UserConfig["fmt"]> {
   return (style().config as UserConfig).fmt as NonNullable<UserConfig["fmt"]>;

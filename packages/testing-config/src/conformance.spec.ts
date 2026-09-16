@@ -5,26 +5,14 @@ import { packageFiles, withScratchWorkspaceAsync } from "@stealthscale/testing";
 import { type Conformance, violations } from "#conformance.ts";
 import { type Layer } from "#layers.ts";
 
-/**
- * The one layer the conforming barrel returns.
- */
 const REFRESH: Layer = { because: "why", kind: "contribution", name: "leaf.plugin.refresh" };
 
-/**
- * A hook that does nothing, as the house base attaches to every plugin.
- */
 function hook(): undefined {
   return undefined;
 }
 
-/**
- * The value that unsets an environment variable for one test.
- */
 const UNSET: string | undefined = undefined;
 
-/**
- * A manifest that conforms as a library.
- */
 const MANIFEST = {
   engines: { node: ">=26.0.0" },
   exports: {
@@ -37,26 +25,13 @@ const MANIFEST = {
   publishConfig: { exports: { ".": "./dist/index.mjs", "./package.json": "./package.json" } },
 };
 
-/**
- * The files a conforming package carries beside its manifest.
- */
 const CARRIED = { LICENSE: "MIT\n", "README.md": "# leaf\n", "src/index.ts": "export {};\n" };
 
-/**
- * A barrel that conforms as a config package.
- */
 const BARREL = {
   layers: (): Layer[] => [REFRESH],
   plugin: { refresh: (): Layer => REFRESH },
 };
 
-/**
- * Writes a scratch package and runs the suite against it.
- *
- * @param stated - The conformance options beyond the package directory.
- * @param fields - The manifest fields that replace the conforming ones.
- * @returns The violations.
- */
 function checked(
   stated: Omit<Conformance, "at">,
   fields: Record<string, unknown> = {},

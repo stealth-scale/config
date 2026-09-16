@@ -1,3 +1,7 @@
+/**
+ * Specifies the plugin list the rule groups are written against.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { PLUGINS } from "#lint/rules/plugin.ts";

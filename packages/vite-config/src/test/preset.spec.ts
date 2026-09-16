@@ -1,3 +1,7 @@
+/**
+ * Checks what each tier holds, and where the three of them differ.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { base, node, web } from "#test/preset.ts";

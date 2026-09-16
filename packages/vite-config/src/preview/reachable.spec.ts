@@ -1,3 +1,7 @@
+/**
+ * Proves a preview server names its hosts rather than admitting all of them.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { reachable } from "#preview/reachable.ts";

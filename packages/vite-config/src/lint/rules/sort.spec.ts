@@ -1,10 +1,11 @@
+/**
+ * Specifies what the sorters cover, how they partition, and what they skip.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { SORT } from "#lint/rules/sort.ts";
 
-/**
- * The sorters left off on purpose, because each one reaches an order that carries meaning.
- */
 const REFUSED = [
   "sort-arrays",
   "sort-classes",

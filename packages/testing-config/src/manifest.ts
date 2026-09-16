@@ -1,122 +1,146 @@
 /**
- * Reads a package manifest and reports every promise in it that the tree does not keep.
+ * Checks the package.json of a package against what the house publishes.
+ *
+ * @remarks
+ *   Every check here reads the manifest on disk rather than the module graph, so it reports what
+ *   npm would pack rather than what the specification happened to import. Reading a manifest
+ *   throws where the file is absent or is not JSON, and the engines check inherits that from the
+ *   workspace root it reads.
  */
 
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
 /**
- * The kind of package under test.
+ * Selects which of the three contracts a package is held to.
  *
- * A config package is checked on its manifest, its barrel, its README table, its layers and its
- * tiers. A plugin package is checked on its manifest and its plugin factory. A library is checked
- * on its manifest alone.
+ * @remarks
+ *   The kind decides which checks run. A library is checked on its manifest alone, a plugin on
+ *   its factory as well, and a config package on its barrel, its README and its tiers.
  */
 export type Kind = "config" | "library" | "plugin";
 
 /**
- * The target of one subpath in an export map: a file, or a map from condition to file.
+ * Describes an export target: a single path, or a map of conditions to paths.
+ *
+ * @remarks
+ *   The house publishes the conditional form for anything with a source entry, and
+ *   `publishConfig` rewrites it to the string form for a consumer.
  */
 export type Target = Readonly<Record<string, string>> | string;
 
 /**
- * The manifest fields the checks read.
+ * Describes the manifest fields these checks read.
+ *
+ * @remarks
+ *   Only the name is required, because a field a manifest omits is what a check reports. Nothing
+ *   validates the parsed JSON, so a field written with the wrong type arrives at a check as it
+ *   stands.
  */
 export interface Published {
   /**
-   * The packages installed for the package itself.
+   * The dependencies the package installs for itself, read to catch a peer listed twice.
    */
   readonly dependencies?: Readonly<Record<string, string>> | undefined;
 
   /**
-   * The runtimes the package runs under.
+   * The runtimes the package declares.
    */
   readonly engines?: Engines | undefined;
 
   /**
-   * The subpaths the package exports, each with its target.
+   * The subpaths as a consumer inside the workspace resolves them.
    */
   readonly exports?: Readonly<Record<string, Target>> | undefined;
 
   /**
-   * The files that go in the tarball.
+   * The entries npm packs, the licence and the README included.
    */
   readonly files?: readonly string[] | undefined;
 
   /**
-   * The package name.
+   * The published name, scope and all.
    */
   readonly name: string;
 
   /**
-   * The packages a consumer has to install beside this one.
+   * The dependencies a consumer is asked to supply.
    */
   readonly peerDependencies?: Readonly<Record<string, string>> | undefined;
 
   /**
-   * The fields that replace their namesakes when the package is published.
+   * The overrides npm applies while packing.
    */
   readonly publishConfig?: PublishConfig | undefined;
 }
 
 /**
- * The runtimes a package runs under.
+ * The engines field of a manifest, as these checks read it.
+ *
+ * @remarks
+ *   Only node is read. A range declared against any other engine is left where it is.
  */
 export interface Engines {
   /**
-   * The node version range.
+   * The node range, compared against the workspace root's.
    */
   readonly node?: string | undefined;
 }
 
 /**
- * The fields that replace their namesakes when the package is published.
+ * Covers the export map npm swaps in while packing.
+ *
+ * @remarks
+ *   Every subpath in it resolves to the build output, and the source condition a workspace
+ *   consumer compiles against is dropped.
  */
 export interface PublishConfig {
   /**
-   * The subpaths as they appear in the tarball, each with its target.
+   * The subpaths a consumer of the published package resolves.
    */
   readonly exports?: Readonly<Record<string, Target>> | undefined;
 }
 
 /**
- * The subpath every package exports for its own manifest. No check reads it.
+ * The one subpath every export check passes over.
+ *
+ * @remarks
+ *   A manifest exports itself under this subpath, and it has neither a source file nor a built
+ *   default for a check to look for.
  */
 const MANIFEST = "./package.json";
 
 /**
- * The condition a stealth package publishes its source under.
+ * The export condition resolving to source inside the workspace.
  */
 const SOURCE = "stealth-source";
 
 /**
- * The files every tarball carries beside its build output.
+ * Lists the files a published package ships beside its build output.
  */
 const CARRIED = ["LICENSE", "README.md"];
 
 /**
- * Reads the manifest of the package at a directory.
+ * Reads and parses the package.json sitting in a directory.
  *
- * The file is read from disk rather than imported, because the catalog protocol is visible in the
- * file and resolved away in the installed copy.
- *
- * @param at - The package directory, as an absolute path.
- * @returns The parsed manifest.
+ * @remarks
+ *   The parsed value is asserted to the shape these checks read and nothing validates it, so a
+ *   field of the wrong type is reported by the check that reads it rather than here.
+ * @throws {@link Error} When the file is absent, unreadable, or not JSON.
  */
 export function publishedOf(at: string): Published {
   const text = readFileSync(join(at, "package.json"), "utf8");
 
-  // The manifest is read from disk, and its shape is what the checks in this module assert on
-  // eslint-disable-next-line typescript/no-unsafe-type-assertion -- see above
+  // eslint-disable-next-line typescript/no-unsafe-type-assertion -- the checks here assert the shape
   return JSON.parse(text) as Published;
 }
 
 /**
- * Finds the manifest of the pnpm workspace that contains a package.
+ * Finds the workspace root above a directory by the pnpm-workspace.yaml marking it.
  *
- * @param at - The package directory.
- * @returns The root manifest, or `undefined` when no ancestor directory holds a
- *   `pnpm-workspace.yaml`.
+ * @remarks
+ *   The walk stops at the filesystem root and yields undefined, so a package checked outside a
+ *   workspace has nothing to compare itself against instead of failing.
  */
 function rootOf(at: string): Published | undefined {
   for (let directory = at, parent = dirname(at); parent !== directory;) {
@@ -130,10 +154,11 @@ function rootOf(at: string): Published | undefined {
 }
 
 /**
- * Lists the subpaths of an export map, leaving out the manifest's own.
+ * Lists the entries of an export map, less the manifest's own subpath.
  *
- * @param exportMap - The `exports` field or the `publishConfig.exports` field.
- * @returns Each subpath with its target, in the order the map declares them.
+ * @remarks
+ *   A map that is undefined yields nothing, so a manifest exporting nothing at all passes through
+ *   here rather than failing.
  */
 function subpaths(
   exportMap: Readonly<Record<string, Target>> | undefined,
@@ -142,12 +167,7 @@ function subpaths(
 }
 
 /**
- * Checks a subpath that resolves to one file.
- *
- * @param subpath - The subpath to check.
- * @param target - The file the subpath resolves to.
- * @param at - The package directory.
- * @returns One violation when the file does not exist, otherwise an empty array.
+ * Reports a plain target naming a file that is not on disk.
  */
 function file(subpath: string, target: string, at: string): readonly string[] {
   return existsSync(join(at, target))
@@ -156,15 +176,12 @@ function file(subpath: string, target: string, at: string): readonly string[] {
 }
 
 /**
- * Checks a subpath that resolves to a different file per condition.
+ * Reports a conditional target whose default is not built, or whose source entry is not source.
  *
- * The `default` condition has to point into `dist`, and the stealth condition has to point at an
- * existing file under `src`.
- *
- * @param subpath - The subpath to check.
- * @param target - The map from condition to file.
- * @param at - The package directory.
- * @returns Each violation.
+ * @remarks
+ *   The default belongs under dist because that is what npm packs, and the source entry belongs
+ *   under src and has to exist, because that is what a workspace consumer compiles. Both are
+ *   reported together rather than stopping at the first one.
  */
 function conditional(
   subpath: string,
@@ -191,12 +208,11 @@ function conditional(
 }
 
 /**
- * Checks that the published export map names the same subpaths as the development export map,
- * and that each one resolves to the built file.
+ * Reports the subpaths on which the workspace map and the published map disagree.
  *
- * @param developed - The `exports` field.
- * @param packed - The `publishConfig.exports` field.
- * @returns Each violation.
+ * @remarks
+ *   Both directions are reported, so a subpath published without being declared is caught along
+ *   with one declared and never published.
  */
 function agreeing(
   developed: Readonly<Record<string, Target>>,
@@ -226,15 +242,12 @@ function agreeing(
 }
 
 /**
- * Checks the export map of a manifest.
+ * Checks that every exported subpath resolves and that packing republishes it unchanged.
  *
- * Every conditional subpath has to publish its source under the stealth condition and default to
- * a built file. A manifest with a conditional subpath also has to carry `publishConfig.exports`,
- * and the two maps have to agree.
- *
- * @param published - The manifest to check.
- * @param at - The package directory.
- * @returns Each violation.
+ * @remarks
+ *   A conditional subpath with no `publishConfig` behind it is published as written, which ships
+ *   a source condition to a consumer who has no compiler. That one is reported against the
+ *   manifest rather than against each subpath.
  */
 export function exports(published: Published, at: string): readonly string[] {
   const developed = subpaths(published.exports);
@@ -256,10 +269,11 @@ export function exports(published: Published, at: string): readonly string[] {
 }
 
 /**
- * Lists the files the published subpaths resolve to.
+ * Lists the built files a consumer of the published package can reach, each one once.
  *
- * @param published - The manifest to read.
- * @returns Each file the tarball has to carry, once.
+ * @remarks
+ *   A conditional target with no default contributes nothing, because the export check has
+ *   already reported it. The published map wins over the workspace map wherever both exist.
  */
 function shipped(published: Published): readonly string[] {
   const targets = subpaths(published.publishConfig?.exports ?? published.exports).flatMap(
@@ -270,15 +284,12 @@ function shipped(published: Published): readonly string[] {
 }
 
 /**
- * Checks the `files` field of a manifest.
+ * Checks that the files list carries the licence and README, exists on disk, and covers the
+ * exports.
  *
- * The field has to list the licence and the README, every entry in it has to exist, and every
- * published subpath has to resolve into one of its entries. `dist` is exempt from the existence
- * check, because a package is checked before it is built as often as after.
- *
- * @param published - The manifest to check.
- * @param at - The package directory.
- * @returns Each violation.
+ * @remarks
+ *   The `dist` entry is exempt from the existence check, because a manifest is checked before
+ *   anything has been built. Every other entry has to be there when the check runs.
  */
 export function files(published: Published, at: string): readonly string[] {
   const listed = published.files ?? [];
@@ -298,13 +309,12 @@ export function files(published: Published, at: string): readonly string[] {
 }
 
 /**
- * Checks that the node version range matches the one at the workspace root.
+ * Compares the node range a package declares against the workspace root's.
  *
- * A package outside a workspace has no root to match, and only its own range is checked.
- *
- * @param published - The manifest to check.
- * @param at - The package directory.
- * @returns Each violation.
+ * @remarks
+ *   A package checked outside a workspace states its range and is compared against nothing.
+ *   Declaring no range at all is a violation either way.
+ * @throws {@link Error} When a workspace root is found and its manifest cannot be read.
  */
 export function engines(published: Published, at: string): readonly string[] {
   const own = published.engines?.node;
@@ -319,16 +329,12 @@ export function engines(published: Published, at: string): readonly string[] {
 }
 
 /**
- * Checks the peer dependencies of a manifest.
+ * Checks the peers a package declares for a double entry, a loose range, and the toolchain.
  *
- * A package peers on `vite` and never on the toolchain built over it, so the toolchain can be
- * replaced without a change to any package. A config package composes a Vite config and has to
- * peer on `vite`. A peer on `vite` or `vitest` has to come from the peer catalog, so the published
- * range is a real range and not the exact version the workspace pins.
- *
- * @param published - The manifest to check.
- * @param kind - The kind of package. Only a config package is required to peer on `vite`.
- * @returns Each violation.
+ * @remarks
+ *   A package peering on vite-plus asks a consumer for the toolchain, where Vite itself is what
+ *   the package configures. A config package peering on nothing named vite configures a tool the
+ *   consumer was never asked to install.
  */
 export function peers(published: Published, kind: Kind): readonly string[] {
   const peered = published.peerDependencies ?? {};

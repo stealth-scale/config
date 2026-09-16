@@ -1,3 +1,7 @@
+/**
+ * Pins down the phrasing at each list length, including the empty one.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { listed } from "#index.ts";

@@ -1,3 +1,8 @@
+/**
+ * Pins down that the stylesheet carries every token and lands on a selector a
+ * browser inherits from.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { PALETTE, stylesheet, TOKEN_EXPORTS } from "#palette.ts";

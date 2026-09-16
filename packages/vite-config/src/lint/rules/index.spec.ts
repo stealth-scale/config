@@ -1,10 +1,11 @@
+/**
+ * Specifies that a rule is named once and reaches the tiers it belongs to.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { base, MARKUP, node, SAFETY, SIZE, STYLE, web } from "#lint/rules/index.ts";
 
-/**
- * The domains every package is held to, against the name each is written under.
- */
 const SHARED = { SAFETY, SIZE, STYLE };
 
 describe("vite-config", () => {

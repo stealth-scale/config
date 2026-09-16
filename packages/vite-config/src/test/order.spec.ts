@@ -1,3 +1,7 @@
+/**
+ * Checks that the test files are shuffled rather than run in a fixed order.
+ */
+
 import { type UserConfig } from "vite-plus";
 import { describe, expect, it } from "vitest";
 

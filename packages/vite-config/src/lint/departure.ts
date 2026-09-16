@@ -1,5 +1,11 @@
 /**
- * What a repository states about its own linting beyond what the tier decided.
+ * Builds the lint overrides a repository adds on top of a preset.
+ *
+ * @remarks
+ *   Every factory here takes a `because` string and none has an overload
+ *   without one. Each returns a contribution appended to the block's override
+ *   list, so two packages covering the same glob both keep their entry rather
+ *   than one replacing the other.
  */
 
 import { type UserConfig } from "vite";
@@ -10,74 +16,82 @@ import { docblocksOff } from "#lint/rules/docblock.ts";
 import { SPEC } from "#lint/rules/spec.ts";
 
 /**
- * The `lint` block of a config.
+ * The `lint` block of a Vite config with its optional wrapper removed.
  */
 type LintBlock = NonNullable<UserConfig["lint"]>;
 
 /**
- * One entry of that block's `overrides`.
+ * One entry of the override list a lint block carries.
  */
 export type LintOverride = NonNullable<LintBlock["overrides"]>[number];
 
 /**
- * Where an override is appended.
+ * The path in the config that every override here is appended to.
  */
 const AT = "lint.overrides";
 
 /**
- * Describes a tier and what it may not reach for.
+ * A refusal to import one set of packages from one set of files.
+ *
+ * @remarks
+ *   The reason travels twice. It is recorded on the layer, where it explains
+ *   why the override exists, and it is printed by the linter, where an author
+ *   who tripped the rule reads it without opening the config.
  */
 export interface Forbidden {
   /**
-   * Why the tier may not, shown wherever the rule fires.
+   * Why the import is refused.
    */
   because: string;
 
   /**
-   * What it may import anyway, out of what `packages` matches.
+   * Packages matched by `packages` that stay allowed.
    */
   except?: readonly string[] | undefined;
 
   /**
-   * The globs the tier holds.
+   * The globs the refusal covers.
    */
   files: readonly string[];
 
   /**
-   * The import patterns it may not use.
+   * The package name patterns those files may not import.
    */
   packages: readonly string[];
 }
 
 /**
- * Describes a path and the rules that change for it.
+ * A change to the rules one set of files is held to.
+ *
+ * @remarks
+ *   Both the globs and the rules are copied into the override, so a caller may
+ *   reuse or mutate the object it passed. Nothing checks that a rule name
+ *   exists, since a plugin's names are in no map the linter publishes.
  */
 export interface Ruled {
   /**
-   * Why these files are exceptional.
+   * Why these files are not held to what the rest of the package is.
    */
   because: string;
 
   /**
-   * The globs the change applies to.
+   * The globs the change covers.
    */
   files: readonly string[];
 
   /**
-   * The rules, against what the linter should do about them instead.
+   * Each rule name, with the severity and options to apply to it.
    */
   rules: Readonly<Record<string, unknown>>;
 }
 
 /**
- * Refuses a tier the imports it may not reach for.
+ * Refuses a set of packages to the files that match a set of globs.
  *
- * A layering rule stated as something the linter checks, so a package reaching upward fails before
- * anybody reads the diff. The reason travels with the rule and is what the author sees, which is
- * the difference between a refusal somebody can act on and one they work around.
- *
- * @param stated - The tier, and what it may not import. `Forbidden` documents every member.
- * @returns The contribution.
+ * @remarks
+ *   A name in `except` becomes a negated pattern in the same group, so it only
+ *   has an effect where one of the patterns in `packages` already matched it.
+ *   Listing a package no pattern reaches changes nothing.
  */
 export function forbid(stated: Forbidden): Contribution {
   const group = [...stated.packages, ...(stated.except ?? []).map((name) => `!${name}`)];
@@ -96,11 +110,12 @@ export function forbid(stated: Forbidden): Contribution {
 }
 
 /**
- * Appends an override changing the rules for a set of paths.
+ * Wraps a rule change as a contribution under the name the caller picked.
  *
- * @param stated - The paths, and the rules that change for them.
- * @param name - The contribution's name, which is what a removal asks for.
- * @returns The contribution.
+ * @remarks
+ *   The name ends in the globs the override covers, which is what a repository
+ *   targets to remove one layer out of a preset. Two overrides covering
+ *   different globs are therefore never confused for each other.
  */
 function changing(stated: Ruled, name: string): Contribution {
   return contribute({
@@ -112,42 +127,35 @@ function changing(stated: Ruled, name: string): Contribution {
 }
 
 /**
- * Changes what the linter asks of one set of paths.
+ * Loosens the rules a set of files is held to.
  *
- * The escape hatch for a file whose nature makes a rule inapplicable rather than inconvenient. A
- * reason is required because that distinction is the whole of it, and only the person writing the
- * override knows which one this is.
- *
- * @param stated - The paths, and the rules that change for them. `Ruled` documents every member.
- * @returns The contribution.
+ * @remarks
+ *   The layer is named `lint.relax(...)`, and {@link enforce} builds the same
+ *   shape under the opposite name. Only the name separates them, and the name
+ *   is what a repository removes a layer by.
  */
 export function relax(stated: Ruled): Contribution {
   return changing(stated, "lint.relax");
 }
 
 /**
- * Asks more of one set of paths than of the rest.
+ * Tightens the rules a set of files is held to.
  *
- * The counterpart to `relax`, and the same mechanism: what separates them is which direction the
- * change goes, which is the one thing a later reader needs and the one thing the name can carry. A
- * framework package uses this to hold the files it renders to rules that mean nothing anywhere
- * else.
- *
- * @param stated - The paths, and the rules they answer to. `Ruled` documents every member.
- * @returns The contribution.
+ * @remarks
+ *   The layer is named `lint.enforce(...)`. See {@link relax} for the same
+ *   shape under the name used when rules come off instead of on.
  */
 export function enforce(stated: Ruled): Contribution {
   return changing(stated, "lint.enforce");
 }
 
 /**
- * Excuses what a tool reads by its default export.
+ * Excuses the files a tool reads through their default export.
  *
- * Which files those are is the caller's to say: a config everywhere, a story file or a route module
- * only where the repository keeps them.
- *
- * @param files - The globs read by a default export.
- * @returns The contribution.
+ * @remarks
+ *   A config file and a story file each have one export and nowhere else to put
+ *   it. Only `no-default-export` comes off, so every other rule still reaches
+ *   them.
  */
 export function defaultExported(files: readonly string[]): Contribution {
   return named(
@@ -161,18 +169,12 @@ export function defaultExported(files: readonly string[]): Contribution {
 }
 
 /**
- * Excuses a specification the rule against asserting a type.
+ * Excuses a specification from doc comments, function length and cast safety.
  *
- * A specification reads back what a function answered, and what it answered is often deliberately
- * opaque: a branded layer, a config the toolchain types loosely. Narrowing it is how the assertion
- * gets made at all, and the narrowing is checked by the test failing rather than by the compiler.
- *
- * The length limit goes with them. `max-lines-per-function` stands in for whether a function does
- * one thing, and the body it measures here is a `describe`, whose length is the number of cases
- * rather than the complexity of any one of them. `max-lines` still holds the file to 300.
- *
- * @param files - The globs holding specifications.
- * @returns The contribution.
+ * @remarks
+ *   A case title already states what the case checks, and a doc comment above
+ *   it would say the same thing again. The cast rule comes off beside them
+ *   because a specification narrows the config value it has read back.
  */
 export function undocumented(files: readonly string[]): Contribution {
   return named(
@@ -191,14 +193,12 @@ export function undocumented(files: readonly string[]): Contribution {
 }
 
 /**
- * Holds a specification to how its cases are named.
+ * Applies the house grammar to the case titles of a specification.
  *
- * The counterpart to {@link undocumented}, and the reason it can be granted: a file excused its
- * docblocks documents itself by its test names instead, so those names answer to rules of their
- * own. Granting the excuse without this leaves a file that documents itself nowhere.
- *
- * @param files - The globs holding specifications.
- * @returns The contribution.
+ * @remarks
+ *   These titles carry the documentation {@link undocumented} took off the same
+ *   files. Apply both to the same globs, or a specification ends up with
+ *   neither a doc comment nor a checked title.
  */
 export function specified(files: readonly string[]): Contribution {
   return named(

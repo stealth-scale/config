@@ -1,5 +1,5 @@
 /**
- * What a package with stylesheets states in its own config.
+ * Gives a package one call that checks its stylesheets as it builds.
  */
 
 import { type Layer } from "@stealthscale/vite-config-core";
@@ -7,14 +7,14 @@ import { type Layer } from "@stealthscale/vite-config-core";
 import { check, type Checked } from "#plugin/check.ts";
 
 /**
- * The layers a package with stylesheets adds beside its tier.
+ * Lists the layers a package with stylesheets extends its tier with.
  *
- * One layer, the check, named `css.check`. A repository that reports rather than fails takes it
- * back with `warn`.
- *
- * @param stated - The repository's own answers about its stylesheets. `Checked` documents every
- *   member.
- * @returns Each layer the stylesheets need beside a tier, in the order they compose.
+ * @remarks
+ *   The result is a single contribution, so where a config places it among its
+ *   other add-ons decides nothing. The check appends to `plugins` and reads no
+ *   key another layer sets.
+ * @param stated - The globs and rules this repository departs on, passed
+ *   through untouched.
  */
 export function layers(stated: Checked = {}): readonly Layer[] {
   return [check(stated)];

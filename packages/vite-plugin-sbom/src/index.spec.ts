@@ -1,3 +1,12 @@
+/**
+ * Covers what lands in a generated document, from the subject down to a single dependency edge.
+ *
+ * @remarks
+ *   A case installs a package into a temporary workspace and hands the plugin a stand-in build
+ *   whose module graph it controls, so what the document lists is decided by the case rather than
+ *   by whatever this repository happens to have installed.
+ */
+
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -8,18 +17,20 @@ import { type Bundling } from "@stealthscale/vite-plugin-base";
 import { sbom, written } from "#index.ts";
 
 /**
- * A real integrity, since the parser refuses one of the wrong length.
+ * A digest with the prefix and the length a lockfile reader accepts.
  */
 const INTEGRITY =
   "sha512-1CWR0Ru94zpwIHIAqbDD1zQjyjqszU0cohfGZFH7HiRtUf5ePwwQoer8MfzCiu8m+he5wL8Z/xa1NfoP+FFjnA==";
 
 /**
- * Lays out a workspace: a package to describe, and one installed dependency it reached.
+ * Installs one package into a temporary workspace holding a bun lockfile.
  *
- * @param manifest - What the described package's manifest holds beyond its name.
- * @param dependency - The installed package's manifest, or nothing to install a bare one.
- * @param lockfile - The `packages` entries to write, as JSON text without its braces.
- * @returns Where the described package sits, and the dependency's module.
+ * @param manifest - Fields added to the described package's own manifest.
+ * @param dependency - The installed package's manifest. A missing one names the package and
+ *   nothing else.
+ * @param lockfile - The rows written between the braces of the lockfile's `packages` object.
+ * @returns The described package's directory, and the module path a build would report for the
+ *   installed package.
  */
 function workspace(
   manifest: Record<string, unknown> = {},
@@ -43,10 +54,11 @@ function workspace(
 }
 
 /**
- * Stands in for a build that reached the given modules.
+ * Stands in for a build whose module graph a case decides.
  *
- * @param modules - Each module the build reached.
- * @returns Something with the shape the plugin reads.
+ * @remarks
+ *   Only the three members the plugin calls are provided, and emitted files are discarded. A case
+ *   that needs to see what was emitted supplies its own `emitFile`.
  */
 function building(
   modules: readonly string[] = [],
@@ -60,12 +72,9 @@ function building(
 }
 
 /**
- * Builds a document and reads it back.
+ * Generates a document for a prepared workspace and parses it back.
  *
- * @param stated - What the plugin was asked for.
- * @param held - The workspace to describe.
- * @param modules - The modules the build reached.
- * @returns The document, parsed.
+ * @returns The document as plain data, which a case reads with {@link field}.
  */
 function document(
   stated: Parameters<typeof written>[0],
@@ -77,14 +86,11 @@ function document(
 }
 
 /**
- * Reads a nested field out of the document.
+ * Walks a path of keys into parsed data, stopping at the first key that leads nowhere.
  *
- * Read rather than asserted into a shape, because what is being specified is the document a scanner
- * receives. A shape stated here would only restate what the code already believes.
- *
- * @param held - Whatever holds it.
- * @param path - The field names, outermost first.
- * @returns What sits there, or nothing where the path names nothing.
+ * @remarks
+ *   A path that runs out yields undefined instead of throwing, so a case asserting that the
+ *   document omits something reads it the same way as one asserting a value.
  */
 function field(held: unknown, ...path: readonly string[]): unknown {
   return path.reduce<unknown>(
@@ -94,10 +100,7 @@ function field(held: unknown, ...path: readonly string[]): unknown {
 }
 
 /**
- * Reads the first component of a document.
- *
- * @param held - The document.
- * @returns That component, or nothing where it holds none.
+ * Takes the one component a document lists, out of a case that installed a single package.
  */
 function first(held: unknown): unknown {
   const components = field(held, "components");
@@ -106,11 +109,11 @@ function first(held: unknown): unknown {
 }
 
 /**
- * Reads the first entry of a list sitting at a path.
+ * Walks a path of keys and takes the opening entry of the list it arrives at.
  *
- * @param held - Whatever holds it.
- * @param path - The field names, outermost first.
- * @returns The first entry, or nothing where the path names no list.
+ * @remarks
+ *   A serialised document nests several single-entry lists, such as the licences on a component.
+ *   Reaching into one by index would read as a claim about ordering that no case is making.
  */
 function firstOf(held: unknown, ...path: readonly string[]): unknown {
   const found = field(held, ...path);

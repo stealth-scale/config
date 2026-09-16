@@ -1,5 +1,5 @@
 /**
- * The `server` block: where an app is reached while it is being worked on.
+ * Collects the layers that configure the development server.
  */
 
 export { address } from "#server/address.ts";

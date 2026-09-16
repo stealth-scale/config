@@ -1,8 +1,5 @@
 /**
- * The `test` block: what a package's tests are run under.
- *
- * Read from the package's own config, unlike `lint` and `fmt`, because the runner is started per
- * package and takes its root from the one it was started in.
+ * The test layers a package extends, and the tiers it starts from.
  */
 
 export { assertion } from "#test/assertion.ts";

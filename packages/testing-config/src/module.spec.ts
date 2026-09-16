@@ -2,9 +2,6 @@ import { describe, expect, it } from "vitest";
 
 import { callable, factories, prefixOf, record, walked } from "#module.ts";
 
-/**
- * A barrel with one of everything a config package exports.
- */
 const BARREL = {
   contribute: (): string => "kernel",
   layers: (): string[] => [],

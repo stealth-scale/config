@@ -1,3 +1,8 @@
+/**
+ * Pins down the argument forms the command accepts and the wording it refuses
+ * them with.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { tally } from "#totals.ts";

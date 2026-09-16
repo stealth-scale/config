@@ -1,3 +1,13 @@
+/**
+ * Builds this example as a federation host that names its remotes but never locates them.
+ *
+ * @remarks
+ *   `remote/Dashboard` is resolved while this application is bundled, so the build has to know the
+ *   name. Where that application is deployed is read from `public/remotes.json` when this one
+ *   starts, which keeps every URL out of the artefact and in the one file that differs between the
+ *   environments a single build is promoted through.
+ */
+
 import { join } from "node:path";
 
 import { federation, preview, server } from "@stealthscale/vite-config";
@@ -5,9 +15,11 @@ import * as react from "@stealthscale/vite-config-react";
 import { defineConfig } from "@stealthscale/vite-config/preset/app";
 
 /**
- * The names this application is served under while it is being worked on, beyond loopback. Stated
- * rather than derived, so the tree says which application answers to which name. `STEALTH_HOSTS`
- * overrides it on a machine that has arranged something else.
+ * Lists the hostnames the host's development server answers to beyond loopback.
+ *
+ * @remarks
+ *   Stated rather than derived, so the tree says which application answers to which name.
+ *   `STEALTH_HOSTS` overrides it on a machine that has arranged something else.
  */
 const NAMES = ["host.stealthscale.dev"];
 
@@ -15,10 +27,6 @@ export default defineConfig(import.meta.dirname, {
   extends: [
     react.layers(),
 
-    // A name and no URL. `remote/Dashboard` is resolved while this is bundled, so the bundler has
-    // to know the name; where that application is deployed is read from `public/remotes.json` when
-    // this one starts, which is the only place a URL appears and the only file that differs
-    // between the environments one artefact is promoted through.
     federation.host({
       name: "host",
       remotes: ["remote"],

@@ -1,23 +1,17 @@
 /**
- * What a test has to do to count as one.
+ * Demands an assertion from every test file and widens the failure the runner
+ * prints.
  */
 
 import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
- * Refuses a test that asserts nothing, and shows a whole snapshot when one breaks.
+ * Fails a test that ran without asserting anything.
  *
- * A test with no assertion passes. It passes when the code is right, and it passes when the code is
- * wrong, which makes it worse than no test: the suite reports a number that includes it. The usual
- * cause is an assertion left inside a callback nothing awaited.
- *
- * The runner's API is imported rather than ambient, stated here because a global `expect` is the
- * other way a file can look tested without saying what it imported.
- *
- * A failed snapshot shows the whole diff rather than a patch around the change, because reading a
- * patch means guessing at what surrounds it.
- *
- * @returns The preset.
+ * @remarks
+ *   A test whose assertions all sit inside a branch nothing took still passes
+ *   in most runners, and reports green for code it never reached. The runner
+ *   API stays imported rather than ambient, so the editor can follow it.
  */
 export function assertion(): Preset {
   return preset({

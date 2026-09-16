@@ -1,10 +1,5 @@
 /**
- * The `fmt` block: the one shape every package is written in.
- *
- * Stated once, at the workspace root. A package's own config carries what Vite, Vitest and its
- * framework need, and the formatter reads none of them. A layer from this block put in one is
- * composed, merged and then never seen. Where a package needs an answer of its own, the glob says
- * which files it reaches rather than which config states it.
+ * The formatting layers a package extends.
  */
 
 export {

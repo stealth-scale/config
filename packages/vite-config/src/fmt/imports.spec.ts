@@ -1,3 +1,7 @@
+/**
+ * Checks the band order imports are sorted into, and what counts as internal.
+ */
+
 import { type UserConfig } from "vite-plus";
 import { describe, expect, it } from "vitest";
 
@@ -5,9 +9,7 @@ import { imports } from "#fmt/imports.ts";
 import { SORT } from "#lint/rules/sort.ts";
 
 /**
- * Reads the import settings the preset sets.
- *
- * @returns Those settings.
+ * Unwraps the import-sorting block out of the layer.
  */
 function settings(): Record<string, unknown> {
   const held = (imports().config as UserConfig).fmt?.sortImports;

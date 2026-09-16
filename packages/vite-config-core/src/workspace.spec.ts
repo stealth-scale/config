@@ -1,3 +1,7 @@
+/**
+ * Covers each spelling of a workspace declaration, and which one wins.
+ */
+
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -6,19 +10,14 @@ import { describe, expect, it } from "vitest";
 import { workspaces } from "#workspace.ts";
 
 /**
- * A directory holding nothing, for a reading that does not turn on a file.
- *
- * @returns Where it is.
+ * Makes a directory holding no package manager's file.
  */
 function empty(): string {
   return mkdtempSync(join(tmpdir(), "stealth-workspace-"));
 }
 
 /**
- * Lays out a directory holding a pnpm workspace file.
- *
- * @param yaml - What the file holds.
- * @returns Where it is.
+ * Makes a directory holding a pnpm workspace file with the given contents.
  */
 function written(yaml: string): string {
   const at = empty();

@@ -3,12 +3,6 @@ import { describe, expect, it } from "vitest";
 
 import { command } from "#pack/command.ts";
 
-/**
- * Reads back the commands a layer states.
- *
- * @param stated - Each command name against the file behind it.
- * @returns The bin map the packer is handed.
- */
 function installs(stated: Record<string, string>): Record<string, string> {
   const held = (command(stated).config as UserConfig).pack as {
     exports: { bin: Record<string, string> };

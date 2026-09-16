@@ -1,20 +1,20 @@
 /**
- * What the shared stylelint config is, since it ships no types of its own.
- *
- * Narrowed to the two fields this package reads, because a wider declaration would be a guess.
+ * Declares the shape of the shared Stylelint configuration, which ships no
+ * types of its own.
  */
+
 declare module "stylelint-config-standard" {
   /**
-   * The shared config, as stylelint reads it.
+   * Describes the shared guide the rule sets in this package are layered over.
    */
   const config: {
     /**
-     * The config it is itself built on.
+     * The configuration this one is itself built on, as a package specifier.
      */
     extends: string;
 
     /**
-     * Each rule it states, against what it asks for.
+     * Every rule the shared guide turns on, by Stylelint rule name.
      */
     rules: Record<string, unknown>;
   };

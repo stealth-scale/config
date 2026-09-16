@@ -1,5 +1,10 @@
 /**
- * Checks that every tier a package publishes composes under a build.
+ * Composes every preset a config package publishes and reports what refuses to compose.
+ *
+ * @remarks
+ *   A tier is checked by running it. Its layers are collected and its `defineConfig` is driven
+ *   through a build, so a tier that type-checks and then fails on the first import still fails
+ *   here.
  */
 
 import { flattened, isLayer, reason, repeated } from "#layers.ts";
@@ -7,20 +12,26 @@ import { type Published } from "#manifest.ts";
 import { callable, record } from "#module.ts";
 
 /**
- * The tier modules a specification supplies, keyed by subpath such as `preset/app`.
+ * Keys the tier modules a specification supplies by the subpath that publishes each one.
+ *
+ * @remarks
+ *   A key is written as the manifest exports it with the leading dot removed, such as
+ *   `preset/app`. A published subpath with no entry here is a violation rather than a tier that
+ *   goes unchecked.
  */
 export type Tiers = Readonly<Record<string, Readonly<Record<string, unknown>>>>;
 
 /**
- * The environment a tier is composed under, which is the one the packer uses.
+ * The environment every tier is composed under.
  */
 const BUILDING = { command: "build", mode: "production" } as const;
 
 /**
- * Lists the subpaths a package publishes tiers under.
+ * Lists the preset subpaths a manifest exports, each without its leading dot.
  *
- * @param published - The manifest to read.
- * @returns Each tier subpath without its leading `./`.
+ * @remarks
+ *   Only `./preset/` counts as a tier. The barrel and any other subpath belong to the manifest
+ *   checks and are not composed.
  */
 function tiersOf(published: Published): readonly string[] {
   return Object.keys(published.exports ?? {})
@@ -29,12 +40,12 @@ function tiersOf(published: Published): readonly string[] {
 }
 
 /**
- * Composes one tier the way the toolchain does.
+ * Drives a tier's `defineConfig` through a build and reports what it refuses.
  *
- * @param subpath - The tier subpath.
- * @param define - The `defineConfig` the tier exports.
- * @param at - The package directory the tier reads its manifest from.
- * @returns Each violation.
+ * @remarks
+ *   The export is called with the package directory and has to hand back a function of the
+ *   environment, which is awaited in turn. A throw at either step is reported as the tier failing
+ *   to compose, carrying the message with it.
  */
 async function defined(
   subpath: string,
@@ -57,12 +68,11 @@ async function defined(
 }
 
 /**
- * Checks the two exports of one tier module.
+ * Checks one tier for both entry points, for layers only, and for no layer twice.
  *
- * @param subpath - The tier subpath.
- * @param module - The tier module.
- * @param at - The package directory.
- * @returns Each violation.
+ * @remarks
+ *   A missing entry point ends the check there, because neither question below it can be answered
+ *   without one. A tier that repeats a layer is reported once per name.
  */
 async function composing(
   subpath: string,
@@ -84,13 +94,12 @@ async function composing(
 }
 
 /**
- * Checks that every tier subpath in the manifest is supplied, exports `layers()` and
- * `defineConfig`, composes to distinct layers, and composes under a build.
+ * Checks that every published tier was supplied and that each one composes.
  *
- * @param published - The manifest to read the tier subpaths from.
- * @param tiers - The tier modules the specification supplies.
- * @param at - The package directory.
- * @returns Each violation.
+ * @remarks
+ *   Tiers are composed at the same time, so one that fails hides nothing about the others. A
+ *   subpath the manifest exports and the caller left out is reported without anything being
+ *   loaded on its behalf.
  */
 export async function composes(
   published: Published,

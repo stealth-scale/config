@@ -1,15 +1,22 @@
 /**
- * The task runner's own settings, as the block reaches them.
+ * Describes the shapes the task-runner block of a Vite configuration accepts.
  */
 
 import { type UserConfig } from "vite";
 
 /**
- * What a repository states about running its tasks.
+ * The cache, the task table and the script lifecycle a workspace root declares
+ * for the runner.
  */
 export type Running = NonNullable<UserConfig["run"]>;
 
 /**
- * One task, as the runner takes it: a command, or a command with what it reads and writes.
+ * One task, written as its command alone or as a record naming that command
+ * with its files.
+ *
+ * @remarks
+ *   A record that names inputs while declaring itself uncached fails to
+ *   typecheck, because there is then nothing for a fingerprint to be taken of.
+ *   Naming neither leaves the task running every time it is invoked.
  */
 export type Doing = NonNullable<Running["tasks"]>[string];

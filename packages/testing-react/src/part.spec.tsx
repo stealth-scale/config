@@ -5,11 +5,6 @@ import { describe, expect, it } from "vitest";
 
 import { only, part, parts } from "#part.ts";
 
-/**
- * Renders nothing, which is what a component with nothing to show does.
- *
- * @returns No element at all.
- */
 function Nothing(): null {
   return null;
 }
@@ -96,8 +91,6 @@ describe("only", () => {
   });
 
   it("returns the custom properties a component set", () => {
-    // A count a caller worked out at run time cannot be a class, so it reaches the stylesheet
-    // through the style attribute and the recipe reads it from there.
     const { container } = render(<div style={{ "--columns": 3 } as CSSProperties} />);
 
     expect(only(container).style.getPropertyValue("--columns")).toBe("3");

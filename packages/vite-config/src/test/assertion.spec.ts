@@ -1,12 +1,14 @@
+/**
+ * Checks what the runner demands of a test before it counts as passing.
+ */
+
 import { type UserConfig } from "vite-plus";
 import { describe, expect, it } from "vitest";
 
 import { assertion } from "#test/assertion.ts";
 
 /**
- * Reads the test block the preset sets.
- *
- * @returns That block.
+ * Reaches the runner block the layer states.
  */
 function block(): NonNullable<UserConfig["test"]> {
   return (assertion().config as UserConfig).test as NonNullable<UserConfig["test"]>;

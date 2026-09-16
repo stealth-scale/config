@@ -1,22 +1,23 @@
 /**
- * The docblock standard, as rules a linter can check.
+ * Configures the two plugins that read a doc comment.
  *
- * The standard is TSDoc, and two plugins share the work because they answer different questions:
- * `tsdoc/syntax` asks whether a docblock is valid TSDoc, and the jsdoc plugin asks whether there is
- * one at all, whether it covers the signature, and whether it says anything. Neither alone is the
- * standard.
+ * @remarks
+ *   No rule here requires a tag into existence. The plugin asks for a block on
+ *   every declaration and then checks the text of whichever tags the author
+ *   wrote, and `@throws` is the single exception, because a signature has
+ *   nowhere to record what a function throws.
  */
 
 import { type PluginRules } from "#lint/rules/rules.ts";
 
 /**
- * The order a docblock's tags are written in.
+ * The tags a block may carry, in the order a block writes them.
  *
- * TSDoc's own names throughout, in one group, so the tags stay contiguous and `tag-lines` alone
- * decides the blank line before them.
+ * @remarks
+ *   One list serves two rules. It fixes the order the tags are sorted into, and
+ *   it names the tags whose bodies the indentation check leaves alone.
  */
 const TAG_ORDER = [
-  "packageDocumentation",
   "remarks",
   "typeParam",
   "param",
@@ -25,23 +26,38 @@ const TAG_ORDER = [
   "example",
   "see",
   "deprecated",
+  "packageDocumentation",
 ];
 
 /**
- * The openers that say nothing, refused wherever a tag describes something.
+ * Matches a tag body that does not open on a word carrying no information.
  *
- * A pure negative lookahead: this is about how a sentence starts, and whether it is a sentence at
- * all is `require-description-complete-sentence`'s question.
+ * @remarks
+ *   The lookahead is anchored at the start and consumes nothing, so it reads
+ *   the first word and accepts every other opening. A body describing what a
+ *   parameter is passes, and one opening `What the caller passed` does not.
  */
 const NO_VAGUE_OPENER = String.raw`^(?!(?:What|Whatever|Something|Anything|Stuff)\b)`;
 
 /**
- * Where a docblock is required beyond the declarations `require` already names.
+ * Matches a summary that does not open on a generic verb stamped onto a noun.
  *
- * A constant inside a function is deliberately absent: the standard documents what a reader outside
- * the body can name, and a local is not that. The last selector matches the export statement rather
- * than the declaration inside it, because a docblock above `export const` attaches to the export
- * and a selector reaching past it reports a block that is there.
+ * @remarks
+ *   `Holds`, `Names` and `States` describe any declaration equally well, so a
+ *   summary opening on one of them has not said what this declaration does. A
+ *   noun phrase still passes, because a constant and a type alias are both
+ *   allowed to take one.
+ */
+const NO_GENERIC_OPENER = String.raw`^(?!(?:What|Whatever|Something|Anything|Stuff|Holds|Names|States)\b)`;
+
+/**
+ * Selects the declarations that need a block beyond those the rule covers itself.
+ *
+ * @remarks
+ *   A type, an interface member and a module-level constant are each reached by
+ *   selector, since the rule's own `require` map lists functions and classes
+ *   only. An arrow function is reached through the declarator it is assigned
+ *   to, which is why it appears as a pair rather than on its own.
  */
 const DOCUMENTED = [
   "TSInterfaceDeclaration",
@@ -56,18 +72,40 @@ const DOCUMENTED = [
 ];
 
 /**
- * A destructured object parameter is documented as one `@param` named for its interface, and its
- * members are documented on that interface where the editor reads them. The plugin would otherwise
- * ask for one line per destructured member, which is every props type written twice.
+ * Reaches every declaration whose summary is read, for a rule taking `contexts`.
+ *
+ * @remarks
+ *   A rule given `contexts` checks those nodes instead of its own defaults, so a
+ *   function drops out of the check unless it is named here. {@link DOCUMENTED}
+ *   leaves functions to the `require` map of `require-jsdoc`, which takes no
+ *   `contexts` of its own for them.
+ */
+const SUMMARISED = [
+  ...DOCUMENTED,
+  "ClassDeclaration",
+  "ClassExpression",
+  "FunctionDeclaration",
+  "FunctionExpression",
+  "MethodDefinition",
+];
+
+/**
+ * Counts a destructured parameter once rather than once per property.
+ *
+ * @remarks
+ *   A function taking an options object documents the object, and each property
+ *   is documented where the type declares it. Without this, the same
+ *   descriptions would be asked for twice.
  */
 const ONE_PARAM_PER_OBJECT = { checkDestructured: false };
 
 /**
- * The spellings the jsdoc plugin has to be told about, because its own defaults are JSDoc's.
+ * Maps each JSDoc tag name onto the TSDoc name that stands in for it.
  *
- * Left alone it rewrites `@packageDocumentation` to `@file` and knows nothing of `@typeParam`. Each
- * entry maps the JSDoc name it would reach for to the TSDoc name the standard uses, which also
- * makes the JSDoc spelling an error rather than a second accepted form.
+ * @remarks
+ *   The plugin reports the JSDoc spelling and names its replacement in the
+ *   message. Both `@file` and `@fileoverview` land on `@packageDocumentation`,
+ *   which a documentation site reads as the entry point's own description.
  */
 export const TSDOC_TAGS = {
   default: "defaultValue",
@@ -78,31 +116,24 @@ export const TSDOC_TAGS = {
 };
 
 /**
- * What the jsdoc plugin needs told, since its defaults are JSDoc's rather than TSDoc's.
+ * Tells the plugin it is reading TypeScript, and which tag names to accept.
  *
- * `mode` is what stops it reading a tag's first brace as a type at all.
+ * @remarks
+ *   These belong in the block's `settings` rather than its `rules`, so they
+ *   reach every rule the plugin runs at once and stay in place wherever the
+ *   rules themselves are turned off.
  */
 export const DOCBLOCK_SETTINGS = {
   jsdoc: { mode: "typescript", tagNamePreference: TSDOC_TAGS },
 };
 
 /**
- * The docblock standard, rule by rule.
+ * Checks that a block exists, that it parses, and that its text says something.
  *
- * The syntax is TSDoc's, which `tsdoc/syntax` checks; what follows is the policy on top of it.
- *
- * Everything with a name carries a block, exported or not, in the multi-line form, with a summary
- * that is a sentence and does not restate the name. A tag is not required into existence: a
- * `@param` repeating the parameter's name says nothing the signature has not, and a rule demanding
- * one manufactures exactly the filler that `informative-docs` then reports. What a tag does carry
- * is checked — its name must match a parameter, its description must be a sentence, and it must not
- * restate what it describes.
- *
- * `@throws` is the exception, and required: a thrown error appears nowhere in the signature, so
- * naming one is information rather than repetition.
- *
- * No tag carries a type. TypeScript declares them already, a second copy is a second thing to keep
- * true, and TSDoc leaves them out for that reason.
+ * @remarks
+ *   The fixer is off. A block these rules could write would restate the name of
+ *   the declaration it sits above, and `informative-docs` refuses exactly that,
+ *   so the sentence is left for the author.
  */
 export const DOCBLOCK: PluginRules = {
   "jsdoc-js/check-indentation": ["error", { excludeTags: TAG_ORDER }],
@@ -114,7 +145,8 @@ export const DOCBLOCK: PluginRules = {
   "jsdoc-js/match-description": [
     "error",
     {
-      mainDescription: false,
+      contexts: SUMMARISED,
+      mainDescription: NO_GENERIC_OPENER,
       tags: { param: NO_VAGUE_OPENER, returns: NO_VAGUE_OPENER, throws: NO_VAGUE_OPENER },
     },
   ],
@@ -161,12 +193,12 @@ export const DOCBLOCK: PluginRules = {
 };
 
 /**
- * The same rules, off.
+ * Returns every rule in {@link DOCBLOCK}, each set to `off`.
  *
- * Derived from {@link DOCBLOCK} rather than listed, so a rule added above is turned off here without
- * anybody remembering to.
- *
- * @returns Every docblock rule, each set to `off`.
+ * @remarks
+ *   The names are read back out of the group rather than listed a second time
+ *   beside it. A rule added to the group is therefore off wherever this result
+ *   is applied, with nobody having to remember the other list.
  */
 export function docblocksOff(): PluginRules {
   return Object.fromEntries(Object.keys(DOCBLOCK).map((rule) => [rule, "off"]));

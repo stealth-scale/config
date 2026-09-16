@@ -1,5 +1,5 @@
 /**
- * Publishing subpaths a package works out rather than writes down.
+ * Publishes a subpath that neither the manifest names nor the packer builds.
  */
 
 import { type Preset, preset } from "@stealthscale/vite-config-core";
@@ -7,19 +7,13 @@ import { type Preset, preset } from "@stealthscale/vite-config-core";
 import { carrying, type Packed } from "#pack/carry.ts";
 
 /**
- * Publishes subpaths another module worked out.
+ * Adds each stated subpath to the export map, over whatever else put one there.
  *
- * `pack.carry` already keeps whatever the manifest names, and a file a person wrote belongs there:
- * it is the map the resolver reads, so writing it down is what makes the subpath resolve before
- * anything is packed. This is for the other case, a map that is computed, where writing it down
- * would be copying one package's list into every package that publishes that list, and the failure
- * when the two drift is a subpath pointing at a file the generator stopped writing.
- *
- * Whatever the manifest names is carried through as well, so a package using this keeps the
- * subpaths it wrote by hand and states neither list twice.
- *
- * @param exports - Each subpath against the file it names.
- * @returns The preset.
+ * @remarks
+ *   The stated map is applied after {@link carrying}, so a package extending this keeps its
+ *   hand-written subpaths and still wins for any subpath both name. A package that extends
+ *   `pack.carry` as well states the same setting twice, and only one of the two survives.
+ * @param exports - Each subpath a consumer may import, against the built file behind it.
  */
 export function subpaths(exports: Readonly<Record<string, string>>): Preset {
   return preset({

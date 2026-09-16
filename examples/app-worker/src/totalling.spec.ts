@@ -1,3 +1,12 @@
+/**
+ * Checks what the totalling does with a run of two, a run of one and no run at all.
+ *
+ * @remarks
+ *   The three lengths are here because each takes a different path: the reduce
+ *   only runs on the first, the seed alone answers the second, and the third never
+ *   reaches either.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { totalling } from "#totalling.ts";

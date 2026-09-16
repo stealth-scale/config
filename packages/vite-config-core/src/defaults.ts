@@ -1,5 +1,10 @@
 /**
- * Binding a set of defaults to `defineConfig`, so a config states only what is true of itself.
+ * Binds a set of default layers into a `defineConfig` a tier can publish.
+ *
+ * @remarks
+ *   A tier exports the result rather than asking every package to spell out the
+ *   same list. What a package extends is still its own, and sits above the
+ *   defaults.
  */
 
 import { type UserConfigExport } from "vite";
@@ -8,13 +13,11 @@ import { defineConfig as composed, type Config, type ConfigFn } from "#define.ts
 import { type Extendable } from "#layer.ts";
 
 /**
- * States a config for a package, with a tier's layers already under it.
+ * The signature a tier's `defineConfig` presents to a package.
  *
- * Takes the directory first, as everything handed a context does.
- *
- * Named rather than inferred so that a tier can annotate what it exports. A declaration file has to
- * be writable from one source file at a time, and an inferred type reaching into this module is
- * not.
+ * @remarks
+ *   The config argument is optional here, so a package taking the tier as it
+ *   stands writes nothing but its own directory.
  */
 export type Defining = (
   at: string,
@@ -22,13 +25,14 @@ export type Defining = (
 ) => UserConfigExport;
 
 /**
- * Composes a config with a set of layers already under it.
+ * Builds a `defineConfig` that lays a tier's defaults beneath whatever a package extends.
  *
- * The defaults go beneath whatever the caller extends, so a repository's own layers are merged
- * after and win, and its top-level keys win over both.
- *
- * @param defaults - The layers every package taking this set is built on, nested to any depth.
- * @returns A `defineConfig` carrying them.
+ * @remarks
+ *   The defaults are read once per invocation rather than once per call, so a
+ *   tier working its list out from the environment is asked again on every
+ *   build. A package can take a default back by name with a removal, because
+ *   the defaults come first and a removal only reaches what is above it.
+ * @param defaults - Returns the layers every package on this tier starts from.
  */
 export function configuring(defaults: () => readonly Extendable[]): Defining {
   return function defineConfig(

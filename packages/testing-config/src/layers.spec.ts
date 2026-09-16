@@ -14,26 +14,10 @@ import {
   unique,
 } from "#layers.ts";
 
-/**
- * Builds a layer for a check to read.
- *
- * @param name - The layer name.
- * @param layerKind - The layer kind.
- * @param because - The reason, where the kind carries one.
- * @returns The layer.
- */
 function layer(name: string, layerKind: Layer["kind"] = "preset", because?: string): Layer {
   return because === undefined ? { kind: layerKind, name } : { because, kind: layerKind, name };
 }
 
-/**
- * Builds the return value record of one factory.
- *
- * @param path - The factory path.
- * @param layers - The layers the factory returned.
- * @param listed - Whether the factory returned an array.
- * @returns The record.
- */
 function found(path: string, layers: readonly Layer[], listed = true): Found {
   return { error: undefined, layers, listed, others: [], path };
 }

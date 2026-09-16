@@ -1,3 +1,7 @@
+/**
+ * Proves the application tier builds what the library tier would have packed.
+ */
+
 import { type ConfigEnv, type UserConfig } from "vite-plus";
 import { describe, expect, it } from "vitest";
 
@@ -7,18 +11,12 @@ import { defineConfig, layers } from "#preset/app.ts";
 import { layers as web } from "#preset/web.ts";
 
 /**
- * Where the config under specification is: this package's own root.
- *
- * A config file sits at a package root, and the tier reads the manifest beside it. Naming this
- * directory instead would hand the layers a directory holding no manifest at all.
+ * The package root, which is where a tier expects to find a manifest.
  */
 const AT = new URL("../..", import.meta.url).pathname;
 
 /**
- * Names every layer the tier is built on.
- *
- * @param of - The tier's layers.
- * @returns Every name in it.
+ * Flattens a tier's layers one level and lists what each is called.
  */
 function names(of: ReturnType<typeof layers>): string[] {
   const flat: Layer[] = of.flatMap((held) =>

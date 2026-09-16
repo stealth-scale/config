@@ -1,24 +1,16 @@
 /**
- * What a file that renders answers to beyond what every file does.
+ * Declares the React rules every source file in a repository that renders is held to.
  */
 
 import { type Contribution, lint, named } from "@stealthscale/vite-config";
 
 /**
- * The files these reach, which is everything a package that renders compiles.
+ * The files the rules apply to, which is every source file rather than only the ones with markup.
  */
 const FILES = ["**/*.{ts,tsx}"];
 
 /**
- * The rules the linter files under neither correctness nor pedantry, asked for anyway.
- *
- * Each is a house decision rather than a bug the linter found. Markup assigned as a string is the
- * same hole in React that `innerHTML` is anywhere else, so it is refused in the same terms. A file
- * exporting a component beside something else cannot be refreshed in place, which is a cost paid
- * every save. A class component is a way of writing React that nothing here uses. JSX belongs in a
- * file whose name says it holds JSX, which for TypeScript means `.tsx` and has to be said: the rule
- * ships knowing only about `.jsx`, so left alone it refuses every file in the repository. And one
- * component to a file is what the folder layout already assumes.
+ * Each React rule and the severity it is set at.
  */
 const RULES = {
   "react/function-component-definition": "error",
@@ -30,9 +22,12 @@ const RULES = {
 };
 
 /**
- * Holds what renders to the rules that only make sense there.
+ * Enforces one function component per file, written so the transform recognises it.
  *
- * @returns The contribution.
+ * @remarks
+ *   Fast refresh replaces a module wholesale, so it can only keep state where the module exports
+ *   nothing but components. The one-component and export rules are what make that hold, and a
+ *   package turning either off loses its state on every edit instead of failing the lint run.
  */
 export function rules(): Contribution {
   return named(

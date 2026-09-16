@@ -1,7 +1,5 @@
 /**
- * What is put back between one rendering test and the next.
- *
- * Loaded by the runner rather than imported, through the setup file `test.cleanup` contributes.
+ * Empties the document after every test, so one test never reads markup another one mounted.
  */
 
 import { afterEach } from "vitest";

@@ -1,21 +1,15 @@
 /**
- * Putting a manifest's keys in the order everybody already expects them.
+ * The key order a package manifest is written in.
  */
 
 import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
- * Sorts every `package.json` into the conventional order.
+ * Rewrites a package manifest into the conventional key order.
  *
- * A manifest has a reading order the ecosystem settled on years ago — what the package is, then
- * where it came from, then what it ships, then what it needs — and a key added by hand lands
- * wherever the hand was. Sorting it means a diff shows a dependency changing rather than a file
- * being reshuffled, and two manifests in one workspace can be read side by side.
- *
- * On by the formatter's own default, and stated anyway: this one rewrites a file that is also the
- * package's published contract, so it is worth being a decision rather than something inherited.
- *
- * @returns The preset.
+ * @remarks
+ *   Two people adding a dependency by hand put it in two different places. The
+ *   sort settles that before either change reaches a review.
  */
 export function manifests(): Preset {
   return preset({ config: { fmt: { sortPackageJson: true } }, name: "fmt.manifests" });

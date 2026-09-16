@@ -1,25 +1,21 @@
 /**
- * The rules the automatic JSX runtime makes obsolete.
+ * Drops the one React rule the automatic JSX runtime makes obsolete.
  */
 
 import { type Contribution, lint, named } from "@stealthscale/vite-config";
 
 /**
- * The files the automatic runtime compiles, which is everything this package renders.
+ * The files the relaxation covers, matching the set the React rules are declared over.
  */
 const FILES = ["**/*.{ts,tsx}"];
 
 /**
- * Stops asking for what the compiler now supplies.
+ * Stops the linter asking for a React import that no file needs.
  *
- * The tsconfig this package ships sets the automatic JSX runtime, so a file that renders imports
- * `react/jsx-runtime` without saying so and never needs `React` in scope. The rule that checks for
- * it predates that runtime and fires on every correct file.
- *
- * Paired with the tsconfig deliberately. A repository compiling with the classic runtime instead
- * takes this back by name, and gets the rule that catches its real mistake.
- *
- * @returns The contribution.
+ * @remarks
+ *   The transform and the shipped `web.json` both select the automatic runtime, which imports the
+ *   factory for a file instead of reading it from scope. A package compiling with the classic
+ *   runtime has to put the rule back, because nothing else warns about the import it still needs.
  */
 export function runtime(): Contribution {
   return named(

@@ -1,3 +1,7 @@
+/**
+ * Specifies how the size limits count lines and how they stand to each other.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { SIZE } from "#lint/rules/size.ts";

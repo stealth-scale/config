@@ -1,3 +1,7 @@
+/**
+ * Checks which packages a workspace root hands the runner as projects.
+ */
+
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -8,16 +12,12 @@ import { projects } from "#test/projects.ts";
 import { answered, told } from "#vite.fixtures.ts";
 
 /**
- * Writes a workspace: a root manifest, and a directory for each package named under it.
+ * Builds a throwaway workspace on disk and returns its root.
  *
- * The directories are real because finding the packages is a walk over the file system, which a
- * stated manifest cannot stand in for.
- *
- * @param globs - Where the root says its packages live.
- * @param held - The package directories to create, each given a manifest of its own. A directory
- *   named with a trailing slash is created empty, which is what a skeleton left for a package
- *   nobody has written yet looks like.
- * @returns Where the workspace sits.
+ * @remarks
+ *   A layer that expands globs has to be given real directories, because the
+ *   crawl is the thing under test. An entry ending in a slash is made as a
+ *   directory with no manifest, which is how a skeleton is set up.
  */
 function workspace(globs: readonly string[], held: readonly string[] = []): string {
   const at = mkdtempSync(join(tmpdir(), "stealth-projects-"));
@@ -37,11 +37,11 @@ function workspace(globs: readonly string[], held: readonly string[] = []): stri
 }
 
 /**
- * Reads the test block the preset sets for a workspace on disk.
+ * Resolves the layer at the root of a workspace built for the occasion.
  *
- * @param globs - Where the root says its packages live.
- * @param held - The package directories to create.
- * @returns That block.
+ * @remarks
+ *   The context names that workspace as both the directory and the root, which
+ *   is the one case where the layer states anything.
  */
 function block(
   globs: readonly string[],
@@ -58,10 +58,11 @@ function block(
 }
 
 /**
- * Resolves the layer against a manifest, for the cases that refuse one.
+ * Defers resolving the layer so a check can assert on what it throws.
  *
- * @param stated - Whatever differs from an ordinary package.
- * @returns What the layer does when it is resolved.
+ * @remarks
+ *   No workspace is written to disk here. The context is invented, which is
+ *   what lets a check state a root that declares nothing.
  */
 function resolving(stated: Parameters<typeof told>[0]): () => unknown {
   const held = projects().config;

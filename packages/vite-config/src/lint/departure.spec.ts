@@ -1,3 +1,7 @@
+/**
+ * Specifies how a departure reaches the lint block and what it carries there.
+ */
+
 import { type ConfigEnv, type UserConfig } from "vite-plus";
 import { describe, expect, it } from "vitest";
 
@@ -5,58 +9,26 @@ import { defineConfig, type Layer, owned, remove } from "@stealthscale/vite-conf
 
 import { defaultExported, forbid, relax, undocumented } from "#lint/departure.ts";
 
-/**
- * Where the config under specification is, which every `defineConfig` states for itself.
- */
 const AT = import.meta.dirname;
 
-/**
- * The environment a build is read in.
- */
 const BUILDING: ConfigEnv = { command: "build", mode: "production" };
 
-/**
- * Reads a defined config back, the way Vite+ does.
- *
- * @param config - What was defined.
- * @returns The composed config.
- */
 function readBack(config: Parameters<typeof defineConfig>[1]): Promise<UserConfig> {
   const held = defineConfig(AT, config) as (given: ConfigEnv) => Promise<UserConfig>;
 
   return held(BUILDING);
 }
 
-/**
- * Holds one override, as the specifications below read it.
- */
 interface Held {
-  /**
-   * The globs it covers.
-   */
   files: string[];
 
-  /**
-   * The rules it changes.
-   */
   rules: Record<string, unknown>;
 }
 
-/**
- * Reads the overrides out of a composed config.
- *
- * @param config - The composed config.
- * @returns Its lint overrides.
- */
 function overridesOf(config: UserConfig): readonly Held[] {
   return (config.lint?.overrides ?? []) as readonly Held[];
 }
 
-/**
- * Stands in for a framework package composing its own layers under its name.
- *
- * @returns What that package contributes.
- */
 function react(): readonly Layer[] {
   return owned("react", [
     relax({
@@ -67,11 +39,6 @@ function react(): readonly Layer[] {
   ]);
 }
 
-/**
- * Stands in for a second such package.
- *
- * @returns What that package contributes.
- */
 function paraglide(): readonly Layer[] {
   return owned("paraglide", [
     relax({

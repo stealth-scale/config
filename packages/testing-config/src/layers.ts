@@ -1,120 +1,143 @@
 /**
- * Calls each factory, reads the layers it returns, and checks each layer against the contract.
+ * Calls the factories a config barrel exports and judges the layers they hand back.
+ *
+ * @remarks
+ *   Each factory is called once and every check after that reads the recording, so four checks
+ *   agree on what a factory returned and a factory with a side effect performs it once. A factory
+ *   that throws is recorded as such rather than ending the run.
  */
 
 import { type Arguments, type Factory, record } from "#module.ts";
 
 /**
- * Names the four kinds the kernel mints.
+ * Distinguishes the four kinds a layer can declare itself as.
+ *
+ * @remarks
+ *   The kind decides which rules a layer is held to. A preset is the one kind that states no
+ *   reason, and the other three state one.
  */
 export type LayerKind = "contribution" | "override" | "preset" | "removal";
 
 /**
- * Describes a layer as far as a check reads it.
+ * Describes the part of a layer these checks read.
+ *
+ * @remarks
+ *   Nothing here comes from the kernel's own types, so a package built against a different
+ *   version of the kernel is checked on the shape of what it returns.
  */
 export interface Layer {
   /**
-   * States the reason. Every kind but a preset carries one.
+   * Why the layer exists. It is typed loosely because a layer that omits it is what the check
+   * reports.
    */
   readonly because?: unknown;
 
   /**
-   * States the kind.
+   * Which of the four kinds the layer declares.
    */
   readonly kind: LayerKind;
 
   /**
-   * States the name a removal targets.
+   * The name a consumer reads back out of a merged configuration.
    */
   readonly name: string;
 }
 
 /**
- * Describes the return value of one factory.
+ * Records what one factory produced, or why nothing came back.
+ *
+ * @remarks
+ *   A factory that threw yields empty arrays alongside the message, so a caller reading `layers`
+ *   sees no layers rather than an exception.
  */
 export interface Found {
   /**
-   * Holds the error message when the call threw.
+   * The message from a factory that threw, undefined where the call returned.
    */
   readonly error: string | undefined;
 
   /**
-   * Lists each layer the call returned, flattened.
+   * Every layer in what came back, at whatever depth it was nested.
    */
   readonly layers: readonly Layer[];
 
   /**
-   * States whether the call returned an array. An array is named differently from one layer.
+   * Whether the factory returned an array. One that returns a single layer names it for the call,
+   * and one that returns an array composes layers other factories made.
    */
   readonly listed: boolean;
 
   /**
-   * Lists each returned value that is not a layer.
+   * Everything that came back and is not a layer.
    */
   readonly others: readonly unknown[];
 
   /**
-   * States the path a consumer writes to call the factory.
+   * The dotted path the factory sits at in the barrel.
    */
   readonly path: string;
 }
 
 /**
- * Describes the name a layer has to carry.
+ * Sets the name a layer has to answer to, and how strictly it is matched.
  */
 interface Expected {
   /**
-   * States whether the whole name before the arguments has to match `start`.
+   * Whether the name has to equal `start` rather than begin with it.
    */
   readonly exact: boolean;
 
   /**
-   * States the text the name has to start with.
+   * The name, or the prefix, the layer's own name is measured against.
    */
   readonly start: string;
 }
 
 /**
- * Lists the four kinds. A record with a name and one of these kinds is a layer.
+ * The four kind strings a value has to declare before it passes as a layer.
  */
 const KINDS: ReadonlySet<string> = new Set(["contribution", "override", "preset", "removal"]);
 
 /**
- * Returns true when a value is a layer.
+ * Reports whether a value carries the name and kind that make it a layer.
  *
- * @param value - The value under test.
- * @returns Whether the value has a string name and one of the four kinds.
+ * @remarks
+ *   The test is structural. A layer minted by a second copy of the kernel passes it, and so does
+ *   an object a specification wrote by hand.
  */
 export function isLayer(value: unknown): value is Layer {
   return record(value) && typeof value["name"] === "string" && KINDS.has(String(value["kind"]));
 }
 
 /**
- * Flattens a return value to any depth.
+ * Unwraps nested arrays down to the values they hold.
  *
- * @param value - The return value.
- * @returns Each item in order.
+ * @remarks
+ *   A value that is not an array comes back as a single-item array, so one caller treats a
+ *   factory returning one layer and a factory returning a tree of them the same way.
  */
 export function flattened(value: unknown): readonly unknown[] {
   return Array.isArray(value) ? value.flatMap((item) => flattened(item)) : [value];
 }
 
 /**
- * Returns the message of a thrown value.
+ * Turns a caught value into the message a violation quotes.
  *
- * @param error - The thrown value.
- * @returns The message of an error, or the string form of anything else.
+ * @remarks
+ *   A factory can throw anything at all. Whatever is not an Error is stringified, so a thrown
+ *   string arrives intact and a thrown object reads as `[object Object]`.
  */
 export function reason(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
 /**
- * Calls one factory and sorts its return value into layers and other values.
+ * Calls one factory and records its layers, its leftovers and any failure.
  *
- * @param factory - The factory to call.
- * @param args - The arguments to call it with.
- * @returns The sorted return value, or the error message when the call threw.
+ * @remarks
+ *   The supplied arguments are spread in the order the specification wrote them. A factory that
+ *   throws ends the recording there, and `listed` stays false even where it would have returned
+ *   an array.
  */
 function calling(factory: Factory, args: readonly unknown[]): Found {
   try {
@@ -134,14 +157,12 @@ function calling(factory: Factory, args: readonly unknown[]): Found {
 }
 
 /**
- * Calls every factory and reads each return value.
+ * Calls every factory there are arguments for and collects what each one produced.
  *
- * A factory with required parameters and no entry in `arguments` is not called. The factories
- * check reports it.
- *
- * @param factories - The factories the barrel exports.
- * @param supplied - The arguments the specification supplies, by path.
- * @returns Each return value, sorted into layers and other values.
+ * @remarks
+ *   A factory with required parameters and no supplied entry is skipped here and reported by the
+ *   barrel check, so a missing entry never reaches a layer check as a naming failure.
+ * @returns One record per factory called, in the order the walk found them.
  */
 export function layersOf(factories: readonly Factory[], supplied: Arguments): readonly Found[] {
   return factories
@@ -150,14 +171,12 @@ export function layersOf(factories: readonly Factory[], supplied: Arguments): re
 }
 
 /**
- * Checks that every value shaped like a layer is one.
+ * Reports a factory that throws, and a return value shaped like a layer without being one.
  *
- * A helper may return a string, a version or a record of settings. None of those is checked. A
- * record with a name or a kind but not both is a layer built by hand. An array that mixes layers
- * with other values cannot be composed.
- *
- * @param found - The return value of each factory.
- * @returns Each violation.
+ * @remarks
+ *   A value carrying `name` or `kind` and failing the guard is a layer someone assembled by hand
+ *   and got wrong. A value carrying neither is a plugin, a config or anything else a factory may
+ *   legitimately return, and only an array mixing those with layers is reported.
  */
 export function kind(found: readonly Found[]): readonly string[] {
   return found.flatMap((result) => {
@@ -180,26 +199,23 @@ export function kind(found: readonly Found[]): readonly string[] {
 }
 
 /**
- * Returns the part of a layer name before its arguments.
+ * Strips the arguments off a layer name, leaving the call that made it.
  *
- * @param name - The layer name.
- * @returns The name without its parenthesised arguments.
+ * @remarks
+ *   A layer records the arguments that tell two calls of one factory apart in parentheses, and
+ *   only the part in front of the opening parenthesis is measured against the factory's path.
  */
 function head(name: string): string {
   return name.replace(/\(.*$/su, "");
 }
 
 /**
- * Derives the name a factory's layers have to carry.
+ * Works out the name, or the prefix, a factory's layers have to carry.
  *
- * A factory that returns one layer names it for the call. The arguments that distinguish two calls
- * follow in parentheses. A factory that returns an array composes layers other factories made.
- * Each of those keeps its own name inside the same block. `react.layers()` returns
- * `react.plugin.refresh`. `lint.preset.node()` returns `lint.node`.
- *
- * @param result - The return value of the factory.
- * @param prefix - The package prefix.
- * @returns The expected start of the name, and whether the whole head has to match it.
+ * @remarks
+ *   A factory returning one layer names it for the call exactly. A factory returning an array
+ *   composes layers other factories made, and each of those only has to sit under the block the
+ *   factory belongs to.
  */
 function expected(result: Found, prefix: string): Expected {
   const block = result.path.replace(/\..*$/su, "");
@@ -213,11 +229,12 @@ function expected(result: Found, prefix: string): Expected {
 }
 
 /**
- * Checks that each layer is named for the call a consumer wrote.
+ * Reports a layer named for something other than the call that made it, or named for its owner.
  *
- * @param found - The return value of each factory.
- * @param prefix - The package prefix.
- * @returns Each violation.
+ * @remarks
+ *   A name holding a slash came from a package name, which a merged configuration should never
+ *   show. Every other name is measured against the prefix the package name yields, and the base
+ *   config passes an empty prefix that adds nothing.
  */
 export function named(found: readonly Found[], prefix: string): readonly string[] {
   return found.flatMap((result) => {
@@ -240,10 +257,11 @@ export function named(found: readonly Found[], prefix: string): readonly string[
 }
 
 /**
- * Checks that every departure carries a reason and no preset does.
+ * Reports a contribution, override or removal without a reason, and a preset carrying one.
  *
- * @param found - The return value of each factory.
- * @returns Each violation.
+ * @remarks
+ *   A preset is the one kind whose existence explains itself, so stating a reason on one is as
+ *   much a breach as omitting it from the rest. Whitespace does not pass as a reason.
  */
 export function reasoned(found: readonly Found[]): readonly string[] {
   return found.flatMap((result) =>
@@ -260,13 +278,11 @@ export function reasoned(found: readonly Found[]): readonly string[] {
 }
 
 /**
- * Lists each name that appears twice in an array of layers with the same kind.
+ * Lists the names that occur more than once under the same kind.
  *
- * A removal and the contribution that replaces it share a name on purpose. Two kinds under one
- * name are not a repeat.
- *
- * @param layers - The array of layers.
- * @returns Each repeated name, once.
+ * @remarks
+ *   A name is unique per kind, so one block may contribute and override under a single name. A
+ *   name occurring three times is listed once.
  */
 export function repeated(layers: readonly Layer[]): readonly string[] {
   const seen = new Set<string>();
@@ -283,10 +299,11 @@ export function repeated(layers: readonly Layer[]): readonly string[] {
 }
 
 /**
- * Checks that no factory returns two layers under one name.
+ * Reports a factory that returns two layers under one name and kind.
  *
- * @param found - The return value of each factory.
- * @returns Each violation.
+ * @remarks
+ *   The pair of name and kind identifies a layer, so a factory handing back two of them leaves a
+ *   consumer unable to say which one a configuration took.
  */
 export function unique(found: readonly Found[]): readonly string[] {
   return found.flatMap((result) =>

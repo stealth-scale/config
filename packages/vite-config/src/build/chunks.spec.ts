@@ -3,9 +3,6 @@ import { describe, expect, it } from "vitest";
 
 import { chunks } from "#build/chunks.ts";
 
-/**
- * Describes one group as the layer states it.
- */
 interface Group {
   entriesAware?: boolean;
   name: string;
@@ -14,11 +11,6 @@ interface Group {
   test?: RegExp;
 }
 
-/**
- * Reads the splitting the layer states.
- *
- * @returns The groups, and whatever is set beside them.
- */
 function splitting(): { groups: readonly Group[]; includeDependenciesRecursively?: boolean } {
   const output = (chunks().config as UserConfig).build?.rolldownOptions?.output as {
     codeSplitting: { groups: readonly Group[]; includeDependenciesRecursively?: boolean };
@@ -27,12 +19,6 @@ function splitting(): { groups: readonly Group[]; includeDependenciesRecursively
   return output.codeSplitting;
 }
 
-/**
- * Finds which group a module at a path lands in, the way the bundler tries them: by priority.
- *
- * @param path - Where the module is.
- * @returns The group's name.
- */
 function landing(path: string): string | undefined {
   return splitting()
     .groups.toSorted((a, b) => (b.priority ?? 0) - (a.priority ?? 0))

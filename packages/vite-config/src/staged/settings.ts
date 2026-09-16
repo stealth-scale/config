@@ -1,15 +1,20 @@
 /**
- * What `vp staged` reads, as the block reaches it.
+ * Types the staged-files block a Vite configuration accepts.
  */
 
 import { type UserConfig } from "vite";
 
 /**
- * A glob against what to run on the staged files matching it.
+ * The table pairing each glob with the commands run over the staged files it
+ * matches.
  */
 export type Staging = NonNullable<UserConfig["staged"]>;
 
 /**
- * What runs on one set of staged files: a command, or several in order.
+ * One command, or several run in the order written.
+ *
+ * @remarks
+ *   A bare string and a one-element array reach the hook runner the same way.
+ *   The string form exists so the ordinary case reads as a single line.
  */
 export type Runs = readonly string[] | string;

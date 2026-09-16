@@ -1,13 +1,15 @@
+/**
+ * Proves a repository's own staged command reaches its glob and copies its
+ * list.
+ */
+
 import { type UserConfig } from "vite-plus";
 import { describe, expect, it } from "vitest";
 
 import { command } from "#staged/command.ts";
 
 /**
- * Reads back the staged rules the layer states.
- *
- * @param held - The layer.
- * @returns Each glob against what runs on it.
+ * Reads the glob table out of the layer a caller built.
  */
 function staged(held: ReturnType<typeof command>): Record<string, unknown> {
   return (held.config as UserConfig).staged as Record<string, unknown>;

@@ -1,13 +1,21 @@
+/**
+ * Covers the length reader and the edge-to-edge measurement.
+ *
+ * @remarks
+ *   No element is rendered. The rectangles are stated outright, which is the only way to assert a
+ *   given overlap under a test runner that lays nothing out.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { type Measured, pixels, seamBetween } from "#measure.ts";
 
 /**
- * Builds an element that reports the box a case is about.
+ * Stands in for an element that reports the two edges it is given.
  *
- * @param left - The box's left edge.
- * @param right - Its right edge.
- * @returns An element reporting exactly that box.
+ * @remarks
+ *   The same numbers come back on every call, so a measurement reads what the spec stated rather
+ *   than what a layout engine would compute.
  */
 function boxed(left: number, right: number): Measured {
   return { getBoundingClientRect: () => ({ left, right }) };

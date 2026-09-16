@@ -1,3 +1,7 @@
+/**
+ * Proves both resolvers try source first and keep their own defaults below it.
+ */
+
 import { type UserConfig } from "vite-plus";
 import { describe, expect, it } from "vitest";
 
@@ -5,9 +9,7 @@ import { SOURCE } from "#resolve/condition.ts";
 import { source } from "#resolve/source.ts";
 
 /**
- * Reads the config the preset sets.
- *
- * @returns That config.
+ * Reads the configuration out of a freshly built layer.
  */
 function configOf(): UserConfig {
   return source().config as UserConfig;

@@ -1,5 +1,10 @@
 /**
- * The `pack` block: what a package publishes, and what is checked before it does.
+ * Collects the layers that configure the packer a library is published from.
+ *
+ * @remarks
+ *   A package states what it publishes in its manifest and lets `published` derive the build from
+ *   it, or states the entries itself with `entry`. The rest of this directory adds one packer
+ *   setting each on top of whichever of the two it chose.
  */
 
 export { carry } from "#pack/carry.ts";

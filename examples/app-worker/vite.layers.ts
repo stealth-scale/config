@@ -1,11 +1,17 @@
+/**
+ * Drops the one lint rule this example's workers cannot satisfy, for the root
+ * configuration to pick up.
+ *
+ * @remarks
+ *   A relaxation belongs to the package it covers, and the root imports this file
+ *   rather than carrying a rule for somebody else's directory. The paths below are
+ *   written from the repository root, because the root is where the rule is applied.
+ */
+
 import { type Extendable, lint } from "@stealthscale/vite-config";
 
 /**
- * What the root states on this package's behalf.
- *
- * The linter reads the root config only, so a relaxation for this package's files is composed
- * there. The globs are written from the root, and the reason is written here, beside the code it
- * excuses.
+ * The layers the root configuration spreads in on this example's behalf.
  */
 export const layers: readonly Extendable[] = [
   lint.relax({

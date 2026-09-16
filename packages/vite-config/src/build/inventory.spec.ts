@@ -8,19 +8,11 @@ import { type Context } from "@stealthscale/vite-config-core";
 import { inventory } from "#build/inventory.ts";
 import { told } from "#vite.fixtures.ts";
 
-/**
- * The hooks the plugin states, as this spec drives them.
- */
 interface Writing {
   configResolved: (config: { root: string }) => void;
   generateBundle: (this: unknown) => void;
 }
 
-/**
- * Lays out an application for the plugin to describe.
- *
- * @returns Its directory.
- */
 function described(): string {
   const at = mkdtempSync(join(tmpdir(), "stealth-build-inventory-"));
 
@@ -29,13 +21,6 @@ function described(): string {
   return at;
 }
 
-/**
- * Runs the plugin over a build that reached nothing, and collects what it wrote.
- *
- * @param stated - Whatever differs from an ordinary application being built.
- * @param supplier - Who supplied it, where the layer is not left to decide.
- * @returns Each document, by the path it was written to.
- */
 function written(
   stated: Partial<Context> = {},
   supplier?: Parameters<typeof inventory>[0],
@@ -52,23 +37,10 @@ function written(
   return held;
 }
 
-/**
- * Reads one document back.
- *
- * @param at - The path it was written to.
- * @param stated - Whatever differs from an ordinary application being built.
- * @returns The document, parsed.
- */
 function document(at: string, stated: Partial<Context> = {}): Record<string, unknown> {
   return JSON.parse(written(stated).get(at) ?? "{}") as Record<string, unknown>;
 }
 
-/**
- * Reads the document's metadata.
- *
- * @param stated - Whatever differs from an ordinary application being built.
- * @returns What the document says about itself.
- */
 function metadata(stated: Partial<Context> = {}): Record<string, unknown> {
   return document("cyclonedx/bom.json", stated)["metadata"] as Record<string, unknown>;
 }

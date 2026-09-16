@@ -1,3 +1,7 @@
+/**
+ * Pins down what a title keeps and what it loses on the way to a slug.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { slug } from "#slug.ts";

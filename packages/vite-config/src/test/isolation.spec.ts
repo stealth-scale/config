@@ -1,12 +1,14 @@
+/**
+ * Checks what is put back between one test and the next.
+ */
+
 import { type UserConfig } from "vite-plus";
 import { describe, expect, it } from "vitest";
 
 import { isolation } from "#test/isolation.ts";
 
 /**
- * Reads the test block the preset sets.
- *
- * @returns That block.
+ * Returns the runner block the layer states, and nothing around it.
  */
 function block(): NonNullable<UserConfig["test"]> {
   return (isolation().config as UserConfig).test as NonNullable<UserConfig["test"]>;

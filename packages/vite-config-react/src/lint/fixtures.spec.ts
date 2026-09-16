@@ -1,11 +1,13 @@
+/**
+ * Checks which files the fixture excuse reaches and which rule it lifts.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { fixtures } from "#lint/fixtures.ts";
 
 /**
- * Reads back the override the contribution carries.
- *
- * @returns The paths it applies to, against the rules it changes for them.
+ * Unwraps the linter override the layer carries.
  */
 function override(): { files: string[]; rules: Record<string, unknown> } {
   return fixtures().item as { files: string[]; rules: Record<string, unknown> };

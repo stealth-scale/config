@@ -1,3 +1,12 @@
+/**
+ * Checks the client against a stand-in worker, with no worker runtime present.
+ *
+ * @remarks
+ *   A real worker would make each assertion wait on a thread and a module graph
+ *   for arithmetic these tests are not measuring. The stand-in answers in the same
+ *   turn, which is also the timing most likely to lose a reply.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { type Amount } from "@stealthscale/example-lib-core";
@@ -5,10 +14,15 @@ import { type Amount } from "@stealthscale/example-lib-core";
 import { totalled, type Totaller } from "#total.worker-client.ts";
 
 /**
- * Stands in for the worker, answering with whatever it is told to.
+ * Builds a worker that records what it was sent and replies with one fixed answer.
  *
- * @param answer - What the worker replies with.
- * @returns The stand-in, and what it was sent.
+ * @remarks
+ *   The reply is delivered from inside postMessage, before it returns. A client
+ *   that registered its listener after sending would miss it, so this timing is
+ *   what makes the ordering in the client observable.
+ * @param answer - The total to reply with. Leaving it out replies with undefined,
+ *   as a worker does for an empty run.
+ * @returns The stand-in worker, and the array holding each run it received.
  */
 function standing(answer?: Amount): { sent: Amount[][]; worker: Totaller } {
   const sent: Amount[][] = [];

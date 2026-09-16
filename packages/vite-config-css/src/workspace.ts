@@ -1,17 +1,17 @@
 /**
- * What a workspace with stylesheets states once, at its root.
+ * Gives a workspace root the add-on call every package offers, contributing no
+ * layer.
  */
 
 import { type Layer } from "@stealthscale/vite-config-core";
 
 /**
- * The layers a workspace root adds on behalf of the stylesheets below it.
+ * Contributes no layer to a workspace root.
  *
- * None. A stylesheet is checked while the package that imports it is built, and nothing about
- * that is read from the root. The function exists so a root's config has the same shape whichever
- * add-ons it lists.
- *
- * @returns No layers.
+ * @remarks
+ *   A stylesheet is checked while the package importing it builds, and a root
+ *   builds no package. The call exists so a root config lists every add-on the
+ *   same way, and dropping it changes nothing about what gets checked.
  */
 export function workspace(): readonly Layer[] {
   return [];

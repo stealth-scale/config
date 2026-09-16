@@ -1,3 +1,8 @@
+/**
+ * Covers the demotion: what it takes back, what it states instead, and in
+ * which order.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { warn } from "#warn.ts";

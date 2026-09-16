@@ -1,3 +1,7 @@
+/**
+ * Checks that a package manifest is sorted rather than left as it was typed.
+ */
+
 import { type UserConfig } from "vite-plus";
 import { describe, expect, it } from "vitest";
 

@@ -3,21 +3,11 @@ import { describe, expect, it } from "vitest";
 
 import { carry } from "#pack/carry.ts";
 
-/**
- * The packer's callback, as the layer states it.
- */
 type Carrying = (
   built: Record<string, unknown>,
   context: { pkg: object },
 ) => Record<string, unknown>;
 
-/**
- * Runs the layer's callback the way the packer would.
- *
- * @param built - The map the packer just wrote from what it built.
- * @param pkg - The manifest as it stands on disk.
- * @returns The map the packer writes instead.
- */
 function carried(built: Record<string, unknown>, pkg: object): Record<string, unknown> {
   const held = (carry().config as UserConfig).pack as {
     exports: { customExports: Carrying };

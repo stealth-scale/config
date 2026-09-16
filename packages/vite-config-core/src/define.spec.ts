@@ -1,3 +1,7 @@
+/**
+ * Covers what `extends` composes and how a package's own keys land on top of it.
+ */
+
 import { type ConfigEnv, type UserConfig } from "vite-plus";
 import { describe, expect, it } from "vitest";
 
@@ -5,24 +9,20 @@ import { defineConfig } from "#define.ts";
 import { contribute, override, preset, remove } from "#layer.ts";
 
 /**
- * Where the config under specification is, which every `defineConfig` states for itself.
+ * The directory each config under test declares, which is this package's own source folder.
  */
 const AT = import.meta.dirname;
 
 /**
- * The environment a build is read in.
+ * A production build, which is the invocation these cases are read under.
  */
 const BUILDING: ConfigEnv = { command: "build", mode: "production" };
 
 /**
- * Reads a defined config back, the way Vite+ does.
+ * Defines a config and invokes it, returning what the layers and the own keys settled on.
  *
- * `defineConfig` answers whatever Vite+ takes, which for a config composed of layers is always a
- * function of the environment. Calling it is what a specification has to do to see the result.
- *
- * @param config - What was defined.
- * @param env - The environment to read it in.
- * @returns The composed config.
+ * @param config - What a package would write beside its directory.
+ * @param env - The command and mode to invoke the config for.
  */
 function readBack(
   config: Parameters<typeof defineConfig>[1],

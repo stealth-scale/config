@@ -1,3 +1,7 @@
+/**
+ * Specifies which titles the grammar accepts and which ones it turns away.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { SPEC } from "#lint/rules/spec.ts";

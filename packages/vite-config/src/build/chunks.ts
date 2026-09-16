@@ -1,44 +1,31 @@
 /**
- * How many files the code a page loads first is written to.
+ * Decides which chunk each module of an application bundle lands in.
  */
 
 import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
- * Matches the React runtime, which is what an application changes least often.
+ * Matches the rendering runtime, wherever the package manager happened to put it.
+ *
+ * @remarks
+ *   The pattern looks for a `node_modules` segment rather than a prefix, because pnpm stores a
+ *   package under `.pnpm` and links it back in. Matching a prefix would miss every one of them.
  */
 const FRAMEWORK = /[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/u;
 
 /**
- * Matches every other package.
+ * Matches everything else that came from the registry.
  */
 const VENDOR = /[\\/]node_modules[\\/]/u;
 
 /**
- * Writes what the entry reaches statically to three chunks, by how often each changes: the React
- * runtime, the other packages, and the application.
+ * Splits a bundle three ways: the rendering runtime, the rest of the dependencies, the application.
  *
- * Nothing in a module entry runs until its whole static import graph has arrived, so the number of
- * files that graph is split into can only add requests, never let anything start earlier. Left to
- * itself the bundler writes one file per module that two chunks share, which on an application of
- * any size is a hundred files, most under a kilobyte, each compressed on its own and each named in
- * a preload hint the page parses before its first byte of script. Measured on the design system's
- * docs: 119 files at 396 kB gzipped against three at 349 kB, the difference being what compressing
- * each file alone loses.
- *
- * Three rather than one, so a returning visitor fetches again only what changed: a deploy of the
- * application leaves the packages' hashes alone, and a dependency bump leaves React's. Nothing the
- * page loads lazily is touched: the tag names only what the entry reaches statically, and a route
- * or a page behind a dynamic import stays a chunk of its own.
- *
- * Not grouped per entry. That option counts every lazily loaded chunk as an entry, so an
- * application with many of them comes out with more initial files than it started with: 126
- * preload hints on the docs, against 3. And the captured modules' dependencies are left included,
- * as the bundler has them: what the entry reaches statically reaches its dependencies the same
- * way, so leaving them out changes nothing here and is what the bundler warns produces invalid
- * chunks elsewhere.
- *
- * @returns The preset.
+ * @remarks
+ *   Priority decides which group claims a module, not the order the groups are written in, so the
+ *   framework pattern is consulted before the vendor pattern that also matches it. Only what an
+ *   entry reaches statically is grouped, which leaves a lazily imported module in a chunk of its
+ *   own and a route that is never visited undownloaded.
  */
 export function chunks(): Preset {
   return preset({

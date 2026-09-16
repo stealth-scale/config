@@ -1,5 +1,5 @@
 /**
- * Configuring an application, which is deployed rather than published.
+ * Configures a browser application that is deployed rather than published.
  */
 
 import { configuring, type Defining, type Extendable } from "@stealthscale/vite-config-core";
@@ -11,33 +11,24 @@ import * as test from "#test/index.ts";
 import * as worker from "#worker/index.ts";
 
 /**
- * The layers an application a browser opens is built on.
+ * Lists the layers a browser application is built, linted, tested and bundled
+ * with.
  *
- * The other kind of package, and the axis the runtime tiers do not carry: a library is packed and
- * installed by something else, an application is built and served. Nothing here packs. An
- * application has no export map for the packer to write, no types for a consumer to resolve, and
- * nothing published for `publint` to read — so carrying those layers would only mean a config that
- * describes a command the package cannot run.
- *
- * A browser is assumed rather than asked for. A console program that is deployed rather than
- * published is rare, and a command-line tool — which is the common case — is installed from a
- * registry and belongs on `preset/node` with the rest of what publishes.
- *
- * The worker format is among them, because it costs nothing to state and everything to forget: an
- * application with no worker is unaffected, and one that grows a worker gets a module rather than a
- * script that cannot import. `worker.format` says what that buys.
- *
- * Answered as a list as well as bound below, so that a config package for a framework composes
- * these with its own rather than sitting beside them. Sitting beside them is what lets a repository
- * pair the wrong tier with the right framework and lose half its rules without being told.
- *
- * @returns Each layer the tier is built on, in the order they compose.
+ * @remarks
+ *   Nothing here packs an entry point or writes an exports map, because an
+ *   application has no consumer to read one. What the web tier spends on
+ *   packing, this tier spends on build output and on bundling a worker as a
+ *   module instead.
  */
 export function layers(): readonly Extendable[] {
   return [...house(), build.preset.web(), lint.preset.web(), test.preset.web(), worker.format()];
 }
 
 /**
- * Composes a config for an application a browser opens.
+ * Composes the Vite configuration of a deployed browser application.
+ *
+ * @remarks
+ *   The layers are placed ahead of whatever a repository extends, so a key the
+ *   application sets by hand stands over the same key a layer set.
  */
 export const defineConfig: Defining = configuring(layers);

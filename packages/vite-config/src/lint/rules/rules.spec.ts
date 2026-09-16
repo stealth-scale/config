@@ -1,3 +1,7 @@
+/**
+ * Specifies what the two rule maps check and what they let through unread.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { type PluginRules, type Rules } from "#lint/rules/rules.ts";

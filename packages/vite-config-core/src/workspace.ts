@@ -1,19 +1,22 @@
 /**
- * Which directories a workspace holds, whichever package manager was used to state them.
+ * Finds the globs a repository declares for its workspace, whichever package manager wrote them.
+ *
+ * @remarks
+ *   The only caller wants to know whether a directory is a workspace root, so
+ *   the globs are never matched against anything here. A repository declaring
+ *   no package is still a root, and reports an empty list rather than nothing.
  */
 
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 /**
- * How one package manager states the directories a workspace holds.
+ * One package manager's way of declaring a workspace.
  *
- * Answers nothing where this is not that package manager's workspace, which is what lets the next
- * reader be tried. An empty list is a different answer: the workspace is stated and holds nothing.
- *
- * @param at - The directory that might be a workspace root.
- * @param manifest - The manifest already read from it, so no reader opens that file twice.
- * @returns Each directory, or nothing where this reader does not recognise the workspace.
+ * @remarks
+ *   Undefined means this manager is not the one in use, and the next reader is
+ *   asked. An empty array means it is in use and declares no package, which
+ *   stops the search.
  */
 type Reader = (
   at: string,
@@ -21,24 +24,19 @@ type Reader = (
 ) => readonly string[] | undefined;
 
 /**
- * Keeps the names out of a list that holds anything else.
- *
- * @param held - The list as the file holds it.
- * @returns Every entry that is a name.
+ * Keeps the entries that are strings and drops the rest.
  */
 function names(held: readonly unknown[]): readonly string[] {
   return held.filter((one): one is string => typeof one === "string");
 }
 
 /**
- * Reads the `workspaces` field, which is where npm, bun and yarn each state a workspace.
+ * Reads the workspace npm, yarn and bun each declare in the manifest.
  *
- * Two spellings: a list, and an object holding one under `packages`. Both are read, because a
- * manifest written for one of the three is routinely installed by another.
- *
- * @param at - Unused. A manifest states this without a second file.
- * @param manifest - The manifest read from that directory.
- * @returns Each directory, or nothing where the manifest states no workspace.
+ * @remarks
+ *   Both spellings are accepted: the bare array, and the object holding a
+ *   `packages` array that yarn's classic form uses. A field of any other shape
+ *   still marks the directory as a root, and declares no package.
  */
 function declared(
   at: string,
@@ -57,10 +55,11 @@ function declared(
 }
 
 /**
- * Strips the quotes and the trailing comment a YAML scalar may carry.
+ * Strips a trailing comment and a surrounding pair of quotes from a YAML scalar.
  *
- * @param held - The scalar as the line holds it.
- * @returns The directory it names.
+ * @remarks
+ *   The quotes have to match each other, and a comment is only recognised where
+ *   whitespace precedes the hash, so a glob containing one survives.
  */
 function unquoted(held: string): string {
   const bare = held
@@ -72,10 +71,12 @@ function unquoted(held: string): string {
 }
 
 /**
- * Reads the directories written on the `packages:` line itself.
+ * Reads the globs from a `packages:` key written inline as a flow sequence.
  *
- * @param line - That line.
- * @returns Each directory, or nothing where the line opens a block instead.
+ * @remarks
+ *   Undefined means the line is not in flow form and the block form should be
+ *   tried instead. An entry that is empty after unquoting is dropped, which is
+ *   what a trailing comma leaves behind.
  */
 function flowing(line: string): readonly string[] | undefined {
   const held = /^packages:\s*\[(?<held>.*)\]/u.exec(line)?.groups?.["held"];
@@ -89,13 +90,14 @@ function flowing(line: string): readonly string[] | undefined {
 }
 
 /**
- * Reads the directories written under the `packages:` line, one to a line.
+ * Collects the dashed entries below a `packages:` key.
  *
- * Stops at the first line that is neither an entry, a comment nor blank, which is the next thing
- * the file states rather than another directory.
- *
- * @param lines - Everything below that line.
- * @returns Each directory.
+ * @remarks
+ *   Reading stops at the first line that is neither an entry, a comment nor
+ *   blank, which is how the next top-level key ends the list. Indentation is
+ *   not measured, so a nested sequence elsewhere in the file would be read as
+ *   part of this one.
+ * @param lines - The lines after the `packages:` key, in file order.
  */
 function listed(lines: readonly string[]): readonly string[] {
   const held: string[] = [];
@@ -112,14 +114,13 @@ function listed(lines: readonly string[]): readonly string[] {
 }
 
 /**
- * Reads the `packages` list out of `pnpm-workspace.yaml`, which is the only place pnpm states one.
+ * Reads the workspace out of a `pnpm-workspace.yaml` beside the manifest.
  *
- * Scanned rather than parsed. This is the package every other one depends on, and a YAML parser to
- * read a list of strings is a dependency every consumer would then carry. Both spellings pnpm
- * writes are read: a block sequence under `packages:`, and a flow sequence on the same line.
- *
- * @param at - The directory to look in.
- * @returns Each directory, or nothing where the directory holds no such file.
+ * @remarks
+ *   The file is scanned line by line rather than parsed, because the one key
+ *   that matters is at the top level and pulling in a YAML parser would put a
+ *   dependency in front of every package that composes a config.
+ * @throws {@link Error} When the file exists and cannot be read.
  */
 function pnpm(at: string): readonly string[] | undefined {
   const path = join(at, "pnpm-workspace.yaml");
@@ -136,22 +137,19 @@ function pnpm(at: string): readonly string[] | undefined {
 }
 
 /**
- * Every way a workspace is stated, in the order they are tried.
- *
- * The manifest first. A repository that states a workspace there and also keeps a pnpm file is
- * answered from the manifest, which is the file every one of the three reads.
- *
- * A package manager is added by writing its reader and putting it here.
+ * Each reader in the order it gets a turn.
  */
 const READERS: readonly Reader[] = [declared, pnpm];
 
 /**
- * Reads the directories a workspace holds.
+ * Reports what a directory declares as its workspace, or nothing when it declares none.
  *
- * @param at - The directory that might be a workspace root.
- * @param manifest - The manifest already read from it.
- * @returns Each directory, or nothing where no package manager recognises a workspace here, which
- *   is what tells a package apart from a root.
+ * @remarks
+ *   The manifest is asked before the pnpm file, so a repository carrying both
+ *   is described by its manifest. An empty array separates a root that lists no
+ *   package from a directory that is not a root at all.
+ * @param at - The directory to look beside for a package manager's own file.
+ * @param manifest - The parsed manifest found in that directory.
  */
 export function workspaces(
   at: string,

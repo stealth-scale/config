@@ -1,43 +1,42 @@
 /**
- * Where the dev server starts looking for what to pre-bundle.
+ * Points the dependency scan at files it would not otherwise walk.
+ *
+ * @remarks
+ *   Vite starts its scan from the HTML entries it knows about. A module reached
+ *   some other way, such as a story or a preview harness, contributes nothing to
+ *   that walk and neither do its imports.
  */
 
 import { contribute, type Contribution } from "@stealthscale/vite-config-core";
 
 /**
- * Where a contribution to the list of what is crawled is appended.
+ * Targets the entry list Vite's dependency scan walks before serving.
  */
 const AT = "optimizeDeps.entries";
 
 /**
- * Describes where the crawl starts, beyond the pages it finds on its own.
+ * Lists the files the scan should start from, and why it misses them.
  */
 export interface Crawled {
   /**
-   * Why these are not reached from a page, kept with the contribution so a later reader can weigh
-   * it.
+   * Records what keeps these files out of the scan's own reach.
    */
   because: string;
 
   /**
-   * The files to crawl from, as globs relative to the project root.
+   * Points at files by path or glob, resolved against the project root and kept as written.
    */
   files: readonly string[];
 }
 
 /**
- * Crawls from a file the dev server would not have started at.
+ * Adds each file to the set the scan walks before a server starts serving.
  *
- * Left alone the server starts at every `.html` it can find, which is right for an application
- * whose page imports everything it needs. It is wrong wherever the real entry is not a page: a
- * story kit loading a preview module, a worker started from a URL, a package whose page is built by
- * something else. What those import is then discovered one module at a time.
- *
- * Naming the file is cheaper than naming every dependency behind it, because the crawl follows it.
- * `deps.prebundle` is the other half, for a dependency no crawl reaches from anywhere.
- *
- * @param stated - The files, and why the crawl misses them.
- * @returns One contribution for each file.
+ * @remarks
+ *   A dependency found only once the server is running forces a second optimise
+ *   pass and a full page reload. Naming the file here moves that discovery into
+ *   startup, where nobody is waiting on it.
+ * @returns One contribution per entry, in the order they were given.
  */
 export function crawl(stated: Crawled): readonly Contribution[] {
   return stated.files.map((held) =>

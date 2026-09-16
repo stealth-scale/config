@@ -1,5 +1,10 @@
 /**
- * Checks that a plugin package exports one plugin named for the house and peers on what runs it.
+ * Checks that a plugin package exports a factory returning a house-named Vite plugin.
+ *
+ * @remarks
+ *   A plugin is called rather than read, because its name and its hooks are decided when the
+ *   factory runs. A package exporting several factories is asked only that one of them produces a
+ *   plugin, and every plugin it does produce is held to the naming rule.
  */
 
 import { reason } from "#layers.ts";
@@ -7,21 +12,21 @@ import { type Published } from "#manifest.ts";
 import { type Arguments, callable, record } from "#module.ts";
 
 /**
- * The prefix every plugin name starts with.
+ * Prefixes the name every plugin in this repository answers to.
  */
 const HOUSE = "stealth:";
 
 /**
- * The two hooks a plugin built on the house base has.
+ * Lists the two hooks a value carries before it passes as a house plugin.
  */
 const HOOKS = ["configResolved", "generateBundle"];
 
 /**
- * Checks one plugin a factory returned.
+ * Reports a plugin named for something other than its factory, or missing one of the base hooks.
  *
- * @param path - The factory name.
- * @param plugin - The plugin the factory returned.
- * @returns Each violation.
+ * @remarks
+ *   The expected name is built from the export path, so someone reading a resolved config can
+ *   point at the factory that put the plugin there. Each missing hook is reported on its own.
  */
 function shaped(path: string, plugin: Readonly<Record<string, unknown>>): readonly string[] {
   const name = String(plugin["name"]);
@@ -36,13 +41,11 @@ function shaped(path: string, plugin: Readonly<Record<string, unknown>>): readon
 }
 
 /**
- * Calls one function on the barrel when it can be called.
+ * Calls one export and hands back what it produced, or the failure wrapped in an Error.
  *
- * @param path - The function name.
- * @param call - The function to call.
- * @param supplied - The arguments the specification supplies, keyed by path.
- * @returns The return value, an `Error` when the call threw, or `undefined` when the function has
- *   required parameters and no entry in `arguments`.
+ * @remarks
+ *   A factory with required parameters and no supplied arguments yields undefined and is passed
+ *   over, because calling it with nothing would report a failure the package did not cause.
  */
 function returned(
   path: string,
@@ -61,14 +64,11 @@ function returned(
 }
 
 /**
- * Checks that the barrel exports a function returning a plugin, and that each plugin returned is
- * named for its factory and built on the house base.
+ * Reports a barrel holding no plugin at all, and every plugin whose name or hooks are wrong.
  *
- * A function with required parameters and no entry in `arguments` is a helper and is not called.
- *
- * @param module - The barrel.
- * @param supplied - The arguments the specification supplies, keyed by path.
- * @returns Each violation.
+ * @remarks
+ *   Each callable export is called, so an export with a side effect performs it during the check.
+ *   Anything coming back as an object with a string `name` is taken for a plugin.
  */
 export function named(
   module: Readonly<Record<string, unknown>>,
@@ -93,13 +93,11 @@ export function named(
 }
 
 /**
- * Checks that a plugin package peers on `vite`.
+ * Reports a plugin package that peers on nothing named vite.
  *
- * Kept apart from the manifest's peer check, so a plugin's specification can skip one half with a
- * reason and keep the other.
- *
- * @param published - The manifest to check.
- * @returns Each violation.
+ * @remarks
+ *   A plugin runs inside the consumer's Vite, so the consumer owns that dependency. A copy
+ *   installed here would be a second Vite the plugin never meets.
  */
 export function peer(published: Published): readonly string[] {
   return published.peerDependencies?.["vite"] === undefined

@@ -1,15 +1,16 @@
 /**
- * The spelling picked where the language allows two.
+ * Settles the spelling this house picked wherever the language offers several.
+ *
+ * @remarks
+ *   Nothing in this group reports a defect. Each rule settles a choice that
+ *   would otherwise be argued again in every review, which is why the linter's
+ *   own `style` category stays off and these are named one at a time.
  */
 
 import { type Rules } from "#lint/rules/rules.ts";
 
 /**
- * Which of two spellings this house writes.
- *
- * Each settles a choice that would otherwise be made per file and argued in review. A property
- * signature is checked contravariantly where a method signature is checked both ways, so the
- * stricter spelling is the one worth having.
+ * Fixes how a type, an export, a signature and a declaration are written.
  */
 export const STYLE: Rules = {
   // `T[]` where the element is one word and `Array<T>` where it is not, which is the spelling that

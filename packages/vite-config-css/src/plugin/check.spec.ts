@@ -1,3 +1,8 @@
+/**
+ * Covers the layer the check produces: where it lands, what it is called, and
+ * what a repository's own options do to it.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { check } from "#plugin/check.ts";

@@ -1,31 +1,22 @@
 /**
- * What a commit does to the source files it is about to record.
+ * Runs the repository check over the source files a commit stages.
  */
 
 import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
- * The files the whole toolchain has something to say about.
+ * The glob matching every source extension the checker reads.
  */
 const SOURCE = "*.{ts,tsx,mts,cts,js,jsx,mjs,cjs}";
 
 /**
- * Formats, lints and type-checks the source files a commit is about to record.
+ * Checks each staged source file and writes back what it can fix.
  *
- * The same command a repository runs by hand, pointed at the files that changed. `--fix` is the
- * point of running it here rather than after: what the formatter and the linter can settle, they
- * settle before the commit exists, so the diff under review is the one the tools agree on and no
- * later commit says "format".
- *
- * A hook is not a substitute for the checks a repository runs on the whole tree. What is staged is
- * a subset, and a change that only breaks something elsewhere passes this and fails `vp run ci`,
- * which is the right place for it to fail — this one is for the mistakes worth catching in the two
- * seconds before a commit rather than the two minutes after a push.
- *
- * Read from the workspace root's config. `vp staged` runs from wherever the hook does, which is the
- * root of the repository, so that is the config it reads.
- *
- * @returns The preset.
+ * @remarks
+ *   The command is the one a developer already runs by hand, so a commit is
+ *   never refused for a rule the local check would have passed. Documents and
+ *   stylesheets match nothing here and are handled by the formatting layer
+ *   instead.
  */
 export function checked(): Preset {
   return preset({

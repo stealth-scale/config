@@ -1,5 +1,5 @@
 /**
- * How a package is built.
+ * Groups the build layers an application extends, one group per kind of target.
  */
 
 import { type Layer } from "@stealthscale/vite-config-core";
@@ -12,22 +12,22 @@ import { preload } from "#build/preload.ts";
 import { sourcemaps } from "#build/sourcemaps.ts";
 
 /**
- * What every build gets, wherever its output runs.
+ * Gathers the little that holds for any build, browser or not.
  *
- * Only the source maps, which are the one thing worth having about output nobody can read. The rest
- * of what a build decides is about a page, and a tier that says nothing about where it runs cannot
- * know there is one.
- *
- * @returns The layers.
+ * @remarks
+ *   The group is thin because almost everything else in this directory only means something for an
+ *   artefact a browser downloads over a network.
  */
 export function base(): readonly Layer[] {
   return [sourcemaps()];
 }
 
 /**
- * What a build whose output a browser runs gets.
+ * Extends the base group for an application a browser downloads and runs.
  *
- * @returns The layers, with what only a page has.
+ * @remarks
+ *   Splitting, preloading and the asset manifest all assume that target. A server-side build takes
+ *   the base group and adds none of them.
  */
 export function web(): readonly Layer[] {
   return [...base(), chunks(), inventory(), licences(), manifest(), preload()];

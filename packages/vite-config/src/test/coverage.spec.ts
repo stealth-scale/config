@@ -1,3 +1,7 @@
+/**
+ * Checks what coverage counts, what it leaves out, and what it demands.
+ */
+
 import { type UserConfig } from "vite-plus";
 import { describe, expect, it } from "vitest";
 
@@ -6,9 +10,7 @@ import { GENERATED } from "#ignore/generated.ts";
 import { coverage } from "#test/coverage.ts";
 
 /**
- * Reads the coverage settings the preset sets.
- *
- * @returns Those settings.
+ * Digs out the coverage block the layer states.
  */
 function settings(): Record<string, unknown> {
   const held = (coverage().config as UserConfig).test?.coverage;

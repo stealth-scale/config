@@ -2,9 +2,6 @@ import { describe, expect, it } from "vitest";
 
 import { type Commands, type Moments, type Packing } from "#pack/settings.ts";
 
-/**
- * Stands in for whatever a repository would run, told apart by identity alone.
- */
 function ran(): void {
   return undefined;
 }

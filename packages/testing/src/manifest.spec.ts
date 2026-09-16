@@ -1,3 +1,11 @@
+/**
+ * Covers the manifests and file maps a spec builds a workspace out of.
+ *
+ * @remarks
+ *   The exact JSON text is asserted once, because a caller writing it to disk cares about the
+ *   trailing newline. Every other expectation parses the text, so field order stays free to move.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { manifest, packageFiles, workspaceFiles } from "#manifest.ts";

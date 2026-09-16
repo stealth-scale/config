@@ -1,3 +1,7 @@
+/**
+ * Covers where a tier's defaults sit against what a package extends and writes for itself.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { readBack } from "#core.fixtures.ts";
@@ -5,12 +9,12 @@ import { configuring } from "#defaults.ts";
 import { preset } from "#layer.ts";
 
 /**
- * Where the config under specification is, which every `defineConfig` states for itself.
+ * The directory each config under test declares, which is this package's own source folder.
  */
 const AT = import.meta.dirname;
 
 /**
- * A `defineConfig` carrying one default, for testing the binding itself.
+ * A tier stating one default, standing for whatever a real tier would state.
  */
 const defineConfig = configuring(() => [
   preset({ config: { mode: "from-default", publicDir: "held" }, name: "a-default" }),

@@ -6,12 +6,6 @@ import { type Contribution, type Preset } from "@stealthscale/vite-config";
 import { host, type Hosted } from "#federation/host.ts";
 import { told } from "#vite.fixtures.ts";
 
-/**
- * Reads back the layer that carries the plugins.
- *
- * @param stated - What the host was told.
- * @returns The contribution.
- */
 function plugged(stated: Hosted): Contribution {
   return host(stated)[0] as Contribution;
 }

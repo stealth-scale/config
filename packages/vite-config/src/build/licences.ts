@@ -1,24 +1,16 @@
 /**
- * The attribution an application owes for what it bundled.
+ * Ships the licence notices of the code a bundle absorbed.
  */
 
 import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
- * Writes out the licence of everything the build bundled.
+ * Collects the licence of every dependency the bundle drew from into a file beside it.
  *
- * Almost every permissive licence asks for the same thing in return: that its text and its
- * copyright notice travel with the code. A bundle is where that stops happening by itself, because
- * minifying strips the comments the notices were in, so an application that ships one and nothing
- * else is distributing somebody's work without the one condition they attached to it.
- *
- * `.vite/license.md` is the file the builder writes, and it is prose rather than data: the full
- * text of each licence, under the name and version of the dependency it came from. That is what
- * attribution is for, and it answers a different question from a bill of materials: who to credit
- * for a person deciding whether they may ship it, rather than what is in here for a machine
- * deciding whether to worry.
- *
- * @returns The preset.
+ * @remarks
+ *   A bundle carries other people's code with the attribution stripped out by minification, and
+ *   most licences require the notice to travel with the code. The collected file is what satisfies
+ *   that.
  */
 export function licences(): Preset {
   return preset({ config: { build: { license: true } }, name: "build.licences" });

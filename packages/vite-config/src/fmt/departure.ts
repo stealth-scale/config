@@ -1,5 +1,10 @@
 /**
- * What a repository states about its own formatting beyond what the house decided.
+ * The formatting departures a repository states, each carrying its reason.
+ *
+ * @remarks
+ *   Every layer here adds to what a preset already set rather than replacing
+ *   it, so a repository skipping one directory keeps the house list of
+ *   generated files as well.
  */
 
 import { type UserConfig } from "vite";
@@ -14,82 +19,78 @@ import {
 import { GENERATED } from "#ignore/generated.ts";
 
 /**
- * The `sortImports` settings, as they stand once the layers have merged.
- *
- * Read off the block rather than written out again, so a change upstream is a type error here
- * rather than a config the formatter rejects at run time.
+ * The import-sorting settings a contributed group is folded into.
  */
 type Sorted = Exclude<NonNullable<NonNullable<UserConfig["fmt"]>["sortImports"]>, boolean>;
 
 /**
- * Where a contribution to the list of what the formatter leaves alone is appended.
+ * The configuration path holding the globs the formatter walks past.
  */
 const SKIPPED = "fmt.ignorePatterns";
 
 /**
- * Where a contribution to the list of what counts as this repository's own is appended.
+ * The configuration path holding the prefixes counted as an internal import.
  */
 const OWN = "fmt.sortImports.internalPattern";
 
 /**
- * Describes a path the formatter leaves as it found it.
+ * A set of files the formatter is told to leave as they were written.
  */
 export interface Skipped {
   /**
-   * Why this repository needs it, kept with the contribution so a later reader can weigh it.
+   * Why these files go unformatted, recorded beside the entry it adds.
    */
   because: string;
 
   /**
-   * The globs to leave alone.
+   * Globs resolved against the directory the formatter runs in.
    */
   files: readonly string[];
 }
 
 /**
- * Describes the scopes a repository publishes under beyond the house's own.
+ * A set of package prefixes a repository counts as its own code.
  */
 export interface Owned {
   /**
-   * Why these scopes are this repository's own, kept with the contribution so a later reader can
-   * weigh it.
+   * Why these prefixes are this repository's rather than somebody else's.
    */
   because: string;
 
   /**
-   * The scopes, as prefixes an import's source starts with.
+   * Prefixes matched against a specifier, not regular expressions.
    */
   patterns: readonly string[];
 }
 
 /**
- * Describes a kind of import that belongs above the ordinary ones.
+ * A band of imports that sorts above every band the house order defines.
  */
 export interface Grouped {
   /**
-   * Why this module needs its imports kept together.
+   * Why these imports are worth separating from the rest.
    */
   because: string;
 
   /**
-   * What the group is called, which is what appears in the order.
+   * The band's name, which also names the layer.
    */
   name: string;
 
   /**
-   * The globs an import's source matches to be placed in it. Globs rather than patterns, which is
-   * what the formatter reads them as.
+   * Patterns matched against an import specifier.
    */
   patterns: readonly string[];
 }
 
 /**
- * Reads the import settings a group is being added to.
+ * Takes the import order out of the configuration a group is joining.
  *
- * @param config - The merged config.
- * @param name - The group being added, for the message.
- * @returns Those settings.
- * @throws Error Where nothing above it sorts imports, so there is no order to join.
+ * @remarks
+ *   Setting `sortImports` to a boolean turns sorting on without stating an
+ *   order, and a group has nothing to join in that case. It is refused the same
+ *   way an absent setting is.
+ * @throws {@link Error} When no layer above this one states an import order.
  */
 function sorting(config: UserConfig, name: string): Sorted {
   const held = config.fmt?.sortImports;
@@ -105,17 +106,12 @@ function sorting(config: UserConfig, name: string): Sorted {
 }
 
 /**
- * Leaves a path as the formatter found it.
+ * Tells the formatter to leave a set of files as they are.
  *
- * The conventional spellings for a written file are walked past already. This is for the rest: a
- * generator that writes somewhere of its own, a vendored file kept byte for byte, a fixture whose
- * layout is the thing under test.
- *
- * One contribution per glob, each named for the glob it carries, so a later module can take back
- * exactly one rather than the set.
- *
- * @param stated - The globs, and why.
- * @returns One contribution for each glob.
+ * @remarks
+ *   Each glob becomes a contribution of its own, named for itself, so a
+ *   repository dropping one glob never disturbs a glob another layer added.
+ * @returns One contribution per glob.
  */
 export function skip(stated: Skipped): readonly Contribution[] {
   return stated.files.map((held) =>
@@ -124,12 +120,11 @@ export function skip(stated: Skipped): readonly Contribution[] {
 }
 
 /**
- * Leaves alone what a tool wrote, by either conventional spelling.
+ * Leaves alone the files a code generator owns.
  *
- * A formatter rewriting a generated file starts a fight it loses on the next run, and the diff it
- * leaves behind is nobody's to read.
- *
- * @returns One contribution for each conventional spelling.
+ * @remarks
+ *   A formatted generated file differs from what its generator writes on the
+ *   next run, and the difference lands on whoever runs the generator.
  */
 export function generated(): readonly Contribution[] {
   return skip({
@@ -139,14 +134,12 @@ export function generated(): readonly Contribution[] {
 }
 
 /**
- * Counts another scope's packages as this repository's own.
+ * Counts a further package prefix as an import of this repository's own code.
  *
- * Which scope a repository publishes under is the repository's to say. The house default stands
- * alongside whatever is added here, so a workspace spanning two scopes groups both together rather
- * than filing one of them among strangers.
- *
- * @param stated - The scopes, and why.
- * @returns One contribution for each pattern.
+ * @remarks
+ *   The house scope stays in the list. A repository publishing under a second
+ *   scope names that one here rather than restating both.
+ * @returns One contribution per prefix.
  */
 export function own(stated: Owned): readonly Contribution[] {
   return stated.patterns.map((held) =>
@@ -155,18 +148,12 @@ export function own(stated: Owned): readonly Contribution[] {
 }
 
 /**
- * Puts a kind of import in a group of its own, above the ordinary ones.
+ * Lifts the imports matching a set of patterns into a band of their own.
  *
- * What a framework's imports are is the framework package's knowledge: React knows `react` and
- * `react-dom` belong together at the top of every file that renders, and nothing here does. The
- * order itself stays the house's, which is why this arrives last and only inserts.
- *
- * An override rather than a contribution because two lists have to change together. The formatter
- * refuses a group named in the order that nothing defines, so appending to either one alone leaves
- * a config that will not parse.
- *
- * @param stated - The group, its patterns, and why.
- * @returns The override.
+ * @remarks
+ *   The band goes above every band already in the order, and the order beneath
+ *   it is untouched. Two modules each adding a band both keep theirs.
+ * @throws {@link Error} When the config it refines states no import order.
  */
 export function group(stated: Grouped): Override {
   return override({

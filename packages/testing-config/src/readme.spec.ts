@@ -4,22 +4,12 @@ import { withScratchWorkspace } from "@stealthscale/testing";
 
 import { exports } from "#readme.ts";
 
-/**
- * Writes a README into a scratch package and checks it against the given namespaces.
- *
- * @param text - The README text, or `undefined` for a package without one.
- * @param namespaces - The namespaces the barrel exports.
- * @returns The violations.
- */
 function checked(text: string | undefined, namespaces: readonly string[]): readonly string[] {
   const tree = text === undefined ? {} : { "README.md": text };
 
   return withScratchWorkspace(tree, (workspace) => exports(workspace.root, namespaces));
 }
 
-/**
- * A README with a block table naming two namespaces.
- */
 const TABLED = [
   "# leaf",
   "",

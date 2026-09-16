@@ -1,3 +1,12 @@
+/**
+ * Covers what the graph readers answer for a real package on disk.
+ *
+ * @remarks
+ *   Each check installs its own package in a fresh temporary directory, so the
+ *   checks can run in any order and one that writes a broken manifest cannot
+ *   reach another.
+ */
+
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -7,12 +16,17 @@ import { type Bundling } from "#plugin.ts";
 import { licensed, manifestAt, owning, reached, text } from "#reached.ts";
 
 /**
- * Writes a package into a temporary `node_modules`, as a build would have found one.
+ * Installs a package under a temporary node_modules and points at its module.
  *
- * @param named - What the package is called.
- * @param manifest - What else its manifest holds.
- * @param licence - The licence file to write beside it, or nothing to write none.
- * @returns Where the package sits, and the module inside it.
+ * @remarks
+ *   A fresh temporary root each time keeps one check's manifest out of the
+ *   reach of the next, which matters because several checks overwrite the
+ *   manifest they were given with a broken one.
+ * @param named - The name written into the manifest and used as the directory.
+ * @param manifest - Further fields, spread after the name and able to replace
+ *   it.
+ * @param licence - The text to file as LICENSE, or nothing to ship none.
+ * @returns The package directory and the path of the one module it holds.
  */
 function packaged(
   named: string,
@@ -32,10 +46,12 @@ function packaged(
 }
 
 /**
- * Stands in for a build holding the given modules and imports.
+ * Builds a stand-in for a finished module graph from a map of imports.
  *
- * @param imports - Each module against what it imported.
- * @returns Something with the shape `reached` reads.
+ * @remarks
+ *   A module named only as an import, and never as a key, is still crawled, so
+ *   a graph can describe an edge into a package without listing that package's
+ *   own modules.
  */
 function building(imports: Readonly<Record<string, readonly string[]>>): Bundling {
   return {

@@ -1,10 +1,11 @@
+/**
+ * Specifies which doc comment rules run and which tags are never forced.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { DOCBLOCK, DOCBLOCK_SETTINGS, docblocksOff, TSDOC_TAGS } from "#lint/rules/docblock.ts";
 
-/**
- * The rules that would require a tag into existence rather than check one that is there.
- */
 const FORCED = ["jsdoc-js/require-param", "jsdoc-js/require-returns", "jsdoc-js/require-template"];
 
 describe("docblock", () => {

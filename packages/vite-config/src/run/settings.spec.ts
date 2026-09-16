@@ -1,3 +1,8 @@
+/**
+ * Proves the task types accept each form, and reject an uncached task naming
+ * inputs.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { type Doing, type Running } from "#run/settings.ts";

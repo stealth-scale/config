@@ -1,3 +1,7 @@
+/**
+ * Checks which packages are shared, the range they are shared at, and how a bad manifest fails.
+ */
+
 import { describe, expect, it } from "vitest";
 
 import { installed, shared } from "#federation/shared.ts";

@@ -5,15 +5,6 @@ import { describe, expect, test, vi } from "vitest";
 
 import { Reports } from "#reports.tsx";
 
-/**
- * Draws into a detached element and waits for whatever suspended to arrive.
- *
- * Waited for rather than awaited once: what suspends here is a dynamic import, and how many turns
- * of the loop it takes to settle is not something a test should write down.
- *
- * @param element - The element to draw.
- * @returns The text on the page once it has stopped loading.
- */
 function drawn(element: ReactElement): Promise<string> {
   const into = document.createElement("div");
 

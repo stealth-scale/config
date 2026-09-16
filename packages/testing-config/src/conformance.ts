@@ -1,9 +1,10 @@
 /**
- * Runs every check a package's kind calls for and returns the violations as one list.
+ * Selects the checks a package kind is subject to and labels each violation with its check.
  *
- * The result is a list of sentences rather than a verdict, the way an audit reports. A
- * specification writes one assertion, and a failure names the export, the file or the layer and
- * what was expected of it. Nothing here asserts.
+ * @remarks
+ *   Every selected check runs, and a breach found by one never stops another, so a specification
+ *   reports the whole set in a single run. Skipping a check costs a written reason, and pinning
+ *   the run to `only` is itself a violation under CI.
  */
 
 import * as layer from "#layers.ts";
@@ -14,7 +15,11 @@ import * as readme from "#readme.ts";
 import { composes, type Tiers } from "#tier.ts";
 
 /**
- * One check the suite runs, named for what it reads and what it asks.
+ * Enumerates every check a specification can select, skip, or see quoted in a violation.
+ *
+ * @remarks
+ *   The part in front of the dot is the area a check reads, and it opens every sentence that
+ *   check reports.
  */
 export type Check =
   | "layer.kind"
@@ -32,101 +37,115 @@ export type Check =
   | "tier.composes";
 
 /**
- * The package under test, and what the suite cannot work out on its own.
+ * Describes the package under test and which checks the specification runs over it.
+ *
+ * @remarks
+ *   Everything a check cannot work out for itself is named here, so a factory needing arguments
+ *   or a tier needing an import is supplied rather than guessed at.
  */
 export interface Conformance {
   /**
-   * The arguments a factory needs, keyed by the path a consumer writes: `lint.relax`,
-   * `server.port`. A factory with required parameters and no entry here is a violation.
+   * The arguments each factory with required parameters is called with, keyed by its path in the
+   * barrel.
    */
   readonly arguments?: Arguments | undefined;
 
   /**
-   * The package directory, as an absolute path.
+   * The directory holding the package's manifest.
    */
   readonly at: string;
 
   /**
-   * The kind of package.
+   * Which contract the package is held to.
    */
   readonly kind: manifest.Kind;
 
   /**
-   * The package barrel, as returned by `await import("#index.ts")`.
+   * The barrel, already imported by the specification that runs the checks.
    */
   readonly module: Readonly<Record<string, unknown>>;
 
   /**
-   * The checks to run and no others. This narrows a failure and is never committed: the suite
-   * reports it as a violation of its own when `CI` is set.
+   * The checks to run to the exclusion of the rest, for narrowing a failure by hand.
    */
   readonly only?: readonly Check[] | undefined;
 
   /**
-   * The checks to leave out, each with a reason a reviewer can weigh.
+   * The checks to leave out, each against the reason it is left out.
    */
   readonly skip?: Readonly<Partial<Record<Check, string>>> | undefined;
 
   /**
-   * The tier modules a config package publishes, keyed by subpath such as `preset/app`. Every
-   * tier subpath in the manifest has to be here, so a tier added without an edit to the
-   * specification is reported.
+   * The tier modules the package publishes, keyed by subpath such as `preset/app`.
    */
   readonly tiers?: Tiers | undefined;
 }
 
 /**
- * The material every check reads.
+ * Carries everything the checks read, gathered once before the first of them runs.
+ *
+ * @remarks
+ *   Each factory is called here rather than inside a check, so the four layer checks agree on
+ *   what a factory returned and a factory with a side effect performs it once.
  */
 interface Reading {
   /**
-   * The return value of each factory.
+   * Records what each factory that could be called returned.
    */
   readonly found: readonly layer.Found[];
 
   /**
-   * The prefix of the package's layer names.
+   * The prefix the package's layer names carry, empty for the base config.
    */
   readonly prefix: string;
 
   /**
-   * The manifest.
+   * The parsed manifest.
    */
   readonly published: manifest.Published;
 
   /**
-   * The package under test.
+   * The caller's own request, kept for the fields a check reads back from it.
    */
   readonly stated: Conformance;
 
   /**
-   * The walked barrel.
+   * The barrel split into factories, namespaces and exports that are neither.
    */
   readonly walked: Walked;
 }
 
 /**
- * The checks selected for a run, and the violations in the selection itself.
+ * Pairs the checks that will run with what the selection itself found wrong.
+ *
+ * @remarks
+ *   A specification can break the contract before a check runs, by skipping without a reason or
+ *   by pinning `only` under CI. Those violations belong to no check and carry no prefix.
  */
 interface Selection {
   /**
-   * The checks to run, in order.
+   * The checks to run, in the order they are declared.
    */
   readonly checks: readonly Check[];
 
   /**
-   * Each violation in how the checks were selected.
+   * Lists the breaches in the request rather than in the package.
    */
   readonly violations: readonly string[];
 }
 
 /**
- * One check as a function of the material it reads.
+ * Runs one check over the gathered reading and reports what it found.
+ *
+ * @remarks
+ *   A runner reports a breach rather than throwing on one, so a package that fails one check is
+ *   still measured by the rest. Returning synchronously is allowed, and the caller awaits either
+ *   form.
  */
 type Runner = (reading: Reading) => Promise<readonly string[]> | readonly string[];
 
 /**
- * The checks in the order they run, and the kinds each runs for.
+ * Lists every check against the kinds of package it applies to, in the order they report.
  */
 const RUNS: ReadonlyArray<readonly [Check, readonly manifest.Kind[]]> = [
   ["manifest.exports", ["config", "library", "plugin"]],
@@ -145,7 +164,7 @@ const RUNS: ReadonlyArray<readonly [Check, readonly manifest.Kind[]]> = [
 ];
 
 /**
- * The runner for each check.
+ * Maps each check to the call that performs it.
  */
 const RUNNERS: Readonly<Record<Check, Runner>> = {
   "layer.kind": ({ found }) => layer.kind(found),
@@ -164,10 +183,11 @@ const RUNNERS: Readonly<Record<Check, Runner>> = {
 };
 
 /**
- * Selects the checks to run for a package, and reports what is wrong with the selection.
+ * Works out which checks to run, and what the request itself gets wrong.
  *
- * @param stated - The package under test.
- * @returns The checks in run order, and each violation in the selection.
+ * @remarks
+ *   A kind that does not list a check drops it without a word, because a library has no barrel to
+ *   walk. A check the caller takes out by hand is the one that has to be justified.
  */
 function selected(stated: Conformance): Selection {
   const flagged: string[] = [];
@@ -191,13 +211,15 @@ function selected(stated: Conformance): Selection {
 }
 
 /**
- * Finds every part of the contract a package breaks.
+ * Runs every check the package kind and the caller's selection leave standing.
  *
- * Each violation is one sentence prefixed with the check that found it. The list is empty for a
- * package that conforms.
- *
- * @param stated - The package under test. `Conformance` documents every member.
- * @returns Each violation, in the order the checks run.
+ * @remarks
+ *   The manifest is read, the barrel walked and the factories called before the first check, so a
+ *   barrel that cannot be walked fails on the walk rather than under one check's name. Factories
+ *   are called for a config package and for nothing else.
+ * @returns Each violation, opening with the check that reported it, or an empty array for a
+ *   package that keeps the contract.
+ * @throws {@link Error} When the manifest at `at` is missing or is not JSON.
  */
 export async function violations(stated: Conformance): Promise<readonly string[]> {
   const selection = selected(stated);
