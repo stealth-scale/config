@@ -1,5 +1,19 @@
 # @stealthscale/vite-config
 
+## 0.5.0
+
+### Minor Changes
+
+- [#19](https://github.com/stealth-scale/config/pull/19) [`cfc5b2a`](https://github.com/stealth-scale/config/commit/cfc5b2a7b55fd1f115faa6b76416277814352a3d) Thanks [@stealth-rklopper](https://github.com/stealth-rklopper)! - vite-config: excuse a barrel from the dependency cap
+  
+  - `lint.barrelled(files)` turns off `import/max-dependencies` for the globs it is handed.
+  - Every lint tier applies it to `**/index.ts`.
+
+### Patch Changes
+
+- Updated dependencies [[`8cc2075`](https://github.com/stealth-scale/config/commit/8cc20751fe95cc28db6f0e5df3d4ac7e5936f354)]:
+  - @stealthscale/vite-plugin-sbom@0.3.1
+
 ## 0.4.0
 
 ### Minor Changes

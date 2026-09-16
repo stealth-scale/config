@@ -1,5 +1,16 @@
 # @stealthscale/vite-plugin-sbom
 
+## 0.3.1
+
+### Patch Changes
+
+- [#19](https://github.com/stealth-scale/config/pull/19) [`8cc2075`](https://github.com/stealth-scale/config/commit/8cc20751fe95cc28db6f0e5df3d4ac7e5936f354) Thanks [@stealth-rklopper](https://github.com/stealth-rklopper)! - vite-plugin-sbom: read the lockfile through the base plugin
+  
+  - `locked` and `Installed` come from `@stealthscale/vite-plugin-base`, and the direct dependency on
+    `yaml` goes with them.
+- Updated dependencies [[`8cc2075`](https://github.com/stealth-scale/config/commit/8cc20751fe95cc28db6f0e5df3d4ac7e5936f354)]:
+  - @stealthscale/vite-plugin-base@0.2.0
+
 ## 0.3.0
 
 ### Minor Changes

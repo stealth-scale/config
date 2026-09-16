@@ -1,0 +1,16 @@
+# @stealthscale/vite-config-theme
+
+## 0.1.0
+
+### Minor Changes
+
+- [#19](https://github.com/stealth-scale/config/pull/19) [`6299362`](https://github.com/stealth-scale/config/commit/6299362c1f82969a33049d451ee88bdd6a10526f) Thanks [@stealth-rklopper](https://github.com/stealth-rklopper)! - vite-config-theme: add the runtime and stylesheet contributions
+  
+  - `runtime()` adds `theme.runtime()` to the plugins of the design-system package, and `stylesheet()`
+    adds `theme.stylesheet()` to the plugins of an application.
+  - `layers()` and `workspace()` contribute nothing, so every package lists every add-on the same way.
+
+### Patch Changes
+
+- Updated dependencies [[`8cc2075`](https://github.com/stealth-scale/config/commit/8cc20751fe95cc28db6f0e5df3d4ac7e5936f354)]:
+  - @stealthscale/vite-plugin-theme@0.1.0
