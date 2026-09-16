@@ -45,10 +45,11 @@ describe("animationStyles", () => {
     });
   });
 
-  it("slides out towards the side the placement is on", () => {
+  it("slides out towards the side the anchor is on", () => {
     expect(tokenAt(animationStyles, "slide-fade.out")).toMatchObject({
-      "&[data-placement^=right]": { animationName: "slide-to-right, fade-out" },
-      "&[data-placement^=top]": { animationName: "slide-to-top, fade-out" },
+      "&[data-placement^=bottom]": { animationName: "slide-to-top, fade-out" },
+      "&[data-placement^=right]": { animationName: "slide-to-left, fade-out" },
+      "&[data-placement^=top]": { animationName: "slide-to-bottom, fade-out" },
     });
   });
 

@@ -16,9 +16,10 @@ import { type AnimationStyle, type AnimationStyles } from "#pandacss.ts";
 type Motion = Record<"value", AnimationStyle>;
 
 /**
- * Lists the sides a placement can start with against the side a panel slides in from.
+ * Lists the sides a placement can start with against the side a panel slides in from and back
+ * out to, which is the side its anchor is on.
  */
-const SLIDES: ReadonlyArray<readonly [placement: string, from: string]> = [
+const SLIDES: ReadonlyArray<readonly [placement: string, anchored: string]> = [
   ["top", "bottom"],
   ["bottom", "top"],
   ["left", "right"],
@@ -42,6 +43,9 @@ function motion(name: string, pace: string, curve: string): Motion {
 /**
  * Writes a slide that reads the placement its machine stamps.
  *
+ * @remarks
+ *   A panel enters from the side its anchor is on and leaves towards it, so both directions read
+ *   the anchored side of the placement.
  * @param direction - Whether the panel slides in or out, which decides the keyframe name.
  */
 function slide(direction: "from" | "to", fade: string, pace: string, curve: string): Motion {
@@ -51,11 +55,9 @@ function slide(direction: "from" | "to", fade: string, pace: string, curve: stri
     value: {
       ...value,
       ...Object.fromEntries(
-        SLIDES.map(([placement, from]) => [
+        SLIDES.map(([placement, anchored]) => [
           `&[data-placement^=${placement}]`,
-          {
-            animationName: `slide-${direction}-${direction === "from" ? from : placement}, ${fade}`,
-          },
+          { animationName: `slide-${direction}-${anchored}, ${fade}` },
         ]),
       ),
       transformOrigin: "var(--transform-origin)",
