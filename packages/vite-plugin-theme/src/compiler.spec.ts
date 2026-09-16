@@ -139,6 +139,23 @@ describe("compiler", () => {
     expect(declared).toContain("): SlotRecipeRuntimeFn<Slot, RecipeSelection<Variants>, ");
   });
 
+  it("declares the class a compound's styles are emitted under", async () => {
+    const declared = await withScratchWorkspaceAsync(SYSTEM, async (workspace) => {
+      await generateRuntime(
+        workspace.root,
+        workspace.path("node_modules/.theme/runtime.config.mjs"),
+        workspace.path("generated"),
+      );
+
+      return workspace.read("generated/recipes/runtime.d.mts");
+    });
+
+    expect(declared).toContain(
+      "RecipeCompoundSelection<Variants> & { className?: string | undefined; css: SystemStyleObject }",
+    );
+    expect(declared).toContain("classNames?: SlotRecord<Slot, string> | undefined;");
+  });
+
   it("leaves an unchanged runtime file as it was when generating again", async () => {
     const past = new Date("2020-01-01T00:00:00Z");
     const modified = await withScratchWorkspaceAsync(SYSTEM, async (workspace) => {

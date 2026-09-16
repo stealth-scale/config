@@ -39,7 +39,7 @@ const KIT = packageFiles(
       '  name: "@acme/kit",',
       "  theme: {",
       "    extend: {",
-      '      recipes: { button: { className: "button", base: { color: "brand", letterSpacing: "0em" }, variants: { size: { lg: { padding: "8px" } } } } },',
+      '      recipes: { button: { className: "button", jsx: ["Button"], base: { color: "brand", letterSpacing: "0em" }, variants: { size: { lg: { padding: "8px" }, md: { padding: "4px" } }, variant: { ghost: { color: "green" }, solid: { color: "red" } } }, compoundVariants: [{ className: "button--compound__size_lg__variant_solid", css: { fontWeight: "700" }, size: "lg", variant: "solid" }, { className: "button--compound__size_md__variant_ghost", css: { fontStyle: "italic" }, size: "md", variant: "ghost" }] } },',
       '      slotRecipes: { dialog: { className: "dialog", slots: ["content", "backdrop"], base: { content: { padding: "4px" } } } },',
       "    },",
       "  },",
@@ -181,6 +181,51 @@ describe("assemble", () => {
 
     expect(declared(css, ".button--size_lg", "padding")).toBe("8px");
     expect(declared(css, "[data-theme=abyss] .button--size_lg", "padding")).toBe("12px");
+  });
+
+  it("compiles a compound under the class its recipe names", async () => {
+    const css = await withScratchWorkspaceAsync(APP, compiled);
+
+    expect(declared(css, ".button--compound__size_lg__variant_solid", "font-weight")).toBe("700");
+  });
+
+  it("compiles a theme's compound for the same selection under the same class", async () => {
+    const extend =
+      'recipes: { button: { compoundVariants: [{ size: "lg", variant: "solid", css: { letterSpacing: "0.2em" } }] } }';
+    const files = { ...APP, "themes/abyss.ts": theme("abyss", extend) };
+    const css = await withScratchWorkspaceAsync(files, compiled);
+
+    expect(
+      declared(
+        css,
+        "[data-theme=abyss] .button--compound__size_lg__variant_solid",
+        "letter-spacing",
+      ),
+    ).toBe("0.2em");
+  });
+
+  it("compiles the compound a page selects and leaves an unselected one out", async () => {
+    const files = {
+      ...APP,
+      "src/button.tsx": "export const Button = (props: object) => <button {...props} />;\n",
+      "src/page.tsx": [
+        'import { Button } from "./button.tsx";',
+        "",
+        'export const Page = () => <Button variant="solid" size="lg">Go</Button>;',
+        "",
+      ].join("\n"),
+      "theme.config.ts": [
+        'import { abyss } from "./themes/abyss.ts";',
+        'import { fathom } from "./themes/fathom.ts";',
+        "",
+        "export default { themes: [fathom, abyss] };",
+        "",
+      ].join("\n"),
+    };
+    const css = await withScratchWorkspaceAsync(files, compiled);
+
+    expect(declared(css, ".button--compound__size_lg__variant_solid", "font-weight")).toBe("700");
+    expect(css).not.toContain("size_md__variant_ghost");
   });
 
   it("scopes a slot recipe's styles inside the slot", async () => {

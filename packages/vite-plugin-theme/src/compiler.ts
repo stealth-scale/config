@@ -55,7 +55,8 @@ const SCRATCH = join(CACHE, "runtime");
  *   stylesheet: the name, the class name, the slots, the values of each axis, the defaults and the
  *   compound variants. The declaration types that configuration from the generated recipe types,
  *   so the package binding a recipe states the variants it was written with and receives the
- *   runtime function typed the way the compiler's own `cva` and `sva` are.
+ *   runtime function typed the way the compiler's own `cva` and `sva` are. A compound carries the
+ *   class its styles are emitted under, which the recipe names and the compiler honours.
  */
 const RUNTIME_DECLARATION = [
   "/*",
@@ -79,7 +80,9 @@ const RUNTIME_DECLARATION = [
   " */",
   "export interface RecipeRuntimeConfig<Variants extends RecipeVariantRecord> {",
   "  className?: string;",
-  "  compoundVariants?: ReadonlyArray<RecipeCompoundSelection<Variants> & { css: SystemStyleObject }>;",
+  "  compoundVariants?: ReadonlyArray<",
+  "    RecipeCompoundSelection<Variants> & { className?: string | undefined; css: SystemStyleObject }",
+  "  >;",
   "  defaultVariants?: RecipeSelection<Variants>;",
   "  name: string;",
   "  variantMap?: RecipeConfigVariantMap<Variants>;",
@@ -94,7 +97,11 @@ const RUNTIME_DECLARATION = [
   "> {",
   "  className?: string;",
   "  compoundVariants?: ReadonlyArray<",
-  "    RecipeCompoundSelection<Variants> & { css: SlotRecord<Slot, SystemStyleObject> }",
+  "    RecipeCompoundSelection<Variants> & {",
+  "      className?: string | undefined;",
+  "      classNames?: SlotRecord<Slot, string> | undefined;",
+  "      css: SlotRecord<Slot, SystemStyleObject>;",
+  "    }",
   "  >;",
   "  defaultVariants?: RecipeSelection<Variants>;",
   "  name: string;",
