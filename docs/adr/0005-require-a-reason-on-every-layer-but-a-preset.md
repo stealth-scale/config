@@ -23,8 +23,8 @@ Accepted
 - Those three kinds are where a repository departs from the house answer. A later reader cannot act
   on a departure without a recorded reason. Deleting it risks breaking something. Keeping it means
   keeping a rule whose purpose is lost.
-- A field required on all four kinds gets filled in by habit. A reason filled in by habit tells the
-  reader nothing.
+- A field required on all four kinds gets filled in by habit. A reason filled in by habit carries no
+  information.
 
 ## Decision
 

@@ -26,6 +26,7 @@
     "@stealthscale/vite-config": "workspace:^",
     "@stealthscale/vite-config-react": "workspace:^",
     "@stealthscale/vite-config-typescript": "workspace:^",
+    "@testing-library/react": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "happy-dom": "catalog:",

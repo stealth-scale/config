@@ -1,15 +1,16 @@
+import { act } from "react";
+
 import { describe, expect, it } from "vitest";
 
 import { mount } from "#mount.ts";
 
 describe("mount", () => {
-  it("renders into the element the host gave it and nowhere else", async () => {
+  it("renders into the element the host gave it and nowhere else", () => {
     const into = document.createElement("div");
 
     document.body.append(into);
-    mount(into, 7);
-    await new Promise((settle) => {
-      setTimeout(settle, 0);
+    act(() => {
+      mount(into, 7);
     });
 
     expect(into.textContent).toContain("7 open");
@@ -20,12 +21,11 @@ describe("mount", () => {
 
     document.body.append(into);
 
-    const root = mount(into, 1);
+    const root = await act(() => mount(into, 1));
 
-    await new Promise((settle) => {
-      setTimeout(settle, 0);
+    act(() => {
+      root.unmount();
     });
-    root.unmount();
 
     expect(into.textContent).toBe("");
   });
