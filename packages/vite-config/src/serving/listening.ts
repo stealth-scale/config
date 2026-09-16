@@ -1,63 +1,66 @@
 /**
- * What the dev server and the preview server both state, stated once.
+ * Where the development server and the preview server listen.
+ *
+ * @remarks
+ *   Every layer here takes the server it configures as its first argument and
+ *   writes under that one alone, so the same call spells a development server
+ *   and the preview of a build without either reaching the other.
  */
 
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 
 import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 import { bound as derived, hosts } from "#serving/environment.ts";
 
 /**
- * Which of the two servers a layer is speaking about.
+ * Which of the two servers a layer configures.
  */
 export type Serving = "preview" | "server";
 
 /**
- * The settings both servers take, which is every setting these layers write.
+ * The listening settings the two servers have in common.
  */
 interface Listening {
   /**
-   * The names it answers to, beyond loopback.
+   * The names the server answers to.
    */
   allowedHosts?: string[];
 
   /**
-   * The address it binds.
+   * The interface to bind, or true for every one of them.
    */
   host?: boolean | string;
 
   /**
-   * The port it serves at.
+   * The port to bind.
    */
   port?: number;
 
   /**
-   * Whether a busy port fails rather than becoming another one.
+   * Refuses to start on a taken port rather than moving to the next one.
    */
   strictPort?: boolean;
 }
 
 /**
- * Writes a block under whichever of the two keys was named.
+ * Files a block of settings under the server it was written for.
  *
- * Stated as a branch rather than a computed key, because a computed one answers a record of
- * unknowns and neither block would then be checked against what it actually takes.
- *
- * @param where - Which server is being configured.
- * @param held - The settings that server takes.
- * @returns The config, under that one key.
+ * @remarks
+ *   The other server is left absent rather than set to an empty object, so a
+ *   composed config shows which of the two a layer touched.
  */
 function stating(where: Serving, held: Listening): UserConfig {
   return where === "server" ? { server: held } : { preview: held };
 }
 
 /**
- * Listens on the address given rather than on IPv6 loopback alone.
+ * Binds the server to an address, or to the one its host names imply.
  *
- * @param where - Which server is being configured.
- * @param at - The address, `true` for every interface, or the names to work it out from.
- * @returns The preset.
+ * @remarks
+ *   An array asks for the address to be worked out, and works out nothing when
+ *   the array and the machine are both empty. The layer then states no settings
+ *   at all and leaves the engine's own default standing.
  */
 export function bound(where: Serving, at: boolean | readonly string[] | string): Preset {
   return preset({
@@ -66,16 +69,27 @@ export function bound(where: Serving, at: boolean | readonly string[] | string):
 
       return held === undefined ? {} : stating(where, { host: held });
     },
-    name: `${where}.bound`,
+    name: `${where}.bound${spelled(typeof at === "object" ? at : [String(at)])}`,
   });
 }
 
 /**
- * Serves on the port given, and refuses to move off it.
+ * Spells a layer's arguments into the name it carries.
  *
- * @param where - Which server is being configured.
- * @param at - The port to serve at.
- * @returns The preset.
+ * @remarks
+ *   No arguments gives an empty string rather than an empty pair of brackets,
+ *   so a layer stating nothing reads as `server.bound`.
+ */
+function spelled(args: readonly string[]): string {
+  return args.length === 0 ? "" : `(${args.join(", ")})`;
+}
+
+/**
+ * Pins the server to one port and refuses to start when it is taken.
+ *
+ * @remarks
+ *   A server allowed to move up would still start, and everything that was told
+ *   the first port would reach whatever is answering there instead.
  */
 export function port(where: Serving, at: number): Preset {
   return preset({
@@ -85,35 +99,32 @@ export function port(where: Serving, at: number): Preset {
 }
 
 /**
- * Answers to the names given, beyond loopback.
+ * Lists the names the server answers to, from the machine or from the caller.
  *
- * @param where - Which server is being configured.
- * @param names - The names the repository states, which the machine's own override.
- * @returns The preset.
+ * @remarks
+ *   The names are copied into an array of the server's own, so a caller holding
+ *   on to the list it passed cannot change what the server accepts once the
+ *   config has resolved.
  */
 export function reachable(where: Serving, names: readonly string[]): Preset {
   return preset({
     config: (context) => stating(where, { allowedHosts: [...hosts(context, names)] }),
-    name: `${where}.reachable`,
+    name: `${where}.reachable${spelled(names)}`,
   });
 }
 
 /**
- * States the port, the names and the address together, which is how they are true.
+ * Sets a whole address at once: the port, the names, and the interface to bind.
  *
- * The three answer one question between them: where this server is reached. Stated apart they are
- * three lines a config repeats per application, and two of them are the same list — a name the
- * server answers to is a name that resolves to loopback, so binding follows from answering.
- *
- * Each is still its own layer underneath, named as it always was, so a repository disagreeing with
- * one of the three takes that one back rather than all three.
- *
- * @param where - Which server is being configured.
- * @param at - The port to serve at.
- * @param names - The names it answers to, beyond loopback.
- * @returns The three layers, in the order they compose.
+ * @remarks
+ *   The three layers are independent of one another, and a package that needs
+ *   one of them states that one instead of this.
+ * @param where - Which server to configure.
+ * @param at - The port to pin.
+ * @param names - The host names, which also decide whether the server binds
+ *   loopback.
  */
-export function reached(
+export function address(
   where: Serving,
   at: number,
   names: readonly string[] = [],

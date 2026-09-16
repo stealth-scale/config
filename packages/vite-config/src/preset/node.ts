@@ -1,5 +1,5 @@
 /**
- * Configuring a package that publishes and runs on node.
+ * Configures a published package that runs on node.
  */
 
 import { configuring, type Defining, type Extendable } from "@stealthscale/vite-config-core";
@@ -10,23 +10,23 @@ import { house } from "#preset/house.ts";
 import * as test from "#test/index.ts";
 
 /**
- * The layers a package the console runs is built on.
+ * Lists the layers a node package is linted, packed and tested with.
  *
- * A package that publishes, which is what the `pack` layers are for. A command-line tool is one of
- * these: it is installed from a registry like any other package, and names the command it installs
- * with `pack.command`.
- *
- * Answered as a list as well as bound below, so that a config package for a framework composes
- * these with its own rather than sitting beside them. Sitting beside them is what lets a repository
- * pair the wrong tier with the right framework and lose half its rules without being told.
- *
- * @returns Each layer the tier is built on, in the order they compose.
+ * @remarks
+ *   Node's globals are in scope and the browser's are withheld, so a stray
+ *   reference to `document` is a lint error here rather than a runtime failure
+ *   in whoever installs the package.
  */
 export function layers(): readonly Extendable[] {
   return [...house(), lint.preset.node(), pack.preset.node(), test.preset.node()];
 }
 
 /**
- * Composes a config for a package the console runs.
+ * Composes the Vite configuration of a package published for node.
+ *
+ * @remarks
+ *   The configuration packages themselves are defined with this tier, so a
+ *   change to it is felt on the next check of this repository before it reaches
+ *   anybody else's.
  */
 export const defineConfig: Defining = configuring(layers);

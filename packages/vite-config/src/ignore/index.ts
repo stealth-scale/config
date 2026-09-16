@@ -1,5 +1,5 @@
 /**
- * What every tool walks past, wherever the answer is the same for all of them.
+ * Collects the path globs every tool in this repository walks past.
  */
 
 export { FOREIGN } from "#ignore/foreign.ts";

@@ -1,5 +1,10 @@
 /**
- * What a bundler plugin is here, and the one place its type comes from.
+ * Builds a bundler plugin from a name and a single write step.
+ *
+ * @remarks
+ *   A plugin written here takes the build as an argument instead of as `this`,
+ *   so the write step can be an arrow function, a method, or a function two
+ *   plugins share.
  */
 
 import { type Plugin } from "vite";
@@ -7,79 +12,80 @@ import { type Plugin } from "vite";
 export { type Plugin };
 
 /**
- * What a hook is handed to reach the build it is running inside.
+ * The build a bundler binds to `this` while it generates a bundle.
  *
- * Read off the plugin's own hook rather than written out, so a change to what the bundler passes is
- * a type error here rather than a plugin that reads a field nothing sets. Vite's `Plugin` extends
- * rolldown's, which is what makes a plugin written against this one work under either.
+ * @remarks
+ *   The type is taken from Vite's own `generateBundle` signature, so it follows
+ *   whichever rolldown Vite resolves rather than a copy of the context that
+ *   drifts away from it.
  */
 export type Bundling = ThisParameterType<
   Extract<NonNullable<Plugin["generateBundle"]>, (...args: never[]) => unknown>
 >;
 
 /**
- * The part of a resolved configuration a plugin here reads.
+ * The part of a resolved configuration a plugin stated here reads.
+ *
+ * @remarks
+ *   Naming the one field keeps the hook assignable across Vite releases, since
+ *   the published `ResolvedConfig` gains members between minor versions.
  */
 interface Resolved {
   /**
-   * The directory the bundler settled on as the one being built.
+   * The project directory the bundler resolved, absolute.
    */
   root: string;
 }
 
 /**
- * Describes a plugin.
+ * Describes a plugin: what a bundler calls it, and what it writes.
  */
 export interface Stated {
   /**
-   * What it is called, which is what the bundler reports it as.
+   * The name the bundler reports in a build trace and in an error.
    */
   name: string;
 
   /**
-   * What it does once the chunks exist and before they are written.
+   * Emits whatever the plugin contributes to the bundle.
    *
-   * The one moment a plugin here needs. The module graph is complete, so what the build reached is
-   * knowable; the output has not been written, so a file can still be added to it.
-   *
-   * @param bundling - The build it is running inside.
-   * @param at - The directory being built, which the bundler resolved.
-   * @returns Nothing, or a promise for when it is finished.
+   * @remarks
+   *   The call happens at `generateBundle`, where the module graph is complete
+   *   and nothing has reached disk yet, so a file emitted here still lands in
+   *   the output. A returned promise is awaited before the bundle is written.
+   * @param bundling - The build to read the graph from and emit files through.
+   * @param at - The project directory, which under a task runner differs from
+   *   the working directory.
    */
   writes: (bundling: Bundling, at: string) => Promise<void> | void;
 }
 
 /**
- * States a plugin, with the build handed over as an argument.
+ * Assembles a description into a plugin Vite, rolldown and rollup all accept.
  *
- * The bundler calls a hook with the build as `this`, which an arrow function cannot reach and a
- * plain one is easy to get wrong in. Binding it once here means every plugin written against this
- * takes the build as an ordinary argument and nothing downstream writes `this` at all.
- *
- * @param stated - The plugin. `Stated` documents every member.
- * @returns The plugin, as any rolldown or Vite build will take one.
+ * @remarks
+ *   The directory handed to the write step starts as the working directory and
+ *   is replaced once the bundler resolves a configuration. A build that never
+ *   resolves one leaves the write step describing wherever the process started.
+ * @returns A plugin whose write step runs once, at `generateBundle`.
  */
 export function plugin(stated: Stated): Plugin {
   let at = process.cwd();
 
   return {
     /**
-     * Remembers what the bundler resolved as the directory being built.
-     *
-     * Asked of the build rather than of the plugin's caller. The working directory is the workspace
-     * root under a task runner, so a plugin reading that describes the wrong package; the bundler
-     * has already worked out the right answer and this is where it says so.
-     *
-     * @param config - The resolved configuration.
+     * Records the directory the bundler resolved, for the write step to use.
      */
     configResolved(config: Resolved): void {
       at = config.root;
     },
 
     /**
-     * Hands the build to what was stated, so nothing downstream reaches for `this`.
+     * Hands the finished module graph and the project directory to the write step.
      *
-     * @returns A promise where the plugin answered one, and nothing otherwise.
+     * @remarks
+     *   The promise a write step returns is passed straight back, so the
+     *   bundler waits for an asynchronous write before it closes the bundle.
      */
     generateBundle(this: Bundling): Promise<void> | void {
       return stated.writes(this, at);

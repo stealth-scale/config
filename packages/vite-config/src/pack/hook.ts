@@ -1,46 +1,33 @@
 /**
- * Running a repository's own code around a pack.
+ * Schedules code to run at a named moment of the packer's build.
  */
 
-import { type Override, override } from "@stealthscale/vite-config-core";
+import { named, type Override, override } from "@stealthscale/vite-config-core";
 
 import { type Moments } from "#pack/settings.ts";
 
 /**
- * Describes code a repository runs around its own pack.
+ * Carries a set of moments together with the reason a package scheduled them.
  */
 export interface Hooked {
   /**
-   * Why this repository needs it, kept with the layer so a later reader can weigh it.
+   * Explains what the package needs the hook for, and shows up wherever layers are reported.
    */
   because: string;
 
   /**
-   * The code, against the moment each piece runs. `build:prepare` before the packer starts,
-   * `build:before` before each bundle, `build:done` once the chunks exist.
+   * Supplies the code to run at each moment the packer reaches.
    */
   hooks: Moments;
 }
 
 /**
- * Runs a repository's own code at a point in the pack.
+ * Merges the stated moments into whatever the configuration has already scheduled.
  *
- * For an artefact no bundler produces and the package still ships: a stylesheet solved from a
- * recipe, a manifest of what was generated, a file written from a schema. Writing it in
- * `build:before` is what puts it on disk in time for the packer to find it, and keeps the thing
- * that writes it beside the package that ships it rather than in a script somebody has to remember
- * to run.
- *
- * Stated as an override because it is the least legible layer a config can carry: arbitrary code,
- * at a moment nothing else in the config names, doing something the config cannot describe. The
- * reason travels with it for that.
- *
- * Composes with whatever a tier already asked for rather than replacing it, so a repository adding
- * `build:done` keeps the `build:before` something else stated. Two layers naming the same moment
- * are the one case that does not compose, and the nearer one wins.
- *
- * @param stated - The hooks, and why.
- * @returns The override.
+ * @remarks
+ *   A moment another layer has already taken is replaced, and every other moment survives. Hooks
+ *   stated as a registrar function are discarded rather than merged, and so is a `pack` field
+ *   holding the multi-bundle array form.
  */
 export function hook(stated: Hooked): Override {
   return override({
@@ -56,56 +43,70 @@ export function hook(stated: Hooked): Override {
 }
 
 /**
- * What the packer runs at one moment, as the packer declares it.
+ * Resolves to the function the packer calls at one moment.
  *
- * Read off the moment rather than shared between the three, because each is handed something
- * different: the bundler at `build:before`, the chunks it produced at `build:done`, and neither
- * before it has started.
- *
- * @typeParam At - Which moment.
+ * @remarks
+ *   Every moment is optional on the packer's own type. Stripping the undefined lets a caller state
+ *   a moment without narrowing the result before passing it on.
+ * @typeParam At - The moment whose signature is wanted.
  */
-type Runs<At extends keyof Moments> = NonNullable<Moments[At]>;
+export type Runs<At extends keyof Moments> = NonNullable<Moments[At]>;
 
 /**
- * Runs code before the packer starts, which is before it empties the output directory.
+ * Carries the code for a single moment and the reason for scheduling it.
  *
- * The moment for what has to exist before the packer looks at anything, and the wrong moment for
- * writing into `dist`: the directory is emptied between this and `buildBefore`, so a file written
- * here is deleted before the bundle is made.
- *
- * @param because - Why this repository needs it.
- * @param runs - The code to run.
- * @returns The override.
+ * @typeParam At - The moment the code runs at, which fixes what the packer passes it.
  */
-export function buildPrepare(because: string, runs: Runs<"build:prepare">): Override {
-  return hook({ because, hooks: { "build:prepare": runs } });
+export interface Scheduled<At extends keyof Moments> {
+  /**
+   * Explains what the package needs the hook for, and shows up wherever layers are reported.
+   */
+  because: string;
+
+  /**
+   * Runs when the packer reaches the moment this type names.
+   */
+  runs: Runs<At>;
 }
 
 /**
- * Runs code before each bundle, once the output directory has been emptied.
+ * Runs code once, before the packer starts on a package.
  *
- * The moment for an artefact the package ships and no bundler produces — a stylesheet solved from a
- * recipe, a file written from a schema. Writing it here is what puts it on disk in time for the
- * packer to find it.
- *
- * @param because - Why this repository needs it.
- * @param runs - The code to run.
- * @returns The override.
+ * @remarks
+ *   Nothing has been read or written yet, which makes this the place to produce a file the build
+ *   itself will go on to read.
  */
-export function buildBefore(because: string, runs: Runs<"build:before">): Override {
-  return hook({ because, hooks: { "build:before": runs } });
+export function buildPrepare(stated: Scheduled<"build:prepare">): Override {
+  return named(
+    "pack.buildPrepare",
+    hook({ because: stated.because, hooks: { "build:prepare": stated.runs } }),
+  );
 }
 
 /**
- * Runs code once the chunks exist.
+ * Runs code before each bundle, with the bundler's options in hand.
  *
- * The moment for reading what was built rather than adding to it: an inventory of the output, a
- * check on what landed, a copy taken somewhere else.
- *
- * @param because - Why this repository needs it.
- * @param runs - The code to run.
- * @returns The override.
+ * @remarks
+ *   A package that publishes two formats gets two calls, one per format. Code that has to happen
+ *   exactly once belongs in `build:prepare` instead.
  */
-export function buildDone(because: string, runs: Runs<"build:done">): Override {
-  return hook({ because, hooks: { "build:done": runs } });
+export function buildBefore(stated: Scheduled<"build:before">): Override {
+  return named(
+    "pack.buildBefore",
+    hook({ because: stated.because, hooks: { "build:before": stated.runs } }),
+  );
+}
+
+/**
+ * Runs code after the packer has finished, with every chunk it emitted.
+ *
+ * @remarks
+ *   The output exists on disk by the time this runs, so a step that has to see the finished build —
+ *   a size budget, a copy into another package — belongs here rather than at an earlier moment.
+ */
+export function buildDone(stated: Scheduled<"build:done">): Override {
+  return named(
+    "pack.buildDone",
+    hook({ because: stated.because, hooks: { "build:done": stated.runs } }),
+  );
 }

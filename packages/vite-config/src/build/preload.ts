@@ -1,22 +1,16 @@
 /**
- * What a build ships to make a browser fetch a chunk before it is asked for.
+ * Decides how a browser is told about the modules a chunk will go on to request.
  */
 
 import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
- * Stops shipping the module preload polyfill.
+ * Emits the preload links but leaves out the polyfill that backs them.
  *
- * A build emits `<link rel="modulepreload">` so a browser starts fetching a chunk while it is still
- * parsing the one that imports it, and ships a polyfill because Safari did not support the hint
- * until 17. The build target is the set of browsers that support everything in it, and every
- * browser in that set supports this, so the polyfill runs in nothing and costs every visitor the
- * bytes it takes to decide so.
- *
- * Nothing here applies to a library. The preload hints belong to a page, and a package that is
- * imported rather than opened emits none.
- *
- * @returns The preset.
+ * @remarks
+ *   The polyfill is an inline script the document has to run before anything else, and dropping it
+ *   assumes every targeted browser implements `modulepreload` itself. One that does not still
+ *   loads the application, a round trip slower per chunk.
  */
 export function preload(): Preset {
   return preset({

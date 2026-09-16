@@ -1,44 +1,41 @@
 /**
- * Sorting everything sortable, so a diff shows a change rather than a reordering.
+ * Fixes the order of the members a reader looks up by name.
+ *
+ * @remarks
+ *   A list is sorted only where its order carries no meaning. An array, an
+ *   enum, a set and a class each have an order somebody chose, and none of them
+ *   is sorted here.
  */
 
 import { type PluginRules } from "#lint/rules/rules.ts";
 
 /**
- * Sorted, with a blank line starting a new block.
+ * Sorts within a run of lines and starts over after a blank one.
  *
- * A deliberate grouping survives — a manifest's `name` before its `version`, a union's ordinary
- * case before its failures — because the sorter treats a blank line as the end of one group and the
- * start of another.
+ * @remarks
+ *   A blank line is how an author groups the members that belong together.
+ *   Sorting across it would merge those groups, and the grouping is information
+ *   the author put there on purpose.
  */
 const PARTITIONED = { partitionByNewLine: true, type: "alphabetical" } as const;
 
 /**
- * Sorted throughout, blank lines and all.
+ * Sorts every member of a declaration, blank lines and all.
  *
- * What a type's own members take. The docblock standard puts a blank line between every one of
- * them, so partitioning there would divide the members into groups of one and sort nothing.
+ * @remarks
+ *   A member of an interface or an object type is separated by a blank line
+ *   because a doc comment sits above it. Partitioning on that blank line would
+ *   put each member in a group of its own and sort nothing.
  */
 const THROUGHOUT = { partitionByNewLine: false, type: "alphabetical" } as const;
 
 /**
- * What is sorted, and how.
+ * Orders the imports, the exports, the type members and the object literals.
  *
- * Import order is absent because the formatter holds it: `fmt.imports` sorts every import on every
- * save, and a second sorter here would only be a thing to keep in step.
- *
- * Sorting a list whose order carries no meaning loses nothing, and stops a diff showing
- * reorderings. `sort-objects` is the one that reaches something observable — a literal's key order
- * is what `Object.keys` answers — and it is on anyway, because code reading its own literal back in
- * declaration order is relying on something no reader should have to know. What is deliberately
- * absent is the other kind:
- *
- * An array's order is its data, and a map's and a set's iteration order is insertion order and
- * observable, so `sort-arrays`, `sort-maps` and `sort-sets` stay off. A module's declaration order
- * is its reading order and a top-level `const` can be moved past its own use, so `sort-modules`
- * does too. A field initialiser may read a field above it, which rules out `sort-classes` and
- * `sort-variable-declarations`; decorators compose in the order written; and `erasableSyntaxOnly`
- * refuses enums, so there are none for `sort-enums` to sort.
+ * @remarks
+ *   A switch is sorted too, which holds only because
+ *   `noFallthroughCasesInSwitch` refuses a case that runs into the next one.
+ *   That is the one arrangement where the position of a case is its meaning.
  */
 export const SORT: PluginRules = {
   "perfectionist/sort-export-attributes": ["error", { type: "alphabetical" }],
@@ -52,9 +49,6 @@ export const SORT: PluginRules = {
   "perfectionist/sort-named-imports": ["error", { type: "alphabetical" }],
   "perfectionist/sort-object-types": ["error", THROUGHOUT],
   "perfectionist/sort-objects": ["error", PARTITIONED],
-
-  // Safe only because `noFallthroughCasesInSwitch` refuses a case that falls into the next one,
-  // which is the one arrangement where a case's position is its meaning.
   "perfectionist/sort-switch-case": ["error", { type: "alphabetical" }],
   "perfectionist/sort-union-types": ["error", PARTITIONED],
 };

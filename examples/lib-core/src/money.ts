@@ -1,32 +1,36 @@
 /**
- * Amounts of money, kept as whole units of the smallest denomination.
+ * Adds money without reaching for anything a runtime supplies.
  */
 
 /**
- * An amount, in the smallest unit the currency has.
+ * A sum of money, held as a whole number of minor units.
+ *
+ * @remarks
+ *   Counting in minor units keeps arithmetic exact where a fractional major
+ *   unit would not: 0.1 + 0.2 is 3 rather than 0.30000000000000004. A currency
+ *   whose minor unit is not a hundredth, such as JPY, is still counted in its
+ *   own minor unit, and nothing here divides by 100.
  */
 export interface Amount {
   /**
-   * How many of the smallest unit. Negative for what is owed.
+   * The whole number of minor units, negative where the money is owed.
    */
   cents: number;
 
   /**
-   * Which currency, as its three-letter code.
+   * The ISO 4217 code, in the upper case that code is written in.
    */
   currency: string;
 }
 
 /**
- * Adds two amounts of the same currency.
+ * Sums two amounts of one currency into a third.
  *
- * Kept in the smallest unit rather than as a fraction, because a tenth cannot be written exactly in
- * binary and adding a hundred of them is off by enough to show up on an invoice.
- *
- * @param one - The first amount.
- * @param other - The second amount.
- * @returns The total.
- * @throws Error Where the two are in different currencies, which have no common total.
+ * @remarks
+ *   Neither argument is changed, and the result carries the currency both
+ *   share. A mixed pair is refused rather than converted, because a conversion
+ *   needs a rate and nothing in this package holds one.
+ * @throws {@link Error} When the two amounts name different currencies.
  */
 export function added(one: Amount, other: Amount): Amount {
   if (one.currency !== other.currency) {

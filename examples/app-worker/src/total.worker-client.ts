@@ -1,15 +1,24 @@
 /**
- * Talking to the worker, kept apart from the page so it can be specified without one.
+ * Turns the worker's message exchange into a promise the page can await.
+ *
+ * @remarks
+ *   The worker is described by the two members this module actually calls, so a
+ *   test drives it with an object literal and needs no worker runtime.
  */
 
 import { type Amount } from "@stealthscale/example-lib-core";
 
 /**
- * The part of a worker this needs, so a specification can stand in for one.
+ * The part of a worker that sends a run of amounts and hears the total back.
+ *
+ * @remarks
+ *   A DOM Worker satisfies this without being cast. Describing two members rather
+ *   than the whole interface also keeps this module away from terminate, which
+ *   would end a worker its caller still owns.
  */
 export interface Totaller {
   /**
-   * Registers what to do with the worker's answer.
+   * Registers the listener that each reply from the worker is handed to.
    */
   addEventListener: (
     of: "message",
@@ -17,21 +26,20 @@ export interface Totaller {
   ) => void;
 
   /**
-   * Sends the amounts to be totalled.
+   * Hands the worker a run of amounts to total.
    */
   postMessage: (amounts: readonly Amount[]) => void;
 }
 
 /**
- * Asks the worker for a total and waits for the answer.
+ * Sends a run of amounts to a worker and settles with the total it sends back.
  *
- * A worker answers by event rather than by return, so what a caller wants — a value it can await —
- * has to be built here. Written against the two methods it uses rather than against `Worker`, so
- * what it does can be specified without starting a thread.
- *
- * @param worker - The worker to ask.
- * @param amounts - The amounts to total.
- * @returns The total, or nothing where there was nothing to total.
+ * @remarks
+ *   The listener goes on before the run is sent, so a worker replying inside
+ *   postMessage is still heard. The listener is never taken off and the wait is
+ *   never timed out, so a worker that throws on the run, or answers a different
+ *   request, leaves the promise pending.
+ * @returns The total the worker computed, or undefined for an empty run.
  */
 export function totalled(
   worker: Totaller,

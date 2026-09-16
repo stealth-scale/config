@@ -1,87 +1,105 @@
 # @stealthscale/vite-plugin-sbom
 
-A CycloneDX 1.7 bill of materials listing every package a build put into the bundle, written beside
-the bundle itself.
+`@stealthscale/vite-plugin-sbom` writes a CycloneDX 1.7 bill of materials for a build. The component
+list is read from the finished module graph rather than from a manifest, so a package that is
+installed and never imported is absent from the document. A component is keyed by its package URL,
+and that same URL is its `bom-ref`, so a dependency edge points at the string an advisory database
+matches on.
 
-A bundle is the one artefact where "what is in this" has no answer anybody can read: every
-dependency has been inlined, renamed and minified into a file that names none of them. This is that
-answer, written by the thing that did the inlining and so the only thing that knows.
+## Install
 
 ```bash
-pnpm add -D @stealthscale/vite-plugin-sbom @stealthscale/vite-plugin-base
+pnpm add -D @stealthscale/vite-plugin-sbom
 ```
+
+The package peers on `@stealthscale/vite-plugin-base`, `vite` and `vitest`. Install all three beside
+it.
+
+## Usage
 
 ```ts
 import { sbom } from "@stealthscale/vite-plugin-sbom";
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  plugins: [sbom({ type: "application" })],
+  plugins: [sbom()],
 });
 ```
 
-Writes `cyclonedx/bom.json` into the output directory.
+A task runner starts a build from the workspace root, so the package being described is taken from
+the bundler's resolved root rather than from the working directory. The plugin writes
+`cyclonedx/bom.json` into the output directory.
+
+Every field is optional, and no field is read off another. An application build states all five:
+
+```ts
+sbom({
+  paths: ["cyclonedx/bom.json", ".well-known/sbom"],
+  serialNumber: mode === "production",
+  supplier: { name: "Stealth Scale B.V.", url: ["https://stealthscale.io"] },
+  timestamp: mode === "production",
+  type: "application",
+});
+```
+
+The build is serialised once and the same bytes go to each path, so a copy served from a deployment
+and a copy taken out of the output tree can never disagree.
 
 ## Options
 
-| Option         | Default                  | What it decides                                  |
-| -------------- | ------------------------ | ------------------------------------------------ |
-| `paths`        | `["cyclonedx/bom.json"]` | Where the document is written, one copy per path |
-| `serialNumber` | `false`                  | Whether the document carries a random identity   |
-| `timestamp`    | `false`                  | Whether it records when it was written           |
-| `supplier`     | none                     | `{ name, url }` of whoever supplied it           |
-| `type`         | `"library"`              | `"application"` or `"library"`                   |
+`sbom` and `written` both take a `Described` record.
 
-Nothing is derived. `serialNumber` and `timestamp` are separate because they are separately wanted:
-a reproducible release may carry an identity and no clock reading. Both are off by default, so two
-builds of one commit produce the same bytes until you ask otherwise.
+| Option         | Type                         | Default                  | Effect                                                          |
+| -------------- | ---------------------------- | ------------------------ | --------------------------------------------------------------- |
+| `paths`        | `readonly string[]`          | `["cyclonedx/bom.json"]` | Where the document is emitted, relative to the output directory |
+| `serialNumber` | `boolean`                    | `false`                  | Writes a random URN naming this one build                       |
+| `supplier`     | `Supplier`                   | None                     | Names the organisation that supplied the build                  |
+| `timestamp`    | `boolean`                    | `false`                  | Records the moment the document was written                     |
+| `type`         | `"application" \| "library"` | `"library"`              | Whether the subject is deployed or installed                    |
 
-A deployment usually wants a second copy at `.well-known/sbom`, which is where a scanner looks at
-something already running:
+Omit `supplier` and the document includes no supplier at all. Both fields of a stated supplier are
+required.
 
-```ts
-sbom({ paths: ["cyclonedx/bom.json", ".well-known/sbom"], type: "application" });
-```
+| Field  | Type                | Default  | Effect                                                      |
+| ------ | ------------------- | -------- | ----------------------------------------------------------- |
+| `name` | `string`            | Required | The organisation's name, written into the document as given |
+| `url`  | `readonly string[]` | Required | Each address a consumer can reach the organisation at       |
+
+Note: `serialNumber` and `timestamp` are the only two fields that differ between two builds of the
+same source. Every list in the document is sorted, so leaving both off makes a build reproducible
+byte for byte.
+
+## Reference
+
+| Export    | Signature                                                       | What it returns                                       |
+| --------- | --------------------------------------------------------------- | ----------------------------------------------------- |
+| `sbom`    | `(stated?: Described) => Plugin`                                | A plugin that emits the document alongside the bundle |
+| `written` | `(stated: Described, bundling: Bundling, at: string) => string` | The serialised document for one build                 |
+
+The bundler knows the plugin as `stealth:sbom` and calls it at `generateBundle`, after the module
+graph is complete and before the output is written. `written` does the same work without a bundler
+around it, taking the build context that hook receives as `bundling` and the directory of the
+package being described as `at`. `Described` and `Supplier` are exported as types, and the preceding
+tables list their fields.
 
 ## The document
 
-**Components** come from the module graph rather than from a manifest, so what is listed is what
-arrived — including what arrived through something else.
+- **Components.** Each installed package the build imported from appears once, typed as a library.
+  The edges between them are drawn from the module graph the components themselves came from.
+- **Metadata.** The subject is built from the described package's manifest, under the `build`
+  lifecycle phase. The tool list records the vite and rolldown versions read at run time, together
+  with every `devDependency` of the described package that resolves.
+- **Licence evidence.** A licence or copying file in a package's top directory is attached to its
+  component as base64 text, beside the expression its manifest declares. An expression SPDX does not
+  define is recorded as a name instead.
+- **Integrity and origin.** A digest the lockfile pinned becomes the component's hash, and a source
+  other than the default registry becomes a `vcs_url` or `repository_url` qualifier on the package
+  URL. The search reads `bun.lock` first and `pnpm-lock.yaml` second, from the nearest directory
+  above the package that has either one.
 
-**Dependency edges** are drawn from what each package's modules imported, not from what its manifest
-declared.
-
-**purl** identifies every component, which is what an advisory database keys on and what the
-document uses as its `bom-ref`. A package installed from git carries its source in a qualifier:
-
-```
-pkg:npm/once@1.4.1?vcs_url=github%3Aisaacs%2Fonce%230fbb41e
-```
-
-**Hashes** are SHA-512, read from the lockfile. A package manager writes little or nothing into an
-installed package — bun writes none of it — so the lockfile is the only place the integrity of what
-was installed survives. `pnpm-lock.yaml` and `bun.lock` are both read; the reader list in
-`locked.ts` is where npm would go.
-
-**Licences** are recorded twice: the SPDX expression the manifest declares, and the text of the
-`LICENSE` file beside it, base64-encoded as evidence. The two disagree often enough that a licence
-review needs both.
-
-**The toolchain** is derived, not asked for. `vite` and `rolldown` report their own versions at run
-time, so what lands is what actually ran; beside them go the tools the described package declares in
-`devDependencies`.
-
-## Where it describes
-
-The directory comes from `configResolved.root`. The plugin is not told, and takes no argument for it
-— under a task runner the working directory is the workspace root, so a plugin that reads that
-describes the wrong package.
-
-## Requires
-
-Vite 8 or later. The plugin reads `rolldownVersion` from `vite`, which a rollup-based Vite does not
-export.
+A missing manifest, an unreadable lockfile and a digest nothing can parse each cost the document
+detail rather than failing the build.
 
 ## Licence
 
-MIT
+MIT. See [LICENSE](LICENSE).

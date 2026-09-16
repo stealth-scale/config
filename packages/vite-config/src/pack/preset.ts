@@ -1,5 +1,5 @@
 /**
- * How a stealth package is packed.
+ * Groups the pack layers a library extends, one group per runtime it targets.
  */
 
 import { type Layer } from "@stealthscale/vite-config-core";
@@ -13,43 +13,33 @@ import { quality } from "#pack/quality.ts";
 import { source } from "#pack/source.ts";
 
 /**
- * What every published package is packed with, wherever it runs.
+ * Gathers what holds for every published library, whatever it runs on.
  *
- * The entry list is among them. Every package that publishes states its subpaths in its manifest
- * already, so reading them here is what stops each config repeating the answer.
- *
- * @returns The layers.
+ * @remarks
+ *   The group derives its entries from the manifest, so a package extending it states what it
+ *   publishes in `package.json` and nowhere else.
  */
 export function base(): readonly Layer[] {
   return [carry(), declarations(), inventory(), published(), quality(), source()];
 }
 
 /**
- * What a package the console runs is packed with.
+ * Takes the base group for a library that only ever runs on a server.
  *
- * The same as the base. The packer already targets node by default and reads the engine the
- * manifest declares, so a tier that said so again would only be a second place to change it.
- *
- * @returns The layers.
+ * @remarks
+ *   The packer already resolves for node, so this adds nothing. A package calls it to say which
+ *   runtime it targets, which stops the choice from being invisible when that changes.
  */
 export function node(): readonly Layer[] {
   return base();
 }
 
 /**
- * What a library the browser runs is packed with.
+ * Extends the base group for a library a browser has to be able to load.
  *
- * Built for no runtime in particular rather than for a browser. A published library is imported
- * wherever whoever installed it imports it, and a component library is rendered on a server as
- * often as in a page — the example in this repository renders one with `react-dom/server`. Naming
- * the browser would resolve every dependency through its `browser` field, which is the wrong answer
- * for half of those.
- *
- * What that leaves is the export map, which is what a package is meant to be read through and the
- * one answer that holds in both places. A library that really does reach for a browser and nothing
- * else says so with `pack.platform`.
- *
- * @returns The layers, built for no runtime in particular.
+ * @remarks
+ *   The runtime is fixed to neutral rather than to the browser, because a library reaching the
+ *   browser is usually also imported by a server rendering it.
  */
 export function web(): readonly Layer[] {
   return [...base(), platform("neutral")];

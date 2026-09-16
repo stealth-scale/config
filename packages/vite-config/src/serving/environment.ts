@@ -1,39 +1,36 @@
 /**
- * What a machine says about how the servers on it are reached.
+ * The host names and origins a machine states for its own servers.
+ *
+ * @remarks
+ *   A name that resolves on one developer's machine has no business in a file
+ *   everybody shares. These variables let that machine say what it arranged,
+ *   and replace what the repository declared rather than adding to it.
  */
 
 import { type Context } from "@stealthscale/vite-config-core";
 
 /**
- * Where the names a server answers to are read from.
+ * The variable naming the hosts a server answers to.
  */
 const HOSTS = "STEALTH_HOSTS";
 
 /**
- * Where the origins allowed to fetch from it are read from.
+ * The variable naming the origins allowed to fetch from it.
  */
 const ORIGINS = "STEALTH_ORIGINS";
 
 /**
- * What a server binds to once names are in play.
- *
- * A wildcard record pointed at a developer's own machine answers `127.0.0.1`, and a server left
- * alone binds IPv6 loopback and nothing else — so the name resolves, the connection is refused, and
- * it looks like the server is down rather than bound somewhere else.
+ * The address a server binds once it is reached under a name.
  */
 const LOOPBACK = "127.0.0.1";
 
 /**
- * Reads a list out of the environment.
+ * Splits a comma-separated variable into the entries it names.
  *
- * Comma separated, and empty where the variable is unset. Nothing here fails on an absent one: a
- * machine that has arranged no names is the ordinary case, and a server on loopback alone is what
- * it should get.
- *
- * @param context - The command, the mode and the repository around them, whose variables are its
- *   own `.env` files and the shell around them.
- * @param named - The variable to read.
- * @returns Each entry, with the empties dropped.
+ * @remarks
+ *   An empty entry is dropped, so a trailing comma costs nothing. A variable
+ *   that is unset and one set to an empty string both give no entries, which is
+ *   what makes an empty setting fall back rather than blank the list.
  */
 function listed(context: Context, named: string): readonly string[] {
   const held = context.env[named];
@@ -42,16 +39,12 @@ function listed(context: Context, named: string): readonly string[] {
 }
 
 /**
- * The names the servers on this machine answer to, beyond loopback.
+ * Reports the host names the server answers to.
  *
- * What a repository states is the answer until a machine says otherwise, and then the machine's
- * list replaces it rather than adding to it. Which names a machine answers to is that machine's
- * arrangement — one developer points a wildcard record at loopback, another has none and uses ports
- * — so a repository stating names is stating what it expects rather than what is true.
- *
- * @param context - The command, the mode and the repository around them.
- * @param stated - The names the repository states, used where the machine names none.
- * @returns Each name, or none where neither names any.
+ * @remarks
+ *   A machine naming any host replaces the whole list the repository declared.
+ *   A developer setting the variable gets those names and no others, rather
+ *   than theirs appended to a list they cannot see.
  */
 export function hosts(context: Context, stated: readonly string[] = []): readonly string[] {
   const held = listed(context, HOSTS);
@@ -60,14 +53,11 @@ export function hosts(context: Context, stated: readonly string[] = []): readonl
 }
 
 /**
- * The origins allowed to fetch what the servers on this machine serve.
+ * Reports the origins allowed to fetch from the server.
  *
- * A different list from the names, and not derivable from them: an origin is a scheme, a name and a
- * port together, so a server answering to a name says nothing about which pages may read it.
- *
- * @param context - The command, the mode and the repository around them.
- * @param stated - The origins the repository states, used where the machine names none.
- * @returns Each origin, or none where nothing else loads from here.
+ * @remarks
+ *   Each entry is a whole origin, scheme and all. A bare host name matches
+ *   nothing at run time and is not reported as a mistake here.
  */
 export function origins(context: Context, stated: readonly string[] = []): readonly string[] {
   const held = listed(context, ORIGINS);
@@ -76,17 +66,13 @@ export function origins(context: Context, stated: readonly string[] = []): reado
 }
 
 /**
- * The address a server should listen on.
+ * Reports the address to bind once the server is reached under a name.
  *
- * Derived from whether any name is in play at all, which is the condition that makes the default
- * bind wrong. A repository stating names counts, and not only a machine arranging them: the name
- * resolves to IPv4 loopback either way, so a server left on `::1` refuses the connection either
- * way.
- *
- * @param context - The command, the mode and the repository around them.
- * @param stated - The names the repository states.
- * @returns IPv4 loopback where names are in play, and otherwise nothing, which leaves the server on
- *   its own answer.
+ * @remarks
+ *   A server answering to a name is reached through something that forwards to
+ *   it, so it listens on loopback rather than on every interface.
+ * @returns The loopback address, or undefined when neither the machine nor the
+ *   repository names a host.
  */
 export function bound(context: Context, stated: readonly string[] = []): string | undefined {
   return hosts(context, stated).length > 0 ? LOOPBACK : undefined;

@@ -1,18 +1,14 @@
 /**
- * The export condition every stealth repository resolves its own packages through.
+ * Fixes the export condition that reaches a workspace package's source.
  */
 
 /**
- * Names the condition a workspace package publishes its source under.
+ * The condition every package here publishes its TypeScript source under.
  *
- * One name shared by every repository rather than one per repository, which is safe because the
- * packer writes a compiled-only export map when a package is published: nothing carrying this
- * condition reaches a registry, so an installed package matches nothing and falls through to
- * `default`.
- *
- * The same string is in `@stealthscale/vite-config-typescript`'s `customConditions`, and a
- * specification asserts the two agree — the type checker resolves through one and the bundler
- * through the other, so a drift between them is a package whose types come from source while its
- * values come from a build.
+ * @remarks
+ *   The same string appears in the shared tsconfig's customConditions, in the
+ *   exports map of every package, and in what the packer is told to write.
+ *   Changing it in one of the three leaves an importer resolving to built
+ *   output that a fresh checkout has not produced yet.
  */
 export const SOURCE = "stealth-source";

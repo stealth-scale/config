@@ -1,22 +1,16 @@
 /**
- * Writing down which built file each source file became.
+ * Publishes the mapping a server needs to find a hashed file by its source name.
  */
 
 import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
- * Writes the map from source paths to the hashed files they were built into.
+ * Records which built file each source entry became, along with what that file pulls in.
  *
- * Every asset a build emits carries a content hash, which is what lets it be cached forever and
- * what makes its name unguessable. Anything outside the build that has to name one — a server
- * rendering the first response, a template injecting a stylesheet, a host loading another
- * application's entry — needs the map to do it, and without one the only options are parsing the
- * emitted HTML or pinning names and losing the cache.
- *
- * The cost is one small JSON file. That is cheap enough that writing it always is better than
- * discovering halfway through building something that reads it that the build was not writing it.
- *
- * @returns The preset.
+ * @remarks
+ *   A file name carries a content hash and therefore changes whenever the file does. Anything
+ *   outside the bundle that has to reference one — a server rendering the document, a template in
+ *   another language — reads the name out of this file rather than guessing it.
  */
 export function manifest(): Preset {
   return preset({ config: { build: { manifest: true } }, name: "build.manifest" });

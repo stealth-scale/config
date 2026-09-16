@@ -1,34 +1,36 @@
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import * as build from "#build/index.ts";
 
-test("publishes the presets an application picks from, under one name", () => {
-  expect(Object.keys(build.preset).toSorted()).toEqual(["base", "web"]);
-});
+describe("vite-config", () => {
+  it("publishes the presets an application picks from", () => {
+    expect(Object.keys(build.preset).toSorted()).toStrictEqual(["base", "web"]);
+  });
 
-test("publishes the layers an application states one at a time, beside them", () => {
-  for (const verb of [
-    "chunks",
-    "inventory",
-    "licences",
-    "manifest",
-    "preload",
-    "served",
-    "sourcemaps",
-  ]) {
-    expect(Object.keys(build), `${verb} is not published`).toContain(verb);
-  }
-});
+  it("publishes the layers an application adds one at a time", () => {
+    for (const verb of [
+      "base",
+      "chunks",
+      "inventory",
+      "licences",
+      "manifest",
+      "preload",
+      "sourcemaps",
+    ]) {
+      expect(Object.keys(build), `${verb} is not published`).toContain(verb);
+    }
+  });
 
-test("publishes nothing a layer here reaches for on its own", () => {
-  expect(Object.keys(build).toSorted()).toEqual([
-    "chunks",
-    "inventory",
-    "licences",
-    "manifest",
-    "preload",
-    "preset",
-    "served",
-    "sourcemaps",
-  ]);
+  it("publishes nothing a layer here uses internally", () => {
+    expect(Object.keys(build).toSorted()).toStrictEqual([
+      "base",
+      "chunks",
+      "inventory",
+      "licences",
+      "manifest",
+      "preload",
+      "preset",
+      "sourcemaps",
+    ]);
+  });
 });

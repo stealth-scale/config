@@ -1,15 +1,18 @@
-import { expect, test } from "vite-plus/test";
+/**
+ * Pins the public surface, so an export cannot appear or disappear unnoticed.
+ */
+
+import { describe, expect, it } from "vitest";
 
 import * as published from "#index.ts";
 
 /**
- * What a repository with stylesheets reaches for.
- *
- * A block's namespace joins this list when that block exists, which is what the exact comparison
- * below is for: a surface grows because somebody meant it to.
+ * Names every export the package publishes, in no particular order.
  */
-const SURFACE = ["override", "plugin", "rules"];
+const SURFACE = ["layers", "rules", "warn", "workspace"];
 
-test("publishes what a repository with stylesheets needs", () => {
-  expect(Object.keys(published).toSorted()).toEqual(SURFACE.toSorted());
+describe("vite-config-css", () => {
+  it("publishes what a repository with stylesheets needs", () => {
+    expect(Object.keys(published).toSorted()).toStrictEqual(SURFACE.toSorted());
+  });
 });

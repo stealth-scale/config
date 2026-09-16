@@ -1,34 +1,39 @@
 /**
- * Keeping the subpaths a package ships without building them.
+ * Keeps the export subpaths a manifest hand-wrote from being lost to a pack build.
  */
 
 import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
- * The subpath the packer writes on its own, and would write twice if it were handed back.
+ * Identifies the subpath a manifest publishes itself under, so carrying leaves it alone.
  */
 const OWN = "./package.json";
 
 /**
- * The part of the packer's context this reads.
+ * Carries what the packer hands a custom exports function.
+ *
+ * @remarks
+ *   The packer passes the manifest exactly as it parsed it and narrows nothing, so a reader takes a
+ *   field through `Reflect.get` rather than by property access.
  */
 export interface Packed {
   /**
-   * The manifest as it stands on disk, before the packer writes its own answer over it.
+   * Exposes the manifest the packer parsed, before the packer rewrote a field of it.
    */
   pkg: object;
 }
 
 /**
- * Puts every shipped subpath the manifest names back into the map the packer just wrote.
+ * Adds back each subpath the manifest points straight at a file, leaving the built ones alone.
  *
- * A subpath resolving to a plain string names a file that ships as it stands, and is handed
- * straight back. One resolving through a condition is something the packer built, and it has just
- * written a better answer than the manifest's own.
- *
- * @param built - The map the packer wrote from what it built.
- * @param context - The manifest to read the shipped subpaths back out of.
- * @returns The map to write instead.
+ * @remarks
+ *   The packer replaces the whole export map with what it built, which drops a hand-written
+ *   declaration file or a copied-in stylesheet. Only a subpath whose value is a string is carried,
+ *   because an object value is a condition map the packer resolved and built itself.
+ * @param built - The export map the packer produced from the entries it built.
+ * @param context - The packing context, read for its manifest and nothing else.
+ * @returns The built map with each carried subpath added, or the built map untouched when the
+ *   manifest declares no export map.
  */
 export function carrying(built: Record<string, unknown>, context: Packed): Record<string, unknown> {
   const stated: unknown = Reflect.get(context.pkg, "exports");
@@ -47,17 +52,11 @@ export function carrying(built: Record<string, unknown>, context: Packed): Recor
 }
 
 /**
- * Puts back every subpath the manifest points straight at a shipped file.
+ * Installs the exports function that carries a hand-written subpath into the published manifest.
  *
- * The packer rebuilds the export map out of what it just built, so a subpath naming a file it did
- * not build is gone by the time the map is written: a declaration written by hand, a setup file a
- * consumer loads, a manifest of data. Nothing reports it. The package publishes, the checks pass,
- * and the subpath fails for whoever installs it.
- *
- * The manifest is where those subpaths are already written, so there is nothing for a config to
- * state, and this runs for every package rather than for the ones that remembered to ask.
- *
- * @returns The preset.
+ * @remarks
+ *   A package that also states subpaths of its own extends `pack.subpaths` instead, which composes
+ *   this behaviour rather than replacing it. Extending both sets the same field twice.
  */
 export function carry(): Preset {
   return preset({

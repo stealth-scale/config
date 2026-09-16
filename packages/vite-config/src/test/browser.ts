@@ -1,98 +1,87 @@
 /**
- * Running the tests in a real browser rather than against a document implementation.
+ * Runs a suite in a real browser instead of a document implementation.
+ *
+ * @remarks
+ *   Nothing here imports the driver at module scope. A repository that never
+ *   composes a browser layer can load this module without having playwright
+ *   installed at all.
  */
 
 import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
- * The browsers Playwright drives.
- *
- * Written out rather than imported, because the type comes from a package a repository installs
- * only if it asks for a browser.
+ * The engines a browser run can be driven against.
  */
 export type Browser = "chromium" | "firefox" | "webkit";
 
 /**
- * How large the page is when a test opens it.
- *
- * The runner's own answer is 414 by 896, which is a phone held upright. A component tested at that
- * width meets whatever the stylesheet does below its first breakpoint, which is rarely what the
- * author was testing and never what they said.
+ * The page a test opens at when it asks for no particular size.
  */
 const DESKTOP: Viewport = { height: 800, width: 1280 };
 
 /**
- * The Chromium build to drive.
- *
- * Playwright reaches for a headless shell by default, which is a cut-down build. Naming the channel
- * asks for the browser a person would open.
+ * The Chromium build that ships a browser rather than a headless shell.
  */
 const CHROMIUM = "chromium";
 
 /**
- * How large a page is.
+ * The area a test renders into, in CSS pixels.
  */
 export interface Viewport {
   /**
-   * The page height, in pixels.
+   * The height of the page.
    */
   height: number;
 
   /**
-   * The page width, in pixels.
+   * The width of the page.
    */
   width: number;
 }
 
 /**
- * Describes a run in a real browser.
+ * How a repository wants its browser run driven.
  */
 export interface Browsed {
   /**
-   * Which browser to drive. One of the three Playwright ships.
+   * The engine to launch. Chromium runs when none is named.
    */
   browser?: Browser;
 
   /**
-   * Which build of it to drive, where the browser has more than one.
-   *
-   * Chromium is driven as `chromium` rather than as the headless shell Playwright reaches for on
-   * its own, because the shell is a cut-down build and a test that passes on it can still fail on
-   * what a person opens. A repository shipping to one particular build names it here: `chrome`,
-   * `msedge`.
-   *
-   * Meaningless for the other two, which ship one build each, so nothing is passed for them.
+   * A named build of that engine, such as a branded Chrome release.
    */
   channel?: string;
 
   /**
-   * Whether to run without opening a window. Headless by default.
+   * Opens a window when false, which is what watching a failure needs.
    */
   headless?: boolean;
 
   /**
-   * How large the page is. Defaults to a desktop window rather than a phone.
+   * The page size. A desktop one is used when this is left out.
    */
   viewport?: Viewport;
 }
 
 /**
- * The browser driver, as the package that ships it declares.
+ * The module the Playwright provider is taken from.
  */
-export type Driver = typeof import("vite-plus/test/browser-playwright");
+export type Driver = typeof import("@vitest/browser-playwright");
 
 /**
- * Loads the browser driver, and says what to install where it is missing.
+ * Loads the Playwright provider, and says what to install when it is absent.
  *
- * Which loader it calls is an argument so that the failure a repository without those packages
- * meets is reachable from a specification here, where they are installed.
- *
- * @param load - How to reach the driver. The real import unless a specification says otherwise.
- * @returns Playwright's provider, ready to be handed to the runner.
- * @throws Error Where the optional packages a browser run needs are not installed.
+ * @remarks
+ *   Three things have to be present: two packages and a downloaded browser. The
+ *   import fails the same way whichever is missing, so the message names all
+ *   three rather than guessing at one.
+ * @param load - Replaced by a test. The real dynamic import runs when it is
+ *   omitted.
+ * @throws {@link Error} When the provider cannot be imported.
  */
 export async function driver(
-  load: () => Promise<Driver> = () => import("vite-plus/test/browser-playwright"),
+  load: () => Promise<Driver> = () => import("@vitest/browser-playwright"),
 ): Promise<Driver> {
   try {
     return await load();
@@ -106,37 +95,26 @@ export async function driver(
 }
 
 /**
- * Runs the tests in a real browser rather than against a document implementation.
+ * Runs the suite in a browser, against the driver that is installed.
  *
- * Off unless asked for, and asked for rarely: a browser is slower than `happy-dom` by an order of
- * magnitude and needs one downloaded before anything runs. What it buys is the part a document
- * implementation cannot answer — layout, real events, and what a stylesheet actually computes.
- *
- * The provider is imported when this is called rather than when the block is loaded. It lives in a
- * package that is an optional peer, so importing it at the top of this file would make every
- * repository install a browser driver to configure anything at all.
- *
- * Headless, which the runner is not on its own: it opens a window when a person is watching and
- * hides it otherwise, so a run behaves one way on a laptop and another in continuous integration.
- * One answer everywhere, and a person watching a test fail passes `headless: false`.
- *
- * @param stated - The browser and the page size. `Browsed` documents every member.
- * @returns The preset.
+ * @remarks
+ *   The driver is imported while the configuration resolves rather than when
+ *   this returns, so a package that composes the layer needs it installed even
+ *   on a run that executes no browser test.
  */
 export function browser(stated: Browsed = {}): Preset {
   return browsing(stated);
 }
 
 /**
- * States the browser block, reaching the driver through whichever loader it was given.
+ * Runs the suite in a browser, against the driver a caller hands it.
  *
- * Separate from `browser` so that the loader stays out of the published surface. A repository
- * configuring a browser run passes a browser and a page size and nothing else; this repository
- * installs no driver, so its own specification hands over one that answers without importing.
- *
- * @param stated - The browser and the page size. `Browsed` documents every member.
- * @param load - How to reach the driver. The real import unless a specification says otherwise.
- * @returns The preset.
+ * @remarks
+ *   Chromium is launched under its full build, because the download the driver
+ *   defaults to is a headless shell that paints differently from the browser
+ *   anybody would open. An engine shipping one build names none.
+ * @param stated - The engine, window, page size and build to drive.
+ * @param load - The loader used in place of the real dynamic import.
  */
 export function browsing(stated: Browsed, load?: () => Promise<Driver>): Preset {
   const driving = stated.browser ?? "chromium";

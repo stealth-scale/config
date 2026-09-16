@@ -1,5 +1,5 @@
 /**
- * The `resolve` block: how a workspace finds its own packages.
+ * Collects what makes a workspace import reach source rather than built output.
  */
 
 export { SOURCE } from "#resolve/condition.ts";

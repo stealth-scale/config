@@ -1,74 +1,93 @@
 # @stealthscale/vite-plugin-base
 
-A hook that takes the build as an argument rather than as `this`, and the set of installed packages
-a build used. Every bundler plugin needs both, and both are easy to get subtly wrong.
+`@stealthscale/vite-plugin-base` turns a name and one write step into a bundler plugin, and reports
+the installed packages a finished build imported from. The write step takes the build as an argument
+rather than as `this`, so an arrow function or a function two plugins share can serve as one. The
+package list is read from the module graph, so a dependency the bundler dropped is absent from it
+and one that arrived through another package is present.
 
-Peers on `vite`. Vite's `Plugin` extends rolldown's, so a plugin written against this runs under
-Vite, under rolldown, and under anything taking a rollup-shaped plugin.
+## Install
 
 ```bash
 pnpm add -D @stealthscale/vite-plugin-base
 ```
 
-## Writing a plugin
+The package peers on `vite` 8 and `vitest` 4. Install both. `engines.node` is `>=26.0.0`.
+
+## Usage
 
 ```ts
-import { plugin } from "@stealthscale/vite-plugin-base";
+import { licensed, manifestAt, plugin, reached, text } from "@stealthscale/vite-plugin-base";
 
-export function manifest() {
+export function inventory() {
   return plugin({
-    name: "example:manifest",
+    name: "example:inventory",
+
     writes(bundling, at) {
-      bundling.emitFile({ fileName: "manifest.json", source: "{}", type: "asset" });
+      const components = [...reached(bundling).values()].map((one) => ({
+        licences: licensed(one.at).map((file) => file.named),
+        named: one.named,
+        version: text(one.manifest, "version"),
+      }));
+
+      bundling.emitFile({
+        fileName: "inventory.json",
+        source: JSON.stringify({ components, named: text(manifestAt(at) ?? {}, "name") }),
+        type: "asset",
+      });
     },
   });
 }
 ```
 
-`writes` runs at `generateBundle`: the module graph is complete, so what the build reached is
-knowable, and the output has not been written, so a file can still be added to it.
+Add the plugin this returns to `plugins` in a Vite configuration. `writes` runs at `generateBundle`,
+where the module graph is complete and the output is not yet on disk. A file the write step emits
+there becomes part of the bundle. The bundler awaits a promise the write step returns before it
+closes the bundle.
 
-`at` is the directory the bundler resolved, taken from `configResolved`. Not `process.cwd()` — under
-a task runner that is the workspace root, so a plugin reading it describes the wrong package.
+## Reference
+
+| Export       | Signature                                                    | What it returns                                    |
+| ------------ | ------------------------------------------------------------ | -------------------------------------------------- |
+| `plugin`     | `(stated: Stated) => Plugin`                                 | A plugin that writes once, at `generateBundle`     |
+| `reached`    | `(bundling: Bundling) => ReadonlyMap<string, Reached>`       | Each package the build reached, keyed by directory |
+| `owning`     | `(from: string) => string \| undefined`                      | The directory of the package a file belongs to     |
+| `manifestAt` | `(at: string) => Manifest \| undefined`                      | The package.json parsed out of one directory       |
+| `licensed`   | `(at: string) => readonly Licensed[]`                        | The licence files in a package's top directory     |
+| `text`       | `(manifest: Manifest, field: string) => string \| undefined` | The field's value, when that value is a string     |
+
+| Type       | What it describes                                                   |
+| ---------- | ------------------------------------------------------------------- |
+| `Bundling` | The build a bundler binds to `this` while it generates a bundle     |
+| `Licensed` | One licence file, under `named` and `text`                          |
+| `Manifest` | A parsed package.json, typed as `Readonly<Record<string, unknown>>` |
+| `Plugin`   | Vite's own plugin type, re-exported                                 |
+| `Reached`  | One package, under `at`, `dependsOn`, `manifest` and `named`        |
+| `Stated`   | The description `plugin` takes, under `name` and `writes`           |
+
+## The project directory
+
+`at` is the directory the bundler resolved, recorded when Vite calls `configResolved`. Under a task
+runner the working directory is the workspace root, so a plugin reading `process.cwd()` describes
+the wrong package.
+
+Note: rolldown defines no `configResolved` hook. A build that resolves no configuration hands the
+write step the directory the process started in.
 
 ## Reading the graph
 
-```ts
-import { reached } from "@stealthscale/vite-plugin-base";
+`reached` keys its answer by package directory, so two installs of one name are two entries. Four
+kinds of module stay out of the result:
 
-for (const [at, one] of reached(bundling)) {
-  console.log(one.named, one.manifest["version"], [...one.dependsOn]);
-}
-```
+- A module outside `node_modules`. The test splits the path into segments, so a directory named
+  `node_modules_old` is not mistaken for an install.
+- A module with no package.json above it.
+- A module whose nearest manifest does not parse, or parses to anything but an object.
+- A module whose nearest manifest does not declare a `name`.
 
-`reached()` answers every installed package the build touched, keyed by directory so two copies of
-one name are two entries. From the graph, not from a manifest: a manifest names what was asked for,
-including what the bundler dropped, and misses what arrived through something else — `scheduler`
-comes in through React and appears in no application's manifest.
-
-| Field       | Holds                                            |
-| ----------- | ------------------------------------------------ |
-| `at`        | The package's own directory, absolute            |
-| `named`     | Its name                                         |
-| `manifest`  | Its `package.json`                               |
-| `dependsOn` | The directories of the packages it imported from |
-
-A module with no manifest above it is passed over, as is anything outside `node_modules` — the
-repository's own source is the thing being described rather than a component of it.
-
-## Exports
-
-| Export       | What it does                                                |
-| ------------ | ----------------------------------------------------------- |
-| `plugin`     | States a plugin, with the build handed over as an argument  |
-| `reached`    | Every installed package the build reached                   |
-| `owning`     | The directory of the package a file belongs to              |
-| `manifestAt` | Reads a manifest, answering nothing where it cannot be read |
-| `licensed`   | The licence files a package ships, as text                  |
-| `text`       | Reads one text field out of a manifest                      |
-
-Types: `Bundling`, `Licensed`, `Manifest`, `Plugin`, `Reached`, `Stated`.
+Every reader here answers undefined, or an empty result, where the file system refuses. One
+dependency with an unreadable manifest costs the crawl an entry and never fails the build.
 
 ## Licence
 
-MIT
+MIT. See [LICENSE](LICENSE).

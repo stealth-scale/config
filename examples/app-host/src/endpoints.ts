@@ -1,29 +1,36 @@
 /**
- * Where the applications this one loads are deployed, worked out while it is running.
+ * Discovers where the applications this host loads are deployed, while it is running.
+ *
+ * @remarks
+ *   A URL compiled into a bundle pins that bundle to one environment, so promoting it means
+ *   building again and shipping an artefact nobody tested. Reading the URLs at startup instead
+ *   leaves the artefact the same in every environment, and only the file served beside it differs.
  */
 
 import { registerRemotes } from "@module-federation/runtime";
 
 /**
- * Where one application is deployed.
+ * Locates one application a host may load.
  */
 export interface Endpoint {
   /**
-   * The URL its entry is served from.
+   * The URL the browser fetches the application's entry module from.
    */
   entry: string;
 
   /**
-   * The name this application imports it under.
+   * The name the bundler resolved this application's imports against.
    */
   name: string;
 }
 
 /**
- * Reads an endpoint out of whatever the deployment answered with.
+ * Accepts an entry that carries both a name and a URL, and rejects every other shape.
  *
- * @param held - One entry of the answer.
- * @returns The endpoint, or nothing where it is not one.
+ * @remarks
+ *   The deployment serves this file and the build never sees it, so nothing guarantees its
+ *   contents. A half-formed entry is dropped rather than registered, because a registration
+ *   holding undefined fails much later at an import that never mentions the file.
  */
 function endpoint(held: unknown): Endpoint | undefined {
   if (typeof held !== "object" || held === null) return undefined;
@@ -35,19 +42,15 @@ function endpoint(held: unknown): Endpoint | undefined {
 }
 
 /**
- * Reads where the other applications are from a file the deployment serves.
+ * Fetches the file a deployment serves beside this application and lists the endpoints it names.
  *
- * This is the answer to a question the build cannot have: a URL compiled into the bundle is a build
- * that only runs in the environment it was built for, so promoting it from staging to production
- * means building it again and shipping an artefact nobody tested. Fetched instead, the same bundle
- * reads a different file in each environment and the artefact is the one that was tested.
- *
- * Served from this application's own origin, so it needs no configuration to find and no
- * cross-origin request to read.
- *
- * @param from - Where the deployment serves the file, relative to this application.
- * @returns Every endpoint it named, and nothing for an entry that is not one.
- * @throws Error Where the file is missing, which means the deployment is incomplete.
+ * @remarks
+ *   An empty result covers three cases a caller cannot tell apart: a file naming nothing, a file
+ *   holding something other than an array, and a file whose every entry was half-formed. A file
+ *   the deployment does not serve at all is the one case that raises.
+ * @param from - Where the deployment serves the file, resolved against this application's origin.
+ * @returns Each endpoint the file names, in the order it named them.
+ * @throws {@link Error} When the deployment answers the request with anything but a success status.
  */
 export async function endpoints(from: string): Promise<readonly Endpoint[]> {
   const answered = await fetch(from);
@@ -67,17 +70,13 @@ export async function endpoints(from: string): Promise<readonly Endpoint[]> {
 }
 
 /**
- * Tells the federation runtime where those applications are.
+ * Points each name the build declared at the URL the deployment serves it from.
  *
- * Forced, because each of these names is already registered: the build declared it, with whatever
- * URL a developer's machine serves. That default is what this replaces, and replacing it is the
- * whole point — the artefact was built once and this is the only thing that differs between the
- * environments it is promoted through.
- *
- * Called before anything imports from one. A module imported from a remote whose URL has not been
- * replaced yet is fetched from the default, which on a deployment is a machine that is not there.
- *
- * @param held - The endpoints to register.
+ * @remarks
+ *   Every one of these names is registered already, with whatever URL the build defaulted to, and
+ *   this overwrites it. Nothing imports from a remote until that has happened, because an import
+ *   reached first is fetched from the default, which on a deployment is a machine that is not
+ *   there.
  */
 export function join(held: readonly Endpoint[]): void {
   registerRemotes(

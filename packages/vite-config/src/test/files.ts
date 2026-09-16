@@ -1,5 +1,5 @@
 /**
- * Which files hold tests.
+ * Which files the runner collects as tests, and where it does not look.
  */
 
 import { type Preset, preset } from "@stealthscale/vite-config-core";
@@ -7,18 +7,17 @@ import { type Preset, preset } from "@stealthscale/vite-config-core";
 import { FOREIGN } from "#ignore/foreign.ts";
 
 /**
- * The one spelling a test file takes.
- *
- * The runner also reads `.test.`, and reading both means two conventions in one repository and no
- * way to tell which a file follows without opening it. One spelling, and the linter's relaxations
- * already name the same one.
+ * The one spelling of a test file this repository uses.
  */
 const TESTS = ["**/*.spec.{ts,tsx}"];
 
 /**
- * Looks for tests where this house writes them, and nowhere else.
+ * Collects the suite from files named .spec and from nowhere else.
  *
- * @returns The preset.
+ * @remarks
+ *   The runner recognises .test as well by default. Keeping one spelling means
+ *   nobody has to check which a package chose, at the price that a file named
+ *   .test is collected by nothing and reports no failure while doing it.
  */
 export function files(): Preset {
   return preset({

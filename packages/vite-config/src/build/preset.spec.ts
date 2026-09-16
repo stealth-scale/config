@@ -1,31 +1,33 @@
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { base, web } from "#build/preset.ts";
 
-test("emits hidden maps in every tier, output nobody can read being worth mapping anywhere", () => {
-  for (const tier of [base(), web()]) {
-    expect(tier.map((one) => one.name)).toContain("build.sourcemaps");
-  }
-});
+describe("preset", () => {
+  it("emits hidden maps in every tier", () => {
+    for (const tier of [base(), web()]) {
+      expect(tier.map((one) => one.name)).toContain("build.sourcemaps");
+    }
+  });
 
-test("says nothing about a page in the tier that says nothing about where it runs", () => {
-  const held = base()
-    .map((one) => one.name)
-    .join();
+  it("configures no page in the tier that is agnostic about where it runs", () => {
+    const held = base()
+      .map((one) => one.name)
+      .join();
 
-  expect(held).not.toContain("manifest");
-  expect(held).not.toContain("preload");
-  expect(held).not.toContain("chunks");
-});
+    expect(held).not.toContain("manifest");
+    expect(held).not.toContain("preload");
+    expect(held).not.toContain("chunks");
+  });
 
-test("writes a manifest, drops the polyfill and gathers the first load where there is a page", () => {
-  const held = web().map((one) => one.name);
+  it("writes a manifest and drops the polyfill where there is a page", () => {
+    const held = web().map((one) => one.name);
 
-  expect(held).toContain("build.manifest");
-  expect(held).toContain("build.preload");
-  expect(held).toContain("build.chunks");
-});
+    expect(held).toContain("build.manifest");
+    expect(held).toContain("build.preload");
+    expect(held).toContain("build.chunks");
+  });
 
-test("says who to credit for what it is made of, wherever it is deployed", () => {
-  expect(web().map((one) => one.name)).toContain("build.licences");
+  it("records who to credit for what the bundle is made of", () => {
+    expect(web().map((one) => one.name)).toContain("build.licences");
+  });
 });

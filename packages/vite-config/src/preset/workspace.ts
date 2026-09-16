@@ -1,29 +1,32 @@
 /**
- * What a workspace states once, at its root, on behalf of every package below it.
+ * Configures the root of a repository rather than a package inside it.
  */
 
-import { type Extendable } from "@stealthscale/vite-config-core";
+import { configuring, type Defining, type Extendable } from "@stealthscale/vite-config-core";
 
+import { layers as node } from "#preset/node.ts";
 import * as run from "#run/index.ts";
 import * as staged from "#staged/index.ts";
 import * as test from "#test/index.ts";
 
 /**
- * The layers a root config states rather than a package.
+ * Lists the node tier plus everything only a workspace root gets to declare.
  *
- * Each of these is read from the root and nowhere else. The task runner's cache and its continuous
- * integration settings describe the whole tree; what happens to a file before it is committed is
- * arranged once per repository, because there is one hook; and the list of projects is what the
- * root has instead of tests of its own.
- *
- * Neither a tier nor part of one. A root config is not a package — nothing to pack, nothing to
- * build, no tests of its own — so it takes this rather than `base`, `node` or `web`.
- *
- * Unowned, unlike what a framework package hands over. These are the toolchain's own layers under
- * their own names, so a repository takes one back by the name it already knows.
- *
- * @returns Each layer a root config needs, in the order they compose.
+ * @remarks
+ *   A task table, a commit hook and the project list are read once for the
+ *   whole tree. Declaring any of the three inside a package has every package
+ *   repeat it while the runner reads the root's copy regardless.
  */
-export function workspace(): readonly Extendable[] {
-  return [run.cache(), run.ci(), staged.checked(), staged.formatted(), test.projects()];
+export function layers(): readonly Extendable[] {
+  return [...node(), run.cache(), run.ci(), staged.checked(), staged.formatted(), test.projects()];
 }
+
+/**
+ * Composes the Vite configuration a repository root is defined with.
+ *
+ * @remarks
+ *   Every layer reaching this tier carries an unowned name, with no path in it.
+ *   A repository can therefore remove one by the name it reads in the
+ *   configuration rather than by guessing which package minted it.
+ */
+export const defineConfig: Defining = configuring(layers);

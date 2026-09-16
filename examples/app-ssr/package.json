@@ -2,7 +2,8 @@
   "name": "@stealthscale/example-app-ssr",
   "version": "0.0.0",
   "private": true,
-  "description": "An app rendered on a server before it reaches a browser, which is where externalising a dependency starts to matter.",
+  "description": "Renders markup on a server and hydrates it in a browser.",
+  "license": "MIT",
   "type": "module",
   "imports": {
     "#*": "./src/*"
@@ -28,6 +29,7 @@
     "happy-dom": "catalog:",
     "oxc-transform-react": "catalog:",
     "typescript": "catalog:",
-    "vite-plus": "catalog:"
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
   }
 }

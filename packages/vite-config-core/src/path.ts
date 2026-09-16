@@ -1,39 +1,36 @@
 /**
- * Reaching into a config by a dotted path, without mutating what was there.
+ * Grows a list buried in a config without knowing what the config holds.
  *
- * A contribution names the list it appends to as text — `lint.overrides`, `test.setupFiles` —
- * because the package contributing it and the package owning that list are not the same one, and a
- * path is the smallest thing the two have to agree on.
+ * @remarks
+ *   A contribution names its target as a dotted path, so this file is the only
+ *   place a Vite key is reached by string rather than by property.
  */
 
 /**
- * Holds an object being walked, whatever its declared shape.
+ * An object this file is willing to walk into.
  */
 type Held = Record<string, unknown>;
 
 /**
- * Answers whether a value is a plain object that can be walked into.
+ * Reports whether a value can be stepped into on the way to the list.
  *
- * @param value - The value found at a path.
- * @returns Whether it holds keys.
+ * @remarks
+ *   An array fails the check although it is an object, because a path stepping
+ *   through one would index it by a name rather than a number.
  */
 function walkable(value: unknown): value is Held {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 /**
- * Appends an item to the list at a path, making the list and everything above it where absent.
+ * Copies an object with one item added to the list at a dotted path.
  *
- * Answers the type it was handed, so a config goes in and a config comes out and no caller has to
- * assert its way back. Copies only along the path walked: everything else is the object that was
- * handed in, which keeps a config that is mostly untouched from being rebuilt once per
- * contribution.
- *
- * @typeParam Of - The shape being appended into.
- * @param held - The object to append into.
- * @param path - The dotted path of the list.
- * @param item - The value to append.
- * @returns A copy holding the longer list.
+ * @remarks
+ *   The path is a run of property names separated by dots, such as
+ *   `test.setupFiles`, which leaves a property whose own name holds a dot out
+ *   of reach. Every level along it is copied and everything beside it is
+ *   carried over by reference, a missing level is created, and anything at the
+ *   end that is not an array is thrown away for a list holding the one item.
  */
 export function appended<Of extends object>(held: Of, path: string, item: unknown): Of {
   const dot = path.indexOf(".");

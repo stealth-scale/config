@@ -21,10 +21,8 @@ coverage
 
 # Editor directories and files
 .vscode/*
-!.vscode/settings.json
-!.vscode/extensions.json
 .idea/*
-!.idea/OxfmtSettings.xml
+.zed/*
 .DS_Store
 *.suo
 *.ntvs*

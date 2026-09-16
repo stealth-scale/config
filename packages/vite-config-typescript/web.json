@@ -1,9 +1,9 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "_comment": "What a package the browser runs compiles under: the base, plus the document. Node's globals stay absent, so a package reaching for `process.env` is told here rather than at run time in somebody's browser. It names the same set the lint configuration calls `web`.",
+  "_comment": "What a package the browser runs compiles under: the base, plus the document. It names the same set the lint configuration calls `web`. The toolchain's types reference node's, so node's globals are visible to the compiler here as well; the environment this file adds is the document, not the absence of node.",
   "extends": "./base.json",
   "compilerOptions": {
     "lib": ["es2023", "dom", "dom.iterable"],
-    "types": ["vite/client"]
+    "types": ["vite-plus", "vite/client"]
   }
 }

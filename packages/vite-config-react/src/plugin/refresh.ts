@@ -1,5 +1,5 @@
 /**
- * The plugin that compiles JSX and reloads a component without losing what it was holding.
+ * Configures the React plugin that compiles JSX and refreshes a component in place.
  */
 
 import react, { type Options } from "@vitejs/plugin-react";
@@ -7,90 +7,61 @@ import react, { type Options } from "@vitejs/plugin-react";
 import { contribute, type Contribution } from "@stealthscale/vite-config";
 
 /**
- * Where a contribution to the list of plugins lands.
+ * The configuration key the plugin joins.
  */
 const AT = "plugins";
 
 /**
- * The files the plugin compiles before anything is added to them.
- *
- * Markdown that renders is included because it becomes JSX before it reaches here, and a transform
- * that skipped it would leave the one file kind whose whole point is rendering uncompiled. It needs
- * a plugin ahead of this one to do that conversion; without one, the first such file fails rather
- * than silently shipping unrendered.
+ * The file kinds the transform reads, covering both TypeScript and markdown that renders.
  */
 const COMPILED = [/\.[tj]sx?$/u, /\.mdx$/u];
 
 /**
- * The files it leaves alone before anything is added to them.
- *
- * Kept first wherever more are added, because a dependency compiled a second time is the one
- * exclusion nobody means to drop.
+ * The path a dependency is installed under, left uncompiled because it ships compiled already.
  */
 const UNTOUCHED = /\/node_modules\//u;
 
 /**
- * The runtime the JSX factory is imported from, exported so a specification can hold the tsconfig
- * to the same answer.
- *
- * Not an argument on its own: this is the same string the tsconfig this package ships puts in
- * `jsxImportSource`, and the two have to agree or a file compiles against one factory and
- * type-checks against another. A repository changing it changes both, which is what `from` is for.
+ * The package the JSX factory is imported from unless a caller names another one.
  */
 export const FACTORY = "react";
 
 /**
- * Describes what a repository knows about its own files that this package cannot.
+ * Widens or narrows the transform a package inherits.
+ *
+ * @remarks
+ *   Every field widens or narrows a default rather than replacing it, so a caller setting one
+ *   keeps the behaviour of the rest. A field left undefined takes the value this package ships.
  */
 export interface Refreshed {
   /**
-   * The files to compile beyond the TypeScript and JavaScript ones.
-   *
-   * Added to the default rather than replacing it, so asking for `.mdx` does not quietly stop
-   * `.tsx` being compiled.
+   * Extra file kinds to compile, added after the ones compiled by default.
    */
   also?: readonly RegExp[];
 
   /**
-   * Auto-memoises with the React Compiler.
-   *
-   * On, which is not the plugin's own default. The compiler decides what a component recomputes,
-   * and a build with it is a different program from one without — so the house builds one of them
-   * and tests that one, rather than shipping the memoised build and testing the other.
-   *
-   * Turned off for a package the compiler cannot reason about: it refuses a component that breaks
-   * the rules of React rather than compiling it wrongly, and a package with such a component says
-   * so here while it is being fixed.
+   * Lets the React compiler memoise a component, which it does unless this is false.
    */
   compiler?: boolean;
 
   /**
-   * The files to leave alone beyond the dependencies.
-   *
-   * A worker, or JSX belonging to another framework. Added to the default, which keeps a dependency
-   * from being compiled twice.
+   * Extra paths to leave alone, added after the dependency directory.
    */
   except?: readonly RegExp[];
 
   /**
-   * Where the JSX factory is imported from, for a repository that renders through something else.
-   *
-   * The tsconfig has to say the same thing in `jsxImportSource`. Nothing here can check a
-   * repository's tsconfig, so the two are stated together or not at all.
+   * The package the automatic runtime imports the JSX factory from.
    */
   from?: string;
 }
 
 /**
- * Works out what to hand the plugin.
+ * Fills in what a caller left out and hands the result to the React plugin.
  *
- * Kept apart from building the plugin so that what a repository asked for can be read back and
- * checked. Every list starts from the answer the plugin would have reached on its own, because both
- * of them replace rather than extend: asking for one more file to compile would otherwise stop the
- * rest being compiled.
- *
- * @param stated - The repository's own answers about its files.
- * @returns The options, as the plugin takes them.
+ * @remarks
+ *   The automatic runtime imports the factory itself, so no file under this transform needs React
+ *   in scope. The shipped `web.json` sets the same factory for the type checker, and a caller
+ *   changing `from` here has to change the tsconfig with it or the two disagree.
  */
 export function options(stated: Refreshed): Options {
   return {
@@ -103,27 +74,19 @@ export function options(stated: Refreshed): Options {
 }
 
 /**
- * Compiles JSX, and reloads a component in place while it is being worked on.
+ * Adds the React plugin to whatever plugins a tier already built.
  *
- * Contributed rather than set, because a repository's plugins are a list several modules add to and
- * setting the key would take away whatever the others put there. It arrives in the order it was
- * written, which is the order the plugins run in.
- *
- * The transform is Oxc's, the same compiler the linter and the formatter use, so a file is parsed
- * by one thing rather than three. The React Compiler is on, so what a component recomputes is
- * decided by the compiler rather than by hand. The runtime is the automatic one and is not an
- * argument: the tsconfig this package ships compiles against it, and the rule asking for `React` in
- * scope is turned off on the strength of it. Three things agree, and a repository wanting the
- * classic runtime is changing all three rather than passing an option.
- *
- * @param stated - The repository's own answers about its files. `Refreshed` documents every member.
- * @returns The contribution the bundler runs the plugin from.
+ * @remarks
+ *   The plugin is constructed when this call runs, not when the configuration resolves, so two
+ *   calls produce two independent plugin instances.
+ * @param stated - The parts of the transform to change. Omitting it compiles a TypeScript package
+ *   rendering through React itself.
  */
 export function refresh(stated: Refreshed = {}): Contribution {
   return contribute({
     at: AT,
     because: "a package that renders has to compile JSX before anything can run it",
     item: react(options(stated)),
-    name: "react.refresh",
+    name: "react.plugin.refresh",
   });
 }

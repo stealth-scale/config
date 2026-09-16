@@ -1,5 +1,10 @@
 /**
- * Reading the entry points a package's own manifest says it publishes.
+ * Derives what the packer builds from what the manifest says the package publishes.
+ *
+ * @remarks
+ *   The manifest is the one statement of a package's public surface, because it is the file a
+ *   resolver reads. Deriving the build from it means a subpath cannot be published without being
+ *   built, or built without being published.
  */
 
 import { type Context, type Preset, preset } from "@stealthscale/vite-config-core";
@@ -7,26 +12,29 @@ import { type Context, type Preset, preset } from "@stealthscale/vite-config-cor
 import { SOURCE } from "#resolve/condition.ts";
 
 /**
- * What the packer builds the root subpath under.
+ * Stands in for the root subpath, which is spelled with a character no file can be named after.
  */
 const ROOT = "index";
 
 /**
- * Strips the leading marker a manifest puts on every path it names.
+ * Drops the leading marker a manifest spells a relative path with.
  *
- * @param path - The path as the manifest spells it.
- * @returns The path relative to the package.
+ * @remarks
+ *   A manifest writes `./src/index.ts` and the packer's entry map wants `src/index.ts`. A path
+ *   already written without the marker is returned unchanged, so a manifest may use either.
  */
 function within(path: string): string {
   return path.startsWith("./") ? path.slice(2) : path;
 }
 
 /**
- * Reads the export map of the package being configured.
+ * Hands back the export map to build from, or nothing at all for a workspace root.
  *
- * @param context - The command, the mode and the repository around them.
- * @returns The map, or nothing where a workspace root is what is being configured.
- * @throws Error Where the manifest declares no exports.
+ * @remarks
+ *   The root configuration is extended by every package under it, and the root itself publishes
+ *   nothing. Separating that case from a missing export map is what lets the missing one be an
+ *   error.
+ * @throws {@link Error} When a package below the root declares no exports.
  */
 function exported(context: Context): Readonly<Record<string, unknown>> | undefined {
   if (context.at === context.root) return undefined;
@@ -45,29 +53,14 @@ function exported(context: Context): Readonly<Record<string, unknown>> | undefin
 }
 
 /**
- * Builds whatever the package's own manifest says it publishes.
+ * Builds one entry per subpath whose conditions name the source file behind it.
  *
- * The export map is the package's public surface, and it is already written down: the resolver
- * reads it, `publint` checks it, and a consumer's import fails against it. Stating the same surface
- * again in a config is a second place for it to be wrong, and the way it goes wrong is a subpath
- * that resolves for whoever wrote it and for nobody else.
- *
- * The packer will not read it. Its entry is a config field, and given none it builds `src/index.ts`
- * alone — so a package that had grown three subpaths would publish one and report success. This
- * reads the map instead and hands the packer what it found, keyed by the subpath each was found
- * under, so where a source file sits decides nothing about what a consumer imports.
- *
- * That the packer then rewrites the map from those entries is what makes the pair hold: it lands on
- * what it was given. A subpath is added by writing it into the manifest, beside the ones already
- * there, in the file a consumer will read it from.
- *
- * Part of the tier rather than something a package states, so the entry list is read from the one
- * file that already holds it wherever a package publishes at all. It states nothing where the
- * workspace root is what is being configured: a root publishes nothing, and a package with no
- * config of its own is read through the root's, so refusing there would refuse the package too.
- *
- * @returns The preset.
- * @throws Error Where a package's manifest declares no exports, or none the packer could build.
+ * @remarks
+ *   A subpath pointing straight at a shipped file, such as a hand-written declaration or a
+ *   stylesheet, has no source to build and is passed over. The `pack.carry` layer is what puts
+ *   those back into the published export map afterwards.
+ * @throws {@link Error} When the manifest declares no exports, or declares not one subpath naming
+ *   a source file.
  */
 export function published(): Preset {
   return preset({

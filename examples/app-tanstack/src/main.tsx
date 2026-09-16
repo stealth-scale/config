@@ -1,5 +1,10 @@
 /**
- * What the page runs once it has loaded.
+ * Starts the routed application in the browser.
+ *
+ * @remarks
+ *   The reload watch is set up before the router exists, because a route the visitor reaches first
+ *   can be the one whose chunk has gone. A document without the root element is served as the
+ *   build wrote it and no route is ever matched.
  */
 
 import { createRoot } from "react-dom/client";
@@ -9,8 +14,6 @@ import { RouterProvider } from "@tanstack/react-router";
 import { routed } from "#routes.tsx";
 import { watching } from "#stale.ts";
 
-// The other application is deployed on its own schedule, so the chunks a route was told about can
-// be gone by the time somebody navigates to it.
 watching({
   held: sessionStorage,
   reload: () => {
@@ -19,7 +22,7 @@ watching({
 });
 
 /**
- * Where this application draws.
+ * The element the application is drawn into.
  */
 const root = document.querySelector("#root");
 

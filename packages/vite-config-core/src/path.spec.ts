@@ -1,30 +1,42 @@
-import { expect, test } from "vite-plus/test";
+/**
+ * Covers what a dotted path grows, creates and replaces on the way to a list.
+ */
+
+import { describe, expect, it } from "vitest";
 
 import { appended } from "#path.ts";
 
-test("appends to a list that is already there", () => {
-  expect(appended({ test: { setupFiles: ["./a.ts"] } }, "test.setupFiles", "./b.ts")).toEqual({
-    test: { setupFiles: ["./a.ts", "./b.ts"] },
+describe("path", () => {
+  it("appends to a list that is already there", () => {
+    expect(
+      appended({ test: { setupFiles: ["./a.ts"] } }, "test.setupFiles", "./b.ts"),
+    ).toStrictEqual({
+      test: { setupFiles: ["./a.ts", "./b.ts"] },
+    });
   });
-});
 
-test("makes the list, and everything above it, where absent", () => {
-  expect(appended({}, "test.setupFiles", "./a.ts")).toEqual({ test: { setupFiles: ["./a.ts"] } });
-});
-
-test("leaves what it did not walk untouched, so a config is not rebuilt per contribution", () => {
-  const untouched = { environment: "node" };
-  const held = appended({ lint: {}, test: untouched }, "lint.layers", "one");
-
-  expect(held["test"]).toBe(untouched);
-});
-
-test("replaces what is at the path where it is not a list, rather than walking into it", () => {
-  expect(appended({ test: { setupFiles: "./a.ts" } }, "test.setupFiles", "./b.ts")).toEqual({
-    test: { setupFiles: ["./b.ts"] },
+  it("creates the array and every level above it when absent", () => {
+    expect(appended({}, "test.setupFiles", "./a.ts")).toStrictEqual({
+      test: { setupFiles: ["./a.ts"] },
+    });
   });
-});
 
-test("appends at the top where the path names one step and no deeper", () => {
-  expect(appended({}, "plugins", "one")).toEqual({ plugins: ["one"] });
+  it("leaves what it did not walk untouched", () => {
+    const untouched = { environment: "node" };
+    const held = appended({ lint: {}, test: untouched }, "lint.layers", "one");
+
+    expect(held["test"]).toBe(untouched);
+  });
+
+  it("replaces the value at the path when it is not an array", () => {
+    expect(appended({ test: { setupFiles: "./a.ts" } }, "test.setupFiles", "./b.ts")).toStrictEqual(
+      {
+        test: { setupFiles: ["./b.ts"] },
+      },
+    );
+  });
+
+  it("appends at the top when the path names one step", () => {
+    expect(appended({}, "plugins", "one")).toStrictEqual({ plugins: ["one"] });
+  });
 });

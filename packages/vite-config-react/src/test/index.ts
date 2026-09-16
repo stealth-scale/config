@@ -1,5 +1,5 @@
 /**
- * The `test` block, as a package that renders needs it.
+ * Gathers the testing block a package reaches through `test`.
  */
 
 export { cleanup } from "#test/cleanup.ts";

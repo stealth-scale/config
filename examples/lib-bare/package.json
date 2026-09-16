@@ -2,7 +2,8 @@
   "name": "@stealthscale/example-lib-bare",
   "version": "0.0.0",
   "private": true,
-  "description": "A library with no config of its own, which takes the workspace root's and its entry from the command line.",
+  "description": "Packs a library that states no configuration of its own.",
+  "license": "MIT",
   "files": [
     "dist"
   ],
@@ -34,6 +35,7 @@
     "@stealthscale/vite-config-react": "workspace:^",
     "@stealthscale/vite-config-typescript": "workspace:^",
     "typescript": "catalog:",
-    "vite-plus": "catalog:"
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
   }
 }

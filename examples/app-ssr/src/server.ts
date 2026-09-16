@@ -1,5 +1,5 @@
 /**
- * What a server runs to turn the application into text.
+ * Joins the application's markup into the page the build produced.
  */
 
 import { createElement } from "react";
@@ -8,20 +8,19 @@ import { renderToString } from "react-dom/server";
 import { Summary } from "#summary.tsx";
 
 /**
- * What the page leaves for the rendered application to replace.
+ * The comment an index page carries where the application's markup belongs.
  */
 const SLOT = "<!--app-->";
 
 /**
- * Renders the application into the page a build produced.
+ * Puts the application's markup in place of the slot a page holds for it.
  *
- * The one entry a server build has. Everything it reaches is compiled into that build rather than
- * imported at run time, which is what `ssr.bundled` is for: the component library imports a
- * stylesheet, and node reaching an untransformed `import "./panel.css"` throws.
- *
- * @param page - The built page, as text.
- * @param subject - The thing to report on.
- * @returns The page with the application drawn into it.
+ * @remarks
+ *   A page with no slot in it comes back unchanged, so a build that dropped the comment serves an
+ *   empty shell and reports nothing.
+ * @param page - The built index page, holding the slot once.
+ * @param subject - Named in the rendered summary and read nowhere else.
+ * @returns The page with the markup where the slot stood.
  */
 export function rendered(page: string, subject: string): string {
   return page.replace(SLOT, renderToString(createElement(Summary, { subject })));

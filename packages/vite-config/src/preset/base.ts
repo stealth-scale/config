@@ -1,5 +1,5 @@
 /**
- * Configuring a package that publishes and says nothing about where it runs.
+ * Configures a published package that commits to no runtime.
  */
 
 import { configuring, type Defining, type Extendable } from "@stealthscale/vite-config-core";
@@ -10,22 +10,25 @@ import { house } from "#preset/house.ts";
 import * as test from "#test/index.ts";
 
 /**
- * The layers a package that reaches for neither node's globals nor the browser's is built on.
+ * Lists the layers a runtime-agnostic package is linted, packed and tested
+ * with.
  *
- * A package that publishes, which is what the `pack` layers are for. An application is the other
- * kind and reads `preset/app`: it is built rather than packed, and the two blocks do not overlap.
- *
- * Answered as a list as well as bound below, so that a config package for a framework composes
- * these with its own rather than sitting beside them. Sitting beside them is what lets a repository
- * pair the wrong tier with the right framework and lose half its rules without being told.
- *
- * @returns Each layer the tier is built on, in the order they compose.
+ * @remarks
+ *   No globals are declared, so neither a node built-in nor a browser API is in
+ *   scope without an import. A package that reaches for either compiles here
+ *   and fails in whatever consumes it, which is the reason to move it to the
+ *   node or web tier rather than to widen this one.
  */
 export function layers(): readonly Extendable[] {
   return [...house(), lint.preset.base(), pack.preset.base(), test.preset.base()];
 }
 
 /**
- * Composes a config for a package that reaches for neither node's globals nor the browser's.
+ * Composes the Vite configuration of a package that names no runtime.
+ *
+ * @remarks
+ *   A repository's own keys are merged over the layers, so departing from a
+ *   house decision means writing the key rather than removing the layer that
+ *   set it.
  */
 export const defineConfig: Defining = configuring(layers);

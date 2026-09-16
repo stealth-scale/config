@@ -1,20 +1,11 @@
 /**
- * The headers a preview answers with, which a dev server has no reason to.
+ * Sends the response headers a preview server shares with a deployment.
  */
 
 import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
- * What a build is served with, so a preview answers the way a deployment will.
- *
- * None of these change what the application does; each one narrows what a browser will let a page
- * do to it. They are here rather than in the dev server because a dev server is reached from one
- * machine by one person, while a preview is the last thing between a build and a deployment — and a
- * header that was going to break something is cheaper to find here.
- *
- * What is deliberately absent is anything that needs a value only a deployment knows: a content
- * security policy names the origins an application actually talks to, and a strict transport header
- * is a promise about a domain. Both belong to whatever serves the build for real.
+ * The headers a preview server answers every request with.
  */
 const ANSWERED = {
   "Referrer-Policy": "strict-origin-when-cross-origin",
@@ -23,9 +14,16 @@ const ANSWERED = {
 };
 
 /**
- * Answers every request with the headers a deployment should answer with.
+ * Answers a preview request with the three headers that need no knowledge of a
+ * deployment.
  *
- * @returns The preset.
+ * @remarks
+ *   A Content-Security-Policy and an HSTS max-age both depend on the origin a
+ *   deployment runs at. Guessing either here gives a preview that passes and a
+ *   deployment that does not, so both are left to whoever knows the origin. The
+ *   table is copied into the layer, and a caller mutating the result reaches
+ *   its own copy.
+ * @returns A layer holding its own copy of the headers.
  */
 export function headers(): Preset {
   return preset({ config: { preview: { headers: { ...ANSWERED } } }, name: "preview.headers" });

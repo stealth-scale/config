@@ -1,28 +1,14 @@
-// Plain Vite+ configuration, naming no stealth package. Every other package here is configured by
-// layers, and the layers are in this one — config-vite resolves the kernel by name, so the kernel is
-// packed first and has nothing to compose itself out of. What the tiers would have stated is
-// therefore written out below, and a change to either has to be made in both places.
-import { defineConfig } from "vite-plus";
+/**
+ * Packs this package under the settings the plain tier states.
+ *
+ * @remarks
+ *   Every tier is built on this package, so composing one here would have the
+ *   package configure itself. The tier's bare config goes to Vite directly
+ *   instead, with no layer involved.
+ */
 
-export default defineConfig({
-  pack: {
-    attw: true,
-    dts: true,
-    entry: { index: "src/index.ts" },
-    exports: { devExports: "stealth-source" },
-    publint: true,
-  },
+import { defineConfig } from "vite";
 
-  test: {
-    clearMocks: true,
-    exclude: ["**/node_modules/**", "**/dist/**", "**/coverage/**"],
-    expandSnapshotDiff: true,
-    expect: { requireAssertions: true },
-    globals: false,
-    include: ["**/*.spec.ts"],
-    restoreMocks: true,
-    sequence: { shuffle: true },
-    unstubEnvs: true,
-    unstubGlobals: true,
-  },
-});
+import { plain } from "@stealthscale/vite-config-plain";
+
+export default defineConfig(plain);

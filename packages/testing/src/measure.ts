@@ -1,48 +1,50 @@
 /**
- * Reads geometry off a rendered element, so a specification asserts what a reader would see rather
- * than what a class name promises.
+ * Reads geometry out of a CSS length and off a laid-out element.
+ *
+ * @remarks
+ *   A jsdom element reports every rectangle as zero, so a spec running there measures a stub of its
+ *   own rather than the element it rendered. Only a browser run gives real numbers.
  */
 
 /**
- * Describes the box a measurement reads: the two inline edges of a rendered element.
+ * The horizontal edges of a rectangle, in CSS pixels.
+ *
+ * @remarks
+ *   A DOMRect satisfies this and is accepted unchanged. The vertical edges are absent because
+ *   nothing here reads them, not because an element lacks them.
  */
 export interface Box {
   /**
-   * Holds the distance from the viewport's left edge to the element's, in pixels.
+   * Where the rectangle begins, measured from the left of the viewport.
    */
   left: number;
 
   /**
-   * Holds the distance from the viewport's left edge to the element's right edge, in pixels.
+   * Where the rectangle ends, measured from the left of the viewport.
    */
   right: number;
 }
 
 /**
- * Names what a measurement needs of an element: its box, and nothing else.
+ * Reports the rectangle it occupies when asked for one.
  *
- * Structural rather than `Element`, for two reasons. This package compiles without the DOM library,
- * and a specification states the boxes it is measuring instead of laying out a document, which
- * jsdom reports as zero anyway. A real element satisfies it, because `DOMRect` carries both edges.
+ * @remarks
+ *   The shape is structural, so a DOM element satisfies it without a cast and a plain object with
+ *   two fixed numbers stands in for one in a spec.
  */
 export interface Measured {
   /**
-   * Reads the element's box.
-   *
-   * @returns The box the element currently occupies.
+   * Returns the rectangle the thing occupies at the moment of the call.
    */
   getBoundingClientRect: () => Box;
 }
 
 /**
- * Reads a CSS length as a number.
+ * Reads the number in front of a CSS unit, and returns 0 where there is no number to read.
  *
- * `getComputedStyle` answers in `px` strings. A comparison against `NaN` is false rather than loud,
- * so a measurement that failed to parse would pass while measuring nothing. The conversion lives
- * here once, and a length with no number in it reads as `0`.
- *
- * @param length - A computed length, with its unit.
- * @returns The number in front of the unit. `0` for a length with no number.
+ * @remarks
+ *   Reading stops at the first character that cannot continue a number, so `16px` gives 16 and
+ *   `auto` gives 0. A caller cannot tell a measured zero from a length this failed to read.
  */
 export function pixels(length: string): number {
   // eslint-disable-next-line unicorn/prefer-number-coercion -- `Number('16px')` is NaN
@@ -51,15 +53,13 @@ export function pixels(length: string): number {
 }
 
 /**
- * Measures how far apart two elements sit in the inline direction.
+ * Measures how far the second element's left edge sits from the first element's right edge.
  *
- * Zero means flush: a shared border rather than a gap, which is the claim a segmented control
- * makes. Reading it from the boxes rather than from a class catches the day the rounding and the
- * border stop agreeing.
- *
- * @param first - The left-hand element in a row.
- * @param second - The element after it.
- * @returns The gap between them, in pixels. Never negative.
+ * @remarks
+ *   The distance carries no sign. Two elements overlapping by 8 pixels and two separated by 8
+ *   pixels both measure 8, so a caller that has to know which of the two it has compares the edges
+ *   itself.
+ * @returns The distance in CSS pixels, and 0 when the two elements share an edge.
  */
 export function seamBetween(first: Measured, second: Measured): number {
   return Math.abs(second.getBoundingClientRect().left - first.getBoundingClientRect().right);

@@ -1,13 +1,22 @@
+/**
+ * Configures the example application that renders on a server and hydrates in a browser.
+ *
+ * @remarks
+ *   The shared component library imports its own stylesheet, and node cannot load
+ *   `import "./panel.css"`. Naming it for bundling changes nothing while the package is linked,
+ *   because the builder bundles a linked package either way, and it keeps the server pass working
+ *   once that package arrives from a registry instead.
+ */
+
 import { preview, server, ssr } from "@stealthscale/vite-config";
-import { defineConfig } from "@stealthscale/vite-config-react/preset/app";
+import * as react from "@stealthscale/vite-config-react";
+import { defineConfig } from "@stealthscale/vite-config/preset/app";
 
 export default defineConfig(import.meta.dirname, {
   extends: [
-    // The component library imports its own stylesheet, and `import "./panel.css"` is not something
-    // node can load. While the package is linked the builder bundles it anyway, so this changes
-    // nothing today; stated so that it keeps working once the same package is installed from a
-    // registry rather than linked, which is when nothing else marks it out.
-    ssr.bundled({
+    react.layers(),
+
+    ssr.bundle({
       because: "it imports its own stylesheet, which node has no way to load",
       deps: ["@stealthscale/example-lib-ui"],
     }),

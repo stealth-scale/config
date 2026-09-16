@@ -1,28 +1,35 @@
-import { expect, test } from "vite-plus/test";
+/**
+ * Proves the task types accept each form, and reject an uncached task naming
+ * inputs.
+ */
+
+import { describe, expect, it } from "vitest";
 
 import { type Doing, type Running } from "#run/settings.ts";
 
-test("takes a task written as nothing but its command", () => {
-  const held: Doing = "vp check";
+describe("settings", () => {
+  it("takes a task written as nothing but its command", () => {
+    const held: Doing = "vp check";
 
-  expect(held).toBe("vp check");
-});
+    expect(held).toBe("vp check");
+  });
 
-test("takes a task that says what it reads and what it leaves behind", () => {
-  const held: Doing = { command: "typedoc", input: ["src/**"], output: ["docs/**"] };
+  it("takes a task declaring its inputs and outputs", () => {
+    const held: Doing = { command: "typedoc", input: ["src/**"], output: ["docs/**"] };
 
-  expect(held).toHaveProperty("output");
-});
+    expect(held).toHaveProperty("output");
+  });
 
-test("refuses a task naming inputs while saying it is not cached", () => {
-  // @ts-expect-error -- a task that is not cached has nothing to fingerprint.
-  const held: Doing = { cache: false, command: "vp check", input: ["src/**"] };
+  it("throws for a task naming inputs while declaring it is not cached", () => {
+    // @ts-expect-error -- a task that is not cached has nothing to fingerprint.
+    const held: Doing = { cache: false, command: "vp check", input: ["src/**"] };
 
-  expect(held).toHaveProperty("cache");
-});
+    expect(held).toHaveProperty("cache");
+  });
 
-test("holds the cache, the tasks and the lifecycle a workspace states at its root", () => {
-  const held: Running = { cache: { scripts: true, tasks: true }, enablePrePostScripts: true };
+  it("holds the cache the tasks and the lifecycle a workspace declares at its root", () => {
+    const held: Running = { cache: { scripts: true, tasks: true }, enablePrePostScripts: true };
 
-  expect(held.cache).toBeDefined();
+    expect(held.cache).toBeDefined();
+  });
 });

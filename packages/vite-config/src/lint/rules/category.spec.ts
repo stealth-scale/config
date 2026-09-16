@@ -1,17 +1,23 @@
-import { expect, test } from "vite-plus/test";
+/**
+ * Specifies which linter categories are denied and which are left alone.
+ */
+
+import { describe, expect, it } from "vitest";
 
 import { CATEGORIES } from "#lint/rules/category.ts";
 
-test("denies the categories that name a defect", () => {
-  expect(CATEGORIES).toEqual({
-    correctness: "error",
-    pedantic: "error",
-    perf: "error",
-    suspicious: "error",
+describe("category", () => {
+  it("denies the categories that name a defect", () => {
+    expect(CATEGORIES).toStrictEqual({
+      correctness: "error",
+      pedantic: "error",
+      perf: "error",
+      suspicious: "error",
+    });
   });
-});
 
-test("leaves the categories that name a position, which a linter cannot settle", () => {
-  expect(CATEGORIES).not.toHaveProperty("restriction");
-  expect(CATEGORIES).not.toHaveProperty("style");
+  it("leaves the categories that name a position", () => {
+    expect(CATEGORIES).not.toHaveProperty("restriction");
+    expect(CATEGORIES).not.toHaveProperty("style");
+  });
 });

@@ -1,11 +1,17 @@
-import { expect, test } from "vite-plus/test";
+/**
+ * Proves the house supplier carries the entity a generated SBOM has to name.
+ */
+
+import { describe, expect, it } from "vitest";
 
 import { HOUSE } from "#sbom/supplier.ts";
 
-test("names the registered entity, which is the one that can be written to", () => {
-  expect(HOUSE.name).toBe("Stealth Scale B.V.");
-});
+describe("supplier", () => {
+  it("names the registered entity", () => {
+    expect(HOUSE.name).toBe("Stealth Scale B.V.");
+  });
 
-test("says where to read about it", () => {
-  expect(HOUSE.url).toContain("https://stealthscale.io");
+  it("gives the URL to read about it", () => {
+    expect(HOUSE.url).toContain("https://stealthscale.io");
+  });
 });

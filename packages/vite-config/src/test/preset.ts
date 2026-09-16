@@ -1,5 +1,5 @@
 /**
- * How a stealth package is tested.
+ * The tiers a package extends instead of naming every layer itself.
  */
 
 import { type Layer } from "@stealthscale/vite-config-core";
@@ -12,31 +12,34 @@ import { isolation } from "#test/isolation.ts";
 import { order } from "#test/order.ts";
 
 /**
- * What every package's tests are run under, wherever the package runs.
+ * Lists the layers every package gets, whatever it runs on.
  *
- * @returns The layers.
+ * @remarks
+ *   No environment is named, so a package extending this alone runs in whatever
+ *   the runner falls back to. The other two tiers each add one.
  */
 export function base(): readonly Layer[] {
   return [files(), isolation(), assertion(), order(), coverage()];
 }
 
 /**
- * What a package the console runs is tested under.
+ * Lists the layers a package that runs on the console gets.
  *
- * @returns The layers, with the runner's own environment.
+ * @remarks
+ *   The tests run in the runner's own process, so a test reaches the file
+ *   system and the network with no document standing between it and them.
  */
 export function node(): readonly Layer[] {
   return [...base(), environment("node")];
 }
 
 /**
- * What a package the browser runs is tested under.
+ * Lists the layers a package that renders into a document gets.
  *
- * A document rather than node's globals, so a component can be rendered and read back. `happy-dom`
- * over `jsdom` because it implements less and runs faster, and what it leaves out is the part a
- * component test rarely reaches.
- *
- * @returns The layers, with a document.
+ * @remarks
+ *   The document is happy-dom, which is JavaScript rather than a browser. A
+ *   test that depends on layout, on painting, or on how a real engine schedules
+ *   work belongs in a browser run instead.
  */
 export function web(): readonly Layer[] {
   return [...base(), environment("happy-dom")];

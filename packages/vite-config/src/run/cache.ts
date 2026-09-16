@@ -1,21 +1,17 @@
 /**
- * Remembering what a task produced, so it runs once per change rather than once per ask.
+ * Turns on the task runner's result cache for a whole repository.
  */
 
 import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
- * Caches every task and every script, keyed on what each one reads.
+ * Caches the result of a package script as readily as the result of a declared
+ * task.
  *
- * The runner caches the tasks a config names and leaves `package.json` scripts alone, which splits
- * a workspace in two: `vp run -r build` re-runs every package whose script has not changed, because
- * a script is not a task as far as the cache is concerned. A script is a task that happens to be
- * written somewhere else, and the runner fingerprints both the same way.
- *
- * Belongs in the workspace root's config and nowhere else. The runner refuses it in a package,
- * because a cache shared by every package cannot be configured by one of them.
- *
- * @returns The preset.
+ * @remarks
+ *   Scripts are included so that a package which never moved its build into the
+ *   task table still skips work it has already done. A task declaring no inputs
+ *   has nothing to fingerprint and runs every time whatever this layer says.
  */
 export function cache(): Preset {
   return preset({

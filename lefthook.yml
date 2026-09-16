@@ -1,0 +1,16 @@
+# What runs at a git hook.
+#
+# `pnpm prepare` runs `lefthook install`, which writes the hooks into `.git/hooks`. Each job runs
+# through `pnpm exec` because lefthook does not put `node_modules/.bin` on the PATH, and a job that
+# names a binary directly fails with `command not found` rather than with what it was checking.
+
+pre-commit:
+  parallel: true
+  jobs:
+    - name: staged
+      run: pnpm exec vp staged
+
+commit-msg:
+  jobs:
+    - name: commitlint
+      run: pnpm exec commitlint --edit {1}

@@ -2,7 +2,8 @@
   "name": "@stealthscale/example-lib-cli",
   "version": "0.0.0",
   "private": true,
-  "description": "A published library that installs a command, named for what it does rather than for the package.",
+  "description": "Adds up money amounts from the command line and exports the same function as a module.",
+  "license": "MIT",
   "bin": {
     "tally": "./src/bin/tally.ts"
   },
@@ -47,6 +48,7 @@
     "@stealthscale/vite-config-typescript": "workspace:^",
     "@types/node": "catalog:",
     "typescript": "catalog:",
-    "vite-plus": "catalog:"
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
   }
 }

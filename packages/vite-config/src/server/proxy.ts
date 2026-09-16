@@ -1,22 +1,19 @@
 /**
- * Forwarding one path to whatever is answering behind it.
+ * Forwards a request path from a development server to a back end.
  */
 
 import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
- * Forwards every request under a path to the origin answering behind it.
+ * Sends every request under a path prefix on to another origin.
  *
- * What an app talks to is the app's own knowledge, and one call states one route so that two
- * modules can each state theirs. Routes merge by path, so a later one replaces an earlier one
- * naming the same path and leaves the rest standing.
- *
- * A preview server reads its routes from the dev server's, so forwarding a path here forwards it in
- * both.
- *
- * @param path - The prefix every forwarded request starts with.
- * @param target - The origin to forward it to.
- * @returns The preset.
+ * @remarks
+ *   The layer is named for its path, so two modules each adding a route both
+ *   survive and two naming the same path resolve to the later one. Vite reads
+ *   the same table in a preview server, which receives the route without being
+ *   asked.
+ * @param path - The prefix to match, leading slash included.
+ * @param target - The origin to forward to, scheme included.
  */
 export function proxy(path: string, target: string): Preset {
   return preset({

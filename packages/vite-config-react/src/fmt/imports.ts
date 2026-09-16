@@ -1,27 +1,29 @@
 /**
- * Where a rendering file's framework imports sit.
+ * Gives React its own group in the import order the formatter writes.
  */
 
-import { fmt, type Override } from "@stealthscale/vite-config";
+import { fmt, named, type Override } from "@stealthscale/vite-config";
 
 /**
- * The modules that are React rather than a dependency that happens to be installed.
+ * The specifiers that sort into the React group, subpaths included.
  */
 const REACT = ["react", "react-dom", "react-dom/*", "react/*"];
 
 /**
- * Puts React at the top of every file that renders.
+ * Sorts React and its renderer into a group of their own, ahead of every other group.
  *
- * A file that renders is about rendering, so the framework reads first and everything else follows
- * it. The toolchain cannot state this on its own behalf: it would have to name React to do so, and
- * a configuration that names one framework is one no other framework can be added beside.
- *
- * @returns The override.
+ * @remarks
+ *   The group goes to the front of the order a tier already declared, so a reader opening a file
+ *   that renders sees the framework before the dependencies built on it. A configuration that
+ *   sorts no imports at all fails when this layer resolves rather than when it is built.
  */
 export function imports(): Override {
-  return fmt.group({
-    because: "a file that renders is about rendering, so its framework reads first",
-    name: "react",
-    patterns: REACT,
-  });
+  return named(
+    "react.fmt.imports",
+    fmt.group({
+      because: "a file that renders is about rendering, so its framework reads first",
+      name: "react",
+      patterns: REACT,
+    }),
+  );
 }

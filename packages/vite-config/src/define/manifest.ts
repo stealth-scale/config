@@ -1,55 +1,55 @@
 /**
- * The constants a package can read about itself.
+ * Compiles a package's own identity into its bundle as literal values.
+ *
+ * @remarks
+ *   Each constant is substituted textually at build time and costs nothing at
+ *   run time. A consumer types them against the declarations this package
+ *   publishes under its `./globals` subpath.
  */
 
 import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
- * Describes which constants a package wants beyond the two it always gets.
+ * Selects which constants are injected beyond the package name and version.
+ *
+ * @remarks
+ *   Both are off unless asked for. A timestamp and a revision each differ
+ *   between two builds of the same source, so a repository that needs a
+ *   reproducible build opts out by leaving them alone.
  */
 export interface Injected {
   /**
-   * Injects `__BUILT_AT__`, the moment the build ran, as an ISO 8601 string.
-   *
-   * Off by default, and worth leaving off. A timestamp differs on every run, so the output of two
-   * builds of the same source differs too — which defeats a build cache and makes a release
-   * impossible to reproduce byte for byte.
+   * Injects the moment the configuration was evaluated, as an ISO 8601 string.
    */
   builtAt?: boolean | undefined;
 
   /**
-   * Injects `__COMMIT__`, the revision the build ran against.
-   *
-   * Off by default because it is not always knowable: a build from a published tarball has no
-   * repository to ask, and the value is then the empty string.
+   * Injects the revision the build ran against, taken from the environment.
    */
   commit?: boolean | undefined;
 }
 
 /**
- * Reads the revision the build is running against.
+ * Reads the revision from whichever variable the runner happens to set.
  *
- * @param env - The variables in force, as `Context` carries them.
- * @returns The commit, or an empty string where there is no repository to ask.
+ * @remarks
+ *   GitHub Actions and GitLab CI spell the variable differently, and a
+ *   workstation sets neither. An unset environment yields an empty string rather
+ *   than an error, so building outside CI still works.
  */
 function commitOf(env: Readonly<Record<string, string>>): string {
   return env["GITHUB_SHA"] ?? env["CI_COMMIT_SHA"] ?? "";
 }
 
 /**
- * Injects what a package's own manifest says about it, as constants it can read at run time.
+ * Injects the package name and version, along with whatever else was asked for.
  *
- * `__NAME__` and `__VERSION__` come from the package's own manifest, which is the only copy of
- * either — so an error report, a cache key or a support question names a build without anybody
- * keeping a second version string in step with the first.
- *
- * These are substitutions rather than variables: the token is replaced wherever it appears,
- * including inside a string literal, which is why each is spelled unmistakably. The declarations
- * that make them type-check ship beside this package as `globals.d.ts`, and a specification asserts
- * the two lists agree.
- *
- * @param injected - The constants beyond the two always given. `Injected` documents every member.
- * @returns The preset.
+ * @remarks
+ *   The manifest comes from the context the composer supplies rather than from
+ *   disk, and a field the package omits becomes an empty string. Every value is
+ *   JSON-encoded, because the substitution replaces source text.
+ * @returns A preset whose name lists the optional constants, so two
+ *   configurations asking for different ones stay separately removable.
  */
 export function manifest(injected: Injected = {}): Preset {
   return preset({
@@ -66,6 +66,23 @@ export function manifest(injected: Injected = {}): Preset {
 
       return { define: held };
     },
-    name: "define.manifest",
+    name: `define.manifest${asked(injected)}`,
   });
+}
+
+/**
+ * Spells the chosen constants out as a suffix for the layer's name.
+ *
+ * @remarks
+ *   A layer is taken back by name, so two of them asking for different constants
+ *   have to end up with different names. Choosing none adds no suffix, leaving
+ *   the plain name a repository would guess at.
+ */
+function asked(injected: Injected): string {
+  const held = [
+    injected.commit === true ? "commit" : "",
+    injected.builtAt === true ? "builtAt" : "",
+  ].filter((one) => one !== "");
+
+  return held.length === 0 ? "" : `(${held.join(", ")})`;
 }

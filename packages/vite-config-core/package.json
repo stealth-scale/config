@@ -1,7 +1,7 @@
 {
   "name": "@stealthscale/vite-config-core",
   "version": "0.2.1",
-  "description": "What a layer is and how layers compose: four kinds, three passes, and the record of which one decided each value.",
+  "description": "Composes presets, contributions, removals and overrides into one Vite configuration.",
   "keywords": [
     "compose",
     "config",
@@ -49,15 +49,19 @@
     "test": "vp test"
   },
   "devDependencies": {
+    "@stealthscale/vite-config-plain": "workspace:^",
     "@stealthscale/vite-config-typescript": "workspace:^",
     "@types/node": "catalog:",
     "typescript": "catalog:",
-    "vite-plus": "catalog:"
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
   },
   "peerDependencies": {
-    "vite-plus": "catalog:"
+    "vite": "catalog:peer",
+    "vitest": "catalog:peer"
   },
   "engines": {
-    "node": ">=24.0.0"
+    "node": ">=26.0.0"
   }
 }

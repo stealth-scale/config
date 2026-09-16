@@ -1,125 +1,121 @@
 # @stealthscale/testing-react
 
-A kit, meaning a dev-time library another repository takes.
+`@stealthscale/testing-react` reads a rendered React component through the markings on its anatomy.
+A specification finds a piece of a component by the `data-part` name it is marked with, and reads
+its state from the data attributes beside it. A class name, the text and the shape of the tree all
+move under a restyling, so a specification reaching through any of those three fails on a change
+that broke nothing.
 
-Reads a rendered component in a specification, through the `data-part` marking each piece of its
-anatomy and the `data-` attributes carrying its state.
-
-It is a package of its own rather than an entry of `@stealthscale/testing`, because that one reads a
-workspace off the disk and a specification doing that should not have the document and the JSX
-runtime in scope to do it. One package compiles under one tsconfig, so the two surfaces are two
-packages.
+## Install
 
 ```bash
 pnpm add -D @stealthscale/testing-react
 ```
 
-## Why these handles
+The package peers on `@testing-library/react`, `react` and `vitest`. Install all three.
 
-A component reports what it is doing on `data-` attributes: `data-part="content"`,
-`data-state="open"`, `data-shape="circle"`. A restyling leaves those alone. A class name changes
-with the recipe, the text changes with the copy, and the shape of the tree changes whenever the
-library underneath is upgraded — so a specification reaching through any of the three fails on a
-change that broke nothing.
-
-## Reading
-
-```ts
-import { attr, only, part, parts, renderedAs, violations } from "@stealthscale/testing-react";
-
-const { container } = render(<Cropper cropShape="circle" />);
-
-attr(container, "root", "shape"); // "circle"
-renderedAs(container, "title"); // "H2"
-parts(container, "handle").length; // 8
-only(container); // the one element the render produced
-violations(Cropper); // [] where it keeps the component contract
-```
-
-| Export       | Answers                                       |
-| ------------ | --------------------------------------------- |
-| `part`       | The one element carrying a named part         |
-| `parts`      | Every element carrying it, as a list          |
-| `only`       | The single element a render produced          |
-| `attr`       | A `data-` attribute off a named part          |
-| `renderedAs` | The tag name a part rendered as               |
-| `violations` | The parts of the component contract it breaks |
-
-## The component contract
-
-A component in a design system is not only its own markup. A consumer puts a `className` on it,
-holds a `ref` to it, spreads an attribute onto it, and expects every one of those to reach the
-element that was rendered. None of it is what the component is for, all of it is what makes the
-component usable from the outside, and each is dropped the same way: by binding a recipe to an
-element and spreading nothing.
-
-`violations` mounts the component once per check and answers what it breaks:
-
-```ts
-import { violations } from "@stealthscale/testing-react";
-
-it("keeps the component contract", () => {
-  expect(violations(Box, { children: true, element: "DIV" })).toStrictEqual([]);
-});
-```
-
-| Checked                             | Always | Reported as                                     |
-| ----------------------------------- | ------ | ----------------------------------------------- |
-| renders an element at all           | yes    | `renders no element`                            |
-| does not throw rendering it         | yes    | `throws when it renders: <message>`             |
-| merges the caller's `className`     | yes    | `does not merge className`                      |
-| keeps its own `className` beside it | yes    | `replaces its own className instead of merging` |
-| forwards `ref` to what it rendered  | yes    | `does not forward ref`                          |
-| spreads props it does not name      | yes    | `does not spread unknown props`                 |
-| renders the tag `element` names     | no     | `renders DIV, not SPAN`                         |
-| renders `children`                  | no     | `does not render children`                      |
-| honours `asChild`                   | no     | `does not honour asChild`                       |
-
-The last three are options because they are not every component's to keep: the element a box renders
-is the caller's business, a rule and a spacer take no children, and a component that renders its own
-element owes nothing about `asChild`. `props` passes whatever the component needs before it renders
-at all — a ratio, a label, a value.
-
-A component that throws, or that renders no element to check, fails the first check and is asked no
-others, since every answer after it would be the same failure restated. The two are reported apart
-because they are different bugs.
-
-## A part that cannot be rendered alone
-
-A compound's part reads its state from a provider and throws without one, so checking it needs both
-the provider around it and a way to find it inside what that provider rendered:
+## Usage
 
 ```tsx
-violations(CardHeader, {
-  element: "DIV",
-  subject: (container) => part(container, "header"),
-  wrapper: (children) => <CardRoot>{children}</CardRoot>,
+import { render } from "@testing-library/react";
+import { expect, it } from "vitest";
+
+import { attr, holds, renderedAs } from "@stealthscale/testing-react";
+
+it("opens the panel its trigger names", () => {
+  const { container } = render(<Disclosure defaultOpen />);
+
+  expect(attr(container, "content", "state")).toBe("open");
+  expect(renderedAs(container, "title")).toBe("H2");
+  expect(holds(container, "root", "content")).toBe(true);
 });
 ```
 
-`wrapper` is whatever the component needs above it — a provider, a theme, a router. `subject` finds
-the element under test, and defaults to `only`, which is right for a component rendered on its own
-and wrong under a wrapper, where the first element belongs to the wrapper.
+Each reader finds its part first. A reader that fails to match throws and quotes the selector it
+looked for, so a renamed part fails the specification that reads it rather than passing as an absent
+value. `parts` is the one exception. It hands back an empty array instead of throwing, which lets a
+specification assert that a component drew none of a part.
 
-Violations rather than a verdict, the way an audit is: a specification writes one assertion, and a
-failure names the prop that went missing rather than saying that `false` is not `true`. Nothing here
-asserts, so the package stays free of a test runner.
+## Reference
 
-## A missing part throws
+| Function     | Signature                                                                         | What it returns                                                                               |
+| ------------ | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `part`       | `(container: ParentNode, name: string) => Rendered`                               | The first element marked with the part name, in document order                                |
+| `parts`      | `(container: ParentNode, name: string) => readonly Rendered[]`                    | Every element marked with the part name, as a plain array rather than a live NodeList         |
+| `only`       | `(container: ParentNode) => Rendered`                                             | The first element at the top of the container, asking nothing of its markings                 |
+| `attr`       | `(container: ParentNode, name: string, attribute: string) => string \| undefined` | A data attribute on the part, or `undefined` where the part sets none                         |
+| `aria`       | `(container: ParentNode, name: string, attribute: string) => string \| undefined` | Any attribute the part exposes, or `undefined` where it exposes none                          |
+| `holds`      | `(container: ParentNode, outer: string, inner: string) => boolean`                | True when the outer part contains the inner one, at any depth                                 |
+| `renderedAs` | `(container: ParentNode, name: string) => string`                                 | The tag the part rendered as, upper-cased, so `DIV` and `SVG` are compared the same way       |
+| `violations` | `(Component: ElementType, options?: ConformanceOptions) => readonly string[]`     | Each departure from the contract as a phrase, or an empty array for a component that conforms |
 
-Every reader throws where the part it was asked for is absent, naming it:
+Note: `attr` and `aria` take the same three arguments and differ in the form of the name they
+expect. `attr` indexes `dataset`, so `data-crop-shape` is asked for as `cropShape`. `aria` calls
+`getAttribute`, so the same attribute is asked for as it is written. A caller passing the written
+form to `attr` receives `undefined` and no complaint.
 
+| Type                 | Declaration                                          | What it describes                                                                                             |
+| -------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `Rendered`           | `Element & ElementCSSInlineStyle & HTMLOrSVGElement` | The element a reader hands back, in HTML or SVG. The `style` member reaches a custom property set at run time |
+| `ConformanceOptions` | `interface`                                          | Which optional checks `violations` runs, and how to reach a component that cannot render on its own           |
+
+## Conformance
+
+A bare `violations(Component)` checks what every component owes whatever else it does:
+
+- The component renders.
+- It merges a caller's `className` into its own.
+- It forwards a `ref` to the element under check.
+- It spreads a prop it does not name.
+
+`conformance-probe` goes in as the class and `data-conformance` as the unnamed prop, and both come
+back off the element. Every field below is optional. A bare call runs the four checks and nothing
+else.
+
+| Field      | Type                                    | Default     | What it turns on                                                                              |
+| ---------- | --------------------------------------- | ----------- | --------------------------------------------------------------------------------------------- |
+| `asChild`  | `boolean`                               | `undefined` | Renders the component with `asChild` and an anchor child, and expects the element back as `A` |
+| `children` | `boolean`                               | `undefined` | Passes a string as `children` and expects it in the element's `textContent`                   |
+| `element`  | `string`                                | `undefined` | The tag the component is expected to render, spelled upper-case                               |
+| `props`    | `Readonly<Record<string, unknown>>`     | `{}`        | The props the component needs before it can render at all                                     |
+| `subject`  | `(container: ParentNode) => Rendered`   | `only`      | Finds the element to check, where the component's own root is not the first one rendered      |
+| `wrapper`  | `(children: ReactNode) => ReactElement` | `undefined` | Wraps the component in the provider it cannot render outside                                  |
+
+A part of a compound throws when it is rendered outside its root. Pass `wrapper` to supply the
+provider and `subject` to find the part inside it:
+
+```tsx
+import { part, violations } from "@stealthscale/testing-react";
+
+expect(
+  violations(AccordionItem, {
+    children: true,
+    element: "DIV",
+    subject: (container) => part(container, "item"),
+    wrapper: (children) => <AccordionRoot>{children}</AccordionRoot>,
+  }),
+).toStrictEqual([]);
 ```
-Nothing in the rendered output carries [data-part="trigger"].
-```
 
-That is what lets a specification write the read inline, with no guard at the call site and no
-non-null assertion, which the house linter refuses. It also decides what a failure says: which part
-went missing, rather than that `undefined` is not `"open"`.
+Each check renders the component afresh and unmounts it afterwards, so every check starts from a
+clean container.
 
-`parts` is the exception, since a component drawing none of something is a thing a specification
-asserts. It answers an empty list.
+## Violations
+
+A phrase states what the component did. The order of the list is the order the checks ran.
+
+| Phrase                                          | Reported when                                                                               |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `throws when it renders: <message>`             | The render threw. The entry stands alone, because no later check can run without an element |
+| `renders no element`                            | The render produced nothing, or `subject` found nothing. This entry also stands alone       |
+| `renders DIV, not SPAN`                         | `element` was given and the component rendered another tag                                  |
+| `does not merge className`                      | The caller's class is absent from the element                                               |
+| `replaces its own className instead of merging` | The caller's class arrived and the component's own class went                               |
+| `does not forward ref`                          | The ref reached no element, or reached one other than the element under check               |
+| `does not spread unknown props`                 | An attribute the component does not name never reached the element                          |
+| `does not render children`                      | `children` was given and the text did not arrive                                            |
+| `does not honour asChild`                       | `asChild` was given and the element is not the child's                                      |
 
 ## Licence
 
-MIT
+MIT. See [LICENSE](LICENSE).

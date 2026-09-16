@@ -1,11 +1,11 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "_comment": "What every stealth package compiles under, and nothing about where it runs. A repository extends this once in its own tsconfig.base.json and adds the customConditions naming its source condition; a package extends that and states nothing further unless its shape differs. `types` is deliberately empty: left out, every @types/* anywhere in node_modules is in scope and a browser package silently sees node. node.json and web.json each add one environment, which is what makes that split mean anything. A package reaches its own source by the `#*` subpath its manifest declares, which is read from package.json rather than named here. `customConditions` names the condition every stealth repository resolves its own packages through; it must match the SOURCE constant in @stealthscale/vite-config, and a specification there asserts that it does.",
+  "_comment": "What every stealth package compiles under, and nothing about where it runs. A package extends node.json or web.json directly and states nothing further unless its shape differs. `types` names the toolchain and nothing else: left out, every @types/* anywhere in node_modules is in scope. The toolchain's types are what add `pack`, `lint`, `fmt`, `run`, `staged` and `test` to vite's UserConfig, and this is the one place the toolchain is named for the compiler; every package imports `vite`. node.json and web.json each add one environment on top. A package reaches its own source by the `#*` subpath its manifest declares, which is read from package.json rather than named here. `customConditions` names the condition every stealth repository resolves its own packages through; it must match the SOURCE constant in @stealthscale/vite-config, and a specification there asserts that it does.",
   "compilerOptions": {
     "customConditions": ["stealth-source"],
     "target": "esnext",
     "lib": ["es2023"],
-    "types": [],
+    "types": ["vite-plus"],
     "module": "preserve",
     "moduleDetection": "force",
     "verbatimModuleSyntax": true,
@@ -25,6 +25,6 @@
     "noEmit": true,
     "skipLibCheck": true
   },
-  "include": ["${configDir}/src", "${configDir}/vite.config.ts"],
-  "_include": "What every package compiles: its source, and the config that builds it. `${configDir}` is what makes this shareable \u2014 a relative path here would resolve against this file and compile nothing. A package with another shape states its own `include`, which replaces this rather than adding to it."
+  "include": ["${configDir}/src", "${configDir}/vite.config.ts", "${configDir}/vite.layers.ts"],
+  "_include": "What every package compiles: its source, the config that builds it, and the layers the root states on its behalf where it has any. `${configDir}` is what makes this shareable: a relative path here would resolve against this file and compile nothing. A package with another shape states its own `include`, which replaces this rather than adding to it."
 }

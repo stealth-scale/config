@@ -1,23 +1,26 @@
 /**
- * What a packed package is built to run on.
+ * Fixes the runtime a packed library is resolved and built for.
  */
 
 import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
- * Where a packed package runs, which decides what the packer may leave to it.
+ * Lists the runtimes the packer will resolve a dependency against.
  *
- * The packer builds for node unless told, and on node it reads the engine the manifest declares. A
- * package the browser runs has neither: no engines field describes a browser, and node's built-in
- * modules are not there to import.
+ * @remarks
+ *   The two named runtimes each bring their own export conditions and their own set of built-in
+ *   modules. `neutral` brings neither, which is what a library has to use when the same file has to
+ *   load in both.
  */
 export type Platform = "browser" | "neutral" | "node";
 
 /**
- * Builds the package for where it runs.
+ * Fixes the runtime, so a dependency resolves the same way here as it will at the consumer.
  *
- * @param on - The platform, as the packer names it.
- * @returns The preset.
+ * @remarks
+ *   Resolution happens while the library is packed, not when a consumer imports it. A library that
+ *   has to run in more than one place therefore resolves against none of them.
+ * @param on - The runtime to resolve against.
  */
 export function platform(on: Platform): Preset {
   return preset({ config: { pack: { platform: on } }, name: `pack.platform(${on})` });

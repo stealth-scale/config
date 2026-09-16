@@ -1,7 +1,13 @@
-import { expect, test } from "vite-plus/test";
+/**
+ * Pins the one rule the order set carries, and the value it is set to.
+ */
+
+import { describe, expect, it } from "vitest";
 
 import { ORDER } from "#rules/order.ts";
 
-test("sorts declarations, the same as every other list whose order carries no meaning", () => {
-  expect(ORDER["order/properties-alphabetical-order"]).toBe(true);
+describe("order", () => {
+  it("sorts declarations", () => {
+    expect(ORDER["order/properties-alphabetical-order"]).toBe(true);
+  });
 });

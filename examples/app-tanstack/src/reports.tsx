@@ -1,5 +1,5 @@
 /**
- * What this application draws where the other application's module goes.
+ * Gives the other deployment's dashboard a page to appear on.
  */
 
 import { type ReactElement, Suspense } from "react";
@@ -7,13 +7,11 @@ import { type ReactElement, Suspense } from "react";
 import { Dashboard } from "#dashboard.tsx";
 
 /**
- * Draws the module fetched from the other application.
+ * Draws the remote dashboard, and a line of text until it arrives.
  *
- * Behind a boundary, because the entry is fetched over the network the first time somebody
- * navigates here. What the boundary shows is what this route looks like on a slow connection, and
- * what it shows if the other application is not deployed.
- *
- * @returns The element.
+ * @remarks
+ *   Every first visit to this route waits on the network, so the fallback is what a visitor reads
+ *   rather than an edge case. The count is fixed here because the route parses no parameters.
  */
 export function Reports(): ReactElement {
   return (

@@ -1,28 +1,14 @@
-// Plain Vite+ configuration, naming no stealth package. config-vite's tiers reach for this plugin,
-// so a plugin built by those tiers is a cycle: each would have to be packed before the other. What
-// the node tier would have stated is written out below, and a change to either has to be made in
-// both places.
-import { defineConfig } from "vite-plus";
+/**
+ * Builds and tests this package under the plain configuration.
+ *
+ * @remarks
+ *   The configuration tiers are themselves built on the plugin packages, so a
+ *   plugin that extended a tier would pack itself with a version of itself. The
+ *   plain configuration writes those settings out instead.
+ */
 
-export default defineConfig({
-  pack: {
-    attw: true,
-    dts: true,
-    entry: { index: "src/index.ts" },
-    exports: { devExports: "stealth-source" },
-    publint: true,
-  },
+import { defineConfig } from "vite";
 
-  test: {
-    clearMocks: true,
-    exclude: ["**/node_modules/**", "**/dist/**", "**/coverage/**"],
-    expandSnapshotDiff: true,
-    expect: { requireAssertions: true },
-    globals: false,
-    include: ["**/*.spec.ts"],
-    restoreMocks: true,
-    sequence: { shuffle: true },
-    unstubEnvs: true,
-    unstubGlobals: true,
-  },
-});
+import { plain } from "@stealthscale/vite-config-plain";
+
+export default defineConfig(plain);

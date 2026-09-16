@@ -1,29 +1,27 @@
 /**
- * What the applications this one loads hand over.
+ * Declares the module the other deployment exposes, so an import of it type-checks here.
  *
- * Written by hand because the federation plugin's type generation is off: it compiles a remote's
- * types and serves them for a host to fetch, which needs the remote running while this is type
- * checked. One declaration per exposed module is cheaper than that.
+ * @remarks
+ *   Nothing in this application builds that module, and this declaration is all the compiler knows
+ *   about it. Where it drifts from what the other deployment actually exposes, the mismatch
+ *   surfaces when a visitor opens the route rather than when the build runs.
  */
 
 declare module "remote/Dashboard" {
   import { type ReactElement } from "react";
 
   /**
-   * Describes what the other application reports.
+   * Tells the remote dashboard how many items to report on.
    */
   export interface DashboardProps {
     /**
-     * How many of them there are.
+     * How many items the dashboard counts as open.
      */
     count: number;
   }
 
   /**
-   * Reports a count inside the panel both applications share.
-   *
-   * @param props - The count to report. `DashboardProps` documents every member.
-   * @returns The element.
+   * Draws the other deployment's dashboard.
    */
   export function Dashboard(props: DashboardProps): ReactElement;
 }

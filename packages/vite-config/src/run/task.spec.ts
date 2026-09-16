@@ -1,23 +1,34 @@
+/**
+ * Proves a declared task reaches the runner's table under the name it was
+ * given.
+ */
+
 import { type UserConfig } from "vite-plus";
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { task } from "#run/task.ts";
 
-test("names a command under what it does", () => {
-  const held = (task("lint", "vp check").config as UserConfig).run?.tasks;
+describe("task", () => {
+  it("names a command under what it does", () => {
+    const held = (task("lint", "vp check").config as UserConfig).run?.tasks;
 
-  expect(held?.["lint"]).toBe("vp check");
-});
+    expect(held?.["lint"]).toBe("vp check");
+  });
 
-test("takes a task that says what it reads and what it leaves behind", () => {
-  const held = (
-    task("docs", { command: "typedoc", input: ["src/**"], output: ["docs/**"] })
-      .config as UserConfig
-  ).run?.tasks;
+  it("takes a task declaring its inputs and outputs", () => {
+    const held = (
+      task("docs", { command: "typedoc", input: ["src/**"], output: ["docs/**"] })
+        .config as UserConfig
+    ).run?.tasks;
 
-  expect(held?.["docs"]).toEqual({ command: "typedoc", input: ["src/**"], output: ["docs/**"] });
-});
+    expect(held?.["docs"]).toStrictEqual({
+      command: "typedoc",
+      input: ["src/**"],
+      output: ["docs/**"],
+    });
+  });
 
-test("names the task it carries, so one can be taken back without the rest", () => {
-  expect(task("docs", "typedoc").name).toBe("run.task(docs)");
+  it("names the task it holds", () => {
+    expect(task("docs", "typedoc").name).toBe("run.task(docs)");
+  });
 });

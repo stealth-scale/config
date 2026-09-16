@@ -1,28 +1,30 @@
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import * as pack from "#pack/index.ts";
 
-test("publishes the presets a package picks from, under one name", () => {
-  expect(Object.keys(pack.preset).toSorted()).toEqual(["base", "node", "web"]);
-});
+describe("vite-config", () => {
+  it("publishes the presets a package picks from", () => {
+    expect(Object.keys(pack.preset).toSorted()).toStrictEqual(["base", "node", "web"]);
+  });
 
-test("publishes the layers a package states one at a time, beside them", () => {
-  for (const verb of [
-    "carry",
-    "command",
-    "declarations",
-    "entry",
-    "hook",
-    "platform",
-    "published",
-    "quality",
-    "ships",
-    "source",
-  ]) {
-    expect(Object.keys(pack), `${verb} is not published`).toContain(verb);
-  }
-});
+  it("publishes the layers a package adds one at a time", () => {
+    for (const verb of [
+      "carry",
+      "command",
+      "declarations",
+      "entry",
+      "hook",
+      "platform",
+      "published",
+      "quality",
+      "source",
+      "subpaths",
+    ]) {
+      expect(Object.keys(pack), `${verb} is not published`).toContain(verb);
+    }
+  });
 
-test("withholds what exists only so another layer can reuse it", () => {
-  expect(Object.keys(pack), "carrying is published").not.toContain("carrying");
+  it("exports nothing that exists only for another layer to reuse", () => {
+    expect(Object.keys(pack), "carrying is published").not.toContain("carrying");
+  });
 });

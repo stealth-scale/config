@@ -2,7 +2,8 @@
   "name": "@stealthscale/example-lib-node",
   "version": "0.0.0",
   "private": true,
-  "description": "A library built for node, small enough that the config is the interesting part.",
+  "description": "Joins names into an English phrase on the node tier.",
+  "license": "MIT",
   "files": [
     "dist"
   ],
@@ -33,6 +34,7 @@
     "@stealthscale/vite-config-typescript": "workspace:^",
     "@types/node": "catalog:",
     "typescript": "catalog:",
-    "vite-plus": "catalog:"
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
   }
 }

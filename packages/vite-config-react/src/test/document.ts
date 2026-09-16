@@ -1,30 +1,21 @@
 /**
- * The document a rendering test draws into.
+ * Gives the test runner a document for a component to render into.
  */
 
-import { type Preset, test } from "@stealthscale/vite-config";
+import { named, type Preset, test } from "@stealthscale/vite-config";
 
 /**
- * The implementation the runner draws into.
- *
- * `happy-dom` rather than jsdom because a theme follows the reader's colour-mode preference, which
- * is a media query, and jsdom has never implemented those. The alternative is stubbing `matchMedia`
- * by hand in every repository and hoping each stub keeps resembling the real thing.
+ * The document implementation the runner loads, chosen for its support of media queries.
  */
 const DRAWN = "happy-dom";
 
 /**
- * Gives the runner a document to draw into.
+ * Swaps the runner's environment for one that implements a document.
  *
- * Stated by the workspace rather than by a package. The runner takes its environment from the root
- * config, and a workspace holding anything that renders needs one everywhere: a specification that
- * mounts a component into no document fails with `document is not defined`, which reads as a broken
- * test rather than as a missing setting.
- *
- * A repository testing against something else takes this back by name and states its own.
- *
- * @returns The preset.
+ * @remarks
+ *   A preset replaces the environment a tier set rather than adding to it, so a package needing
+ *   another implementation removes this layer by name instead of setting the field again.
  */
 export function document(): Preset {
-  return test.environment(DRAWN);
+  return named("react.test.document", test.environment(DRAWN));
 }

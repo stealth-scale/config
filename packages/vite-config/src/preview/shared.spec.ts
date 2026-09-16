@@ -1,14 +1,16 @@
-import { expect, test } from "vite-plus/test";
+/**
+ * Proves a preview server's allowed origins are copied, and that the
+ * environment overrides them.
+ */
+
+import { describe, expect, it } from "vitest";
 
 import { shared } from "#preview/shared.ts";
 import { answered } from "#vite.fixtures.ts";
 
 /**
- * Reads back the origins a layer allows.
- *
- * @param origins - The origins stated.
- * @param env - The variables the machine holds.
- * @returns The origins the preview answers.
+ * Reads back the origins a layer permits, under an environment a caller
+ * supplies.
  */
 async function allowed(
   origins: readonly string[],
@@ -19,28 +21,35 @@ async function allowed(
   return held.origin;
 }
 
-test("lets the origins it was given fetch what the preview serves", async () => {
-  expect(await allowed(["http://localhost:4200"])).toEqual(["http://localhost:4200"]);
-});
-
-test("takes more than one, an application loaded by two hosts naming both", async () => {
-  expect(await allowed(["http://localhost:4200", "http://localhost:4400"])).toHaveLength(2);
-});
-
-test("copies what it was given, so a caller's list is not the server's", async () => {
-  const origins = ["http://localhost:4200"];
-
-  expect(await allowed(origins)).not.toBe(origins);
-});
-
-test("takes the environment's answer instead, where a machine has arranged its own", async () => {
-  const held = await allowed(["https://stated.example.test"], {
-    STEALTH_ORIGINS: "https://override.example.test",
+describe("shared", () => {
+  it("lets the origins it was given fetch what the preview serves", async () => {
+    await expect(allowed(["http://localhost:4200"])).resolves.toStrictEqual([
+      "http://localhost:4200",
+    ]);
   });
 
-  expect(held).toEqual(["https://override.example.test"]);
-});
+  it("takes more than one origin", async () => {
+    await expect(allowed(["http://localhost:4200", "http://localhost:4400"])).resolves.toHaveLength(
+      2,
+    );
+  });
 
-test("is named the same whatever a machine arranged, so a repository can take it back", () => {
-  expect(shared(["http://localhost:4200"]).name).toBe("preview.shared");
+  it("copies the origins it was given", async () => {
+    const origins = ["http://localhost:4200"];
+
+    await expect(allowed(origins)).resolves.not.toBe(origins);
+  });
+
+  it("takes the environment value instead when a machine has arranged its own", async () => {
+    const held = await allowed(["https://stated.example.test"], {
+      STEALTH_ORIGINS: "https://override.example.test",
+    });
+
+    expect(held).toStrictEqual(["https://override.example.test"]);
+  });
+
+  it("names the layer for the origins it was written with", () => {
+    expect(shared(["http://localhost:4200"]).name).toBe("preview.shared(http://localhost:4200)");
+    expect(shared().name).toBe("preview.shared");
+  });
 });

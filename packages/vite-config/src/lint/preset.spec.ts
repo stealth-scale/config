@@ -1,5 +1,9 @@
+/**
+ * Specifies what each tier puts in the block and which departures it brings.
+ */
+
 import { type UserConfig } from "vite-plus";
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { type Layer, type Preset } from "@stealthscale/vite-config-core";
 
@@ -7,93 +11,83 @@ import { GENERATED } from "#ignore/generated.ts";
 import { base, node, web } from "#lint/preset.ts";
 import * as rules from "#lint/rules/index.ts";
 
-/**
- * Reads the `lint` block the preset among some layers sets.
- *
- * @param layers - What one of the entries answered.
- * @returns Its lint block.
- */
 function blockOf(layers: readonly Layer[]): NonNullable<UserConfig["lint"]> {
   const held = layers.find((one) => one.kind === "preset") as Preset;
 
   return (held.config as UserConfig).lint as NonNullable<UserConfig["lint"]>;
 }
 
-/**
- * Reads what every layer an entry answered is called.
- *
- * @param layers - What one of the entries answered.
- * @returns Their names.
- */
 function namesOf(layers: readonly Layer[]): readonly string[] {
   return layers.map((one) => one.name);
 }
 
-test("sets a block rather than appending to a list", () => {
-  expect(base().some((one) => one.kind === "preset")).toBe(true);
-});
+describe("preset", () => {
+  it("sets a block rather than appending to a list", () => {
+    expect(base().some((one) => one.kind === "preset")).toBe(true);
+  });
 
-test("names itself, so a repository disagreeing with it can take it back", () => {
-  expect(namesOf(base())).toContain("lint.base");
-  expect(namesOf(node())).toContain("lint.node");
-  expect(namesOf(web())).toContain("lint.web");
-});
+  it("names the layer so a repository can remove it", () => {
+    expect(namesOf(base())).toContain("lint.base");
+    expect(namesOf(node())).toContain("lint.node");
+    expect(namesOf(web())).toContain("lint.web");
+  });
 
-test("lets the linter see a type, which is most of what there is to get wrong", () => {
-  expect(blockOf(base()).options).toMatchObject({ typeAware: true, typeCheck: true });
-});
+  it("turns on type-aware linting", () => {
+    expect(blockOf(base()).options).toMatchObject({ typeAware: true, typeCheck: true });
+  });
 
-test("fails on a finding rather than warning about it", () => {
-  expect(blockOf(base()).categories).toBe(rules.CATEGORIES);
-});
+  it("fails on a finding rather than warning about it", () => {
+    expect(blockOf(base()).categories).toBe(rules.CATEGORIES);
+  });
 
-test("holds the package to every rule group", () => {
-  expect(blockOf(base()).rules).toEqual(rules.base());
-});
+  it("applies every rule group to the package", () => {
+    expect(blockOf(base()).rules).toStrictEqual(rules.base());
+  });
 
-test("names the plugins its rules are written against", () => {
-  expect(blockOf(base()).plugins).toBe(rules.PLUGINS);
-});
+  it("names the plugins its rules are written against", () => {
+    expect(blockOf(base()).plugins).toBe(rules.PLUGINS);
+  });
 
-test("walks past what a tool wrote", () => {
-  expect(blockOf(base()).ignorePatterns).toEqual([...GENERATED]);
-});
+  it("ignores what a tool wrote", () => {
+    expect(blockOf(base()).ignorePatterns).toStrictEqual([...GENERATED]);
+  });
 
-test("says nothing about where a package runs, where it is the base", () => {
-  expect(blockOf(base()).env).toBeUndefined();
-});
+  it("adds no environment in the base tier", () => {
+    expect(blockOf(base()).env).toBeUndefined();
+  });
 
-test("gives a package the console runs node's globals, and not the browser's", () => {
-  expect(blockOf(node()).env).toEqual({ node: true });
-});
+  it("gives a package the console runs node globals and not browser globals", () => {
+    expect(blockOf(node()).env).toStrictEqual({ node: true });
+  });
 
-test("gives a package the browser runs the browser's globals, and not node's", () => {
-  expect(blockOf(web()).env).toEqual({ browser: true });
-});
+  it("gives a package the browser runs browser globals and not node globals", () => {
+    expect(blockOf(web()).env).toStrictEqual({ browser: true });
+  });
 
-test("carries everything the base does, so an environment is added rather than swapped for", () => {
-  for (const held of [node(), web()]) {
-    expect(blockOf(held)).toMatchObject({
-      categories: blockOf(base()).categories,
-      options: blockOf(base()).options,
-      plugins: blockOf(base()).plugins,
-    });
-  }
-});
+  it("includes everything the base tier does", () => {
+    for (const held of [node(), web()]) {
+      expect(blockOf(held)).toMatchObject({
+        categories: blockOf(base()).categories,
+        options: blockOf(base()).options,
+        plugins: blockOf(base()).plugins,
+      });
+    }
+  });
 
-test("excuses a config file and a specification whichever entry was picked", () => {
-  for (const held of [base(), node(), web()]) {
-    expect(namesOf(held)).toContain("lint.relax(**/*.config.ts)");
-    expect(held.some((one) => one.name.includes("*.spec.ts"))).toBe(true);
-  }
-});
+  it("excuses a config file and a specification whichever entry was picked", () => {
+    for (const held of [base(), node(), web()]) {
+      expect(namesOf(held)).toContain("lint.defaultExported(**/*.config.ts)");
+      expect(held.some((one) => one.name.includes("*.spec.ts"))).toBe(true);
+    }
+  });
 
-test("excuses no rendered specification where the package runs in the console", () => {
-  for (const held of [base(), node()]) {
-    expect(held.some((one) => one.name.includes("*.spec.tsx"))).toBe(false);
-  }
-});
+  it("excuses no rendered specification when the package runs in the console", () => {
+    for (const held of [base(), node()]) {
+      expect(held.some((one) => one.name.includes("*.spec.tsx"))).toBe(false);
+    }
+  });
 
-test("excuses one where the package renders, since markup is why it is written that way", () => {
-  expect(web().some((one) => one.name.includes("*.spec.tsx"))).toBe(true);
+  it("excuses a rendered specification when the package renders", () => {
+    expect(web().some((one) => one.name.includes("*.spec.tsx"))).toBe(true);
+  });
 });

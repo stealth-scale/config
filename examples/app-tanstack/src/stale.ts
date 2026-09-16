@@ -1,43 +1,41 @@
 /**
- * Recovering from a chunk that was there when the page loaded and is not there now.
+ * Recovers a page whose chunks the other deployment has already replaced.
+ *
+ * @remarks
+ *   That deployment ships on its own schedule, so a chunk a route was told about at page load can
+ *   be gone by the time a visitor navigates there. Vite reports the failed fetch as a
+ *   `vite:preloadError` event, and a fresh page load picks up the manifest naming the chunks that
+ *   exist now.
  */
 
 /**
- * Where the one reload is recorded, so a broken deployment cannot be reloaded at forever.
+ * The key marking that this page has already been fetched a second time.
  */
 const RELOADED = "stealth.stale";
 
 /**
- * Describes what to do about a chunk that has gone.
+ * Gives a reload the store its mark survives in and the call that fetches the page again.
  */
 export interface Staleness {
   /**
-   * Where to record that this page has already tried once.
+   * Where the mark outlives the reload. A session store scopes it to the one tab.
    */
   held: Pick<Storage, "getItem" | "setItem">;
 
   /**
-   * How to fetch the page again.
+   * Fetches the page again.
    */
   reload: () => void;
 }
 
 /**
- * Fetches the page again, once, when a chunk it was told about has gone.
+ * Builds the listener that fetches the page again when a chunk has gone.
  *
- * Every chunk is named for its contents, so deploying a new build deletes the names the old one
- * handed out. A page open across a deployment then asks for a file that is not there and the import
- * rejects: a route never arrives, or a loaded application never draws, and nothing on the page says
- * why. That is more likely with a remote than with anything else, because the two are deployed
- * apart and neither waits for the other.
- *
- * Once, and recorded. A deployment that is genuinely missing its files would otherwise have every
- * open page reloading itself for as long as it stayed broken, which turns one bad release into a
- * load test. The second failure is left to throw, which is what puts it in front of somebody.
- *
- * @param stated - Where to record the attempt and how to reload. `Staleness` documents every
- *   member.
- * @returns The listener, so a specification can raise the event without a browser.
+ * @remarks
+ *   A page reloads at most once per session. Leaving the second failure to propagate means a
+ *   visitor sees the bundler's error, where reloading on every failure would spin against a
+ *   deployment that is broken rather than merely newer.
+ * @returns A listener that cancels the first failure it is given and lets every later one through.
  */
 export function stale(stated: Staleness): (event: Event) => void {
   return (event) => {
@@ -50,9 +48,11 @@ export function stale(stated: Staleness): (event: Event) => void {
 }
 
 /**
- * Listens for the bundler saying a chunk has gone.
+ * Subscribes the reload listener to the bundler's preload failures.
  *
- * @param stated - Where to record the attempt and how to reload.
+ * @remarks
+ *   The listener stays on the window for as long as the page lives, and the page it belongs to is
+ *   the one being replaced, so nothing removes it.
  */
 export function watching(stated: Staleness): void {
   window.addEventListener("vite:preloadError", stale(stated));

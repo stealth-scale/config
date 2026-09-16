@@ -2,7 +2,8 @@
   "name": "@stealthscale/example-lib-tokens",
   "version": "0.0.0",
   "private": true,
-  "description": "A library that writes part of what it ships, which is what a pack hook and a computed export map are for.",
+  "description": "Writes the stylesheet it publishes during the pack.",
+  "license": "MIT",
   "files": [
     "dist"
   ],
@@ -37,6 +38,7 @@
     "@types/node": "catalog:",
     "happy-dom": "catalog:",
     "typescript": "catalog:",
-    "vite-plus": "catalog:"
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
   }
 }

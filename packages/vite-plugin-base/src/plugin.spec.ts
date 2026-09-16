@@ -1,11 +1,23 @@
-import { expect, test } from "vite-plus/test";
+/**
+ * Covers what a plugin receives when a bundler runs it.
+ *
+ * @remarks
+ *   The hooks are called directly rather than through a build, because the
+ *   thing under test is the wiring between them and a real build would supply
+ *   it.
+ */
+
+import { describe, expect, it } from "vitest";
 
 import { type Bundling, plugin } from "#plugin.ts";
 
 /**
- * Stands in for the build a hook is handed.
+ * Stands in for the build a bundler binds while it generates a bundle.
  *
- * @returns Something with the shape a hook reads, holding nothing.
+ * @remarks
+ *   Only the three members these checks touch are present, and the cast hides
+ *   the rest of the context. A check that reaches for a fourth member reads
+ *   undefined instead of failing at the type.
  */
 function building(): Bundling {
   return {
@@ -16,11 +28,14 @@ function building(): Bundling {
 }
 
 /**
- * Calls a plugin's hooks the way a bundler does, with the build as `this`.
+ * Drives a plugin through the hooks a bundler would call, in bundler order.
  *
- * @param held - The plugin.
- * @param root - What the resolved config says the directory is, or nothing to skip that hook.
- * @returns Nothing; what the plugin did is what a test reads.
+ * @remarks
+ *   Leaving the root out skips `configResolved` altogether, which is how a
+ *   build that resolves no configuration reaches `generateBundle`.
+ * @param held - The plugin under test.
+ * @param root - The directory the bundler resolved, or nothing to skip the
+ *   resolution hook.
  */
 function running(held: ReturnType<typeof plugin>, root?: string): void {
   const hooks = held as unknown as {
@@ -33,33 +48,35 @@ function running(held: ReturnType<typeof plugin>, root?: string): void {
   hooks.generateBundle?.call(building());
 }
 
-test("is named what the bundler will report it as", () => {
-  expect(plugin({ name: "stealth:probe", writes: () => {} }).name).toBe("stealth:probe");
-});
+describe("plugin", () => {
+  it("names the plugin as the bundler reports it", () => {
+    expect(plugin({ name: "stealth:probe", writes: () => {} }).name).toBe("stealth:probe");
+  });
 
-test("hands the build over as an argument, so nothing downstream writes `this`", () => {
-  let held: unknown;
+  it("passes the build as an argument", () => {
+    let held: unknown;
 
-  running(plugin({ name: "probe", writes: (bundling) => void (held = bundling) }));
+    running(plugin({ name: "probe", writes: (bundling) => void (held = bundling) }));
 
-  expect(held).toBeDefined();
-});
+    expect(held).toBeDefined();
+  });
 
-test("tells a plugin the directory the bundler settled on", () => {
-  let held = "";
+  it("gives a plugin the directory the bundler resolved", () => {
+    let held = "";
 
-  running(
-    plugin({ name: "probe", writes: (_bundling, at) => void (held = at) }),
-    "/repository/packages/one",
-  );
+    running(
+      plugin({ name: "probe", writes: (_bundling, at) => void (held = at) }),
+      "/repository/packages/one",
+    );
 
-  expect(held).toBe("/repository/packages/one");
-});
+    expect(held).toBe("/repository/packages/one");
+  });
 
-test("falls back to where the command runs, for a bundler that resolves no config", () => {
-  let held = "";
+  it("falls back to the working directory when the bundler resolves no config", () => {
+    let held = "";
 
-  running(plugin({ name: "probe", writes: (_bundling, at) => void (held = at) }));
+    running(plugin({ name: "probe", writes: (_bundling, at) => void (held = at) }));
 
-  expect(held).toBe(process.cwd());
+    expect(held).toBe(process.cwd());
+  });
 });

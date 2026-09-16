@@ -1,5 +1,5 @@
 /**
- * The bill of materials a package publishes beside itself.
+ * Records what a packed library is made of, as a CycloneDX document.
  */
 
 import { contribute, type Contribution } from "@stealthscale/vite-config-core";
@@ -8,25 +8,16 @@ import { sbom, type Supplier } from "@stealthscale/vite-plugin-sbom";
 import { HOUSE } from "#sbom/supplier.ts";
 
 /**
- * Writes down what the package was built out of.
+ * Writes the bill of materials for a library, alongside what the packer built.
  *
- * The same answer a built application writes, for the same reason and to a different audience. A
- * published package is read by whoever installs it, and what they get is a `dist` that inlined
- * whatever the packer decided to inline — so the manifest's dependency list describes what is left
- * over rather than what is in there.
- *
- * It ships because `files` names `dist` and this is written into it. That is the point: a consumer
- * scanning what they installed finds it without asking anybody, which is the difference between an
- * inventory and a report somebody has to request.
- *
- * One path only. The other is `.well-known/sbom`, which is where a scanner looks on a running
- * deployment, and nothing serves a tarball.
- *
- * A release says which build wrote it and when; a development pack says neither, so two runs of one
- * commit are the same file.
- *
- * @param supplier - Who supplied it. The house unless a repository says otherwise.
- * @returns The contribution the packer writes the inventory from.
+ * @remarks
+ *   The document is typed as a library and lands wherever the plugin defaults to, which is what a
+ *   package published to a registry wants. Its counterpart in `build` types the document as an
+ *   application and writes it twice. A serial number and a timestamp differ between two builds of
+ *   the same source, so both are written only in production and a development build stays
+ *   reproducible.
+ * @param supplier - The organisation attributed as publisher of every component. The house
+ *   identity is used unless a repository states its own.
  */
 export function inventory(supplier: Supplier = HOUSE): Contribution {
   return contribute({

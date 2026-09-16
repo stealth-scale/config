@@ -1,5 +1,5 @@
 /**
- * The routes this application answers, and what sits at each.
+ * Puts each of the application's pages at an address and builds the router over them.
  */
 
 import { createRootRoute, createRoute, createRouter, Outlet } from "@tanstack/react-router";
@@ -8,46 +8,52 @@ import { Home } from "#home.tsx";
 import { Reports } from "#reports.tsx";
 
 /**
- * What every route sits under.
+ * The route every page hangs beneath.
+ *
+ * @remarks
+ *   Rendering the outlet alone puts no shell around a page, so the matched child owns the whole
+ *   document body and a remote module is free to draw its own frame.
  */
 const root = createRootRoute({
   component: Outlet,
 });
 
 /**
- * What this application draws at its own address.
+ * The address of the page this application serves itself.
  */
 const home = createRoute({ component: Home, getParentRoute: () => root, path: "/" });
 
 /**
- * What it draws where the other application's module goes.
+ * The address the other deployment's dashboard is reached at.
  */
 const reports = createRoute({ component: Reports, getParentRoute: () => root, path: "/reports" });
 
 /**
- * Every path this application answers.
- *
- * Named apart from the router so a specification can read the tree without starting one.
+ * Every address this application answers on.
  */
 export const PATHS = ["/", "/reports"] as const;
 
 /**
- * Every route, under the one they share.
+ * The tree a router is built from, holding each page under the root.
  */
 const tree = root.addChildren([home, reports]);
 
 /**
- * The router this application runs on, as the library types it over this tree.
+ * A router over this application's pages.
+ *
+ * @remarks
+ *   The type carries the tree, so a link to an address no route declares is a compile error rather
+ *   than a blank page at runtime.
  */
 export type Routed = ReturnType<typeof createRouter<typeof tree>>;
 
 /**
- * Builds the router.
+ * Builds a router serving every page in the tree.
  *
- * A function rather than a value, so that nothing is constructed by importing this file and a
- * specification gets a router of its own rather than one another test has already navigated.
- *
- * @returns The router, ready to be handed to the provider.
+ * @remarks
+ *   Each call hands back a router of its own, with its own history and its own matched route. Two
+ *   callers sharing one would navigate each other, which is what a test needs and what a browser
+ *   never wants.
  */
 export function routed(): Routed {
   return createRouter({ routeTree: tree });

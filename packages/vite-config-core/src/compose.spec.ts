@@ -1,107 +1,111 @@
-import { expect, test } from "vite-plus/test";
+/**
+ * Covers which layers survive a removal and what each pass contributes.
+ */
+
+import { describe, expect, it } from "vitest";
 
 import { resolved, surviving } from "#compose.ts";
 import { BUILDING } from "#core.fixtures.ts";
 import { contribute, type Contribution, preset, type Removal, remove } from "#layer.ts";
 
 /**
- * States one contribution, since only its name matters here.
+ * Builds a contribution whose name is also the item it appends.
  *
- * @param name - What to call it.
- * @returns The contribution.
+ * @remarks
+ *   The two are the same string so an assertion can read the surviving names
+ *   and the appended items interchangeably.
  */
 function added(name: string): Contribution {
   return contribute({ at: "test.setupFiles", because: "a reason", item: name, name });
 }
 
 /**
- * Takes one back.
- *
- * @param target - The contribution to take back.
- * @returns The removal.
+ * Builds a removal aimed at one name, called after the name it takes back.
  */
 function taken(target: string): Removal {
   return remove({ because: "a reason", name: `without(${target})`, target });
 }
 
-test("keeps every contribution nothing took back", () => {
-  const held = surviving([added("a"), added("b")]);
+describe("compose", () => {
+  it("keeps every contribution no removal took back", () => {
+    const held = surviving([added("a"), added("b")]);
 
-  expect(held.map((one) => one.name)).toEqual(["a", "b"]);
-});
+    expect(held.map((one) => one.name)).toStrictEqual(["a", "b"]);
+  });
 
-test("keeps a preset, so that a removal can reach one", () => {
-  const held = surviving([preset({ config: {}, name: "base" }), added("a")]);
+  it("keeps a preset", () => {
+    const held = surviving([preset({ config: {}, name: "base" }), added("a")]);
 
-  expect(held.map((one) => one.name)).toEqual(["base", "a"]);
-});
+    expect(held.map((one) => one.name)).toStrictEqual(["base", "a"]);
+  });
 
-test("takes back a preset by name, which is the alternative to restating what it set", () => {
-  const held = surviving([preset({ config: {}, name: "base" }), added("a"), taken("base")]);
+  it("removes a preset by name", () => {
+    const held = surviving([preset({ config: {}, name: "base" }), added("a"), taken("base")]);
 
-  expect(held.map((one) => one.name)).toEqual(["a"]);
-});
+    expect(held.map((one) => one.name)).toStrictEqual(["a"]);
+  });
 
-test("takes back the one a removal names", () => {
-  const held = surviving([added("a"), added("b"), taken("a")]);
+  it("removes the contribution a removal names", () => {
+    const held = surviving([added("a"), added("b"), taken("a")]);
 
-  expect(held.map((one) => one.name)).toEqual(["b"]);
-});
+    expect(held.map((one) => one.name)).toStrictEqual(["b"]);
+  });
 
-test("takes back the nearest above it, leaving a later one standing", () => {
-  const held = surviving([added("a"), taken("a"), added("a")]);
+  it("removes the nearest contribution above it", () => {
+    const held = surviving([added("a"), taken("a"), added("a")]);
 
-  expect(held.map((one) => one.name)).toEqual(["a"]);
-});
+    expect(held.map((one) => one.name)).toStrictEqual(["a"]);
+  });
 
-test("refuses a removal naming nothing contributed above it", () => {
-  expect(() => surviving([taken("a"), added("a")])).toThrow(/written too early/u);
-});
+  it("throws for a removal naming nothing contributed above it", () => {
+    expect(() => surviving([taken("a"), added("a")])).toThrow(/written too early/u);
+  });
 
-test("refuses a removal naming nothing at all", () => {
-  expect(() => surviving([added("a"), taken("z")])).toThrow(/nothing above it stated/u);
-});
+  it("throws for a removal naming nothing", () => {
+    expect(() => surviving([added("a"), taken("z")])).toThrow(/nothing above it stated/u);
+  });
 
-test("settles a preset asking to go last after one that said nothing", async () => {
-  const held = await resolved(BUILDING, [
-    preset({ config: { mode: "last" }, enforce: "post", name: "after" }),
-    preset({ config: { mode: "first" }, name: "before" }),
-  ]);
+  it("orders a preset asking to go last after one that declared no order", async () => {
+    const held = await resolved(BUILDING, [
+      preset({ config: { mode: "last" }, enforce: "post", name: "after" }),
+      preset({ config: { mode: "first" }, name: "before" }),
+    ]);
 
-  expect(held.mode).toBe("last");
-});
+    expect(held.mode).toBe("last");
+  });
 
-test("appends what a contribution states outright", async () => {
-  const held = await resolved(BUILDING, [
-    contribute({ at: "test.setupFiles", because: "a reason", item: "stated.ts", name: "one" }),
-  ]);
+  it("appends what a contribution declares outright", async () => {
+    const held = await resolved(BUILDING, [
+      contribute({ at: "test.setupFiles", because: "a reason", item: "stated.ts", name: "one" }),
+    ]);
 
-  expect(held.test?.setupFiles).toEqual(["stated.ts"]);
-});
+    expect(held.test?.setupFiles).toStrictEqual(["stated.ts"]);
+  });
 
-test("appends what a contribution works out from what is being configured", async () => {
-  const held = await resolved(BUILDING, [
-    contribute({
-      at: "test.setupFiles",
-      because: "a reason",
-      itemOf: (context) => `${context.mode}.ts`,
-      name: "one",
-    }),
-  ]);
+  it("appends what a contribution derives from the config", async () => {
+    const held = await resolved(BUILDING, [
+      contribute({
+        at: "test.setupFiles",
+        because: "a reason",
+        itemOf: (context) => `${context.mode}.ts`,
+        name: "one",
+      }),
+    ]);
 
-  expect(held.test?.setupFiles).toEqual(["production.ts"]);
-});
+    expect(held.test?.setupFiles).toStrictEqual(["production.ts"]);
+  });
 
-test("prefers what it works out, where a layer states both", async () => {
-  const held = await resolved(BUILDING, [
-    contribute({
-      at: "test.setupFiles",
-      because: "a reason",
-      item: "stated.ts",
-      itemOf: () => "worked-out.ts",
-      name: "one",
-    }),
-  ]);
+  it("prefers the derived value when a layer declares both", async () => {
+    const held = await resolved(BUILDING, [
+      contribute({
+        at: "test.setupFiles",
+        because: "a reason",
+        item: "stated.ts",
+        itemOf: () => "worked-out.ts",
+        name: "one",
+      }),
+    ]);
 
-  expect(held.test?.setupFiles).toEqual(["worked-out.ts"]);
+    expect(held.test?.setupFiles).toStrictEqual(["worked-out.ts"]);
+  });
 });

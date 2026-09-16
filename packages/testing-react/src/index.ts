@@ -1,16 +1,11 @@
 /**
- * Reading a rendered component in a specification.
+ * Reads a rendered React component through the markings its anatomy carries.
  *
- * A component reports what it is doing through the `data-part` marking each piece of its anatomy
- * and the `data-` attributes carrying its state. Those are the handles a specification holds: a
- * class name changes with the recipe, the text changes with the copy, and the shape of the tree
- * changes whenever the library underneath is upgraded.
- *
- * Every reader here throws where the part it was asked for is absent, naming it. That is what lets
- * a specification write the read inline, without a guard at the call site and without the non-null
- * assertion the linter refuses — and it is what makes a failure say which part went missing rather
- * than that `undefined` is not `"open"`.
- *
+ * @remarks
+ *   A specification reaches a piece of a component by the part name it is marked with, and its
+ *   state by the data attributes beside it. A class name, the text and the shape of the tree all
+ *   move under a restyling, so a specification reaching through any of those three fails on a
+ *   change that broke nothing.
  * @packageDocumentation
  */
 

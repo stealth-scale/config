@@ -1,5 +1,6 @@
 /**
- * A bill of materials for what a build reached, and the toolchain that produced it.
+ * Writes a CycloneDX bill of materials listing what a build actually put into its bundle, read from
+ * the module graph rather than from any manifest and pinned against the lockfile.
  *
  * @packageDocumentation
  */
@@ -26,88 +27,82 @@ import {
 import { type Installed, locked } from "#locked.ts";
 
 /**
- * Where the document is written when a caller names nowhere else.
+ * The path the document is written to when a caller names none.
  */
 const AT = "cyclonedx/bom.json";
 
 /**
- * Who supplied what a build produced.
+ * The organisation a document names as having supplied the thing it describes.
+ *
+ * @remarks
+ *   CycloneDX carries a supplier on the document's metadata rather than on each component, so this
+ *   describes whoever produced the build and says nothing about any package inside it.
  */
 export interface Supplier {
   /**
-   * The organisation's registered name, since a document like this is read by whoever has to write
-   * to somebody about it.
+   * The organisation's name, written into the document as given.
    */
   name: string;
 
   /**
-   * Where to read about it.
+   * Each address a consumer can reach the organisation at.
    */
   url: readonly string[];
 }
 
 /**
- * Describes a bill of materials.
+ * Fixes what a caller decides about the document, leaving the rest to the build.
+ *
+ * @remarks
+ *   No field is inferred from another. An identity and a clock reading are asked for separately
+ *   because a reproducible release often wants the first without the second.
  */
-export interface Stated {
+export interface Described {
   /**
-   * Where the document is written, relative to the output directory.
-   *
-   * More than one path writes more than one copy. A deployment usually wants a second at
-   * `.well-known/sbom`, which is where a scanner looks on something already running; a tarball
-   * wants only the first, because nothing serves a tarball.
-   *
-   * Whether a given build is one or the other is not this plugin's to know, so it is asked rather
-   * than worked out.
+   * Each path the document is emitted at, relative to the output directory.
    */
   paths?: readonly string[];
 
   /**
-   * Whether the document carries a serial number.
-   *
-   * One document's identity, which a scanner tracks it by. It is also random, so two builds of one
-   * commit differ by it — which is why it is asked for rather than always written.
+   * Whether the document carries a random URN naming this one build.
    */
   serialNumber?: boolean;
 
   /**
-   * Who supplied it.
+   * Who supplied the build. An absent supplier is left out of the document entirely.
    */
   supplier?: Supplier;
 
   /**
-   * Whether the document says when it was written.
-   *
-   * Separate from the serial number because they are separately wanted: a reproducible release may
-   * carry an identity and no clock reading.
+   * Whether the document records the moment it was written.
    */
   timestamp?: boolean;
 
   /**
-   * What is being described: something deployed, or something installed.
+   * Whether the subject is deployed or installed. A subject with no type is a library.
    */
   type?: "application" | "library";
 }
 
 /**
- * Refuses a licence string that is not a valid SPDX expression.
+ * Rejects an SPDX expression the parser refuses.
  *
- * The factory asks for something that throws rather than something that answers, so what the parser
- * returns is dropped. What it is for is telling `MIT OR Apache-2.0` — an expression — apart from a
- * plain identifier or a name somebody invented, which is the difference between a document a
- * licence review can act on and one holding strings.
- *
- * @param held - The licence, as the manifest states it.
- * @throws Error Where it is not an expression.
+ * @remarks
+ *   The licence factory reads a thrown error as its answer, and falls back to recording the
+ *   declared licence as a name. A validator that returned a boolean would be read as valid.
+ * @throws {@link Error} When the text is not a licence expression SPDX defines.
  */
 function expression(held: string): void {
   parse(held);
 }
 
 /**
- * Builds the components, reading a licence as the expression it is.
+ * Assembles the builder that turns a package manifest into a component.
  *
- * @returns The builder.
+ * @remarks
+ *   One builder serves every component in a document, and holds the licence and external reference
+ *   factories that decide how a manifest's fields are read.
+ * @returns A builder that reads a manifest in the shape npm writes one.
  */
 function building(): Contrib.FromNodePackageJson.Builders.ComponentBuilder {
   return new Contrib.FromNodePackageJson.Builders.ComponentBuilder(
@@ -117,14 +112,12 @@ function building(): Contrib.FromNodePackageJson.Builders.ComponentBuilder {
 }
 
 /**
- * Reads where a package was actually installed from.
+ * Finds where a package came from, among the fields an installer leaves behind in its manifest.
  *
- * A package manager writes this into the installed copy's manifest: npm as `_resolved`, and a
- * registry tarball as `dist.tarball`. Bun writes neither, so under bun there is nothing here to
- * read and every package looks like a registry one.
- *
- * @param manifest - The installed package's manifest.
- * @returns The URL it came from, or nothing where the manager recorded none.
+ * @remarks
+ *   Each field is read in turn and the first one present answers. npm writes `_resolved`, yarn
+ *   writes `resolved`, and a plain registry install may leave nothing but the tarball under `dist`.
+ *   bun writes none of the three, which is why the lockfile is read as well.
  */
 function installedFrom(manifest: Manifest): string | undefined {
   const dist = manifest["dist"];
@@ -137,21 +130,15 @@ function installedFrom(manifest: Manifest): string | undefined {
 }
 
 /**
- * Says where a package came from, where that is not the default registry.
+ * Decides the package URL qualifier that records where a package was fetched from.
  *
- * A package URL means `registry.npmjs.org` unless it says otherwise, so a package from GitHub
- * Packages, a company registry or a git remote needs the difference written down — otherwise a
- * scanner looks up a public package of the same name and answers about something else entirely.
- *
- * A git remote is recorded as `vcs_url` and anything else as `repository_url`, which is what the
- * package URL specification asks of an npm package that did not come from the default registry.
- *
- * The lockfile is asked first and the manifest second, because only one of them can answer under a
- * given package manager: bun writes nothing into an installed package, npm writes `_resolved`.
- *
- * @param manifest - The installed package's manifest.
- * @param installed - The lockfile's record for it.
- * @returns The qualifiers, or nothing where it came from the default registry.
+ * @remarks
+ *   The lockfile is trusted over the manifest, because a manifest field survives a reinstall that
+ *   changed the source. A plain version and the default registry each identify a package on their
+ *   own, and a qualifier for either would only make the key an advisory database matches on harder
+ *   to match.
+ * @returns A single qualifier naming a version control or a repository URL, or null for a package
+ *   the default registry already identifies.
  */
 function qualifiers(manifest: Manifest, installed?: Installed): null | Record<string, string> {
   const held = installed?.registry ?? installed?.resolution ?? installedFrom(manifest);
@@ -170,13 +157,11 @@ function qualifiers(manifest: Manifest, installed?: Installed): null | Record<st
 }
 
 /**
- * Records the hash the install was verified against.
+ * Sets the hash of the archive a package was installed from, where the lockfile pinned one.
  *
- * Lets a reader check that the component in front of them is the one this describes, which is the
- * difference between an inventory and a claim.
- *
- * @param component - The component to attach to.
- * @param installed - The lockfile's record for it.
+ * @remarks
+ *   A digest the library refuses to split leaves the component without a hash and does not stop the
+ *   build. A hash nobody can read is worth less than the document it would otherwise cost.
  */
 function verified(component: Models.Component, installed?: Installed): void {
   if (installed?.integrity === undefined) return;
@@ -187,22 +172,15 @@ function verified(component: Models.Component, installed?: Installed): void {
     );
 
     component.hashes.set(algorithm, value);
-  } catch {
-    // An integrity this cannot read says nothing worth recording, and is not worth failing over.
-  }
+  } catch {}
 }
 
 /**
- * Names a component the way a scanner looks one up.
+ * Keys a component by its package URL and pins it to what the lockfile says was installed.
  *
- * A package URL rather than the generated reference the library mints on its own. It is what every
- * advisory database is keyed on, so a document without one lists what is installed while saying
- * nothing a scanner can act on. It doubles as what the dependency graph points with, which makes
- * that graph readable rather than a table of opaque handles.
- *
- * @param component - The component to name.
- * @param manifest - The manifest it was built from.
- * @param installed - The lockfile's record for it.
+ * @remarks
+ *   The same URL becomes the component's `bom-ref`, so a dependency edge points at the string an
+ *   advisory database keys on rather than at a reference only this document understands.
  */
 function identify(component: Models.Component, manifest: Manifest, installed?: Installed): void {
   const url = new PackageURL(
@@ -220,17 +198,12 @@ function identify(component: Models.Component, manifest: Manifest, installed?: I
 }
 
 /**
- * Attaches the licence files a package ships, as evidence for what it says it is.
+ * Attaches the licence files shipped in a package as base64 evidence on its component.
  *
- * The manifest's `license` field is a declaration; this is the text beside it. Both are recorded,
- * because a review seeing only the declaration cannot tell a mislabelled package from a correct
- * one.
- *
- * Base64, which is what the format asks for: a licence is prose with newlines and occasionally
- * something outside ASCII, and encoding it is what keeps the document valid JSON.
- *
- * @param component - The component to attach to.
- * @param at - The package's directory.
+ * @remarks
+ *   A manifest's declared expression and the text beside it disagree often enough that a licence
+ *   review needs to read both. A directory shipping no licence file leaves the component's evidence
+ *   unset rather than present and empty.
  */
 function evidence(component: Models.Component, at: string): void {
   const held = licensed(at);
@@ -254,11 +227,13 @@ function evidence(component: Models.Component, at: string): void {
 }
 
 /**
- * Reads the manifest of a package by the name it is imported under.
+ * Locates the manifest of a named tool as it resolves from the described package.
  *
- * @param at - Where the package being described is.
- * @param named - The tool's name.
- * @returns Its manifest, or nothing where the tool is not installed.
+ * @remarks
+ *   Resolution starts at the described package rather than at this plugin, so a tool hoisted to the
+ *   workspace root is found and a tool declared under a different version elsewhere is not
+ *   mistaken for it.
+ * @returns The tool's manifest, or undefined when nothing resolves under that name.
  */
 function toolAt(at: string, named: string): Manifest | undefined {
   try {
@@ -269,16 +244,12 @@ function toolAt(at: string, named: string): Manifest | undefined {
 }
 
 /**
- * Records what built this, each tool as a component of the document rather than of the artefact.
+ * Records the tools that produced the build on the document's metadata.
  *
- * Derived rather than asked for. The bundler reports its own version at run time, so what lands
- * here is what actually ran — not what happened to be resolvable, which is the mistake that put a
- * bundler into every document the plugin this replaces wrote. Beside those go the tools the package
- * declares it is built with, read from its own manifest and passed over where one is absent.
- *
- * @param bom - The document.
- * @param at - The package's directory.
- * @param components - The builder.
+ * @remarks
+ *   Both vite and rolldown report their own versions at run time, so what is written is what ran
+ *   rather than what a manifest asked for. The rest come from the described package's
+ *   `devDependencies`, and one that is declared but not installed is passed over silently.
  */
 function toolchain(
   bom: Models.Bom,
@@ -310,16 +281,16 @@ function toolchain(
 }
 
 /**
- * Says who this is, who supplied it, and whether it is a release.
+ * Puts the subject of the document, and everything asked about it, on the metadata.
  *
- * @param bom - The document.
- * @param stated - The thing being described.
- * @param at - The package's directory.
- * @param components - The builder.
+ * @remarks
+ *   A directory with no readable manifest still produces a document: it gets the rest of the
+ *   metadata and no subject component. The lifecycle is always the build phase, since this runs
+ *   inside the build that produced the artefact being described.
  */
 function described(
   bom: Models.Bom,
-  stated: Stated,
+  stated: Described,
   at: string,
   components: Contrib.FromNodePackageJson.Builders.ComponentBuilder,
 ): void {
@@ -349,13 +320,12 @@ function described(
 }
 
 /**
- * Adds every package the build reached, and the edges between them.
+ * Lists every package the build reached, then draws the edges the module graph showed between them.
  *
- * Two passes, because an edge cannot point at a component that does not exist yet.
- *
- * @param bom - The document.
- * @param found - The packages the build reached.
- * @param components - The builder.
+ * @remarks
+ *   Components go in on the first pass and edges on the second, because an edge often points at a
+ *   package the first pass has not created a component for yet. A package the builder declines to
+ *   describe, such as one whose manifest names nothing, takes every edge touching it with it.
  */
 function inventory(
   bom: Models.Bom,
@@ -388,14 +358,19 @@ function inventory(
 }
 
 /**
- * Builds the document.
+ * Serialises the bill of materials for one build as CycloneDX 1.7 JSON.
  *
- * @param stated - The thing being described. `Stated` documents every member.
- * @param bundling - The build to read.
- * @param at - The directory being built.
- * @returns The document, serialised.
+ * @remarks
+ *   Every list in the document is sorted, so the same inputs serialise to the same bytes unless the
+ *   caller asked for a serial number or a timestamp. A build is described whole or not at all: a
+ *   missing manifest or an unreadable lockfile costs the document detail, never the call.
+ * @param stated - The choices the caller settled about the document.
+ * @param bundling - The build being described, read for the module graph it reached.
+ * @param at - The directory of the package being described. This is the bundler's resolved root,
+ *   which under a task runner is not the working directory.
+ * @returns The serialised document.
  */
-export function written(stated: Stated, bundling: Bundling, at: string): string {
+export function written(stated: Described, bundling: Bundling, at: string): string {
   const components = building();
   const bom = new Models.Bom();
   const installed = locked(at);
@@ -410,28 +385,24 @@ export function written(stated: Stated, bundling: Bundling, at: string): string 
 }
 
 /**
- * Writes down what the build was made of, beside what it produced.
+ * Builds the plugin that emits a bill of materials alongside the bundle.
  *
- * A bundle is the one artefact where "what is in this" has no answer anybody can read: every
- * dependency has been inlined, renamed and minified into a file that names none of them. This is
- * that answer, written by the thing that did the inlining and so the only thing that knows.
- *
- * The components come from the module graph rather than from a manifest, which is the difference
- * that matters. A manifest names what was asked for; the graph holds what arrived, including what
- * arrived through something else.
- *
- * @param stated - The thing being described. `Stated` documents every member.
- * @returns The plugin.
+ * @remarks
+ *   The described directory is taken from the bundler's resolved root and is never asked of the
+ *   caller, because under a task runner the working directory is the workspace root and a plugin
+ *   reading it would describe the wrong package.
+ * @returns A plugin that emits its assets while the bundle is generated.
  */
-export function sbom(stated: Stated = {}): Plugin {
+export function sbom(stated: Described = {}): Plugin {
   return plugin({
     name: "stealth:sbom",
 
     /**
-     * Writes the document beside what the bundler produced.
+     * Emits the document at every path the caller named, or at the default one.
      *
-     * @param bundling - The build to read.
-     * @param at - The directory being built.
+     * @remarks
+     *   The build is serialised once and the same bytes go to each path, so a deployment copy and
+     *   the artefact copy can never drift apart.
      */
     writes(bundling, at) {
       const source = written(stated, bundling, at);

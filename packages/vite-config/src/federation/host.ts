@@ -1,5 +1,10 @@
 /**
- * An application that loads modules from another one at run time.
+ * Lets an application import modules that another deployment serves.
+ *
+ * @remarks
+ *   A host records the name of each remote and nothing about where it lives. The
+ *   address is registered at run time, so one build runs against any deployment
+ *   of the remotes it names.
  */
 
 import { contribute, type Layer, preset } from "@stealthscale/vite-config-core";
@@ -8,65 +13,38 @@ import { plugged } from "#federation/plugged.ts";
 import { type Remotes, type Shared, UNSET } from "#federation/settings.ts";
 
 /**
- * Describes what an application loads.
+ * Declares which remotes an application imports from, and on what terms.
  */
 export interface Hosted {
   /**
-   * What it is called.
+   * Identifies this application to the federation runtime.
    */
   name: string;
 
   /**
-   * Each remote it loads, against the URL that remote's entry is served from.
-   *
-   * Absent where the endpoints are not known when the build runs, which is the usual case for
-   * anything deployed more than once: a URL written here is compiled in, so the same build cannot
-   * be promoted from one environment to the next. A host that leaves this out registers its remotes
-   * at run time instead, from configuration its deployment serves.
+   * Lists each remote this application imports from, by name alone.
    */
   remotes?: Remotes | undefined;
 
   /**
-   * What it hands to its remotes rather than letting each bring a copy. React and its renderer
-   * belong here for anything that renders, because two copies of React in one page share no hooks.
+   * Declares which dependencies a remote is expected to reuse from this host.
    */
   shared?: Shared;
 
   /**
-   * Each name imported from a remote, against what stands in for it while the tests run.
-   *
-   * As absolute paths. The runner reads a relative one against whatever it happens to be rooted at,
-   * which is not this package, so `join(import.meta.dirname, ...)` is how these are written.
+   * Maps a specifier imported from a remote to a local module, keyed as the import writes it.
    */
   stubs?: Readonly<Record<string, string>> | undefined;
 }
 
 /**
- * Loads the named applications at run time.
+ * Adds the plugins that resolve a remote import, and an alias for each stand-in.
  *
- * The host is the one that owns the page, so it is the one that decides what is shared: a remote
- * asking for a singleton gets the host's copy, and brings its own only where the host offers none.
- * That ordering is why the two lists have to agree on a version range, and why a mismatch shows up
- * as a second React rather than as an error.
- *
- * A name here and a URL are two different commitments, and only the first is a build's to make. The
- * bundler has to know the name: `remote/Thing` is resolved while the application is built, and a
- * name that was never declared fails the build rather than the page. The URL beside it is a default
- * — what a developer's own machine serves — and a deployment replaces it by registering the same
- * name again at run time with `force`, which is what keeps one artefact promotable from staging to
- * production instead of one build per environment.
- *
- * The federation runtime is injected into the entry rather than the page, so a host with no page of
- * its own still initialises it.
- *
- * The stand-ins are stated here rather than beside the runner's own settings, because forgetting
- * them is not a thing a repository should be able to do. `remote/Thing` is a module the plugin
- * invents while it builds, and the test runner is not a build: a specification reaching any module
- * that imports one fails to load at all, with a resolution error naming a module nobody wrote.
- *
- * @param stated - The name and the remotes. `Hosted` documents every member.
- * @returns The contribution the bundler resolves the remotes through, and what the runner reads in
- *   place of each remote.
+ * @remarks
+ *   Every remote starts out pointed at an address that resolves nowhere, and
+ *   registration replaces it. The stand-ins reach the test runner alone, which
+ *   has no deployment to fetch a remote from.
+ * @returns One layer, and a second holding the stand-in aliases when any were named.
  */
 export function host(stated: Hosted): readonly Layer[] {
   const held = contribute({

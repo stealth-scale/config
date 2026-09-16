@@ -1,36 +1,25 @@
 /**
- * What a package is checked against before it is published.
+ * Checks a published package the way a consumer's own toolchain will read it.
  */
 
 import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
- * The subpaths a type checker has nothing to say about.
+ * Matches the entry points that ship no types and are not meant to.
  *
- * `attw` resolves every published subpath as a module and reports the ones whose types it cannot
- * reach. A stylesheet has none to reach: it is an asset a bundler loads, the packer exports it
- * because it emitted it, and no declaration was ever going to sit beside it. Reported as a failure
- * it is noise, and noise on this check is what stops anybody reading the rest of it.
- *
- * `publint` still checks these, which is the half that matters for an asset — that the file the
- * subpath names is one the tarball holds.
+ * @remarks
+ *   A stylesheet entry has no declaration behind it. The type check reads a missing declaration as
+ *   a broken entry point, so each such entry has to be named here or the check fails on a package
+ *   that is correct.
  */
 const UNTYPED = [/\.css$/u];
 
 /**
- * Checks the package the way the ecosystem will, before anybody installs it.
+ * Reads the packed output back, both as a package manager sees it and as a type checker does.
  *
- * Two checks, both off by the packer's own default, both about the manifest rather than the code.
- * `publint` reads it the way a package manager does: an export pointing at a file that is not
- * shipped, a `main` that disagrees with `exports`, a condition in the wrong order. `attw` resolves
- * the types the way each module system does, which is the one that catches a package whose types
- * work under one resolution and vanish under another.
- *
- * Neither can be run by a consumer on a package they did not publish, and neither shows up in a
- * repository's own tests, because every one of them imports by a path the packer has not written
- * yet. This is the only place the mistake is visible.
- *
- * @returns The preset.
+ * @remarks
+ *   Both checks run against what the packer wrote rather than what the repository stated, so they
+ *   catch an export map the build got wrong as well as one a package declared wrong.
  */
 export function quality(): Preset {
   return preset({

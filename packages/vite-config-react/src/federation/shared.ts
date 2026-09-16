@@ -1,5 +1,5 @@
 /**
- * What two federated applications have to agree on before either renders.
+ * Declares React and its renderer as singletons for a federated application to share.
  */
 
 import { createRequire } from "node:module";
@@ -7,24 +7,21 @@ import { createRequire } from "node:module";
 import { type federation } from "@stealthscale/vite-config";
 
 /**
- * The packages a host and its remotes must load exactly one copy of.
+ * The packages a page may only ever hold one copy of.
  */
 const SINGLETONS = ["react", "react-dom"];
 
 /**
- * Reads the version of React this workspace installed.
+ * Reads the version of the React a build resolves.
  *
- * Resolved rather than named, for the same reason the stylelint package resolves its shared config:
- * the answer has to come from the tree the configuration is running in. React is a peer of this
- * package, so the copy found here is the copy the application will load.
- *
- * Which manifest it reads is an argument so that the failure a repository without React meets is
- * reachable from a specification here, where React is installed.
- *
- * @param read - How to reach React's manifest. Its own unless a specification says otherwise.
- * @returns The version, as that manifest states it.
- * @throws TypeError Where the manifest states no version, which a repository federating React
- *   without React installed is what produces.
+ * @remarks
+ *   The version comes from the tree rather than from a constant here, so a major upgrade needs no
+ *   edit in this package.
+ * @param read - Loads React's manifest. The default reads the copy installed beside this package,
+ *   and a test passes its own.
+ * @returns The version string the manifest declares.
+ * @throws {@link TypeError} When the manifest carries no version string, which is what a missing
+ *   peer looks like from here.
  */
 export function installed(
   read: () => unknown = () => createRequire(import.meta.url)("react/package.json"),
@@ -44,35 +41,26 @@ export function installed(
 }
 
 /**
- * Widens a version to the range that counts as the same React.
+ * Widens a version to the whole major it belongs to.
  *
- * The major, because that is the boundary React treats as breaking. Narrower would refuse a host on
- * a later patch than the remote was built against, which is every deployment eventually.
- *
- * @param version - The installed version.
- * @returns The range.
+ * @remarks
+ *   Two applications on different patches of one major share a dispatcher safely, and a narrower
+ *   range would make the host refuse a remote it can in fact run.
  */
 function same(version: string): string {
   return `^${version.replace(/\..*$/u, "")}.0.0`;
 }
 
 /**
- * The packages a host and its remotes must load exactly one copy of.
+ * Marks React and its renderer as singletons, both at the range of the installed major.
  *
- * Two copies of React in one page do not share hooks. Each keeps its own dispatcher, so a component
- * from the remote calling `useState` reaches the copy that did not render it, and React reports
- * that hooks may only be called inside a function component — which is true, and says nothing about
- * what is wrong.
- *
- * `react-dom` for the same reason one level down: two renderers mean two roots competing for the
- * same tree, and context crosses neither.
- *
- * Named here rather than in each application because the answer is React's rather than any
- * application's, and because a host and a remote disagreeing about it is the failure this exists to
- * prevent — one list, imported by both, cannot disagree with itself.
- *
- * @param version - The installed React. Read from the tree unless a specification says otherwise.
- * @returns The shared packages, ready to hand to `federation.host` or `federation.remote`.
+ * @remarks
+ *   Two copies of React on one page keep separate dispatchers, so a component from a remote calling
+ *   a hook reaches the copy that did not render it and React reports the call as illegal. A
+ *   singleton is what makes the host and its remotes agree on one copy.
+ * @param version - The React version to widen. Reading the installed one is what a caller wants
+ *   unless a test is pinning the result.
+ * @throws {@link TypeError} When no version is passed and React's manifest carries none.
  */
 export function shared(version: string = installed()): federation.Shared {
   const requiredVersion = same(version);

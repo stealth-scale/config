@@ -1,7 +1,7 @@
 {
   "name": "@stealthscale/vite-config-typescript",
   "version": "0.1.1",
-  "description": "The TypeScript settings every stealth package compiles under, as configs to extend.",
+  "description": "Sets the TypeScript options every stealthscale package compiles with.",
   "keywords": [
     "config",
     "tsconfig",
@@ -33,6 +33,6 @@
     "access": "public"
   },
   "engines": {
-    "node": ">=24.0.0"
+    "node": ">=26.0.0"
   }
 }

@@ -1,15 +1,15 @@
 import { type ReactElement, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 
-import { expect, test, vi } from "vite-plus/test";
+import { describe, expect, test, vi } from "vitest";
 
 import { Dashboard } from "#dashboard.tsx";
 
 /**
- * Draws into a detached element and waits for whatever suspended to arrive.
+ * Renders into a fresh element and waits until whatever suspended has arrived.
  *
- * @param element - The element to draw.
- * @returns The text on the page once the other application has answered.
+ * @param element - What to render, including the boundary the lazy import needs.
+ * @returns The text on the page once the substitute for the remote has rendered.
  */
 function drawn(element: ReactElement): Promise<string> {
   const into = document.createElement("div");
@@ -26,12 +26,14 @@ function drawn(element: ReactElement): Promise<string> {
   });
 }
 
-test("draws what the other application answered, reached by the name the config gave it", async () => {
-  await expect(
-    drawn(
-      <Suspense fallback={"Loading."}>
-        <Dashboard count={7} />
-      </Suspense>,
-    ),
-  ).resolves.toContain("7 open");
+describe("dashboard", () => {
+  test("draws what the other application answered, reached by the name the config gave it", async () => {
+    await expect(
+      drawn(
+        <Suspense fallback={"Loading."}>
+          <Dashboard count={7} />
+        </Suspense>,
+      ),
+    ).resolves.toContain("7 open");
+  });
 });

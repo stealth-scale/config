@@ -1,7 +1,7 @@
 {
   "name": "@stealthscale/vite-plugin-sbom",
   "version": "0.2.0",
-  "description": "A bill of materials for what a build actually reached, and the toolchain that produced it.",
+  "description": "Writes a CycloneDX bill of materials from the modules a build reached.",
   "keywords": [
     "cyclonedx",
     "sbom",
@@ -56,19 +56,22 @@
     "yaml": "catalog:"
   },
   "devDependencies": {
+    "@stealthscale/vite-config-plain": "workspace:^",
     "@stealthscale/vite-config-typescript": "workspace:^",
     "@stealthscale/vite-plugin-base": "workspace:^",
     "@types/node": "catalog:",
     "@types/spdx-expression-parse": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vite-plus": "catalog:"
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
   },
   "peerDependencies": {
     "@stealthscale/vite-plugin-base": "workspace:^",
-    "vite": "catalog:peer"
+    "vite": "catalog:peer",
+    "vitest": "catalog:peer"
   },
   "engines": {
-    "node": ">=24.0.0"
+    "node": ">=26.0.0"
   }
 }

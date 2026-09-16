@@ -1,15 +1,16 @@
 /**
- * Size limits, standing in for whether a thing does one thing.
+ * Caps how far a file, a function and a signature may grow.
  */
 
 import { type Rules } from "#lint/rules/rules.ts";
 
 /**
- * How large a thing may get before it is two things.
+ * Limits the length, the nesting, the branching and the parameter count.
  *
- * A file needing more than this is two files and a function needing more is two functions. The
- * numbers are not derived from anything: they are where the argument stops being worth having, and
- * a package needing one raised says so in its own override.
+ * @remarks
+ *   Neither blank lines nor comments count towards a limit, so a doc comment
+ *   never pushes a file over. A function is capped at a fifth of what a file
+ *   is, which leaves room for several of them in a file already at its cap.
  */
 export const SIZE: Rules = {
   complexity: ["error", 10],

@@ -1,5 +1,9 @@
+/**
+ * Checks where each of the two servers listens, and what it answers to.
+ */
+
 import { type UserConfig } from "vite-plus";
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { type Context, type Preset } from "@stealthscale/vite-config-core";
 
@@ -7,19 +11,17 @@ import { bound, port, reachable, type Serving } from "#serving/listening.ts";
 import { answered } from "#vite.fixtures.ts";
 
 /**
- * Both servers, since everything here is true of each.
+ * The two servers every layer here is expected to behave the same way for.
  */
 const BOTH: readonly Serving[] = ["preview", "server"];
 
 /**
- * Reads back the block a layer wrote, under whichever of the two keys it wrote it.
+ * Resolves a layer and reads back the block filed under one of the servers.
  *
- * Read without awaiting, because every layer here states its config outright.
- *
- * @param layer - The layer to read.
- * @param where - Which server it was speaking about.
- * @param stated - Whatever differs from an ordinary package being served.
- * @returns That server's block, or nothing where the layer stated none.
+ * @remarks
+ *   Asking for the server a layer was not written for is how a check proves the
+ *   other one was left alone, so an absent block is an answer rather than a
+ *   failure.
  */
 function block(
   layer: Preset,
@@ -31,80 +33,91 @@ function block(
   return (where === "server" ? held.server : held.preview) as Record<string, unknown> | undefined;
 }
 
-test("writes under the server it was named, and leaves the other alone", () => {
-  for (const where of BOTH) {
-    const other = where === "server" ? "preview" : "server";
+describe("listening", () => {
+  it("writes under the server it was named and leaves the other alone", () => {
+    for (const where of BOTH) {
+      const other = where === "server" ? "preview" : "server";
 
-    expect(block(port(where, 3000), where)?.["port"]).toBe(3000);
-    expect(block(port(where, 3000), other)).toBeUndefined();
-  }
-});
+      expect(block(port(where, 3000), where)?.["port"]).toBe(3000);
+      expect(block(port(where, 3000), other)).toBeUndefined();
+    }
+  });
 
-test("pins the port, so a busy one fails rather than quietly becoming another", () => {
-  for (const where of BOTH) {
-    expect(block(port(where, 3000), where)?.["strictPort"]).toBe(true);
-  }
-});
+  it("pins the port", () => {
+    for (const where of BOTH) {
+      expect(block(port(where, 3000), where)?.["strictPort"]).toBe(true);
+    }
+  });
 
-test("answers to the names it was given", () => {
-  for (const where of BOTH) {
-    expect(block(reachable(where, ["a.example.test"]), where)?.["allowedHosts"]).toEqual([
-      "a.example.test",
-    ]);
-  }
-});
+  it("accepts the names it was given", () => {
+    for (const where of BOTH) {
+      expect(block(reachable(where, ["a.example.test"]), where)?.["allowedHosts"]).toStrictEqual([
+        "a.example.test",
+      ]);
+    }
+  });
 
-test("takes the machine's names instead, where it has arranged its own", () => {
-  for (const where of BOTH) {
-    const held = block(reachable(where, ["stated.example.test"]), where, {
+  it("takes the machine names instead when it has arranged its own", () => {
+    for (const where of BOTH) {
+      const held = block(reachable(where, ["stated.example.test"]), where, {
+        env: { STEALTH_HOSTS: "machine.example.test" },
+      });
+
+      expect(held?.["allowedHosts"]).toStrictEqual(["machine.example.test"]);
+    }
+  });
+
+  it("copies the list it was given", () => {
+    const names = ["a.example.test"];
+
+    expect(block(reachable("server", names), "server")?.["allowedHosts"]).not.toBe(names);
+  });
+
+  it("listens on the address it was given", () => {
+    for (const where of BOTH) {
+      expect(block(bound(where, "127.0.0.1"), where)?.["host"]).toBe("127.0.0.1");
+    }
+  });
+
+  it("listens on every interface when asked to", () => {
+    for (const where of BOTH) {
+      expect(block(bound(where, true), where)?.["host"]).toBe(true);
+    }
+  });
+
+  it("derives the address from the names a repository declared", () => {
+    for (const where of BOTH) {
+      expect(block(bound(where, ["a.example.test"]), where)?.["host"]).toBe("127.0.0.1");
+    }
+  });
+
+  it("derives the address from the machine names too", () => {
+    const held = block(bound("server", []), "server", {
       env: { STEALTH_HOSTS: "machine.example.test" },
     });
 
-    expect(held?.["allowedHosts"]).toEqual(["machine.example.test"]);
-  }
-});
-
-test("copies the list, so a caller's array is not the server's", () => {
-  const names = ["a.example.test"];
-
-  expect(block(reachable("server", names), "server")?.["allowedHosts"]).not.toBe(names);
-});
-
-test("listens on the address it was given", () => {
-  for (const where of BOTH) {
-    expect(block(bound(where, "127.0.0.1"), where)?.["host"]).toBe("127.0.0.1");
-  }
-});
-
-test("listens on every interface where that is what was asked for", () => {
-  for (const where of BOTH) {
-    expect(block(bound(where, true), where)?.["host"]).toBe(true);
-  }
-});
-
-test("works the address out from the names a repository stated", () => {
-  for (const where of BOTH) {
-    expect(block(bound(where, ["a.example.test"]), where)?.["host"]).toBe("127.0.0.1");
-  }
-});
-
-test("works it out from the machine's names too", () => {
-  const held = block(bound("server", []), "server", {
-    env: { STEALTH_HOSTS: "machine.example.test" },
+    expect(held?.["host"]).toBe("127.0.0.1");
   });
 
-  expect(held?.["host"]).toBe("127.0.0.1");
-});
+  it("contributes nothing when no name is given", () => {
+    for (const where of BOTH) {
+      expect(block(bound(where, []), where)).toBeUndefined();
+    }
+  });
 
-test("states nothing where no name is in play, the default bind being right on its own", () => {
-  for (const where of BOTH) {
-    expect(block(bound(where, []), where)).toBeUndefined();
-  }
-});
+  it("names the layer for the server it configures", () => {
+    expect(bound("server", []).name).toBe("server.bound");
+    expect(bound("preview", []).name).toBe("preview.bound");
+    expect(reachable("preview", []).name).toBe("preview.reachable");
+    expect(port("server", 3000).name).toBe("server.port(3000)");
+  });
 
-test("names itself for the server it configures, so a repository can take one back", () => {
-  expect(bound("server", []).name).toBe("server.bound");
-  expect(bound("preview", []).name).toBe("preview.bound");
-  expect(reachable("preview", []).name).toBe("preview.reachable");
-  expect(port("server", 3000).name).toBe("server.port(3000)");
+  it("includes the arguments in its name", () => {
+    expect(bound("server", "127.0.0.1").name).toBe("server.bound(127.0.0.1)");
+    expect(bound("server", true).name).toBe("server.bound(true)");
+    expect(bound("server", ["a.example.test", "b.example.test"]).name).toBe(
+      "server.bound(a.example.test, b.example.test)",
+    );
+    expect(reachable("preview", ["a.example.test"]).name).toBe("preview.reachable(a.example.test)");
+  });
 });

@@ -1,5 +1,11 @@
 /**
- * What the page runs once it has loaded.
+ * Starts the host: recovery first, then registration, then the page.
+ *
+ * @remarks
+ *   The order is the whole of this file. Recovery is subscribed before anything else, because the
+ *   remote is deployed on its own schedule and the chunks this page was told about can already be
+ *   gone. Registration is awaited before the first render, because a module imported from a remote
+ *   that has not been registered fails at that import rather than here.
  */
 
 import { Suspense } from "react";
@@ -11,17 +17,15 @@ import { Shell } from "#shell.tsx";
 import { watching } from "#stale.ts";
 
 /**
- * Where the deployment says the other applications are.
+ * Locates the file the deployment serves to say where the remotes are.
  */
 const WHERE = "/remotes.json";
 
 /**
- * Where the host draws.
+ * Looks up the element the host mounts its shell in, or null on a page without one.
  */
 const root = document.querySelector("#root");
 
-// The other application is deployed on its own schedule, so the chunks this page was told about
-// can be gone by the time it asks for them.
 watching({
   held: sessionStorage,
   reload: () => {
@@ -29,8 +33,6 @@ watching({
   },
 });
 
-// Registered before anything draws, because a module imported from a remote that was never
-// registered fails at the import rather than here.
 join(await endpoints(WHERE));
 
 if (root !== null) {

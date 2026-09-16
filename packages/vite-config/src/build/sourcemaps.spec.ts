@@ -1,16 +1,18 @@
 import { type UserConfig } from "vite-plus";
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { sourcemaps } from "#build/sourcemaps.ts";
 
-test("emits maps, so a production stack trace names a line somebody wrote", () => {
-  expect((sourcemaps().config as UserConfig).build?.sourcemap).toBeTruthy();
-});
+describe("sourcemaps", () => {
+  it("emits maps", () => {
+    expect((sourcemaps().config as UserConfig).build?.sourcemap).toBeTruthy();
+  });
 
-test("hides them, so the bundle points at nothing and a browser fetches nothing", () => {
-  expect((sourcemaps().config as UserConfig).build?.sourcemap).toBe("hidden");
-});
+  it("hides them", () => {
+    expect((sourcemaps().config as UserConfig).build?.sourcemap).toBe("hidden");
+  });
 
-test("names itself, so a build that must not emit them can take the layer back", () => {
-  expect(sourcemaps().name).toBe("build.sourcemaps");
+  it("names the layer so a repository can remove it", () => {
+    expect(sourcemaps().name).toBe("build.sourcemaps");
+  });
 });

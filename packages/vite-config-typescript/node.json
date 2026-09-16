@@ -3,6 +3,6 @@
   "_comment": "What a package the console runs compiles under: the base, plus node's own globals. A build step, a generator or a CLI extends this. It names the same set the lint configuration calls `node`, so a file is held to one environment by both tools rather than to two by accident.",
   "extends": "./base.json",
   "compilerOptions": {
-    "types": ["node"]
+    "types": ["vite-plus", "node"]
   }
 }

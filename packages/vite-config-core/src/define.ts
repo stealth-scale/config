@@ -1,5 +1,9 @@
 /**
- * What a repository's own `vite.config.ts` calls.
+ * Adds `extends` to a Vite config and composes what it lists.
+ *
+ * @remarks
+ *   This is the one entry a package's own `vite.config.ts` calls. The layers
+ *   decide first and the keys written beside them decide last.
  */
 
 import {
@@ -8,45 +12,43 @@ import {
   mergeConfig,
   type UserConfig,
   type UserConfigExport,
-} from "vite-plus";
+} from "vite";
 
 import { resolved } from "#compose.ts";
 import { type Context, contextOf } from "#context.ts";
 import { type Extendable } from "#layer.ts";
 
 /**
- * Describes a repository's config: everything Vite+ takes, and the layers underneath it.
+ * A Vite config with a list of layers to compose underneath it.
  */
 export interface Config extends UserConfig {
   /**
-   * The layers this repository is built on, composed in the order written.
-   *
-   * What is written beside `extends` wins over anything in it. That is the one rule between the
-   * two, and it is the one `tsconfig.json` and the old eslintrc already taught everybody: what you
-   * extend composes, what you write yourself decides.
+   * The layers to compose. Nesting is allowed and flattened in reading order.
    */
   extends?: readonly Extendable[] | undefined;
 }
 
 /**
- * Answers a config for what it is read in.
+ * A config written as a function of what is being configured.
+ *
+ * @remarks
+ *   The function runs once per invocation of the config, before any layer does,
+ *   so the list it puts in `extends` can differ between a build and a serve.
  */
 export type ConfigFn = (context: Context) => Config | Promise<Config>;
 
 /**
- * Composes a repository's config out of layers.
+ * Composes a package's layers and merges its own keys over the result.
  *
- * Given a function, it is called with the context, which is how a config says something true only
- * of a dev server or only of a build. A layer that merely takes part sometimes says so with its own
- * `apply` instead, which keeps the shared layers out of both arms of an `if`.
- *
- * The directory is declared rather than discovered. Nothing a machine could work out on its own is
- * reliable here: the working directory is the workspace root under `vp test`, and the frame the
- * config runs in is a bundled temporary file outside the package altogether.
- *
- * @param at - Where this config is, as `import.meta.dirname`.
- * @param config - The config, or a function answering one.
- * @returns The composed config, for Vite+ to read.
+ * @remarks
+ *   Every key written beside `extends` beats whatever a layer decided for it,
+ *   and `extends` itself never reaches Vite. Each value is merged rather than
+ *   replaced, so an array a caller writes is appended to the one the layers
+ *   built.
+ * @param at - The directory being configured, which `import.meta.dirname` is
+ *   the only reliable way to name.
+ * @param config - The caller's own config, or a function or promise returning
+ *   one.
  */
 export function defineConfig(
   at: string,

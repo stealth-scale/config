@@ -1,7 +1,13 @@
-import { expect, test } from "vite-plus/test";
+/**
+ * Specifies the plugin list the rule groups are written against.
+ */
+
+import { describe, expect, it } from "vitest";
 
 import { PLUGINS } from "#lint/rules/plugin.ts";
 
-test("names only plugins the linter already carries, since an absent one runs no rule", () => {
-  expect(PLUGINS).toEqual(["typescript", "unicorn", "oxc", "import", "promise"]);
+describe("plugin", () => {
+  it("names only plugins the linter already ships", () => {
+    expect(PLUGINS).toStrictEqual(["typescript", "unicorn", "oxc", "import", "promise"]);
+  });
 });

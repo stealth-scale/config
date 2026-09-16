@@ -1,33 +1,40 @@
+/**
+ * Checks the house whitespace, and that the editor is told the same thing.
+ */
+
 import { readFileSync } from "node:fs";
 import { type UserConfig } from "vite-plus";
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { style } from "#fmt/style.ts";
 
 /**
- * The section of `.editorconfig` every file falls under.
+ * The editorconfig section that applies to every file.
  */
 const EVERY = "*";
 
 /**
- * The section a quote style belongs to, since a quote is only a choice in code.
+ * The section naming the files a quote style applies to.
  */
 const CODE = "*.{ts,tsx,mts,cts,js,jsx,mjs,cjs}";
 
 /**
- * The section prose falls under, which the formatter rewraps.
+ * The section naming the files written as prose.
  */
 const PROSE = "*.{md,mdx,yml,yaml}";
 
 /**
- * The section a written file falls under, which nothing should tidy.
+ * The section naming the files no editor is allowed to tidy.
  */
 const WRITTEN = "{*.gen.*,pnpm-lock.yaml}";
 
 /**
- * What an editor is told, read off the file the repository ships.
+ * Parses the repository's editorconfig into sections and their settings.
  *
- * @returns Each section against the settings stated under it.
+ * @remarks
+ *   The parser handles the subset this file asserts on: a section header, a
+ *   comment, and a key on one line. An editorconfig using anything else would
+ *   be read as fewer settings rather than reported as unreadable.
  */
 function editor(): Record<string, Record<string, string>> {
   const source = readFileSync(
@@ -53,64 +60,64 @@ function editor(): Record<string, Record<string, string>> {
 }
 
 /**
- * Reads the measurements the preset sets.
- *
- * @returns Those measurements.
+ * Takes the formatting block the layer states.
  */
 function settings(): NonNullable<UserConfig["fmt"]> {
   return (style().config as UserConfig).fmt as NonNullable<UserConfig["fmt"]>;
 }
 
-test("writes to a hundred columns, which is what the docblocks and the prose wrap to", () => {
-  expect(settings().printWidth).toBe(100);
-});
+describe("style", () => {
+  it("writes to a hundred columns", () => {
+    expect(settings().printWidth).toBe(100);
+  });
 
-test("leaves a docblock that already fits alone, rather than rewrapping what the linter checks", () => {
-  expect(settings().jsdoc).toEqual({ lineWrappingStyle: "balance" });
-});
+  it("leaves a docblock that already fits alone", () => {
+    expect(settings().jsdoc).toStrictEqual({ lineWrappingStyle: "balance" });
+  });
 
-test("indents with two spaces rather than a tab", () => {
-  expect(settings().tabWidth).toBe(2);
-  expect(settings().useTabs).toBe(false);
-});
+  it("indents with two spaces rather than a tab", () => {
+    expect(settings().tabWidth).toBe(2);
+    expect(settings().useTabs).toBe(false);
+  });
 
-test("quotes with double quotes, and ends every file with a newline", () => {
-  expect(settings().singleQuote).toBe(false);
-  expect(settings().insertFinalNewline).toBe(true);
-});
+  it("quotes with double quotes and ends every file with a newline", () => {
+    expect(settings().singleQuote).toBe(false);
+    expect(settings().insertFinalNewline).toBe(true);
+  });
 
-test("ends a line the one way, whatever the machine would have done", () => {
-  expect(settings().endOfLine).toBe("lf");
-});
+  it("ends every line the same way", () => {
+    expect(settings().endOfLine).toBe("lf");
+  });
 
-test("tells an editor the same width and indent the formatter writes", () => {
-  const held = editor()[EVERY];
+  it("tells an editor the same width and indent the formatter writes", () => {
+    const held = editor()[EVERY];
 
-  expect(held?.["max_line_length"]).toBe(String(settings().printWidth));
-  expect(held?.["indent_size"]).toBe(String(settings().tabWidth));
-  expect(held?.["indent_style"]).toBe(settings().useTabs === true ? "tab" : "space");
-});
+    expect(held?.["max_line_length"]).toBe(String(settings().printWidth));
+    expect(held?.["indent_size"]).toBe(String(settings().tabWidth));
+    expect(held?.["indent_style"]).toBe(settings().useTabs === true ? "tab" : "space");
+  });
 
-test("tells an editor the same line ending and final newline the formatter writes", () => {
-  const held = editor()[EVERY];
+  it("tells an editor the same line ending and final newline the formatter writes", () => {
+    const held = editor()[EVERY];
 
-  expect(held?.["end_of_line"]).toBe(settings().endOfLine);
-  expect(held?.["insert_final_newline"]).toBe(String(settings().insertFinalNewline));
-});
+    expect(held?.["end_of_line"]).toBe(settings().endOfLine);
+    expect(held?.["insert_final_newline"]).toBe(String(settings().insertFinalNewline));
+  });
 
-test("tells an editor the same quote, in the section where a quote is a choice", () => {
-  expect(editor()[CODE]?.["quote_type"]).toBe(
-    settings().singleQuote === true ? "single" : "double",
-  );
-});
+  it("tells an editor the same quote", () => {
+    expect(editor()[CODE]?.["quote_type"]).toBe(
+      settings().singleQuote === true ? "single" : "double",
+    );
+  });
 
-test("wraps prose to that width too, since the formatter rewraps it", () => {
-  expect(editor()[PROSE]?.["max_line_length"]).toBe(String(settings().printWidth));
-});
+  it("wraps prose to the same width", () => {
+    expect(editor()[PROSE]?.["max_line_length"]).toBe(String(settings().printWidth));
+  });
 
-test("leaves a written file alone in the editor as well as in the formatter", () => {
-  const held = editor()[WRITTEN];
+  it("leaves a written file alone in the editor as well as in the formatter", () => {
+    const held = editor()[WRITTEN];
 
-  expect(held?.["trim_trailing_whitespace"]).toBe("unset");
-  expect(held?.["insert_final_newline"]).toBe("unset");
+    expect(held?.["trim_trailing_whitespace"]).toBe("unset");
+    expect(held?.["insert_final_newline"]).toBe("unset");
+  });
 });

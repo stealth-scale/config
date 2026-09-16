@@ -1,15 +1,16 @@
 /**
- * The other application's component, as this one reaches it.
+ * Defers the other deployment's dashboard until a route asks something to draw it.
  */
 
 import { lazy } from "react";
 
 /**
- * Fetched when a route first draws it.
+ * Fetches the remote dashboard the first time React renders it.
  *
- * Behind the route rather than beside it, so the entry is fetched when somebody navigates there and
- * not while the first page is loading. That is most of what putting a remote behind a router buys:
- * the two applications are deployed apart and now they are loaded apart as well.
+ * @remarks
+ *   The import is resolved over the network at runtime, so whatever renders this puts a Suspense
+ *   boundary above it. A fetch that fails throws out of the render rather than drawing anything,
+ *   and a chunk the other deployment has since replaced is what the reload watch listens for.
  */
 export const Dashboard = lazy(async () => {
   const held = await import("remote/Dashboard");

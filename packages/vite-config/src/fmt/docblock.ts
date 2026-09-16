@@ -1,21 +1,17 @@
 /**
- * Laying out a docblock, which is the part of one nobody should be doing by hand.
+ * The shape the formatter writes a doc comment in.
  */
 
 import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
- * Lays out every docblock the same way.
+ * Spreads a doc comment over several lines and ends each description with a
+ * full stop.
  *
- * A block always spans several lines, because one collapsed onto a single line stops looking like
- * prose and starts looking like a label — and a label is the thing a docblock is supposed to
- * replace. Every description ends in a full stop, which is the same sentence the linter asks for,
- * decided here so that writing one is not a thing to remember.
- *
- * What is left alone is the wording. A formatter can wrap a line and punctuate a sentence; whether
- * the sentence says anything is `informative-docs`' question, and the linter keeps it.
- *
- * @returns The preset.
+ * @remarks
+ *   The lint rules refuse a single-line block and check the wrap at a fixed
+ *   indent. This makes the formatter produce the form those rules accept, so a
+ *   block is never rewritten into something the linter then rejects.
  */
 export function docblocks(): Preset {
   return preset({

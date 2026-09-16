@@ -1,20 +1,16 @@
 /**
- * What order tests run in.
+ * The order the runner takes the test files in.
  */
 
 import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
- * Runs the files and the tests in a different order every time.
+ * Shuffles the test files so one run does not repeat the order of the last.
  *
- * A test that only passes after another one has run is a test that does not say what it needs. Left
- * in a fixed order, it keeps passing until somebody adds a file above it or runs one on its own,
- * and the failure then names the wrong test.
- *
- * The runner prints the seed it used, so a shuffled failure is reproducible: the order is random
- * between runs rather than unknowable.
- *
- * @returns The preset.
+ * @remarks
+ *   A test leaning on the one before it passes under a fixed order and fails
+ *   under this one. It fails on some runs and not others, which is the point:
+ *   the dependency is there whether or not a run happens to reveal it.
  */
 export function order(): Preset {
   return preset({ config: { test: { sequence: { shuffle: true } } }, name: "test.order" });

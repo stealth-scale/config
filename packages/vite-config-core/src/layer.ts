@@ -1,214 +1,211 @@
 /**
- * What a config is composed of: four kinds of layer, and the only way to make one.
+ * Declares the four kinds of layer and mints one from a plain object.
  *
- * A layer carries a brand nothing outside this module can produce, so a bare object literal is not
- * a layer however closely it resembles one. That is not to keep people out — `defineLayer` is here
- * for a repository writing its own — but to leave exactly one door, which can then insist on a name
- * to report the layer by and a reason to justify it.
+ * @remarks
+ *   A layer carries a brand keyed by a symbol this module never exports, so an
+ *   object with the right fields is still rejected where a layer is expected.
+ *   The brand lives in the type alone and nothing is written at run time.
  */
 
-import { type ConfigEnv, type UserConfig } from "vite-plus";
+import { type ConfigEnv, type UserConfig } from "vite";
 
 import { type Context } from "#context.ts";
 
 /**
- * Marks a layer as minted here. Declared but never exported as a value, so only this module can
- * satisfy it.
+ * The key the brand hangs on.
  */
 declare const MINTED: unique symbol;
 
 /**
- * Says when a layer takes part: on a build, on a dev server, or whenever it decides.
+ * The commands a layer takes part in.
+ *
+ * @remarks
+ *   A string is matched against the command. A function is handed the whole
+ *   environment and is the only form that can read the mode, so a layer meant
+ *   for one mode has to be written as a function.
  */
 export type Apply = "build" | "serve" | ((env: ConfigEnv) => boolean);
 
 /**
- * Holds the brand every layer carries.
+ * The brand every layer carries.
  */
 interface Minted {
   /**
-   * Present on a layer this module made, and on nothing else.
+   * Declared and never assigned, so no run-time check can read it.
    */
   readonly [MINTED]: true;
 }
 
 /**
- * Sets a coherent block of config.
+ * A layer that sets config keys outright.
  *
- * Carries no reason: a preset is this design system's decision and its reason belongs in its own
- * documentation, not restated at every call site.
+ * @remarks
+ *   Every preset merges before the first contribution is appended, so an item a
+ *   contribution appends always lands on top of a list a preset declared.
  */
 export interface Preset extends Minted {
   /**
-   * When it takes part. Always, left out.
+   * Which commands this runs for. Every command when absent.
    */
   apply?: Apply | undefined;
 
   /**
-   * What it sets, or a function of the environment answering the same.
+   * The config to merge, or a function handed the context that returns one.
    */
   config: ((context: Context) => Promise<UserConfig> | UserConfig) | UserConfig;
 
   /**
-   * Where it sits among the other presets. Plugin order is decided here rather than by position in
-   * the list, so a caller cannot break a transform by reordering two lines.
+   * Where this sits among the other presets. Ordered with `pre` when absent.
    */
   enforce?: "post" | "pre" | undefined;
 
   /**
-   * Names this kind.
+   * Tells this apart from the other three kinds.
    */
   kind: "preset";
 
   /**
-   * What it is called, which is also what a removal names to take it back.
+   * The name a removal targets.
    */
   name: string;
 }
 
 /**
- * Appends one item to a list inside the config.
+ * A layer that appends one item to a list inside the config.
  *
- * Carries a reason, because a contribution is the consuming repository's own decision rather than
- * this design system's.
+ * @remarks
+ *   Two contributions naming the same path both land, in the order the
+ *   flattened list gave them. Neither is merged into the other, and a path
+ *   holding something that is not an array is replaced rather than kept.
  */
 export interface Contribution extends Minted {
   /**
-   * When it takes part.
+   * Which commands this runs for. Every command when absent.
    */
   apply?: Apply | undefined;
 
   /**
-   * Which list to append to, as a dotted path: `lint.layers`, `test.setupFiles`.
+   * The dotted path of the list to append to, such as `test.setupFiles`.
    */
   at: string;
 
   /**
-   * Why this repository needs it.
+   * Why the layer is stated. A conformance check rejects an empty reason.
    */
   because: string;
 
   /**
-   * The item appended, where it does not depend on what is being configured.
-   *
-   * Stated instead of `itemOf`, never beside it.
+   * The item to append. Ignored when `itemOf` is present.
    */
   item?: unknown;
 
   /**
-   * Answers the item appended, given what is being configured.
-   *
-   * Stated where the item depends on the repository, the mode or the environment — a bill of
-   * materials carrying a timestamp only for a release, say. Separate from `item` rather than told
-   * apart by its type, because an item may legitimately be a function: a hook, a plugin factory, a
-   * resolver. Nothing could tell those two apart by looking.
+   * Works the item out from the context, and wins over `item`.
    */
   itemOf?: ((context: Context) => unknown) | undefined;
 
   /**
-   * Names this kind.
+   * Tells this apart from a preset, a removal and an override.
    */
   kind: "contribution";
 
   /**
-   * What it is called, which is also what a removal names to take it back.
+   * The name a removal targets.
    */
   name: string;
 }
 
 /**
- * Takes back a contribution made earlier in the list.
+ * A layer that takes another layer back by name.
  *
- * Reaches contributions rather than config, so what it can undo is exactly what something else
- * declared it was adding.
+ * @remarks
+ *   A removal reaches the nearest matching layer above it and the composition
+ *   throws when there is none. The environment is filtered first, so a removal
+ *   aimed at a layer that only runs on `serve` has to carry the same `apply` or
+ *   it throws on a build.
  */
 export interface Removal extends Minted {
   /**
-   * When it takes part.
+   * Which commands this runs for. Every command when absent.
    */
   apply?: Apply | undefined;
 
   /**
-   * Why this repository does not want it.
+   * Why the layer is taken back. A conformance check rejects an empty reason.
    */
   because: string;
 
   /**
-   * Names this kind.
+   * Marks this as the kind that deletes rather than adds.
    */
   kind: "removal";
 
   /**
-   * What it is called.
+   * Identifies this removal, so a later removal can target it.
    */
   name: string;
 
   /**
-   * The name of the layer to take back, of whatever kind. Matching nothing fails the config rather
-   * than passing quietly: a layer renamed upstream would otherwise turn a removal into a no-op and
-   * put back the thing somebody deliberately took out.
+   * The name of the layer to take back.
    */
   target: string;
 }
 
 /**
- * Rewrites the whole config once everything else has been applied.
+ * A layer that rewrites the merged config once every other kind has run.
  *
- * The escape hatch, for what merging cannot express: removing a plugin, reordering a list, reading
- * one value to decide another. Carries a reason because it is the least legible thing here.
+ * @remarks
+ *   An override sees what the layers decided and not what the caller wrote
+ *   beside `extends`, because those keys merge afterwards. Two overrides run in
+ *   the order they were written, each on what the one before returned.
  */
 export interface Override extends Minted {
   /**
-   * When it takes part.
+   * Which commands this runs for. Every command when absent.
    */
   apply?: Apply | undefined;
 
   /**
-   * Why this repository needs to reach past the layers.
+   * Why the config is rewritten. A conformance check rejects an empty reason.
    */
   because: string;
 
   /**
-   * Names this kind.
+   * Marks this as the kind that runs last.
    */
   kind: "override";
 
   /**
-   * What it is called.
+   * The name a removal targets.
    */
   name: string;
 
   /**
-   * Takes what is being configured and the merged config, and answers the config to use instead.
-   *
-   * The context comes first, as it does everywhere a layer is handed one, so its position is never
-   * something to remember.
+   * Takes the config composed so far and returns the one to carry on with.
    */
   refine: (context: Context, config: UserConfig) => UserConfig;
 }
 
 /**
- * One layer of a config.
+ * Any of the four kinds, told apart by `kind`.
  */
 export type Layer = Contribution | Override | Preset | Removal;
 
 /**
- * Describes a layer as it is stated, which is everything but the brand.
+ * A layer as a caller writes it, before it is branded.
  *
- * @typeParam Of - The kind of layer being stated.
+ * @remarks
+ *   Each constructor takes this and returns the branded form. A value of this
+ *   type is what keeps an object nobody minted out of an `extends` list.
  */
 export type Stated<Of extends Layer> = Omit<Of, typeof MINTED>;
 
 /**
- * Puts the brand on a stated layer.
+ * Brands a stated layer so the composition accepts it.
  *
- * The one assertion in this package, and the reason it is safe is that it is unreachable from
- * outside: the brand is a symbol nothing else can name, so this function is the only thing that can
- * widen a plain object into a layer.
- *
- * @typeParam Of - The kind of layer being minted.
- * @param stated - The layer, without its brand.
- * @returns The same layer, branded.
+ * @remarks
+ *   This is the one place the brand is invented. The object is handed back
+ *   untouched, so a minted layer serialises as exactly what the caller wrote.
  */
 function mint<Of extends Layer>(stated: Stated<Of>): Of {
   // eslint-disable-next-line typescript/no-unsafe-type-assertion -- the brand is a phantom, so nothing can produce one by construction
@@ -216,81 +213,56 @@ function mint<Of extends Layer>(stated: Stated<Of>): Of {
 }
 
 /**
- * States a preset.
- *
- * @param stated - Everything but the kind and the brand.
- * @returns A preset that sets that config.
+ * Mints a preset from the keys a caller states.
  */
 export function preset(stated: Omit<Stated<Preset>, "kind">): Preset {
   return mint<Preset>({ ...stated, kind: "preset" });
 }
 
 /**
- * States a contribution.
- *
- * @param stated - Everything but the kind and the brand.
- * @returns A contribution appending that item.
+ * Produces a contribution that appends one item at the path it names.
  */
 export function contribute(stated: Omit<Stated<Contribution>, "kind">): Contribution {
   return mint<Contribution>({ ...stated, kind: "contribution" });
 }
 
 /**
- * States a removal.
- *
- * @param stated - Everything but the kind and the brand.
- * @returns A removal taking that target back.
+ * Returns a layer that takes back whichever layer its target names.
  */
 export function remove(stated: Omit<Stated<Removal>, "kind">): Removal {
   return mint<Removal>({ ...stated, kind: "removal" });
 }
 
 /**
- * States an override.
- *
- * The one minting function a consuming repository calls directly. The rest are what a config
- * package builds its own entry points out of.
- *
- * @param stated - Everything but the kind and the brand.
- * @returns An override running that refinement last.
+ * Wraps a refining function as a layer that runs after every other kind.
  */
 export function override(stated: Omit<Stated<Override>, "kind">): Override {
   return mint<Override>({ ...stated, kind: "override" });
 }
 
 /**
- * A layer, or any nesting of them. A builder needing several answers a list, and a caller spreads
- * nothing.
+ * A layer, or an array nesting layers to any depth.
+ *
+ * @remarks
+ *   A builder returning several layers is written into `extends` as it stands.
+ *   Flattening is depth first, so the order on the page is the order the layers
+ *   take.
  */
 export type Extendable = Layer | readonly Extendable[];
 
 /**
- * Answers whether something extended is one layer rather than a nesting of them.
- *
- * @param held - A layer, or a list of them.
- * @returns Whether it is the layer.
+ * Reports whether an entry in an extends list is one layer rather than a nest of them.
  */
 export function isLayer(held: Extendable): held is Layer {
   return !Array.isArray(held);
 }
 
 /**
- * Puts a package's name on every layer it hands over.
+ * Prefixes every layer in a nest with the name of the package stating it.
  *
- * A repository composes layers from several packages at once, and two of them relaxing the same
- * paths produce two layers with the same generated name. Both apply, which is right; but a removal
- * naming one then takes back whichever is nearest, and there is no way to say which was meant.
- *
- * Applied where a package hands its layers over rather than at each call, so a package cannot label
- * some of its contributions and forget others, and so a block's builders never learn about
- * ownership — which is what makes this work for blocks that do not exist yet.
- *
- * Answers a flat list whatever nesting it was given, because nothing downstream needs the shape:
- * `extends` flattens what it is handed anyway.
- *
- * @param name - The package's own name: `react`, `paraglide`.
- * @param layers - Everything it contributes, nested to any depth.
- * @returns Every layer, each named under that package.
+ * @remarks
+ *   A name becomes `owner/name`, and that full name is what a consumer's
+ *   removal has to target. The nesting is flattened on the way through.
  */
 export function owned(name: string, layers: readonly Extendable[]): readonly Layer[] {
   return layers.flatMap((held) =>
@@ -299,11 +271,23 @@ export function owned(name: string, layers: readonly Extendable[]): readonly Lay
 }
 
 /**
- * Answers whether a layer takes part in this environment.
+ * Renames a layer and copies every other field across.
  *
- * @param layer - Whichever layer is being considered.
- * @param env - The environment the config is being read for.
- * @returns Whether to apply it.
+ * @remarks
+ *   A factory that builds its layer by calling another factory hands back a
+ *   layer named for the inner call. A conformance check rejects a name that
+ *   does not match the exported function a consumer wrote.
+ */
+export function named<Of extends Layer>(name: string, layer: Of): Of {
+  return mint<Of>({ ...layer, name });
+}
+
+/**
+ * Reports whether a layer takes part in the environment being configured.
+ *
+ * @remarks
+ *   A layer stating no `apply` takes part in everything. This runs before
+ *   removals do, so a layer left out here is invisible to one.
  */
 export function applies(layer: Layer, env: ConfigEnv): boolean {
   const { apply } = layer;

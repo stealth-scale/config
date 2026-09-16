@@ -1,5 +1,5 @@
 /**
- * The bill of materials an application ships beside itself.
+ * Records what a deployed application is made of, as a CycloneDX document.
  */
 
 import { contribute, type Contribution } from "@stealthscale/vite-config-core";
@@ -8,33 +8,26 @@ import { sbom, type Supplier } from "@stealthscale/vite-plugin-sbom";
 import { HOUSE } from "#sbom/supplier.ts";
 
 /**
- * Where a scanner looks on a deployment that is already running.
+ * Locates the copy a scanner can fetch from a running deployment without being told where to look.
  */
 const SERVED = ".well-known/sbom";
 
 /**
- * Where the document sits inside the output, which is where a reader of the build looks.
+ * Locates the copy a release pipeline picks up out of the build output.
  */
 const BESIDE = "cyclonedx/bom.json";
 
 /**
- * Writes down what the application was built out of.
+ * Writes the bill of materials for an application, to both the served path and the output tree.
  *
- * A bundle is the one artefact where the question "what is in this" has no answer anybody can read:
- * every dependency has been inlined, renamed and minified into a file that names none of them. A
- * bill of materials is that answer, written by the thing that did the inlining and so the only
- * thing that knows.
- *
- * What it is for is the day after. A report names a package and a version; without an inventory,
- * working out whether a deployment contains it means rebuilding it from the commit it was built
- * from — assuming that is still known — and reading the lockfile. With one it is a lookup, and it
- * is a lookup anybody can do rather than only whoever can reproduce the build.
- *
- * Two copies. One beside the output for whoever has the artefact, and one at `.well-known/sbom`,
- * which is where a scanner looks on a deployment it can only reach over the network.
- *
- * @param supplier - Who supplied it. The house unless a repository says otherwise.
- * @returns The contribution the bundler writes the inventory from.
+ * @remarks
+ *   The document is typed as an application, where its counterpart in `pack` types a library and
+ *   writes one copy. Two copies are written because the two readers differ: a scanner reaches the
+ *   deployment over HTTP, and a release pipeline only ever sees the directory. A serial number and
+ *   a timestamp differ between two builds of the same source, so both are written only in
+ *   production and a development build stays reproducible.
+ * @param supplier - The organisation attributed as publisher of every component. The house
+ *   identity is used unless a repository states its own.
  */
 export function inventory(supplier: Supplier = HOUSE): Contribution {
   return contribute({

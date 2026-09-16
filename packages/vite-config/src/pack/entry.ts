@@ -1,18 +1,17 @@
 /**
- * What a package publishes.
+ * Lists the files a packer builds where the manifest does not decide them.
  */
 
 import { type Preset, preset } from "@stealthscale/vite-config-core";
 
 /**
- * Publishes the files named, and everything they reach.
+ * Builds exactly the files listed, whatever the manifest's export map says.
  *
- * What a package's entry points are is the package's own knowledge and nothing else's: it is the
- * shape of what it offers, decided by whoever wrote it. The packer guesses `src/index.ts` where
- * nothing says otherwise, which is right often enough to be worth stating when it is not.
- *
- * @param files - The entry points, relative to the package.
- * @returns The preset.
+ * @remarks
+ *   The `pack.published` layer derives the same field from the manifest instead, and is the form a
+ *   published package uses. This call suits a package that builds something its export map never
+ *   names, such as a binary or a fixture.
+ * @param files - Each entry, as a path relative to the package.
  */
 export function entry(files: readonly string[]): Preset {
   return preset({

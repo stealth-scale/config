@@ -1,29 +1,31 @@
 /**
- * Stands in for the other application while the tests run.
+ * Substitutes for the remote's dashboard while the specifications run.
  *
- * `remote/Dashboard` is a module the federation plugin invents during a build or a dev server, so
- * nothing resolves it under the test runner and a specification reaching any module that imports it
- * fails to load at all. The runner is pointed here instead, which is also the only way to specify
- * what this application does when the other one answers something in particular.
+ * @remarks
+ *   The federation plugin invents `remote/Dashboard` during a build and a dev server, so the test
+ *   runner cannot resolve it and any specification reaching a module that imports it fails to
+ *   load. The runner resolves the name here instead, which is also the only way to fix what the
+ *   remote answers with.
  */
 
 import { type ReactElement } from "react";
 
 /**
- * Describes what the other application reports.
+ * Mirrors the props the real remote declares, so a mismatch shows up as a type error.
  */
 export interface DashboardProps {
   /**
-   * How many of them there are.
+   * How many items are open.
    */
   count: number;
 }
 
 /**
- * Draws what the other application would draw.
+ * Stands in for the remote's dashboard, down to the class name its panel carries.
  *
- * @param props - The count to report. `DashboardProps` documents every member.
- * @returns The element.
+ * @remarks
+ *   The markup is written out rather than taken from the shared library, so a specification that
+ *   passes here says the host wired the remote up and nothing about how the library renders.
  */
 export function Dashboard(props: DashboardProps): ReactElement {
   return <section className="panel">{`${String(props.count)} open`}</section>;

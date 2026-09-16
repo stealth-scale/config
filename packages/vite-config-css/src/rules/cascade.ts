@@ -1,18 +1,15 @@
 /**
- * What a stylesheet may do to the order rules are applied in.
+ * Keeps a conflict between two rules settled by the cascade alone.
  */
 
 /**
- * The refusals that keep the cascade readable.
+ * Rejects the three declarations that settle a conflict outside the cascade.
  *
- * `!important` wins over the cascade rather than taking part in it, so the next person cannot
- * reason about which rule applies by reading the stylesheet: they have to find every `!important`
- * first. Google refuses it outright.
- *
- * Specificity running backwards is the same problem arrived at by accident. A selector written
- * after a more specific one that targets the same element never applies, and nothing says so — the
- * rule is simply dead. A duplicate selector is the mildest version: two blocks for one thing, where
- * only the second is read and the first is a lie.
+ * @remarks
+ *   An author reaches for `!important` to beat a rule elsewhere, and the next
+ *   author has nothing left to beat it with. Descending specificity and a
+ *   duplicated selector each produce a block that never applies, and neither
+ *   is visible at the line where it was written.
  */
 export const CASCADE = {
   "declaration-no-important": true,

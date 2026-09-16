@@ -2,7 +2,8 @@
   "name": "@stealthscale/example-lib-core",
   "version": "0.0.0",
   "private": true,
-  "description": "A library that reaches for neither node's globals nor the browser's, which is what the base tier is for.",
+  "description": "Adds two money amounts without touching node's globals or the browser's.",
+  "license": "MIT",
   "files": [
     "dist"
   ],
@@ -33,6 +34,7 @@
     "@stealthscale/vite-config": "workspace:^",
     "@stealthscale/vite-config-typescript": "workspace:^",
     "typescript": "catalog:",
-    "vite-plus": "catalog:"
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
   }
 }

@@ -1,27 +1,22 @@
 /**
- * What a specification written as markup is excused.
+ * Excuses the files a specification draws its markup in from the docblock rules.
  */
 
-import { type Contribution, lint } from "@stealthscale/vite-config";
+import { type Contribution, lint, named } from "@stealthscale/vite-config";
 
 /**
- * The files a specification writes markup in.
- *
- * Markup is the only reason a specification is written `.tsx`, so these exist wherever a package
- * renders and nowhere else. The toolchain excuses the `.ts` pair on its own.
+ * The two spellings a rendering specification and its fixtures are written in.
  */
-const RENDERED = ["**/*.spec.tsx", "**/*.fixtures.tsx"];
+export const RENDERED = ["**/*.spec.tsx", "**/*.fixtures.tsx"];
 
 /**
- * Excuses a rendered specification the docblock rules, as the toolchain excuses a plain one.
+ * Stops the linter asking a rendering specification for doc comments.
  *
- * Stated by the workspace rather than by a tier. `lint` is read from the root config and nowhere
- * else, and a root takes the node tier whatever its packages render — so the tier that knows about
- * `.tsx` specifications is never the one the linter reads, and without this they are held to a
- * standard the same file in `.ts` is excused.
- *
- * @returns The contribution.
+ * @remarks
+ *   A workspace root resolves the node tier, which excuses `.spec.ts` and `.fixtures.ts` and knows
+ *   nothing of the `.tsx` spellings. A component written to be driven by one test carries that
+ *   test's name as its whole explanation, and this covers it at the root as well.
  */
 export function rendered(): Contribution {
-  return lint.undocumented(RENDERED);
+  return named("react.lint.rendered", lint.undocumented(RENDERED));
 }

@@ -2,7 +2,8 @@
   "name": "@stealthscale/example-app-host",
   "version": "0.0.0",
   "private": true,
-  "description": "An app that loads another one at run time, working out where its files are from a build manifest.",
+  "description": "Loads another application at run time from an address it fetches at startup.",
+  "license": "MIT",
   "type": "module",
   "imports": {
     "#*": "./src/*"
@@ -30,6 +31,7 @@
     "happy-dom": "catalog:",
     "oxc-transform-react": "catalog:",
     "typescript": "catalog:",
-    "vite-plus": "catalog:"
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
   }
 }
