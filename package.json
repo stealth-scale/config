@@ -13,6 +13,7 @@
     "@changesets/changelog-github": "catalog:",
     "@changesets/cli": "catalog:",
     "@commitlint/cli": "catalog:",
+    "@stealthscale/testing": "workspace:^",
     "@stealthscale/testing-config": "workspace:^",
     "@stealthscale/vite-config": "workspace:^",
     "@stealthscale/vite-config-css": "workspace:^",

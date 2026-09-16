@@ -1,10 +1,11 @@
 # @stealthscale/testing
 
 `@stealthscale/testing` builds a scratch directory for a specification under the system temporary
-directory, and writes the package manifests that fill it. The remaining exports read a CSS length
-and the gap between two laid-out elements. A specification owns everything in its workspace, so it
-may assert an exact file count and exact names. Vitest is a peer dependency, and no export calls
-into it.
+directory, and writes the package manifests that fill it. A second group of exports calls one hook
+of a Vite plugin each, the way a bundler would. The remaining exports read a CSS length and the gap
+between two laid-out elements. A specification owns everything in its workspace, so it may assert an
+exact file count and exact names. Vite and Vitest are peer dependencies, and no export calls into
+either.
 
 ## Install
 
@@ -12,7 +13,7 @@ into it.
 pnpm add -D @stealthscale/testing
 ```
 
-The package peers on `vitest` and requires Node 26 or later.
+The package peers on `vite` and `vitest` and requires Node 26 or later.
 
 ## Usage
 
@@ -82,6 +83,22 @@ supplies the last part of the directory name, so two calls never collide.
 | `packageFiles`   | `(directory: string, fields: ManifestFields, files?: ScratchFiles) => ScratchFiles`           | Places a package's manifest and the rest of its files under `directory`, keyed by their path from the workspace root                            |
 | `workspaceFiles` | `(workspaces: readonly string[], fields?: Readonly<Record<string, unknown>>) => ScratchFiles` | Declares a workspace root over the globs its packages live under. The root is named `root` and marked private, and `fields` is merged over both |
 
+### Plugin drivers
+
+| Export        | Signature                                                                                          | What it does                                                                                                                                    |
+| ------------- | -------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Configured`  | `{ root: string; [field: string]: unknown }`                                                       | The resolved configuration a driven plugin reads. `root` is the one field every house plugin reads, and any further field is handed on as given |
+| `Graphed`     | `{ id: string }`                                                                                   | A module as the graph hands one back, cut down to the id a plugin invalidates it by                                                             |
+| `HookContext` | `interface`                                                                                        | What a hook reads off `this`: `addWatchFile`, `environment.moduleGraph`, `warn`, and the `invalidated`, `warned` and `watched` records          |
+| `hookContext` | `(graphed?: readonly string[]) => HookContext`                                                     | Builds the context a hook reads `this` from. Its module graph answers for the ids in `graphed` and for nothing else                             |
+| `configured`  | `(plugin: Plugin, config: Configured) => Promise<void>`                                            | Calls `configResolved` with `config`                                                                                                            |
+| `started`     | `(plugin: Plugin, context: HookContext) => Promise<void>`                                          | Calls `buildStart` with `context` bound as `this`                                                                                               |
+| `resolved`    | `(plugin: Plugin, id: string, importer?: string) => Promise<string \| undefined>`                  | Calls `resolveId` and returns the id the plugin answered with, read from a string or from an object, or undefined where it declined             |
+| `loaded`      | `(plugin: Plugin, id: string) => Promise<string \| undefined>`                                     | Calls `load` and returns the code the plugin answered with, read from a string or from an object, or undefined where it declined                |
+| `transformed` | `(plugin: Plugin, context: HookContext, code: string, id: string) => Promise<string \| undefined>` | Calls `transform` with `context` bound as `this` and returns the code written back, or undefined where the plugin passed on the module          |
+| `updated`     | `(plugin: Plugin, context: HookContext, file: string, content?: string) => Promise<void>`          | Calls `hotUpdate` with `context` bound as `this`, for a file whose `read` resolves to `content`                                                 |
+| `generated`   | `(plugin: Plugin, bundling: object) => Promise<void>`                                              | Calls `generateBundle` with `bundling` bound as `this`                                                                                          |
+
 ### Measurement
 
 | Export        | Signature                                       | What it does                                                                                                                                                            |
@@ -102,6 +119,42 @@ directory is gone.
 Warning: `withScratchWorkspace` does not await the function it runs. A function returning a promise
 loses its directory while it is still running, which is the case `withScratchWorkspaceAsync` covers.
 Work that a function starts and does not await loses the directory under it either way.
+
+## Driving a plugin
+
+A plugin is a set of hooks, and a hook reads `this` for the context the bundler binds. Each driver
+calls one hook the way a bundler would and returns what the hook produced, so a specification
+asserts on the stylesheet a plugin served or on the file it asked to watch rather than on the
+members of the plugin object.
+
+```ts
+import { describe, expect, it } from "vitest";
+
+import { configured, hookContext, loaded, resolved, started } from "@stealthscale/testing";
+
+import { stylesheet } from "#index.ts";
+
+describe("stylesheet", () => {
+  it("serves the layer declaration under the stylesheet subpath", async () => {
+    const plugin = stylesheet();
+    const context = hookContext();
+
+    await configured(plugin, { root: "/pkg" });
+    await started(plugin, context);
+
+    const id = await resolved(plugin, "@acme/theme/styles.css");
+
+    await expect(loaded(plugin, id ?? "")).resolves.toContain("@layer reset, base;");
+  });
+});
+```
+
+Every driver throws when the plugin has no such hook. A specification that calls `loaded` on a
+plugin whose `load` hook was removed fails on that call, and never passes because the hook returned
+nothing. A hook written in the object form, `{ handler, order }`, is called through its handler.
+`hookContext` records what a hook asked the bundler for. `watched` lists each file it asked to
+watch. `warned` lists each message it reported. `invalidated` lists each module it asked the graph
+to drop.
 
 ## Measuring in a document
 

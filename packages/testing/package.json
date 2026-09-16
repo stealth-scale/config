@@ -1,7 +1,7 @@
 {
   "name": "@stealthscale/testing",
   "version": "0.1.1",
-  "description": "Supplies the scratch workspaces, manifests and element measurements a specification needs.",
+  "description": "Supplies the scratch workspaces, manifests, element measurements and plugin drivers a specification needs.",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -45,10 +45,12 @@
     "@types/node": "catalog:",
     "publint": "catalog:",
     "typescript": "catalog:",
+    "vite": "catalog:",
     "vite-plus": "catalog:",
     "vitest": "catalog:"
   },
   "peerDependencies": {
+    "vite": "catalog:peer",
     "vitest": "catalog:peer"
   },
   "engines": {
