@@ -1,6 +1,6 @@
 {
   "name": "@stealthscale/vite-config-react",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Adds the JSX transform, the React lint rules and a test document to a package that renders.",
   "keywords": [
     "config",

@@ -1,5 +1,17 @@
 # @stealthscale/vite-config-react
 
+## 0.6.1
+
+### Patch Changes
+
+- [#19](https://github.com/stealth-scale/config/pull/19) [`815c5fe`](https://github.com/stealth-scale/config/commit/815c5feeb02c060db0d6306ee3e1931992da0ea9) Thanks [@stealth-rklopper](https://github.com/stealth-rklopper)! - vite-config-react: unmount every rendered root after each test
+  
+  - `vitest.setup.ts` calls Testing Library's `cleanup` before it empties `document.body`, so an
+    effect's cleanup runs and a scroll lock or a listener from one test no longer reaches the next.
+  - The package peers on `@testing-library/react`.
+- Updated dependencies [[`cfc5b2a`](https://github.com/stealth-scale/config/commit/cfc5b2a7b55fd1f115faa6b76416277814352a3d)]:
+  - @stealthscale/vite-config@0.5.0
+
 ## 0.6.0
 
 ### Minor Changes
