@@ -122,4 +122,14 @@ describe("fs", () => {
   it("empties the target when the source is absent", () => {
     expect(synced({ "to/a.txt": "a" })).toStrictEqual([]);
   });
+
+  it("does nothing when both directories are absent", () => {
+    const created = withScratchWorkspace({}, (workspace) => {
+      syncDir(workspace.path("from"), workspace.path("to"));
+
+      return existsSync(workspace.path("to"));
+    });
+
+    expect(created).toBe(false);
+  });
 });
