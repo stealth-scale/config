@@ -14,21 +14,31 @@ pnpm add -D @stealthscale/vite-config-typescript
 }
 ```
 
-| Config        | Adds                                       |
-| ------------- | ------------------------------------------ |
-| `./base.json` | Everything but the environment             |
-| `./node.json` | `types: ["node"]`                          |
-| `./web.json`  | `lib: dom, dom.iterable` and `vite/client` |
+| Config        | Adds                                                      |
+| ------------- | --------------------------------------------------------- |
+| `./base.json` | Everything but the environment, and the toolchain's types |
+| `./node.json` | `types: ["node"]`                                         |
+| `./web.json`  | `lib: dom, dom.iterable` and `vite/client`                |
 
 ## Why the split
 
-`types` in the base is deliberately empty. Left out, every `@types/*` anywhere in `node_modules` is
-in scope, and a browser package silently sees node's globals — so `process.env` type-checks and then
-fails in somebody's browser. Each of the two environment configs adds exactly one set, which is what
-makes the split mean anything.
+`types` in the base names the toolchain and nothing else. Left out, every `@types/*` anywhere in
+`node_modules` is in scope. Each of the two environment configs adds exactly one set on top.
 
 The names match the sets the lint configuration calls `node` and `web`, so a file is held to one
 environment by both tools rather than to two by accident.
+
+## Where the toolchain is named
+
+Every package imports `vite`. The fields the toolchain adds to a Vite config, which are `pack`,
+`lint`, `fmt`, `run`, `staged` and `test`, are typed by the toolchain's own augmentation of `vite`,
+and the base loads that augmentation by naming `vite-plus` in `types`. That is the one place the
+compiler learns which toolchain is in use. Swapping the toolchain is a change to this line and to
+the scripts in each manifest, and to no import anywhere.
+
+Note: the toolchain's types reference node's, so node's globals are visible to the compiler in a
+browser package as well. The split governs `lib` and what each environment adds, not the absence of
+node.
 
 ## The base
 

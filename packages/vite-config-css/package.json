@@ -58,8 +58,10 @@
     "stylelint-order": "catalog:",
     "stylelint-use-nesting": "catalog:",
     "typescript": "catalog:",
+    "vite": "catalog:",
     "vite-plugin-stylelint": "catalog:",
-    "vite-plus": "catalog:"
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
   },
   "peerDependencies": {
     "@stealthscale/vite-config-core": "workspace:^",
@@ -68,10 +70,11 @@
     "stylelint-high-performance-animation": "catalog:",
     "stylelint-order": "catalog:",
     "stylelint-use-nesting": "catalog:",
+    "vite": "catalog:peer",
     "vite-plugin-stylelint": "catalog:",
-    "vite-plus": "catalog:"
+    "vitest": "catalog:peer"
   },
   "engines": {
-    "node": ">=24.0.0"
+    "node": ">=26.0.0"
   }
 }
