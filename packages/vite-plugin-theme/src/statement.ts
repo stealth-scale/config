@@ -4,14 +4,14 @@
  *
  * @remarks
  *   Both are imported rather than parsed, because what they hold are live objects another package
- *   exported, which no amount of reading a file would reproduce. The import goes through Vite under
- *   the application's export conditions, so a workspace package resolves to its source.
+ *   exported, which no amount of reading a file would reproduce. The import goes through an
+ *   importer the caller opened under the application's export conditions, so a workspace package
+ *   resolves to its source and a batch of imports shares one environment.
  */
 
 import { join } from "node:path";
-import { type ViteDevServer } from "vite";
 
-import { exportTarget, imported, type Loading, manifestAt } from "@stealthscale/vite-plugin-base";
+import { exportTarget, type Importer, manifestAt } from "@stealthscale/vite-plugin-base";
 
 import { PRESET_SUBPATH, STATEMENT } from "#options.ts";
 import { type Preset, type StaticCssOptions, type ThemeVariant } from "#pandacss.ts";
@@ -92,13 +92,13 @@ export interface Published {
 }
 
 /**
- * Loads the application's statement.
+ * Loads the application's statement from `root` through an importer.
  *
  * @throws {@link Error} When the statement cannot be evaluated or exports no default.
  */
-export async function loadStatement(loading: Loading, server?: ViteDevServer): Promise<Statement> {
-  const at = join(loading.root, STATEMENT);
-  const { files, module } = await imported<Module<Application>>(at, loading, server);
+export async function loadStatement(root: string, through: Importer): Promise<Statement> {
+  const at = join(root, STATEMENT);
+  const { files, module } = await through.import<Module<Application>>(at);
 
   if (module.default === undefined) throw new Error(`${at} exports no default`);
 
@@ -106,17 +106,13 @@ export async function loadStatement(loading: Loading, server?: ViteDevServer): P
 }
 
 /**
- * Loads the preset a package publishes under its `./theme` subpath.
+ * Loads the preset a package publishes under its `./theme` subpath through an importer.
  *
  * @throws {@link Error} When the subpath cannot be evaluated or exports no default.
  */
-export async function loadPreset(
-  name: string,
-  loading: Loading,
-  server?: ViteDevServer,
-): Promise<Published> {
+export async function loadPreset(name: string, through: Importer): Promise<Published> {
   const specifier = `${name}${PRESET_SUBPATH.slice(1)}`;
-  const { files, module } = await imported<Module<Preset>>(specifier, loading, server);
+  const { files, module } = await through.import<Module<Preset>>(specifier);
 
   if (module.default === undefined) throw new Error(`${specifier} exports no default`);
 

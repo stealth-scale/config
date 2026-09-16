@@ -101,6 +101,15 @@ export interface Options {
 }
 
 /**
+ * Describes what the design-system package can state, which is the layer names alone.
+ *
+ * @remarks
+ *   The runtime is generated from the package's own preset, so the globs an application scans and
+ *   the name of the system package mean nothing there.
+ */
+export type RuntimeOptions = Pick<Options, "layers">;
+
+/**
  * Carries the options with every default filled in.
  */
 export interface Resolved {
@@ -153,4 +162,25 @@ export function resolveOptions(options: Options = {}): Resolved {
  */
 export function layerDeclaration(layers: StylesheetLayers): string {
   return `@layer ${LAYER_ORDER.map((role) => layers[role]).join(", ")};`;
+}
+
+/**
+ * Escapes the characters of a layer name that a regular expression would read as syntax.
+ */
+function escaped(name: string): string {
+  return name.replaceAll(/[$()*+.?[\\\]^{|}]/gu, String.raw`\$&`);
+}
+
+/**
+ * Builds the pattern that recognises the at-rule declaring the cascade order, however it is spaced.
+ *
+ * @remarks
+ *   The at-rule is what a stylesheet is recognised by, and a formatter or a minifier decides the
+ *   spacing around its commas. The pattern reads the names alone, so a sheet written as
+ *   `@layer reset,base,tokens,recipes,utilities;` is recognised beside one written with spaces.
+ */
+export function layerPattern(layers: StylesheetLayers): RegExp {
+  const names = LAYER_ORDER.map((role) => escaped(layers[role]));
+
+  return new RegExp(String.raw`@layer\s+${names.join(String.raw`\s*,\s*`)}\s*;`, "u");
 }

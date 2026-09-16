@@ -6,13 +6,18 @@
  */
 
 export {
+  type Change,
+  changed,
+  type Command,
   type Configured,
   configured,
+  created,
   generated,
   type Graphed,
   type HookContext,
   hookContext,
   loaded,
+  removed,
   resolved,
   started,
   transformed,

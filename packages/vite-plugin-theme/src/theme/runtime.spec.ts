@@ -1,3 +1,4 @@
+import { statSync, utimesSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -149,5 +150,24 @@ describe("runtime", () => {
     });
 
     expect(same).toBe(true);
+  });
+
+  it("leaves a generated file the change did not reach as it was when regenerating", async () => {
+    const past = new Date("2020-01-01T00:00:00Z");
+    const modified = await withScratchWorkspaceAsync(SYSTEM, async (workspace) => {
+      const plugin = runtime();
+
+      await configured(plugin, { ...RESOLVED, root: workspace.root });
+      utimesSync(workspace.path("generated/css/index.mjs"), past, past);
+      workspace.write({ "src/theme.ts": preset('brand: { value: "#abc" }') });
+      await updated(plugin, hookContext(), workspace.path("src/theme.ts"));
+
+      return {
+        tokens: workspace.read("generated/tokens/index.mjs").includes("brand"),
+        untouched: statSync(workspace.path("generated/css/index.mjs")).mtime,
+      };
+    });
+
+    expect(modified).toStrictEqual({ tokens: true, untouched: past });
   });
 });

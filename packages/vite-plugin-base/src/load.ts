@@ -55,6 +55,29 @@ export interface Imported<Module> {
 }
 
 /**
+ * Imports modules through one environment, so a caller loading several modules pays for the
+ * environment once.
+ *
+ * @remarks
+ *   Over a dev server's runner, `close` leaves the server's environment running, because the
+ *   server owns it. Over an environment of this module's own, `close` releases it, and nothing can
+ *   be imported afterwards.
+ */
+export interface Importer {
+  /**
+   * Releases the environment the importer built, and leaves a server's environment as it was.
+   */
+  close: () => Promise<void>;
+
+  /**
+   * Imports one module and returns it with the files behind it.
+   *
+   * @throws {@link Error} When the specifier does not resolve or the module fails to evaluate.
+   */
+  import: <Module>(id: string) => Promise<Imported<Module>>;
+}
+
+/**
  * The evaluated modules a runner holds, named through the environment so no subpath is imported.
  */
 type Evaluated = RunnableDevEnvironment["runner"]["evaluatedModules"];
@@ -143,12 +166,40 @@ async function environmentFor(loading: Loading): Promise<RunnableDevEnvironment>
 }
 
 /**
- * Imports a module through Vite and returns it with the files behind it.
+ * Opens an importer over the dev server's runner where its `ssr` environment is runnable, and over
+ * an environment of this module's own otherwise.
  *
  * @remarks
- *   With a dev server whose `ssr` environment is runnable, the import goes through that runner and
- *   joins the server's module graph. Without one, an environment of this module's own is built,
- *   used for the one import, and closed.
+ *   Building an environment resolves a configuration and starts a module runner. A plugin that
+ *   loads a statement and every preset behind it opens one importer for the batch and closes it
+ *   afterwards, so that cost is paid once rather than once per module. An import through the
+ *   server's runner joins the server's module graph, so an edit to any file behind the module
+ *   reaches the plugin as a hot update.
+ */
+export async function importer(loading: Loading, server?: ViteDevServer): Promise<Importer> {
+  const running = server?.environments["ssr"];
+
+  if (running !== undefined && isRunnableDevEnvironment(running)) {
+    return {
+      close: () => Promise.resolve(),
+      import: <Module>(id: string): Promise<Imported<Module>> => through(running, id),
+    };
+  }
+
+  const environment = await environmentFor(loading);
+
+  return {
+    close: () => environment.close(),
+    import: <Module>(id: string): Promise<Imported<Module>> => through(environment, id),
+  };
+}
+
+/**
+ * Imports one module through Vite and returns it with the files behind it.
+ *
+ * @remarks
+ *   The importer is opened for this one import and closed afterwards. A caller with several
+ *   modules to load opens one through {@link importer} instead.
  * @param id - A file path or a bare specifier, resolved from `loading.root`.
  * @throws {@link Error} When the specifier does not resolve or the module fails to evaluate.
  */
@@ -157,15 +208,11 @@ export async function imported<Module>(
   loading: Loading,
   server?: ViteDevServer,
 ): Promise<Imported<Module>> {
-  const running = server?.environments["ssr"];
-
-  if (running !== undefined && isRunnableDevEnvironment(running)) return through(running, id);
-
-  const environment = await environmentFor(loading);
+  const opened = await importer(loading, server);
 
   try {
-    return await through(environment, id);
+    return await opened.import<Module>(id);
   } finally {
-    await environment.close();
+    await opened.close();
   }
 }

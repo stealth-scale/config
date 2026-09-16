@@ -28,6 +28,16 @@ export interface Graphed {
 }
 
 /**
+ * The kinds of change a bundler reports about a file.
+ */
+export type Change = "create" | "delete" | "update";
+
+/**
+ * The commands a bundler runs under, which a plugin reads off its environment.
+ */
+export type Command = "build" | "serve";
+
+/**
  * Carries what a hook reads off `this`, and records what the hook asked the bundler for.
  */
 export interface HookContext {
@@ -37,9 +47,19 @@ export interface HookContext {
   addWatchFile: (file: string) => void;
 
   /**
-   * The environment a hot update reads its module graph from.
+   * The environment a hook reads its module graph and its command from.
    */
   environment: {
+    /**
+     * The part of the environment's configuration a plugin reads to tell a build from a server.
+     */
+    config: {
+      /**
+       * The command the context was built for.
+       */
+      command: Command;
+    };
+
     /**
      * The graph, answering for the ids the context was built with and for nothing else.
      */
@@ -101,10 +121,14 @@ export interface Configured {
  *
  * @remarks
  *   The module graph answers for the ids in `graphed` and for nothing else, which is what a real
- *   graph answers for a file nothing has requested yet.
+ *   graph answers for a file nothing has requested yet. The command is `serve` unless a
+ *   specification drives a build.
  * @param graphed - The module ids the graph holds.
  */
-export function hookContext(graphed: readonly string[] = []): HookContext {
+export function hookContext(
+  graphed: readonly string[] = [],
+  command: Command = "serve",
+): HookContext {
   const invalidated: string[] = [];
   const warned: string[] = [];
   const watched: string[] = [];
@@ -112,6 +136,7 @@ export function hookContext(graphed: readonly string[] = []): HookContext {
   return {
     addWatchFile: (file) => void watched.push(file),
     environment: {
+      config: { command },
       moduleGraph: {
         getModuleById: (id) => (graphed.includes(id) ? { id } : undefined),
         invalidateModule: (module) => void invalidated.push(module.id),
@@ -240,6 +265,37 @@ export async function transformed(
 }
 
 /**
+ * The part of a hot update that differs between a file that changed, appeared or is gone.
+ */
+interface Update {
+  /**
+   * Reads the file back the way the server would, or rejects where there is no file to read.
+   */
+  readonly read: () => Promise<string>;
+
+  /**
+   * The kind of change the server reports.
+   */
+  readonly type: Change;
+}
+
+/**
+ * Calls `hotUpdate` with one update, the way a dev server would.
+ *
+ * @throws {@link Error} When the plugin has no `hotUpdate` hook.
+ */
+async function hotUpdated(
+  plugin: Plugin,
+  context: HookContext,
+  file: string,
+  update: Update,
+): Promise<void> {
+  await Reflect.apply(handlerOf(plugin, "hotUpdate"), context, [
+    { file, modules: [], read: update.read, timestamp: Date.now(), type: update.type },
+  ]);
+}
+
+/**
  * Tells the plugin a file changed, the way a dev server would at `hotUpdate`.
  *
  * @remarks
@@ -253,15 +309,63 @@ export async function updated(
   file: string,
   content = "",
 ): Promise<void> {
-  await Reflect.apply(handlerOf(plugin, "hotUpdate"), context, [
-    {
-      file,
-      modules: [],
-      read: (): Promise<string> => Promise.resolve(content),
-      timestamp: Date.now(),
-      type: "update",
-    },
-  ]);
+  await hotUpdated(plugin, context, file, {
+    read: (): Promise<string> => Promise.resolve(content),
+    type: "update",
+  });
+}
+
+/**
+ * Tells the plugin a file appeared, the way a dev server would at `hotUpdate`.
+ *
+ * @remarks
+ *   The update's `read` resolves to `content`, which stands for the text the server reads back from
+ *   the new file.
+ * @throws {@link Error} When the plugin has no `hotUpdate` hook.
+ */
+export async function created(
+  plugin: Plugin,
+  context: HookContext,
+  file: string,
+  content = "",
+): Promise<void> {
+  await hotUpdated(plugin, context, file, {
+    read: (): Promise<string> => Promise.resolve(content),
+    type: "create",
+  });
+}
+
+/**
+ * Tells the plugin a file is gone, the way a dev server would at `hotUpdate`.
+ *
+ * @remarks
+ *   The update's `read` rejects, because the server reads the file from disk and there is no file
+ *   left to read. A plugin that reads a deleted file fails here the way it would under the server.
+ * @throws {@link Error} When the plugin has no `hotUpdate` hook.
+ */
+export async function removed(plugin: Plugin, context: HookContext, file: string): Promise<void> {
+  await hotUpdated(plugin, context, file, {
+    read: (): Promise<string> =>
+      Promise.reject(new Error(`ENOENT: no such file or directory, open '${file}'`)),
+    type: "delete",
+  });
+}
+
+/**
+ * Tells the plugin a watched file changed, the way a bundler would at `watchChange`.
+ *
+ * @remarks
+ *   The plugin reads the context as `this`, and reads the command off its environment to tell a
+ *   build from a server.
+ * @throws {@link Error} When the plugin has no `watchChange` hook.
+ */
+export async function changed(
+  plugin: Plugin,
+  context: HookContext,
+  file: string,
+  event: Change,
+): Promise<void> {
+  await Reflect.apply(handlerOf(plugin, "watchChange"), context, [file, { event }]);
 }
 
 /**

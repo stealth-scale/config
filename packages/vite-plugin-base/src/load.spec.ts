@@ -15,7 +15,7 @@ import { describe, expect, it } from "vitest";
 
 import { manifest, type ScratchWorkspace, withScratchWorkspaceAsync } from "@stealthscale/testing";
 
-import { imported } from "#load.ts";
+import { imported, importer } from "#load.ts";
 
 /**
  * The condition the linked package publishes its source under.
@@ -160,5 +160,51 @@ describe("imported", () => {
     );
 
     expect(module.default.from).toBe("source");
+  });
+
+  it("imports several modules through one importer until it is closed", async () => {
+    const seen = await linked(async (workspace) => {
+      const through = await importer({ conditions: [SOURCE, "node"], root: workspace.root });
+
+      try {
+        const statement = await through.import<Statement>(workspace.path("src/statement.ts"));
+        const kit = await through.import<{ from: string }>("@acme/kit");
+
+        return [statement.module.default.from, kit.module.from];
+      } finally {
+        await through.close();
+      }
+    });
+
+    expect(seen).toStrictEqual(["source", "source"]);
+  });
+
+  it("leaves the dev server's environment running when its importer is closed", async () => {
+    const seen = await linked(async (workspace) => {
+      const file = workspace.path("src/statement.ts");
+      const server = await createServer({
+        configFile: false,
+        envDir: false,
+        environments: {
+          ssr: { resolve: { conditions: [SOURCE, "node"], noExternal: true } },
+        },
+        logLevel: "silent",
+        root: workspace.root,
+        server: { middlewareMode: true, watch: null },
+      });
+
+      try {
+        const through = await importer({ root: workspace.root }, server);
+
+        await through.close();
+
+        return (await imported<Statement>(file, { root: workspace.root }, server)).module.default
+          .from;
+      } finally {
+        await server.close();
+      }
+    });
+
+    expect(seen).toBe("source");
   });
 });

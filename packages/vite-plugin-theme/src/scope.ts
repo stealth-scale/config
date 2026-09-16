@@ -1,12 +1,12 @@
 /**
- * Scopes a theme's recipe extensions to the attribute that switches to it.
+ * Scopes a theme's extensions to the attribute that switches to it.
  *
  * @remarks
  *   A theme's token values reach the page as custom properties, which a selector redefines. Its
- *   recipe extensions reach the page as declarations inside a rule, which no selector can touch.
- *   Nesting an extension under `[data-theme=<name>] &` gives the compiler a second rule to emit:
- *   `[data-theme=abyss] .button--variant_solid` carries one attribute more than the rule it
- *   extends, so it wins while the attribute is set and matches nothing while it is not. Only the
+ *   recipe extensions and its compositions reach the page as declarations inside a rule, which no
+ *   selector can touch. Nesting each under `[data-theme=<name>] &` gives the compiler a second rule
+ *   to emit: `[data-theme=abyss] .button--variant_solid` carries one attribute more than the rule
+ *   it extends, so it wins while the attribute is set and matches nothing while it is not. Only the
  *   declarations a theme states are emitted, so the cost follows the theme rather than the size of
  *   the recipe layer.
  */
@@ -53,8 +53,25 @@ export interface Extension {
 
 /**
  * Groups the extensions a theme makes, as the preset holding them exposes them.
+ *
+ * @remarks
+ *   A composition is a text, layer or animation style: a tree of names whose leaves hold a
+ *   `value`, and it is scoped by nesting each value under the attribute. A theme's tokens,
+ *   keyframes and global styles are not extensions: the compiler switches tokens through the
+ *   attribute on its own, and a keyframe or a global style has no rule to nest under it, so only
+ *   the first theme's apply.
  */
 export interface Extensions {
+  /**
+   * Animation styles, by name.
+   */
+  animationStyles?: Styles | undefined;
+
+  /**
+   * Layer styles, by name.
+   */
+  layerStyles?: Styles | undefined;
+
   /**
    * Extensions to recipes that draw one element, by key.
    */
@@ -64,6 +81,11 @@ export interface Extensions {
    * Extensions to recipes that draw several elements, by key.
    */
   slotRecipes?: Readonly<Record<string, Extension>> | undefined;
+
+  /**
+   * Text styles, by name.
+   */
+  textStyles?: Styles | undefined;
 }
 
 /**
@@ -221,6 +243,62 @@ function scoped(extension: Extension, slotted: boolean, selector: string): Exten
 }
 
 /**
+ * Rewrites every extension in one map so each applies only under a selector.
+ */
+function all(
+  held: Readonly<Record<string, Extension>>,
+  slotted: boolean,
+  selector: string,
+): Record<string, Extension> {
+  return Object.fromEntries(
+    Object.entries(held).map(([key, extension]) => [key, scoped(extension, slotted, selector)]),
+  );
+}
+
+/**
+ * Nests one node of a composition tree under a selector: a leaf's value is nested, and a group is
+ * walked.
+ *
+ * @remarks
+ *   A leaf is a node whose `value` is a style object. A group holds leaves and groups under names,
+ *   `DEFAULT` among them, and is walked rather than nested so the compiler still sees the tree.
+ *   Anything that is not an object is left as it is.
+ */
+function composition(node: unknown, selector: string): unknown {
+  if (!isStyles(node)) return node;
+
+  const value = node["value"];
+
+  return isStyles(value) ? { ...node, value: { [selector]: value } } : compositions(node, selector);
+}
+
+/**
+ * Nests every value of a composition tree under a selector.
+ */
+function compositions(held: Styles, selector: string): Styles {
+  return Object.fromEntries(
+    Object.entries(held).map(([name, node]) => [name, composition(node, selector)]),
+  );
+}
+
+/**
+ * Rewrites one level's extensions so everything they state applies only under a selector.
+ */
+function scopedExtensions(extensions: Extensions, selector: string): Extensions {
+  const { animationStyles, layerStyles, recipes, slotRecipes, textStyles } = extensions;
+
+  return {
+    ...(animationStyles === undefined
+      ? {}
+      : { animationStyles: compositions(animationStyles, selector) }),
+    ...(layerStyles === undefined ? {} : { layerStyles: compositions(layerStyles, selector) }),
+    ...(recipes === undefined ? {} : { recipes: all(recipes, false, selector) }),
+    ...(slotRecipes === undefined ? {} : { slotRecipes: all(slotRecipes, true, selector) }),
+    ...(textStyles === undefined ? {} : { textStyles: compositions(textStyles, selector) }),
+  };
+}
+
+/**
  * Reports whether a nested preset is one this module can read.
  *
  * @remarks
@@ -250,19 +328,6 @@ function lineage(preset: SwitchablePreset | undefined, inherited = false): reado
 }
 
 /**
- * Rewrites every extension in one map so each applies only under a selector.
- */
-function all(
-  held: Readonly<Record<string, Extension>>,
-  slotted: boolean,
-  selector: string,
-): Record<string, Extension> {
-  return Object.fromEntries(
-    Object.entries(held).map(([key, extension]) => [key, scoped(extension, slotted, selector)]),
-  );
-}
-
-/**
  * Builds the presets that make one theme's extensions apply while a page is switched to it.
  *
  * @remarks
@@ -273,22 +338,17 @@ function all(
  */
 export function scopedPreset(theme: Switchable): readonly ScopedPreset[] {
   const selector = `[data-theme=${theme.name}] &`;
-  const own = `@stealthscale/theme-${theme.name}-switched`;
+  const own = `theme:${theme.name}:switched`;
 
   return lineage(theme.preset).flatMap(({ extensions, inherited, name }) => {
-    const { recipes, slotRecipes } = extensions;
+    const extend = scopedExtensions(extensions, selector);
 
-    if (recipes === undefined && slotRecipes === undefined) return [];
+    if (Object.keys(extend).length === 0) return [];
 
     return [
       {
         name: inherited ? `${own} from ${name ?? "an unnamed preset"}` : own,
-        theme: {
-          extend: {
-            ...(recipes === undefined ? {} : { recipes: all(recipes, false, selector) }),
-            ...(slotRecipes === undefined ? {} : { slotRecipes: all(slotRecipes, true, selector) }),
-          },
-        },
+        theme: { extend },
       },
     ];
   });

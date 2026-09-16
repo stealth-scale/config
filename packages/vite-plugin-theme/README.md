@@ -39,14 +39,15 @@ import { fathom } from "@acme/theme-fathom";
 export default { static: "*", themes: [fathom, abyss] };
 ```
 
-The first theme is the default. Every theme is compiled under `[data-theme=<name>]`, the first
-included, so a subtree can wear any theme. The application imports the stylesheet through the system
-package's `styles.css` subpath, and the plugin appends the compiled rules to whichever stylesheet
-declares the cascade order.
+The first theme is the default: its values and its extensions apply while no attribute is set. Every
+theme is compiled under `[data-theme=<name>]` as well, the first included, so a subtree can wear any
+theme. The application imports the stylesheet through the system package's `styles.css` subpath, and
+the plugin appends the compiled rules to whichever stylesheet declares the cascade order.
 
 ## Options
 
-Both factories take the same options. Every field is optional.
+`theme.stylesheet()` takes three options and `theme.runtime()` takes `layers` alone, because the
+runtime is generated from the package's own preset and scans nothing. Every field is optional.
 
 | Option          | Type                        | Default                 | Effect                                                                                              |
 | --------------- | --------------------------- | ----------------------- | --------------------------------------------------------------------------------------------------- |
@@ -60,20 +61,21 @@ to `node_modules/.theme/`.
 
 ## Reference
 
-| Export             | Signature                       | What it returns                                                             |
-| ------------------ | ------------------------------- | --------------------------------------------------------------------------- |
-| `theme.runtime`    | `(options?: Options) => Plugin` | `stealth:theme.runtime`, which generates the runtime of the system package  |
-| `theme.stylesheet` | `(options?: Options) => Plugin` | `stealth:theme.stylesheet`, which compiles the stylesheet of an application |
+| Export             | Signature                              | What it returns                                                             |
+| ------------------ | -------------------------------------- | --------------------------------------------------------------------------- |
+| `theme.runtime`    | `(options?: RuntimeOptions) => Plugin` | `stealth:theme.runtime`, which generates the runtime of the system package  |
+| `theme.stylesheet` | `(options?: Options) => Plugin`        | `stealth:theme.stylesheet`, which compiles the stylesheet of an application |
 
-| Type               | What it describes                                                                           |
-| ------------------ | ------------------------------------------------------------------------------------------- |
-| `Application`      | What an application states: `themes`, the first being the default, and an optional `static` |
-| `Theme`            | A theme as a theme package exports it: `name`, `variant`, an optional `preset` and `fonts`  |
-| `Options`          | The three options above                                                                     |
-| `Switchable`       | A theme read for its `name` and its `preset`                                                |
-| `SwitchablePreset` | A preset read for its `name`, its `presets` and the extensions under `theme.extend`         |
-| `Extension`        | What a theme changes about one recipe: `base`, `variants` and `compoundVariants`            |
-| `Extensions`       | A theme's extensions, under `recipes` and `slotRecipes`                                     |
+| Type               | What it describes                                                                                       |
+| ------------------ | ------------------------------------------------------------------------------------------------------- |
+| `Application`      | What an application states: `themes`, the first being the default, and an optional `static`             |
+| `Theme`            | A theme as a theme package exports it: `name`, `variant`, an optional `preset` and `fonts`              |
+| `Options`          | The three options above                                                                                 |
+| `RuntimeOptions`   | The `layers` option alone                                                                               |
+| `Switchable`       | A theme read for its `name` and its `preset`                                                            |
+| `SwitchablePreset` | A preset read for its `name`, its `presets` and the extensions under `theme.extend`                     |
+| `Extension`        | What a theme changes about one recipe: `base`, `variants` and `compoundVariants`                        |
+| `Extensions`       | A theme's extensions, under `recipes`, `slotRecipes`, `textStyles`, `layerStyles` and `animationStyles` |
 
 ## The compilation
 
@@ -86,18 +88,26 @@ preset, by absolute path.
 
 A contributor is a package on the application's dependency graph that publishes `./theme`. The
 system package is installed first, and each other package after the packages it depends on, so a
-package building on another can extend it. A theme's extensions are nested under
-`[data-theme=<name>] &`, one preset per level of the theme's lineage, so the compiler emits a rule
-that wins while the attribute is set and matches nothing while it is not.
+package building on another can extend it. The first theme's values and preset are installed next,
+unscoped. Then every theme's recipe extensions and its text, layer and animation styles are nested
+under `[data-theme=<name>] &`, one preset per level of the theme's lineage, so the compiler emits a
+rule that wins while the attribute is set and matches nothing while it is not. A theme's global
+styles and keyframes have no rule to nest under the attribute, so only the first theme's apply.
 
 The compiler emits the theme attribute under its own name and signs the root element. Both are
 rewritten before the rules reach the stylesheet, so nothing a page sees names the compiler.
 
+The rules are compiled once per change however many stylesheets declare the cascade order, and the
+compiler's diagnostics are reported once with them.
+
 ## What is watched
 
-A change to the statement, a theme, a preset or a manifest restarts the compiler. A change to a
-scanned source file is handed to the running compiler. Anything else is left to Vite. A stylesheet
-the rules were appended to is invalidated on either, so the next request retransforms it.
+A change to the statement, a theme, a preset or a manifest restarts the compiler. A file that
+appears, changes or is deleted under the scanned globs is handed to the running compiler, which
+reads it from disk itself. Anything else is left to Vite. Under a dev server, every stylesheet the
+rules were appended to is invalidated on either, so the next request retransforms it. Under a build
+that watches, the same changes reach the plugin through `watchChange`, and the rebuild compiles from
+the changed compiler.
 
 ## Diagnostics
 

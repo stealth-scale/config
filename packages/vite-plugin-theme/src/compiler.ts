@@ -12,7 +12,15 @@ import { createNodeDriver, type NodeDriver } from "@pandacss/compiler";
 import { createRequire } from "node:module";
 import { dirname, join, resolve, sep } from "node:path";
 
-import { emptyDir, exportTarget, manifestAt, writeIfChanged } from "@stealthscale/vite-plugin-base";
+import {
+  emptyDir,
+  exportTarget,
+  manifestAt,
+  syncDir,
+  writeIfChanged,
+} from "@stealthscale/vite-plugin-base";
+
+import { CACHE } from "#options.ts";
 
 /**
  * Marks a path that belongs to an installed package rather than to the workspace.
@@ -30,15 +38,80 @@ const VENDOR = `${sep}node_modules${sep}`;
 const BUNDLE = join("node_modules", ".panda");
 
 /**
+ * Fixes where codegen writes the runtime before it is synced into the generated directory.
+ *
+ * @remarks
+ *   Codegen writes every file whether or not its content changed. Writing into a scratch directory
+ *   and syncing from there leaves an unchanged generated file as it was, so a watcher over the
+ *   package sees the files a change reached and no others.
+ */
+const SCRATCH = join(CACHE, "runtime");
+
+/**
  * Fixes the declaration written beside the recipe runtime, which the compiler emits without one.
+ *
+ * @remarks
+ *   The runtime builds a recipe from what the compiler knows about it once its rules are in the
+ *   stylesheet: the name, the class name, the slots, the values of each axis, the defaults and the
+ *   compound variants. The declaration types that configuration from the generated recipe types,
+ *   so the package binding a recipe states the variants it was written with and receives the
+ *   runtime function typed the way the compiler's own `cva` and `sva` are.
  */
 const RUNTIME_DECLARATION = [
   "/*",
   " * Declares the compiler's recipe runtime, which it emits without a declaration.",
   " */",
   "",
-  "export declare function createRecipe(config: unknown): unknown;",
-  "export declare function createSlotRecipe(config: unknown): unknown;",
+  "import type {",
+  "  RecipeCompoundSelection,",
+  "  RecipeConfigVariantMap,",
+  "  RecipeRuntimeFn,",
+  "  RecipeSelection,",
+  "  RecipeVariantRecord,",
+  "  SlotRecipeRuntimeFn,",
+  "  SlotRecipeVariantRecord,",
+  "  SlotRecord,",
+  '} from "../types/recipe.d.mts";',
+  'import type { SystemStyleObject } from "../types/system.d.mts";',
+  "",
+  "/**",
+  " * What the runtime builds a recipe from, once the compiler has its rules in the stylesheet.",
+  " */",
+  "export interface RecipeRuntimeConfig<Variants extends RecipeVariantRecord> {",
+  "  className?: string;",
+  "  compoundVariants?: ReadonlyArray<RecipeCompoundSelection<Variants> & { css: SystemStyleObject }>;",
+  "  defaultVariants?: RecipeSelection<Variants>;",
+  "  name: string;",
+  "  variantMap?: RecipeConfigVariantMap<Variants>;",
+  "}",
+  "",
+  "/**",
+  " * What the runtime builds a slot recipe from: a recipe configuration and the slots it draws.",
+  " */",
+  "export interface SlotRecipeRuntimeConfig<",
+  "  Slot extends string,",
+  "  Variants extends SlotRecipeVariantRecord<Slot>,",
+  "> {",
+  "  className?: string;",
+  "  compoundVariants?: ReadonlyArray<",
+  "    RecipeCompoundSelection<Variants> & { css: SlotRecord<Slot, SystemStyleObject> }",
+  "  >;",
+  "  defaultVariants?: RecipeSelection<Variants>;",
+  "  name: string;",
+  "  slots: readonly Slot[];",
+  "  variantMap?: RecipeConfigVariantMap<Variants>;",
+  "}",
+  "",
+  "export declare function createRecipe<Variants extends RecipeVariantRecord>(",
+  "  config: RecipeRuntimeConfig<Variants>,",
+  "): RecipeRuntimeFn<RecipeSelection<Variants>, RecipeConfigVariantMap<Variants>>;",
+  "",
+  "export declare function createSlotRecipe<",
+  "  Slot extends string,",
+  "  Variants extends SlotRecipeVariantRecord<Slot>,",
+  ">(",
+  "  config: SlotRecipeRuntimeConfig<Slot, Variants>,",
+  "): SlotRecipeRuntimeFn<Slot, RecipeSelection<Variants>, RecipeConfigVariantMap<Variants>>;",
   "",
 ].join("\n");
 
@@ -87,8 +160,13 @@ export async function startCompiler(root: string, configPath: string): Promise<C
 }
 
 /**
- * Runs the compiler's codegen into an emptied directory, and declares what it leaves undeclared.
+ * Runs the compiler's codegen, declares what it leaves undeclared, and syncs the result into the
+ * generated directory.
  *
+ * @remarks
+ *   Codegen runs into a scratch directory that is emptied first, so the sync sees exactly what
+ *   this run wrote: a file the compiler stopped writing is deleted from the generated directory,
+ *   and a file whose content did not change is left as it was.
  * @returns The compiler, for the files behind its configuration.
  */
 export async function generateRuntime(
@@ -97,10 +175,13 @@ export async function generateRuntime(
   outdir: string,
 ): Promise<Compiler> {
   const compiler = await startCompiler(root, configPath);
+  const scratch = join(root, SCRATCH);
 
-  emptyDir(outdir);
-  compiler.driver.codegen({ cwd: root, outdir });
-  writeIfChanged(join(outdir, "recipes", "runtime.d.mts"), RUNTIME_DECLARATION);
+  emptyDir(scratch);
+  compiler.driver.codegen({ cwd: root, outdir: scratch });
+  writeIfChanged(join(scratch, "recipes", "runtime.d.mts"), RUNTIME_DECLARATION);
+  syncDir(scratch, outdir);
+  emptyDir(scratch);
 
   return compiler;
 }

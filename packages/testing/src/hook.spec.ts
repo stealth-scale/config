@@ -2,10 +2,13 @@ import { type Plugin } from "vite";
 import { describe, expect, it } from "vitest";
 
 import {
+  changed,
   configured,
+  created,
   generated,
   hookContext,
   loaded,
+  removed,
   resolved,
   started,
   transformed,
@@ -37,6 +40,7 @@ function driven(returning?: unknown): Driven {
     name: "stealth:driven",
     resolveId: hook,
     transform: hook,
+    watchChange: hook,
   } as unknown as Plugin;
 
   return { bound, calls, plugin };
@@ -163,6 +167,40 @@ describe("hook", () => {
     await expect((update as { read: () => Promise<string> }).read()).resolves.toBe("");
   });
 
+  it("hands a new file to hotUpdate as created with its content", async () => {
+    const one = driven();
+
+    await created(one.plugin, hookContext(), "/pkg/new.css", "@layer c;");
+
+    const [update] = one.calls[0] ?? [];
+
+    expect(update).toMatchObject({ file: "/pkg/new.css", modules: [], type: "create" });
+    await expect((update as { read: () => Promise<string> }).read()).resolves.toBe("@layer c;");
+  });
+
+  it("hands a deleted file to hotUpdate with a read that rejects", async () => {
+    const one = driven();
+
+    await removed(one.plugin, hookContext(), "/pkg/gone.css");
+
+    const [update] = one.calls[0] ?? [];
+
+    expect(update).toMatchObject({ file: "/pkg/gone.css", modules: [], type: "delete" });
+    await expect((update as { read: () => Promise<string> }).read()).rejects.toThrow(
+      "ENOENT: no such file or directory, open '/pkg/gone.css'",
+    );
+  });
+
+  it("hands the file and the event to watchChange with the context as this", async () => {
+    const one = driven();
+    const context = hookContext([], "build");
+
+    await changed(one.plugin, context, "/pkg/a.css", "delete");
+
+    expect(one.bound).toStrictEqual([context]);
+    expect(one.calls).toStrictEqual([["/pkg/a.css", { event: "delete" }]]);
+  });
+
   it("binds the build as this in generateBundle", async () => {
     const one = driven();
     const bundling = { emitFile: (): string => "" };
@@ -207,5 +245,13 @@ describe("hookContext", () => {
     context.environment.moduleGraph.invalidateModule({ id: "/pkg/a.css" });
 
     expect(context.invalidated).toStrictEqual(["/pkg/a.css"]);
+  });
+
+  it("answers serve as the command when none is given", () => {
+    expect(hookContext().environment.config.command).toBe("serve");
+  });
+
+  it("answers the command it was built for", () => {
+    expect(hookContext([], "build").environment.config.command).toBe("build");
   });
 });

@@ -86,7 +86,7 @@ const APP: ScratchFiles = {
 };
 
 function declared(css: string, selector: string, property: string): string | undefined {
-  const escaped = selector.replaceAll(/[.[\]]/gu, String.raw`\$&`);
+  const escaped = selector.replaceAll(/[.()[\]]/gu, String.raw`\$&`);
   const pattern = new RegExp(`${escaped}\\s*\\{[^}]*?${property}:\\s*([^;}]+)`, "u");
 
   return pattern.exec(css)?.[1]?.trim();
@@ -112,7 +112,7 @@ describe("assemble", () => {
     expect(declared(css, "[data-theme=fathom] .button", "letter-spacing")).toBe("0.01em");
   });
 
-  it("draws a theme's token values under its attribute and names the compiler nowhere", async () => {
+  it("draws a theme's token values under its attribute", async () => {
     const files = {
       ...APP,
       "themes/abyss.ts": theme(
@@ -124,7 +124,54 @@ describe("assemble", () => {
     const css = await withScratchWorkspaceAsync(files, compiled);
 
     expect(declared(css, "[data-theme=abyss]", "--colors-brand")).toBe("#222");
+  });
+
+  it("draws the first theme's token values where no attribute is set", async () => {
+    const files = {
+      ...APP,
+      "themes/fathom.ts": theme(
+        "fathom",
+        tracking("0.01em"),
+        ' tokens: { colors: { brand: { value: "#222" } } } ',
+      ),
+    };
+    const css = await withScratchWorkspaceAsync(files, compiled);
+
+    expect(declared(css, ":where(:root, :host)", "--colors-brand")).toBe("#222");
+    expect(declared(css, "[data-theme=fathom]", "--colors-brand")).toBe("#222");
+  });
+
+  it("names the compiler nowhere in the stylesheet", async () => {
+    const css = await withScratchWorkspaceAsync(APP, compiled);
+
     expect(css).not.toContain("panda");
+  });
+
+  it("scopes a theme's text style under its attribute", async () => {
+    const files = {
+      ...APP,
+      ...packageFiles(
+        "node_modules/@acme/design",
+        {
+          exports: { ".": "./index.js", "./theme": "./theme.js" },
+          name: "@acme/design",
+          type: "module",
+        },
+        {
+          "index.js": "export {};\n",
+          "theme.js":
+            'export default { name: "@acme/design", theme: { extend: { textStyles: { brand: { value: { fontSize: "10px" } } } } } };\n',
+        },
+      ),
+      "src/page.tsx":
+        'import { css } from "@acme/design";\n\nexport const Page = () => css({ textStyle: "brand" });\n',
+      "themes/abyss.ts": theme("abyss", 'textStyles: { brand: { value: { fontSize: "14px" } } }'),
+      "themes/fathom.ts": theme("fathom", 'textStyles: { brand: { value: { fontSize: "12px" } } }'),
+    };
+    const css = await withScratchWorkspaceAsync(files, compiled);
+
+    expect(declared(css, ".textStyle_brand", "font-size")).toBe("12px");
+    expect(declared(css, "[data-theme=abyss] .textStyle_brand", "font-size")).toBe("14px");
   });
 
   it("scopes a variant's styles under the attribute", async () => {
@@ -196,7 +243,7 @@ describe("assemble", () => {
     expect(css).not.toContain("data-theme=abyss");
   });
 
-  it("lists the statement and the themes and the presets and the manifests as watched", async () => {
+  it("lists every file the configuration was built from as watched", async () => {
     const watched = await withScratchWorkspaceAsync(APP, async (workspace) => {
       const assembled = await assemble({ root: workspace.root }, RESOLVED);
 
@@ -223,5 +270,16 @@ describe("assemble", () => {
     });
 
     expect(names).toStrictEqual(["@acme/design", "@acme/kit"]);
+  });
+
+  it("lists every scanned source as an absolute path", async () => {
+    const sources = await withScratchWorkspaceAsync(APP, async (workspace) => {
+      const assembled = await assemble({ root: workspace.root }, RESOLVED);
+
+      return assembled.sources;
+    });
+
+    expect(sources).toHaveLength(1);
+    expect(sources[0]).toMatch(/^\/.*[/\\]src[/\\]page\.tsx$/u);
   });
 });

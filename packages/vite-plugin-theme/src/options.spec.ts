@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { layerDeclaration, resolveOptions } from "#options.ts";
+import { layerDeclaration, layerPattern, resolveOptions } from "#options.ts";
 
 describe("options", () => {
   it("fills in every default when nothing is stated", () => {
@@ -48,5 +48,22 @@ describe("options", () => {
     expect(layerDeclaration(resolveOptions({ layers: { tokens: "vars" } }).layers)).toBe(
       "@layer reset, base, vars, recipes, utilities;",
     );
+  });
+
+  it("recognises the declaration however its commas are spaced", () => {
+    const pattern = layerPattern(resolveOptions().layers);
+
+    expect(pattern.test("@layer reset, base, tokens, recipes, utilities;")).toBe(true);
+    expect(pattern.test("@layer reset,base,tokens,recipes,utilities;")).toBe(true);
+    expect(pattern.test("@layer reset , base , tokens , recipes , utilities ;")).toBe(true);
+    expect(pattern.test("@layer reset, base, tokens, recipes;")).toBe(false);
+  });
+
+  it("recognises a renamed layer by its new name and by no other", () => {
+    const pattern = layerPattern(resolveOptions({ layers: { tokens: "acme.vars" } }).layers);
+
+    expect(pattern.test("@layer reset, base, acme.vars, recipes, utilities;")).toBe(true);
+    expect(pattern.test("@layer reset, base, acmeXvars, recipes, utilities;")).toBe(false);
+    expect(pattern.test("@layer reset, base, tokens, recipes, utilities;")).toBe(false);
   });
 });

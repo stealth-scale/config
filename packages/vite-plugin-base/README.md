@@ -93,6 +93,7 @@ export function registry(): Plugin {
 | `resolvedOnGraph` | `(root: string, name: string) => string \| undefined`                                          | The entry of a package, resolved from the root or from any package on its graph                                  |
 | `exportTarget`    | `(manifest: Manifest, subpath: string, conditions?: readonly string[]) => string \| undefined` | The target the export map names for the subpath under the conditions, as the manifest writes it                  |
 | `imported`        | `<Module>(id: string, loading: Loading, server?: ViteDevServer) => Promise<Imported<Module>>`  | The module Vite resolved and evaluated, with the files behind it                                                 |
+| `importer`        | `(loading: Loading, server?: ViteDevServer) => Promise<Importer>`                              | An importer over one environment, for a batch of modules                                                         |
 | `literal`         | `(value: unknown, path?: string) => string`                                                    | The source that reproduces the value. It throws for a function or an instance, naming the path                   |
 | `locked`          | `(from: string) => ReadonlyMap<string, Installed>`                                             | What the nearest lockfile above `from` pinned, keyed by package name                                             |
 | `owning`          | `(from: string) => string \| undefined`                                                        | The directory of the package a file belongs to                                                                   |
@@ -101,12 +102,14 @@ export function registry(): Plugin {
 | `text`            | `(manifest: Manifest, field: string) => string \| undefined`                                   | The field's value, when that value is a string                                                                   |
 | `writeIfChanged`  | `(at: string, content: string) => boolean`                                                     | True when the file was written, false when it already held the content                                           |
 | `emptyDir`        | `(at: string) => void`                                                                         | Nothing. The directory and everything under it are gone                                                          |
+| `syncDir`         | `(from: string, to: string) => void`                                                           | Nothing. `to` holds exactly the files of `from`, and only the files that differed were written                   |
 
 | Type         | What it describes                                                                               |
 | ------------ | ----------------------------------------------------------------------------------------------- |
 | `Bundling`   | The build a bundler binds to `this` while it generates a bundle                                 |
 | `Dependency` | One package the walk reached, under `at`, `dependsOn`, `manifest` and `named`                   |
 | `Imported`   | A module under `module`, beside the `files` its evaluation read                                 |
+| `Importer`   | An `import` function over one environment, and the `close` that releases it                     |
 | `Installed`  | What a lockfile pinned for one package: `integrity`, `registry` and `resolution`, each optional |
 | `Licensed`   | One licence file, under `named` and `text`                                                      |
 | `Loading`    | Where an import resolves from, under `root`, and the `conditions` it resolves under             |
@@ -169,6 +172,12 @@ file behind the module reaches the plugin as a hot update. Without one, an envir
 function's own is built for the one import and closed afterwards. `files` lists every file the
 evaluation read, the module's own first, which is what a plugin hands to `addWatchFile`.
 
+`importer` opens that environment once and hands back an `import` function and a `close`. A plugin
+that loads a statement and every preset behind it imports them all through one importer, because
+building an environment resolves a configuration and starts a module runner, and that is paid once
+rather than once per module. Closing an importer over a dev server leaves the server's environment
+running.
+
 ## Reading the lockfile
 
 `locked` climbs from a directory to the nearest ancestor holding a lockfile it recognises, reads
@@ -184,7 +193,10 @@ plain object as the source that reproduces it, and refuses a function, an instan
 symbol or a bigint, naming the path where the value is. `writeIfChanged` compares the content with
 what is on disk and writes only on a difference, which keeps a watcher from chasing a plugin's own
 output round a loop. `emptyDir` clears a generated directory before a generator runs again, and does
-nothing when the directory is absent.
+nothing when the directory is absent. `syncDir` makes a directory hold exactly the files of another:
+a file that differs is written, a file the source no longer holds is deleted along with any
+directory that is left empty, and an unchanged file is not touched, so a watcher over the target
+sees the files that changed and no others.
 
 ## Licence
 

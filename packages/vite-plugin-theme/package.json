@@ -51,7 +51,6 @@
   },
   "dependencies": {
     "@pandacss/compiler": "catalog:",
-    "@pandacss/config": "catalog:",
     "@pandacss/preset-base": "catalog:",
     "@pandacss/types": "catalog:"
   },

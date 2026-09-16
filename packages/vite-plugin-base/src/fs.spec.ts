@@ -1,14 +1,14 @@
 /**
- * Covers the two writes a generator makes: one that leaves an unchanged file alone, and one that
- * clears a directory.
+ * Covers the writes a generator makes: one that leaves an unchanged file alone, one that clears a
+ * directory, and one that makes a directory match another.
  */
 
-import { existsSync } from "node:fs";
+import { existsSync, statSync, utimesSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 import { withScratchWorkspace } from "@stealthscale/testing";
 
-import { emptyDir, writeIfChanged } from "#fs.ts";
+import { emptyDir, syncDir, writeIfChanged } from "#fs.ts";
 
 /**
  * Writes `content` to one file in a scratch workspace holding `files`, and reads the file back.
@@ -21,6 +21,17 @@ function written(
     const wrote = writeIfChanged(workspace.path("a/b/c.txt"), content);
 
     return { content: workspace.read("a/b/c.txt"), wrote };
+  });
+}
+
+/**
+ * Syncs `from` into `to` in a scratch workspace holding `files`, and lists what is under `to`.
+ */
+function synced(files: Readonly<Record<string, string>>): readonly string[] {
+  return withScratchWorkspace(files, (workspace) => {
+    syncDir(workspace.path("from"), workspace.path("to"));
+
+    return workspace.files().filter((file) => file.startsWith("to/"));
   });
 }
 
@@ -55,5 +66,60 @@ describe("fs", () => {
     });
 
     expect(left).toBe(false);
+  });
+
+  it("writes every file of one directory into another that is absent", () => {
+    expect(synced({ "from/a.txt": "a", "from/deep/b.txt": "b" })).toStrictEqual([
+      "to/a.txt",
+      "to/deep/b.txt",
+    ]);
+  });
+
+  it("removes a file the source no longer holds", () => {
+    expect(synced({ "from/a.txt": "a", "to/a.txt": "a", "to/stale.txt": "" })).toStrictEqual([
+      "to/a.txt",
+    ]);
+  });
+
+  it("removes a directory the source no longer holds", () => {
+    const left = withScratchWorkspace(
+      { "from/a.txt": "a", "to/gone/deep/stale.txt": "" },
+      (workspace) => {
+        syncDir(workspace.path("from"), workspace.path("to"));
+
+        return existsSync(workspace.path("to/gone"));
+      },
+    );
+
+    expect(left).toBe(false);
+  });
+
+  it("leaves an unchanged file as it was when the source still holds it", () => {
+    const past = new Date("2020-01-01T00:00:00Z");
+    const modified = withScratchWorkspace({ "from/a.txt": "a", "to/a.txt": "a" }, (workspace) => {
+      utimesSync(workspace.path("to/a.txt"), past, past);
+      syncDir(workspace.path("from"), workspace.path("to"));
+
+      return statSync(workspace.path("to/a.txt")).mtime;
+    });
+
+    expect(modified).toStrictEqual(past);
+  });
+
+  it("overwrites a file whose content differs from the source", () => {
+    const content = withScratchWorkspace(
+      { "from/a.txt": "new", "to/a.txt": "old" },
+      (workspace) => {
+        syncDir(workspace.path("from"), workspace.path("to"));
+
+        return workspace.read("to/a.txt");
+      },
+    );
+
+    expect(content).toBe("new");
+  });
+
+  it("empties the target when the source is absent", () => {
+    expect(synced({ "to/a.txt": "a" })).toStrictEqual([]);
   });
 });

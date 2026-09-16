@@ -35,10 +35,16 @@ describe("scope", () => {
     ).toStrictEqual([]);
   });
 
+  it("returns no preset for a level that states only what is not scoped", () => {
+    expect(
+      scopedPreset(theme("abyss", { globalCss: { html: { bg: "red" } }, tokens: {} })),
+    ).toStrictEqual([]);
+  });
+
   it("names the preset after the theme it scopes", () => {
     const scoped = scopedPreset(theme("abyss", { recipes: { button: {} } }));
 
-    expect(scoped).toMatchObject([{ name: "@stealthscale/theme-abyss-switched" }]);
+    expect(scoped).toMatchObject([{ name: "theme:abyss:switched" }]);
   });
 
   it("nests a variant's styles under the attribute that switches to the theme", () => {
@@ -50,7 +56,7 @@ describe("scope", () => {
 
     expect(scoped).toStrictEqual([
       {
-        name: "@stealthscale/theme-abyss-switched",
+        name: "theme:abyss:switched",
         theme: {
           extend: {
             recipes: {
@@ -122,7 +128,7 @@ describe("scope", () => {
     ]);
   });
 
-  it("keeps the axes a compound variant matches on and nests the styles it applies", () => {
+  it("keeps the axes a compound variant matches on while nesting the styles it applies", () => {
     const scoped = scopedPreset(
       theme("abyss", {
         recipes: {
@@ -160,6 +166,68 @@ describe("scope", () => {
     ]);
   });
 
+  it("nests the value of a text style under the attribute", () => {
+    const scoped = scopedPreset(
+      theme("abyss", { textStyles: { brand: { value: { fontSize: "14px" } } } }),
+    );
+
+    expect(scoped).toStrictEqual([
+      {
+        name: "theme:abyss:switched",
+        theme: { extend: { textStyles: { brand: { value: { [ABYSS]: { fontSize: "14px" } } } } } },
+      },
+    ]);
+  });
+
+  it("nests every leaf of a nested composition and keeps the tree", () => {
+    const scoped = scopedPreset(
+      theme("abyss", {
+        layerStyles: {
+          fill: {
+            DEFAULT: { description: "the fill", value: { bg: "red" } },
+            solid: { value: { bg: "blue" } },
+          },
+        },
+      }),
+    );
+
+    expect(scoped).toMatchObject([
+      {
+        theme: {
+          extend: {
+            layerStyles: {
+              fill: {
+                DEFAULT: { description: "the fill", value: { [ABYSS]: { bg: "red" } } },
+                solid: { value: { [ABYSS]: { bg: "blue" } } },
+              },
+            },
+          },
+        },
+      },
+    ]);
+  });
+
+  it("nests an animation style and leaves a value that is not a style object as it is", () => {
+    const scoped = scopedPreset(
+      theme("abyss", {
+        animationStyles: { fade: { value: { animationName: "fade-in" } }, odd: { value: "x" } },
+      }),
+    );
+
+    expect(scoped).toMatchObject([
+      {
+        theme: {
+          extend: {
+            animationStyles: {
+              fade: { value: { [ABYSS]: { animationName: "fade-in" } } },
+              odd: { value: "x" },
+            },
+          },
+        },
+      },
+    ]);
+  });
+
   it("states nothing an extension did not state", () => {
     const [scoped] = scopedPreset(theme("abyss", { recipes: { button: { base: { gap: "3" } } } }));
 
@@ -174,11 +242,11 @@ describe("scope", () => {
 
     expect(scoped).toStrictEqual([
       {
-        name: "@stealthscale/theme-abyss-switched from @stealthscale/theme-fathom",
+        name: "theme:abyss:switched from @stealthscale/theme-fathom",
         theme: { extend: { recipes: { button: { base: { [ABYSS]: { gap: "3" } } } } } },
       },
       {
-        name: "@stealthscale/theme-abyss-switched",
+        name: "theme:abyss:switched",
         theme: { extend: { recipes: { button: { base: { [ABYSS]: { gap: "4" } } } } } },
       },
     ]);
@@ -186,7 +254,7 @@ describe("scope", () => {
 
   it("scopes the parent's extensions when the child states none of its own", () => {
     expect(scopedPreset(derived("abyss", FATHOM))).toMatchObject([
-      { name: "@stealthscale/theme-abyss-switched from @stealthscale/theme-fathom" },
+      { name: "theme:abyss:switched from @stealthscale/theme-fathom" },
     ]);
   });
 
@@ -198,8 +266,8 @@ describe("scope", () => {
     };
 
     expect(scopedPreset(derived("abyss", parent)).map((each) => each.name)).toStrictEqual([
-      "@stealthscale/theme-abyss-switched from @stealthscale/theme-fathom",
-      "@stealthscale/theme-abyss-switched from @stealthscale/theme-deep",
+      "theme:abyss:switched from @stealthscale/theme-fathom",
+      "theme:abyss:switched from @stealthscale/theme-deep",
     ]);
   });
 
@@ -207,14 +275,14 @@ describe("scope", () => {
     const quiet: SwitchablePreset = { name: "@stealthscale/theme-quiet", theme: { extend: {} } };
     const scoped = scopedPreset(derived("abyss", quiet, { recipes: { button: {} } }));
 
-    expect(scoped.map((each) => each.name)).toStrictEqual(["@stealthscale/theme-abyss-switched"]);
+    expect(scoped.map((each) => each.name)).toStrictEqual(["theme:abyss:switched"]);
   });
 
   it("names an ancestor that has no name", () => {
     const unnamed: SwitchablePreset = { theme: { extend: { recipes: { button: {} } } } };
 
     expect(scopedPreset(derived("abyss", unnamed))[0]?.name).toBe(
-      "@stealthscale/theme-abyss-switched from an unnamed preset",
+      "theme:abyss:switched from an unnamed preset",
     );
   });
 
@@ -242,17 +310,17 @@ describe("scope", () => {
     ];
 
     expect(scopedPresets(stated).map((each) => each.name)).toStrictEqual([
-      "@stealthscale/theme-fathom-switched",
-      "@stealthscale/theme-abyss-switched",
+      "theme:fathom:switched",
+      "theme:abyss:switched",
     ]);
   });
 
-  it("carries what a derived theme inherits beside its own under the one attribute", () => {
+  it("scopes what a derived theme inherits beside its own under the one attribute", () => {
     const stated = [derived("abyss", FATHOM, { recipes: { button: { base: { gap: "4" } } } })];
 
     expect(scopedPresets(stated).map((each) => each.name)).toStrictEqual([
-      "@stealthscale/theme-abyss-switched from @stealthscale/theme-fathom",
-      "@stealthscale/theme-abyss-switched",
+      "theme:abyss:switched from @stealthscale/theme-fathom",
+      "theme:abyss:switched",
     ]);
   });
 });

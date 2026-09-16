@@ -5,12 +5,13 @@
  * @remarks
  *   Both lists are read off the graph rather than stated. An application that names the packages
  *   it draws with has said so in its manifest, and a second list written as paths would be one
- *   more thing to keep in step.
+ *   more thing to keep in step. The graph is walked once by the caller, because the walk reads
+ *   every manifest on it, and both readers here take the result.
  */
 
-import { relative, sep } from "node:path";
+import { relative, resolve, sep } from "node:path";
 
-import { dependencies, type Dependency } from "@stealthscale/vite-plugin-base";
+import { type Dependency } from "@stealthscale/vite-plugin-base";
 
 import { PRESET_SUBPATH } from "#options.ts";
 
@@ -44,17 +45,22 @@ function publishes(one: Dependency): boolean {
 }
 
 /**
- * Lists every package on the application's graph that publishes a preset, the system package
- * first and each other package after the packages it depends on.
+ * Lists every package on the graph that publishes a preset, the system package first and each
+ * other package after the packages it depends on.
  *
  * @remarks
  *   The system package goes first whatever the graph says. Every recipe is written against its
  *   vocabulary, and a component package names it as a peer rather than a dependency, so nothing
  *   in the graph puts it where it belongs. The order decides the outcome: where two presets state
  *   the same thing, the one installed later wins.
+ * @param graph - The application's dependency graph, each package after what it depends on.
+ * @param systemPackage - The package that publishes the foundation.
  */
-export function contributors(root: string, systemPackage: string): readonly Contributor[] {
-  const found = dependencies(root)
+export function contributors(
+  graph: readonly Dependency[],
+  systemPackage: string,
+): readonly Contributor[] {
+  const found = graph
     .filter((one) => publishes(one))
     .map((one) => ({ at: one.at, name: one.named }));
 
@@ -65,8 +71,8 @@ export function contributors(root: string, systemPackage: string): readonly Cont
 }
 
 /**
- * Lists a glob for the source of every workspace package the application depends on, relative to
- * the application, sorted.
+ * Lists a glob for the source of every workspace package on the graph, relative to the
+ * application, sorted.
  *
  * @remarks
  *   A style prop is resolved when the stylesheet is compiled, so a prop the compiler never read is
@@ -74,10 +80,12 @@ export function contributors(root: string, systemPackage: string): readonly Cont
  *   with, so their source is scanned beside the application's own. An installed package is left
  *   out: what ships in one is compiled JavaScript whose props were resolved before it was
  *   published.
+ * @param root - The application's directory, which the globs are written relative to.
+ * @param graph - The application's dependency graph.
  */
-export function workspaceSources(root: string): readonly string[] {
-  return dependencies(root)
-    .filter((one) => !one.at.includes(VENDOR))
+export function workspaceSources(root: string, graph: readonly Dependency[]): readonly string[] {
+  return graph
+    .filter((one) => !resolve(one.at).includes(VENDOR))
     .map((one) => `${relative(root, one.at)}/src/**/*.{ts,tsx}`.replaceAll(sep, "/"))
     .toSorted();
 }

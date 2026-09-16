@@ -8,6 +8,7 @@ import {
   type ScratchWorkspace,
   withScratchWorkspace,
 } from "@stealthscale/testing";
+import { dependencies } from "@stealthscale/vite-plugin-base";
 
 import { contributors, workspaceSources } from "#contributors.ts";
 
@@ -41,7 +42,7 @@ function root(dependsOn: readonly string[]): ScratchFiles {
 
 function named(files: ScratchFiles, system = "@acme/design"): readonly string[] {
   return withScratchWorkspace(files, (workspace) =>
-    contributors(workspace.root, system).map((each) => each.name),
+    contributors(dependencies(workspace.root), system).map((each) => each.name),
   );
 }
 
@@ -68,7 +69,7 @@ describe("contributors", () => {
     const at = withScratchWorkspace(
       { ...root(["@acme/kit"]), ...installed("@acme/kit", [], true) },
       (workspace) =>
-        contributors(workspace.root, "@acme/design").map((each) =>
+        contributors(dependencies(workspace.root), "@acme/design").map((each) =>
           each.at.slice(workspace.root.length + 1),
         ),
     );
@@ -124,7 +125,7 @@ describe("contributors", () => {
       (workspace) => {
         linked(workspace, ["deep", "kit"]);
 
-        return workspaceSources(workspace.root);
+        return workspaceSources(workspace.root, dependencies(workspace.root));
       },
     );
 
@@ -137,7 +138,7 @@ describe("contributors", () => {
   it("leaves an installed package out of the source globs", () => {
     const globs = withScratchWorkspace(
       { ...root(["@acme/vendor"]), ...installed("@acme/vendor") },
-      (workspace) => workspaceSources(workspace.root),
+      (workspace) => workspaceSources(workspace.root, dependencies(workspace.root)),
     );
 
     expect(globs).toStrictEqual([]);

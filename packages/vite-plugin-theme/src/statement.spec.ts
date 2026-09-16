@@ -4,9 +4,11 @@ import {
   manifest,
   packageFiles,
   type ScratchFiles,
+  type ScratchWorkspace,
   withScratchWorkspace,
   withScratchWorkspaceAsync,
 } from "@stealthscale/testing";
+import { type Importer, importer } from "@stealthscale/vite-plugin-base";
 
 import { fontPackages, loadPreset, loadStatement, presetEntry } from "#statement.ts";
 
@@ -25,16 +27,31 @@ const APP: ScratchFiles = {
   ),
 };
 
+async function through<Result>(
+  workspace: ScratchWorkspace,
+  run: (through: Importer) => Promise<Result>,
+): Promise<Result> {
+  const opened = await importer({ root: workspace.root });
+
+  try {
+    return await run(opened);
+  } finally {
+    await opened.close();
+  }
+}
+
 describe("statement", () => {
   it("loads the application's statement with the files behind it", async () => {
-    const loaded = await withScratchWorkspaceAsync(APP, async (workspace) => {
-      const { application, files } = await loadStatement({ root: workspace.root });
+    const loaded = await withScratchWorkspaceAsync(APP, (workspace) =>
+      through(workspace, async (opened) => {
+        const { application, files } = await loadStatement(workspace.root, opened);
 
-      return {
-        first: files[0]?.slice(workspace.root.length + 1),
-        name: application.themes[0].name,
-      };
-    });
+        return {
+          first: files[0]?.slice(workspace.root.length + 1),
+          name: application.themes[0].name,
+        };
+      }),
+    );
 
     expect(loaded).toStrictEqual({ first: "theme.config.ts", name: "fathom" });
   });
@@ -43,16 +60,20 @@ describe("statement", () => {
     const files = { ...APP, "theme.config.ts": "export const other = 1;\n" };
 
     await expect(
-      withScratchWorkspaceAsync(files, (workspace) => loadStatement({ root: workspace.root })),
+      withScratchWorkspaceAsync(files, (workspace) =>
+        through(workspace, (opened) => loadStatement(workspace.root, opened)),
+      ),
     ).rejects.toThrow("theme.config.ts exports no default");
   });
 
   it("loads the preset a package publishes with the files behind it", async () => {
-    const loaded = await withScratchWorkspaceAsync(APP, async (workspace) => {
-      const { files, preset } = await loadPreset("@acme/kit", { root: workspace.root });
+    const loaded = await withScratchWorkspaceAsync(APP, (workspace) =>
+      through(workspace, async (opened) => {
+        const { files, preset } = await loadPreset("@acme/kit", opened);
 
-      return { first: files[0]?.slice(workspace.root.length + 1), name: preset.name };
-    });
+        return { first: files[0]?.slice(workspace.root.length + 1), name: preset.name };
+      }),
+    );
 
     expect(loaded).toStrictEqual({ first: "node_modules/@acme/kit/theme.js", name: "@acme/kit" });
   });
@@ -62,7 +83,7 @@ describe("statement", () => {
 
     await expect(
       withScratchWorkspaceAsync(files, (workspace) =>
-        loadPreset("@acme/kit", { root: workspace.root }),
+        through(workspace, (opened) => loadPreset("@acme/kit", opened)),
       ),
     ).rejects.toThrow("@acme/kit/theme exports no default");
   });

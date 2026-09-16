@@ -11,7 +11,6 @@ import { extname } from "node:path";
 import {
   type DevEnvironment,
   type EnvironmentModuleNode,
-  type HotUpdateOptions,
   type Plugin,
   type ViteDevServer,
 } from "vite";
@@ -21,7 +20,8 @@ import { type Loading } from "@stealthscale/vite-plugin-base";
 import { cleaned } from "#compiler.ts";
 import { reportDiagnostics } from "#diagnostics.ts";
 import { renderStylesheet } from "#fonts.ts";
-import { layerDeclaration, type Options, type Resolved, resolveOptions } from "#options.ts";
+import { layerPattern, type Options, type Resolved, resolveOptions } from "#options.ts";
+import { type SourceChange } from "#pandacss.ts";
 import { assemble, type Assembled } from "#theme/assembly.ts";
 
 /**
@@ -34,6 +34,36 @@ import { assemble, type Assembled } from "#theme/assembly.ts";
 const VIRTUAL = "virtual:stealth-theme.css";
 
 /**
+ * The kinds of change a bundler reports about a file, which a dev server's hot update and a build's
+ * watch report under the same names.
+ */
+type Event = "create" | "delete" | "update";
+
+/**
+ * Maps a bundler's change event to the change the compiler applies.
+ */
+const KINDS: Readonly<Record<Event, SourceChange["kind"]>> = {
+  create: "add",
+  delete: "unlink",
+  update: "change",
+};
+
+/**
+ * Carries the rules compiled from one generation of the compiler.
+ */
+interface Compiled {
+  /**
+   * The compiled rules, with what names the compiler removed.
+   */
+  css: string;
+
+  /**
+   * The generation of the compiler the rules were compiled from.
+   */
+  generation: number;
+}
+
+/**
  * Carries everything the plugin holds between its hooks.
  */
 interface Running {
@@ -41,6 +71,17 @@ interface Running {
    * The compiler and what it was assembled from, once assembled.
    */
   assembled?: Assembled | undefined;
+
+  /**
+   * The rules compiled from the current generation, once a stylesheet asked for them.
+   */
+  compiled?: Compiled | undefined;
+
+  /**
+   * Counts the assemblies and the changes applied to the compiler, so rules compiled before a
+   * change are not served after it.
+   */
+  generation: number;
 
   /**
    * Where the application is, and the conditions it resolves under.
@@ -67,9 +108,15 @@ function bare(id: string): string {
 
 /**
  * Assembles the compiler once, and returns the same assembly until something drops it.
+ *
+ * @remarks
+ *   An assembly is a new generation, so rules compiled from the one before are compiled again.
  */
 async function ready(state: Running, resolved: Resolved): Promise<Assembled> {
-  state.assembled ??= await assemble(state.loading, resolved, state.server);
+  if (state.assembled === undefined) {
+    state.assembled = await assemble(state.loading, resolved, state.server);
+    state.generation += 1;
+  }
 
   return state.assembled;
 }
@@ -123,65 +170,88 @@ interface Transforming {
 }
 
 /**
- * Compiles the rules, reports what the compiler found, and appends the rules to a stylesheet.
+ * Compiles the rules once per generation, reports what the compiler found, and returns the rules.
  *
  * @remarks
- *   An application whose graph names no package publishing a preset beside the system package
+ *   Every stylesheet that declares the cascade order receives the same rules, so the compile runs
+ *   once for a generation however many stylesheets ask, and the diagnostics are reported once with
+ *   it. An application whose graph names no package publishing a preset beside the system package
  *   compiles a stylesheet carrying the foundation's values and no component's rules, which is a
  *   blank-looking page and a build that succeeded, so that is reported here too.
  */
-function appended(assembled: Assembled, context: Transforming, code: string): string {
-  const { compiler, contributors, sources, watched } = assembled;
-  const compiled = compiler.driver.cssgen({ emitLayerDeclaration: false });
+function compiled(state: Running, assembled: Assembled, warn: Transforming["warn"]): string {
+  if (state.compiled?.generation === state.generation) return state.compiled.css;
 
-  for (const file of [...watched, ...sources]) context.addWatchFile(file);
-
-  const warn = context.warn.bind(context);
+  const { compiler, contributors } = assembled;
+  const output = compiler.driver.cssgen({ emitLayerDeclaration: false });
 
   reportDiagnostics(compiler.driver.designSystemDiagnostics, "the design system", warn);
-  reportDiagnostics(compiled.diagnostics, "the stylesheet", warn);
+  reportDiagnostics(output.diagnostics, "the stylesheet", warn);
 
   if (contributors.length === 1) {
-    context.warn(
+    warn(
       "No package on this application's dependency graph publishes a preset under ./theme " +
         "beside the system package, so the stylesheet carries the foundation's values and no " +
         "component's rules.",
     );
   }
 
-  return `${code}\n${cleaned(compiled.css)}`;
+  state.compiled = { css: cleaned(output.css), generation: state.generation };
+
+  return state.compiled.css;
 }
 
 /**
- * Applies a changed file: a file behind the configuration restarts the compiler, a source file is
- * handed to the running compiler, and any other file is left to Vite.
- *
- * @returns The modules to reload, with every stylesheet the rules were appended to among them.
+ * Appends the compiled rules to a stylesheet, and asks the bundler to watch everything behind them.
  */
-async function refreshed(
+function appended(
+  state: Running,
+  assembled: Assembled,
+  context: Transforming,
+  code: string,
+): string {
+  for (const file of [...assembled.watched, ...assembled.sources]) context.addWatchFile(file);
+
+  return `${code}\n${compiled(state, assembled, context.warn.bind(context))}`;
+}
+
+/**
+ * Applies a changed file to the compiler: a file behind the configuration restarts it, a source
+ * file is handed to it, and any other file is left alone.
+ *
+ * @remarks
+ *   The compiler reads a changed file from disk itself, so the change carries no content, and a
+ *   deleted file is reported as one rather than read. A file outside the compiler's globs is left
+ *   alone before the compiler is asked, because the compiler reads a file it is handed before it
+ *   decides whether the file is one it scans.
+ * @returns True when the compiler changed, so rules compiled before the change are stale.
+ */
+async function applied(
   state: Running,
   resolved: Resolved,
-  environment: DevEnvironment,
-  context: HotUpdateOptions,
-): Promise<EnvironmentModuleNode[]> {
+  file: string,
+  event: Event,
+): Promise<boolean> {
   const assembled = state.assembled;
 
-  if (assembled === undefined) return context.modules;
+  if (assembled === undefined) return false;
 
-  if (assembled.watched.includes(context.file)) {
+  if (assembled.watched.includes(file)) {
     state.assembled = undefined;
     await ready(state, resolved);
-  } else if (assembled.compiler.driver.isSourceFile(context.file)) {
-    assembled.compiler.driver.applyChange({
-      content: await context.read(),
-      kind: "change",
-      path: context.file,
-    });
-  } else {
-    return context.modules;
+
+    return true;
   }
 
-  return [...new Set([...invalidated(environment, state.sheets), ...context.modules])];
+  const { driver } = assembled.compiler;
+
+  if (!driver.isSourceFile(file) || !driver.applyChange({ kind: KINDS[event], path: file })) {
+    return false;
+  }
+
+  state.generation += 1;
+
+  return true;
 }
 
 /**
@@ -195,8 +265,8 @@ async function refreshed(
  */
 export function stylesheet(options: Options = {}): Plugin {
   const resolved = resolveOptions(options);
-  const declared = layerDeclaration(resolved.layers).slice(0, -1);
-  const state: Running = { loading: { root: process.cwd() }, sheets: new Set() };
+  const declared = layerPattern(resolved.layers);
+  const state: Running = { generation: 0, loading: { root: process.cwd() }, sheets: new Set() };
 
   return {
     enforce: "pre",
@@ -245,18 +315,36 @@ export function stylesheet(options: Options = {}): Plugin {
      * Appends the compiled rules to a stylesheet that declares the cascade order.
      */
     async transform(code, id) {
-      if (extname(bare(id)) !== ".css" || !code.includes(declared)) return null;
+      if (extname(bare(id)) !== ".css" || !declared.test(code)) return null;
 
       state.sheets.add(id);
 
-      return { code: appended(await ready(state, resolved), this, code), map: null };
+      return { code: appended(state, await ready(state, resolved), this, code), map: null };
     },
 
     /**
-     * Recompiles when a file behind the stylesheet changes, and leaves any other change to Vite.
+     * Applies a change under a build that watches, where no hot update runs.
+     *
+     * @remarks
+     *   A dev server reports the same change to `hotUpdate`, which applies it and invalidates the
+     *   stylesheets, so under a server this hook leaves the change to that one.
      */
-    hotUpdate(context) {
-      return refreshed(state, resolved, this.environment, context);
+    async watchChange(id, change) {
+      if (this.environment.config.command !== "build") return;
+
+      await applied(state, resolved, id, change.event);
+    },
+
+    /**
+     * Applies a change under a dev server, and invalidates every stylesheet the rules were
+     * appended to when the compiler changed.
+     */
+    async hotUpdate(context) {
+      const changed = await applied(state, resolved, context.file, context.type);
+
+      return changed
+        ? [...new Set([...invalidated(this.environment, state.sheets), ...context.modules])]
+        : context.modules;
     },
   };
 }

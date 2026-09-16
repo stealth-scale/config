@@ -100,7 +100,7 @@ describe("config", () => {
     );
   });
 
-  it("throws for a preset that carries a function and names where it sat", () => {
+  it("throws with the path of a function inside a preset", () => {
     const presets = [{ name: "@acme/kit", utilities: { x: { transform: (): number => 1 } } }];
 
     expect(() => renderStylesheetConfig({ ...SOURCE, presets })).toThrow(

@@ -14,7 +14,7 @@ import { imported, type Loading, writeIfChanged } from "@stealthscale/vite-plugi
 
 import { basePreset, generateRuntime } from "#compiler.ts";
 import { renderRuntimeConfig } from "#config.ts";
-import { CACHE, GENERATED, type Options, resolveOptions } from "#options.ts";
+import { CACHE, GENERATED, resolveOptions, type RuntimeOptions } from "#options.ts";
 import { presetEntry } from "#statement.ts";
 
 /**
@@ -39,9 +39,11 @@ interface Module {
  * @remarks
  *   The runtime is generated as soon as the package's root is known rather than at the start of a
  *   build, because the package's own source imports what this writes: a type checker, a packer
- *   and a test runner all resolve those imports without starting a build.
+ *   and a test runner all resolve those imports without starting a build. A file whose content
+ *   did not change is left as it was, so a regeneration wakes the watcher for the files a change
+ *   reached and no others.
  */
-export function runtime(options: Options = {}): Plugin {
+export function runtime(options: RuntimeOptions = {}): Plugin {
   const resolved = resolveOptions(options);
   let loading: Loading = { root: process.cwd() };
   let watching: readonly string[] = [];

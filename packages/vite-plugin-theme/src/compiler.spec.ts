@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { existsSync, statSync, utimesSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 import { manifest, withScratchWorkspace, withScratchWorkspaceAsync } from "@stealthscale/testing";
@@ -33,7 +33,13 @@ function entryOf(exports?: unknown): string | undefined {
 }
 
 describe("compiler", () => {
-  it("renames the theme attribute and removes the signature from a stylesheet", () => {
+  it("renames the theme attribute in a stylesheet", () => {
+    expect(cleaned('[data-panda-theme="forge"] { --colors-primary: red; }')).toBe(
+      '[data-theme="forge"] { --colors-primary: red; }',
+    );
+  });
+
+  it("removes the signature from a stylesheet however it is spaced", () => {
     const css = [
       "@layer base {",
       "  :root {",
@@ -41,19 +47,9 @@ describe("compiler", () => {
       "  }",
       "  :root{--made-with-panda:'🐼'}",
       "}",
-      '[data-panda-theme="forge"] { --colors-primary: red; }',
     ].join("\n");
 
-    expect(cleaned(css)).toBe(
-      [
-        "@layer base {",
-        "  :root {",
-        "  }",
-        "  :root{}",
-        "}",
-        '[data-theme="forge"] { --colors-primary: red; }',
-      ].join("\n"),
-    );
+    expect(cleaned(css)).toBe(["@layer base {", "  :root {", "  }", "  :root{}", "}"].join("\n"));
   });
 
   it("resolves the installed base preset to a module file that exists", () => {
@@ -104,7 +100,7 @@ describe("compiler", () => {
     expect(dependencies).toStrictEqual([]);
   });
 
-  it("generates the runtime into an emptied directory with the recipe runtime declared", async () => {
+  it("generates the runtime and removes a file the compiler no longer writes", async () => {
     const files = await withScratchWorkspaceAsync(
       { ...SYSTEM, "generated/stale.txt": "" },
       async (workspace) => {
@@ -123,5 +119,53 @@ describe("compiler", () => {
     expect(files).toContain("generated/jsx/index.mjs");
     expect(files).toContain("generated/recipes/runtime.mjs");
     expect(files).toContain("generated/recipes/runtime.d.mts");
+  });
+
+  it("declares the recipe runtime from the generated recipe types", async () => {
+    const declared = await withScratchWorkspaceAsync(SYSTEM, async (workspace) => {
+      await generateRuntime(
+        workspace.root,
+        workspace.path("node_modules/.theme/runtime.config.mjs"),
+        workspace.path("generated"),
+      );
+
+      return workspace.read("generated/recipes/runtime.d.mts");
+    });
+
+    expect(declared).toContain('from "../types/recipe.d.mts";');
+    expect(declared).toContain(
+      "export declare function createRecipe<Variants extends RecipeVariantRecord>(",
+    );
+    expect(declared).toContain("): SlotRecipeRuntimeFn<Slot, RecipeSelection<Variants>, ");
+  });
+
+  it("leaves an unchanged runtime file as it was when generating again", async () => {
+    const past = new Date("2020-01-01T00:00:00Z");
+    const modified = await withScratchWorkspaceAsync(SYSTEM, async (workspace) => {
+      const configPath = workspace.path("node_modules/.theme/runtime.config.mjs");
+      const generated = workspace.path("generated");
+
+      await generateRuntime(workspace.root, configPath, generated);
+      utimesSync(workspace.path("generated/css/index.mjs"), past, past);
+      await generateRuntime(workspace.root, configPath, generated);
+
+      return statSync(workspace.path("generated/css/index.mjs")).mtime;
+    });
+
+    expect(modified).toStrictEqual(past);
+  });
+
+  it("leaves nothing under the cache directory but the configuration once generated", async () => {
+    const left = await withScratchWorkspaceAsync(SYSTEM, async (workspace) => {
+      await generateRuntime(
+        workspace.root,
+        workspace.path("node_modules/.theme/runtime.config.mjs"),
+        workspace.path("generated"),
+      );
+
+      return workspace.files().filter((file) => file.startsWith("node_modules/.theme/"));
+    });
+
+    expect(left).toStrictEqual(["node_modules/.theme/runtime.config.mjs"]);
   });
 });
