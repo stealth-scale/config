@@ -4,9 +4,9 @@ import { textStyles } from "#preset/styles/text-styles.ts";
 import { tokenAt } from "#tokens.fixtures.ts";
 
 describe("textStyles", () => {
-  it("draws every size of the type scale", () => {
+  it("draws every size of the type scale by the name of its token", () => {
     expect(tokenAt(textStyles, "md")).toStrictEqual({
-      fontSize: "1.0000rem",
+      fontSize: "md",
       letterSpacing: "0em",
       lineHeight: "1.5",
     });

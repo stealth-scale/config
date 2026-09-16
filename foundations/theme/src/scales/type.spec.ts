@@ -31,16 +31,17 @@ describe("type", () => {
     expect(Object.keys(typography())).toStrictEqual(STEPS);
   });
 
-  it("states the size and the leading and the tracking together", () => {
+  it("states the size by name with the leading and the tracking it is read at", () => {
     expect(tokenAt(typography(), "md")).toStrictEqual({
-      fontSize: "1.0000rem",
+      fontSize: "md",
       letterSpacing: "0em",
       lineHeight: "1.5",
     });
   });
 
-  it("uses the same size the sizes alone would give", () => {
-    expect(styleOf("3xl", "fontSize")).toBe(tokenAt(fontSizes(), "3xl"));
+  it("names the size token of the same rung", () => {
+    expect(styleOf("3xl", "fontSize")).toBe("3xl");
+    expect(Object.keys(fontSizes())).toContain("3xl");
   });
 
   it("tightens the leading as the size grows", () => {
