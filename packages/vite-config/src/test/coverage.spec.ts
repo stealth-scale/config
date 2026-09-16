@@ -1,5 +1,5 @@
 import { type UserConfig } from "vite-plus";
-import { expect, test } from "vite-plus/test";
+import { describe, expect, it } from "vitest";
 
 import { FOREIGN } from "#ignore/foreign.ts";
 import { GENERATED } from "#ignore/generated.ts";
@@ -16,49 +16,63 @@ function settings(): Record<string, unknown> {
   return held as Record<string, unknown>;
 }
 
-test("counts with the engine's own coverage rather than an instrumented build", () => {
-  expect(settings()["provider"]).toBe("v8");
-});
+describe("coverage", () => {
+  it("counts with the engine's own coverage rather than an instrumented build", () => {
+    expect(settings()["provider"]).toBe("v8");
+  });
 
-test("leaves out the measurement, the fixtures and the configs, which are not source", () => {
-  const held = settings()["exclude"] as string[];
+  it("leaves out the measurement the fixtures and the configs", () => {
+    const held = settings()["exclude"] as string[];
 
-  expect(held).toContain("**/*.spec.{ts,tsx}");
-  expect(held).toContain("**/*.fixtures.{ts,tsx}");
-  expect(held).toContain("**/*.config.ts");
-});
+    expect(held).toContain("**/*.spec.{ts,tsx}");
+    expect(held).toContain("**/*.fixtures.{ts,tsx}");
+    expect(held).toContain("**/*.config.ts");
+  });
 
-test("leaves out what a tool wrote, the same list the linter and formatter walk past", () => {
-  const held = settings()["exclude"] as string[];
+  it("leaves out what a tool wrote", () => {
+    const held = settings()["exclude"] as string[];
 
-  for (const glob of GENERATED) expect(held).toContain(glob);
-});
+    for (const glob of GENERATED) expect(held).toContain(glob);
+  });
 
-test("reports for a reader and for a machine, and drops the two nobody opens", () => {
-  expect(settings()["reporter"]).toEqual(["text-summary", "html", "lcov"]);
-});
+  it("reports for a reader and for a machine", () => {
+    expect(settings()["reporter"]).toStrictEqual(["text-summary", "html", "lcov"]);
+  });
 
-test("prints the four numbers to the terminal, not a row for every file", () => {
-  expect(settings()["reporter"]).not.toContain("text");
-});
+  it("prints the four numbers to the terminal", () => {
+    expect(settings()["reporter"]).not.toContain("text");
+  });
 
-test("asks for all of it, which is the one number that needs no explaining", () => {
-  const held = settings()["thresholds"] as Record<string, unknown>;
+  it("asks for full coverage", () => {
+    const held = settings()["thresholds"] as Record<string, unknown>;
 
-  expect(held["branches"]).toBe(100);
-  expect(held["functions"]).toBe(100);
-  expect(held["lines"]).toBe(100);
-  expect(held["statements"]).toBe(100);
-});
+    expect(held["branches"]).toBe(100);
+    expect(held["functions"]).toBe(100);
+    expect(held["lines"]).toBe(100);
+    expect(held["statements"]).toBe(100);
+  });
 
-test("measures the package rather than each file, so no small file has to be perfect", () => {
-  const held = settings()["thresholds"] as Record<string, unknown>;
+  it("measures the package rather than each file", () => {
+    const held = settings()["thresholds"] as Record<string, unknown>;
 
-  expect(held["perFile"]).toBe(false);
-});
+    expect(held["perFile"]).toBe(false);
+  });
 
-test("counts neither what was installed nor what was built", () => {
-  const held = settings()["exclude"] as string[];
+  it("counts neither what was installed nor what was built", () => {
+    const held = settings()["exclude"] as string[];
 
-  for (const glob of FOREIGN) expect(held).toContain(glob);
+    for (const glob of FOREIGN) expect(held).toContain(glob);
+  });
+
+  it("counts every source file whether or not a test loaded it", () => {
+    expect(settings()["include"]).toStrictEqual(["**/src/**"]);
+  });
+
+  it("leaves out the entry points that run the program", () => {
+    const excluded = settings()["exclude"] as string[];
+
+    expect(excluded).toContain("**/src/main.{ts,tsx}");
+    expect(excluded).toContain("**/src/bin/**");
+    expect(excluded).toContain("**/*.worker.{ts,tsx}");
+  });
 });
