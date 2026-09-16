@@ -13,6 +13,7 @@ import type {
   SystemProperties,
   SystemStyleObject,
 } from "#generated/types/system.d.mts";
+import { sized } from "#patterns/length.ts";
 import { responsive } from "#patterns/responsive.ts";
 
 /**
@@ -53,22 +54,9 @@ export interface GridProps {
 export type SimpleGridProps = Omit<GridProps, "columnGap" | "rowGap">;
 
 /**
- * Matches a value that already carries a unit or a function, which is read as it stands.
- */
-const LENGTH =
-  /^(?:[+-]?\d*\.?\d+(?:e[+-]?\d+)?[a-z%]+|var\(--.+\)|(?:min|max|clamp|calc)\(.*\))$/iu;
-
-/**
  * Fixes the gap a grid is drawn with when a caller states no gap at all.
  */
 const GAP = "gap.md";
-
-/**
- * Writes a column width as CSS reads one, against the size scale where it is a name.
- */
-function width(least: string): string {
-  return LENGTH.test(least) ? least : `token(sizes.${least}, ${least})`;
-}
 
 /**
  * Writes the template the columns are drawn from: counted, fitted, or none.
@@ -87,7 +75,7 @@ function columns(props: GridProps): SystemStyleObject {
     return {
       gridTemplateColumns: responsive(
         props.minChildWidth,
-        (least) => `repeat(auto-fit, minmax(${width(least)}, 1fr))`,
+        (least) => `repeat(auto-fit, minmax(${sized(least)}, 1fr))`,
       ),
     };
   }
