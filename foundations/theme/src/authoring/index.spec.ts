@@ -12,6 +12,7 @@ const SURFACE = [
   "center",
   "cluster",
   "colorScale",
+  "compoundClassName",
   "contract",
   "contrast",
   "controls",

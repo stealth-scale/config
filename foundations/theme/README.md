@@ -104,14 +104,14 @@ that configuration.
 
 ### Definitions
 
-| Export                     | Returns                                                                           |
-| -------------------------- | --------------------------------------------------------------------------------- |
-| `defineRecipe(recipe)`     | The recipe, typed against the vocabulary, with the literal values of each variant |
-| `defineSlotRecipe(recipe)` | The slot recipe, typed the same way                                               |
-| `defineStyles(styles)`     | A style object two recipes share, typed                                           |
-| `definePreset(preset)`     | The preset a component package publishes under `./theme`                          |
-| `defineTheme(config)`      | A `Theme`: its name, its font packages, a preset and a variant                    |
-| `contract(variant)`        | The variant unchanged. The parameter's type is the check                          |
+| Export                     | Returns                                                                                                                                               |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `defineRecipe(recipe)`     | The recipe, typed against the vocabulary, with the literal values of each variant and every compound named for the class its styles are emitted under |
+| `defineSlotRecipe(recipe)` | The slot recipe, typed the same way, with each compound split per slot it styles                                                                      |
+| `defineStyles(styles)`     | A style object two recipes share, typed                                                                                                               |
+| `definePreset(preset)`     | The preset a component package publishes under `./theme`                                                                                              |
+| `defineTheme(config)`      | A `Theme`: its name, its font packages, a preset and a variant                                                                                        |
+| `contract(variant)`        | The variant unchanged. The parameter's type is the check                                                                                              |
 
 `RecipeProps<typeof recipe>` names the props a recipe lets a caller choose, for a component the
 binding cannot type on its own.
@@ -137,21 +137,21 @@ as references into the status palettes.
 
 ### Scales
 
-| Export                                              | Draws                                                             |
-| --------------------------------------------------- | ----------------------------------------------------------------- |
-| `colorScale(hue, chroma)`                           | Eleven OKLCH steps, `50` to `950`                                 |
-| `alphaScale("white" \| "black")`                    | Eleven steps of an overlay                                        |
-| `backgrounds(pages, hue, chroma)`                   | The `bg` family from the page's lightness in each mode            |
-| `foregrounds(ramp)`, `borders(ramp)`                | The `fg` and `border` families from a grey ramp                   |
-| `paletteRoles(ramp)`                                | The twelve roles of a hue palette                                 |
-| `paletteAlias(hue)`                                 | The twelve roles of a semantic palette, by reference              |
-| `neutralFills()`                                    | The neutral palette's quiet fills, pointed at the page's surfaces |
-| `radii(largest)`                                    | Three concentric corners                                          |
-| `shadows(hue, depth)`                               | Six heights, an inner shadow and an inset line, per mode          |
-| `controls()`, `icons()`, `insets()`, `gaps()`       | The semantic sizes and spacing, five steps each                   |
-| `fontSizes(base, ratio)`, `typography(base, ratio)` | The type scale, and the same with leading and tracking            |
-| `slides()`                                          | The sixteen slide keyframes                                       |
-| `oklch(lightness, chroma, hue)`                     | One color as CSS writes it                                        |
+| Export                                              | Draws                                                                                 |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `colorScale(hue, chroma)`                           | Eleven OKLCH steps, `50` to `950`                                                     |
+| `alphaScale("white" \| "black")`                    | Eleven steps of an overlay                                                            |
+| `backgrounds(pages, hue, chroma)`                   | The `bg` family from the page's lightness in each mode                                |
+| `foregrounds(ramp)`, `borders(ramp)`                | The `fg` and `border` families from a grey ramp                                       |
+| `paletteRoles(ramp)`                                | The twelve roles of a hue palette                                                     |
+| `paletteAlias(hue)`                                 | The twelve roles of a semantic palette, by reference                                  |
+| `neutralFills()`                                    | The neutral palette's quiet fills, pointed at the page's surfaces                     |
+| `radii(largest)`                                    | Three concentric corners                                                              |
+| `shadows(hue, depth)`                               | Six heights, an inner shadow and an inset line, per mode                              |
+| `controls()`, `icons()`, `insets()`, `gaps()`       | The semantic sizes and spacing, five steps each                                       |
+| `fontSizes(base, ratio)`, `typography(base, ratio)` | The type scale, and the text styles that name each size with its leading and tracking |
+| `slides()`                                          | The sixteen slide keyframes                                                           |
+| `oklch(lightness, chroma, hue)`                     | One color as CSS writes it                                                            |
 
 ### Recipe helpers
 
@@ -165,7 +165,7 @@ as references into the status palettes.
 | `iconSizes(sizes)`, `iconOnly(sizes)` | A `size` axis over the icon box, or a square control with no inset                 |
 | `touchTarget()`                       | A hit area of a medium control under a coarse pointer                              |
 | `field()`                             | An input's surface, edge, ink and states                                           |
-| `surface(level)`                      | A panel at a shadow level                                                          |
+| `surface(elevation)`                  | A panel at an elevation of the shadow scale                                        |
 | `floating()`, `overlay()`             | A popover, and the backdrop behind a dialog                                        |
 | `motion(enter, exit)`                 | The animation styles a thing opens and closes with                                 |
 | `divider(orientation)`                | A hairline                                                                         |

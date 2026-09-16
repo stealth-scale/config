@@ -7,10 +7,11 @@
  *   targets the recipe layer under the recipe's own names, so a component bound through a raw
  *   definition could not be extended by a theme. The definition is turned into the compiler's
  *   runtime recipe here first, which is what a config recipe binds through, and the factories are
- *   handed that.
+ *   handed that. A compound's class is the one its recipe named, which the compiler emitted the
+ *   compound's styles under.
  */
 
-import { type Recipe, type SlotRecipe } from "#authoring/recipe.ts";
+import { type Recipe, type SlotCompound, type SlotRecipe } from "#authoring/recipe.ts";
 import { toVariantMap } from "#generated/helpers.mjs";
 import type { RecipeContext } from "#generated/jsx/create-recipe-context.d.mts";
 import type { SlotRecipeContext } from "#generated/jsx/create-slot-recipe-context.d.mts";
@@ -31,6 +32,7 @@ import type {
   RecipeVariantRecord,
   SlotRecipeRuntimeFn,
   SlotRecipeVariantRecord,
+  SlotRecord,
 } from "#generated/types/recipe.d.mts";
 
 export type { RecipeContext, SlotRecipeContext };
@@ -90,6 +92,46 @@ function toRuntimeConfig<Variants extends RecipeVariantRecord>(
 }
 
 /**
+ * Carries the class a compound's styles are emitted under, per slot the compound styles.
+ *
+ * @typeParam Slots - Every part the recipe styles.
+ */
+interface Slotted<Slots extends string> {
+  /**
+   * The class of the compound, keyed by each slot it styles.
+   */
+  classNames?: SlotRecord<Slots, string> | undefined;
+}
+
+/**
+ * Scopes a compound's class to the slots it styles, which is what the runtime's per-slot recipe
+ * reads.
+ *
+ * @remarks
+ *   The compiler takes one class per compound and the runtime takes one per slot. A compound
+ *   `defineSlotRecipe` split styles one slot, so its class reaches that slot and no other. The
+ *   single name is unset, because the runtime falls back to it for a slot the map leaves out.
+ * @typeParam Slots - Every part the recipe styles.
+ * @typeParam Variants - Each axis it offers, against the values it takes.
+ */
+function slotted<Slots extends string, Variants extends SlotRecipeVariantRecord<Slots>>(
+  slots: readonly Slots[],
+  compound: SlotCompound<Slots, Variants>,
+): SlotCompound<Slots, Variants> & Slotted<Slots> {
+  const { className } = compound;
+
+  if (className === undefined) return compound;
+
+  const classNames: SlotRecord<Slots, string> = {};
+
+  for (const slot of slots) {
+    if (compound.css[slot] !== undefined) classNames[slot] = className;
+  }
+
+  return { ...compound, className: undefined, classNames };
+}
+
+/**
  * Reduces a slot definition to the shape the compiler's runtime builds a function from.
  *
  * @typeParam Slots - Every part the recipe styles.
@@ -100,7 +142,13 @@ function toSlotRuntimeConfig<Slots extends string, Variants extends SlotRecipeVa
 ): SlotRecipeRuntimeConfig<Slots, Variants> {
   return {
     className: recipe.className,
-    ...(recipe.compoundVariants === undefined ? {} : { compoundVariants: recipe.compoundVariants }),
+    ...(recipe.compoundVariants === undefined
+      ? {}
+      : {
+          compoundVariants: recipe.compoundVariants.map((compound) =>
+            slotted(recipe.slots, compound),
+          ),
+        }),
     ...(recipe.defaultVariants === undefined ? {} : { defaultVariants: recipe.defaultVariants }),
     name: recipe.className,
     slots: recipe.slots,
@@ -117,7 +165,16 @@ function toSlotRuntimeConfig<Slots extends string, Variants extends SlotRecipeVa
 export function createRecipeContext<const Variants extends RecipeVariantRecord>(
   recipe: Recipe<Variants>,
 ): RecipeContext<Bound<Variants>> {
-  return bindRecipe(createRecipe(toRuntimeConfig(recipe)));
+  const bound = bindRecipe(createRecipe(toRuntimeConfig(recipe)));
+
+  /**
+   * Binds an element with the recipe's name stamped on it as `data-recipe`, which is the handle a
+   * specification finds the element by.
+   */
+  const withContext: RecipeContext<Bound<Variants>>["withContext"] = (Component, options) =>
+    bound.withContext(Component, { dataAttr: true, ...options });
+
+  return { ...bound, withContext };
 }
 
 /**
