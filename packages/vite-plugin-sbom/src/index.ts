@@ -14,7 +14,9 @@ import { rolldownVersion, version } from "vite";
 
 import {
   type Bundling,
+  type Installed,
   licensed,
+  locked,
   type Manifest,
   manifestAt,
   type Plugin,
@@ -23,8 +25,6 @@ import {
   reached,
   text,
 } from "@stealthscale/vite-plugin-base";
-
-import { type Installed, locked } from "#locked.ts";
 
 /**
  * The path the document is written to when a caller names none.

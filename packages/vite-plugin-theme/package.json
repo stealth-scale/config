@@ -1,22 +1,22 @@
 {
-  "name": "@stealthscale/vite-plugin-sbom",
-  "version": "0.3.0",
-  "description": "Writes a CycloneDX bill of materials from the modules a build reached.",
+  "name": "@stealthscale/vite-plugin-theme",
+  "version": "0.0.0",
+  "description": "Generates the styling runtime of a design system and compiles the stylesheet of an application.",
   "keywords": [
-    "cyclonedx",
-    "sbom",
-    "spdx",
-    "supply-chain",
+    "css",
+    "design-system",
+    "pandacss",
+    "theme",
     "vite",
     "vite-plugin"
   ],
-  "homepage": "https://github.com/stealth-scale/config/tree/main/packages/vite-plugin-sbom#readme",
+  "homepage": "https://github.com/stealth-scale/config/tree/main/packages/vite-plugin-theme#readme",
   "bugs": "https://github.com/stealth-scale/config/issues",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/stealth-scale/config.git",
-    "directory": "packages/vite-plugin-sbom"
+    "directory": "packages/vite-plugin-theme"
   },
   "files": [
     "dist",
@@ -50,16 +50,18 @@
     "test": "vp test"
   },
   "dependencies": {
-    "@cyclonedx/cyclonedx-library": "catalog:",
-    "packageurl-js": "catalog:",
-    "spdx-expression-parse": "catalog:"
+    "@pandacss/compiler": "catalog:",
+    "@pandacss/config": "catalog:",
+    "@pandacss/preset-base": "catalog:",
+    "@pandacss/types": "catalog:"
   },
   "devDependencies": {
-    "@stealthscale/vite-config-plain": "workspace:^",
+    "@arethetypeswrong/core": "catalog:",
+    "@stealthscale/vite-config": "workspace:^",
     "@stealthscale/vite-config-typescript": "workspace:^",
     "@stealthscale/vite-plugin-base": "workspace:^",
     "@types/node": "catalog:",
-    "@types/spdx-expression-parse": "catalog:",
+    "publint": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vite-plus": "catalog:",
