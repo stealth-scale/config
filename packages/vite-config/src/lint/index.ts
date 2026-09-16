@@ -7,6 +7,7 @@
  */
 
 export {
+  barrelled,
   defaultExported,
   enforce,
   forbid,
