@@ -55,6 +55,7 @@
     "@arethetypeswrong/core": "catalog:",
     "@stealthscale/vite-config": "workspace:^",
     "@stealthscale/vite-config-typescript": "workspace:^",
+    "@testing-library/react": "catalog:",
     "@types/node": "catalog:",
     "@vitejs/plugin-react": "catalog:",
     "@vitest/coverage-v8": "catalog:",
@@ -69,6 +70,7 @@
   },
   "peerDependencies": {
     "@stealthscale/vite-config": "workspace:^",
+    "@testing-library/react": "catalog:",
     "@vitejs/plugin-react": "catalog:",
     "happy-dom": "catalog:",
     "oxc-transform-react": "catalog:",
