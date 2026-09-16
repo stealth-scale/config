@@ -77,7 +77,7 @@ export default {
     "subject-case": [2, "never", ["sentence-case", "start-case", "pascal-case", "upper-case"]],
     "subject-empty": [2, "never"],
     "subject-full-stop": [2, "never", "."],
-    "subject-max-length": [2, "always", 60],
+    "subject-max-length": [2, "always", 80],
     "subject-no-comma": [2, "always"],
     "type-case": [2, "always", "lower-case"],
     "type-empty": [2, "never"],

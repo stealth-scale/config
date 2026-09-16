@@ -2,7 +2,7 @@
   "name": "@stealthscale/example-lib-core",
   "version": "0.0.0",
   "private": true,
-  "description": "A library that reaches for neither node's globals nor the browser's, which is what the base tier is for.",
+  "description": "Adds two money amounts on the base tier, reaching for neither node's globals nor the browser's.",
   "files": [
     "dist"
   ],

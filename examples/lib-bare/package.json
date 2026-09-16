@@ -2,7 +2,7 @@
   "name": "@stealthscale/example-lib-bare",
   "version": "0.0.0",
   "private": true,
-  "description": "A library with no config of its own, which takes the workspace root's and its entry from the command line.",
+  "description": "Packs a library that states no configuration of its own and names its entry on the command line.",
   "files": [
     "dist"
   ],

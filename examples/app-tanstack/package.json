@@ -2,7 +2,7 @@
   "name": "@stealthscale/example-app-tanstack",
   "version": "0.0.0",
   "private": true,
-  "description": "A routed application that loads a federated remote on one of its routes.",
+  "description": "Routes to its own bundle on one address and to a federated remote on another.",
   "type": "module",
   "imports": {
     "#*": "./src/*"

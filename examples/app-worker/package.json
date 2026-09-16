@@ -2,7 +2,7 @@
   "name": "@stealthscale/example-app-worker",
   "version": "0.0.0",
   "private": true,
-  "description": "An app that does its arithmetic off the main thread, in a worker bundled as a module.",
+  "description": "Totals amounts on a module worker whose file the dependency scan is pointed at explicitly.",
   "type": "module",
   "imports": {
     "#*": "./src/*"

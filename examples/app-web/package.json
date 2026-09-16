@@ -2,7 +2,7 @@
   "name": "@stealthscale/example-app-web",
   "version": "1.4.0",
   "private": true,
-  "description": "An app the browser runs, on a pinned port, reading what it knows about itself.",
+  "description": "Serves a framework-free page on a pinned port and forwards /api to another origin.",
   "type": "module",
   "imports": {
     "#*": "./src/*"

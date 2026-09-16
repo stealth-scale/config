@@ -2,7 +2,7 @@
   "name": "@stealthscale/example-app-react",
   "version": "2.1.0",
   "private": true,
-  "description": "An app that renders, showing what a framework package adds to the toolchain.",
+  "description": "Renders a React component on the application tier, stating nothing of its own beyond the port.",
   "type": "module",
   "imports": {
     "#*": "./src/*"

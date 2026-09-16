@@ -1,8 +1,8 @@
 {
-  "name": "@stealthscale/config",
+  "name": "@stealthscale/scale",
   "version": "0.0.0",
   "private": true,
-  "description": "Every configuration a stealth repository is built, checked, tested and released under.",
+  "description": "Publishes every configuration a stealth repository is built, checked, tested and released under.",
   "type": "module",
   "scripts": {
     "bootstrap": "pnpm -r --filter '{packages/*}' run build",

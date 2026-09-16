@@ -1,7 +1,7 @@
 {
   "name": "@stealthscale/vite-config-plain",
   "version": "0.1.0",
-  "description": "What the node tier states, written out for the packages the tiers are built on.",
+  "description": "Configures a package to pack, resolve and test without extending a tier built on it.",
   "keywords": [
     "config",
     "vite",

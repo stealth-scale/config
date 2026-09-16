@@ -1,7 +1,7 @@
 {
   "name": "@stealthscale/vite-plugin-base",
   "version": "0.1.1",
-  "description": "What every stealth bundler plugin is written with: a typed plugin, the packages a build reached, and the files it writes.",
+  "description": "Builds a bundler plugin from a name and one write step, and reads the packages a build reached.",
   "keywords": [
     "plugin",
     "rolldown",

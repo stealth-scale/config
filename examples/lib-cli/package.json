@@ -2,7 +2,7 @@
   "name": "@stealthscale/example-lib-cli",
   "version": "0.0.0",
   "private": true,
-  "description": "A published library that installs a command, named for what it does rather than for the package.",
+  "description": "Installs a command named for what it does, built from a file the package also exports as a module.",
   "bin": {
     "tally": "./src/bin/tally.ts"
   },

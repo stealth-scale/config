@@ -1,7 +1,7 @@
 {
   "name": "@stealthscale/testing-config",
   "version": "0.1.0",
-  "description": "Reads a config or plugin package in a specification and lists every part of the house contract it breaks.",
+  "description": "Reads a config, plugin or library package and lists every part of the house contract it breaks.",
   "keywords": [
     "config",
     "conformance",

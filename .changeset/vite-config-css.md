@@ -12,6 +12,9 @@ vite-config-css: export layers(), workspace() and warn(), and name every layer f
   removed.
 - `peerDependencies` names `vite` from the peer catalog. `vite-plus` is not a peer.
 - `engines.node` is `>=26.0.0`.
+- `README.md` ships in the tarball, covering the three exports, the `Checked` fields and every rule
+  the four sets declare.
+- `description` is a sentence naming what the package does.
 
 | Before            | After       |
 | ----------------- | ----------- |

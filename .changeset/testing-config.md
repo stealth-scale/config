@@ -10,3 +10,5 @@ testing-config: publish the conformance suite for config and plugin packages
   returns, the tiers, and a plugin's name and peer.
 - `arguments` supplies what a factory with required parameters is called with. `skip` turns a check
   off with a reason, and `only` narrows a run.
+- `README.md` ships in the tarball, listing all thirteen checks against what each one reports.
+- `description` names the `library` kind beside `config` and `plugin`.

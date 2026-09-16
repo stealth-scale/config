@@ -2,7 +2,7 @@
   "name": "@stealthscale/example-lib-ui",
   "version": "0.0.0",
   "private": true,
-  "description": "A component library two applications share, which is where a micro frontend starts.",
+  "description": "Draws the panel four example applications share, against the copy of React each one installed.",
   "files": [
     "dist"
   ],

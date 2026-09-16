@@ -10,3 +10,6 @@ vite-config-typescript: name the toolchain in types, and include vite.layers.ts
 - `node.json` and `web.json` keep that entry beside their own.
 - `base.json` includes `vite.layers.ts` beside `src` and `vite.config.ts`.
 - `engines.node` is `>=26.0.0`.
+- `README.md` ships in the tarball, listing every compiler option the three configurations set and
+  what each one is for.
+- `description` is a sentence naming what the package does.

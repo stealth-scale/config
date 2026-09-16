@@ -2,7 +2,7 @@
   "name": "@stealthscale/example-lib-node",
   "version": "0.0.0",
   "private": true,
-  "description": "A library built for node, small enough that the config is the interesting part.",
+  "description": "Publishes one function on the node tier, adding nothing to what that tier already configures.",
   "files": [
     "dist"
   ],

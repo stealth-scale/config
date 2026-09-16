@@ -12,6 +12,9 @@ vite-config-react: export layers() and workspace(), and name every layer for its
 - `lint.fixtures()` relaxes `react/no-multi-comp` for rendered specifications and fixtures.
 - `peerDependencies` names `vite` and `vitest` from the peer catalog. `vite-plus` is not a peer.
 - `engines.node` is `>=26.0.0`.
+- `README.md` ships in the tarball, covering every factory, the `Refreshed` fields, the tsconfig
+  fragment and the setup file.
+- `description` is a sentence naming what the package does.
 
 | Before                                               | After                       |
 | ---------------------------------------------------- | --------------------------- |

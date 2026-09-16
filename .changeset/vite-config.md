@@ -16,6 +16,9 @@ vite-config: name every layer for the call that made it, and import vite
 - Coverage counts every file under `src`, whether or not a test loaded it. `main.ts`, `main.tsx`,
   files under `bin` and worker files are left out as entry points.
 - `engines.node` is `>=26.0.0`.
+- `README.md` ships in the tarball, covering the five tiers, every block at the package root, and
+  the four kinds of layer.
+- `description` is a sentence naming what the package does.
 
 | Before                                | After                                                                                  |
 | ------------------------------------- | -------------------------------------------------------------------------------------- |
