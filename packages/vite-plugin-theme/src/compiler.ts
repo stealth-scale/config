@@ -20,7 +20,7 @@ import {
   writeIfChanged,
 } from "@stealthscale/vite-plugin-base";
 
-import { CACHE } from "#options.ts";
+import { CACHE, THEME_ATTRIBUTE } from "#options.ts";
 
 /**
  * Marks a path that belongs to an installed package rather than to the workspace.
@@ -203,7 +203,7 @@ export async function generateRuntime(
  *   appends.
  */
 export function cleaned(css: string): string {
-  return css.replaceAll(ATTRIBUTE, "[data-theme=").replaceAll(SIGNATURE, "");
+  return css.replaceAll(ATTRIBUTE, `[${THEME_ATTRIBUTE}=`).replaceAll(SIGNATURE, "");
 }
 
 /**

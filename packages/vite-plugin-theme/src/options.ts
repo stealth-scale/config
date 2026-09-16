@@ -35,6 +35,17 @@ export const GENERATED = "generated";
 export const PRESET_SUBPATH = "./theme";
 
 /**
+ * Fixes the attribute the compiled stylesheet switches a theme under, on the document root or on
+ * any element for a subtree.
+ *
+ * @remarks
+ *   The compiler emits every theme under an attribute of its own naming, and the plugin rewrites it
+ *   to this one, so nothing a page sees names the compiler. The design-system package publishes the
+ *   same name for a provider to write.
+ */
+export const THEME_ATTRIBUTE = "data-theme";
+
+/**
  * Lists the cascade layers in the order the compiler writes them, whatever they are named.
  *
  * @remarks

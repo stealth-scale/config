@@ -1,8 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { layerDeclaration, layerPattern, resolveOptions } from "#options.ts";
+import { layerDeclaration, layerPattern, resolveOptions, THEME_ATTRIBUTE } from "#options.ts";
 
 describe("options", () => {
+  it("names the attribute a theme is switched under without naming the compiler", () => {
+    expect(THEME_ATTRIBUTE).toBe("data-theme");
+  });
+
   it("fills in every default when nothing is stated", () => {
     expect(resolveOptions()).toStrictEqual({
       include: ["src/**/*.{ts,tsx}"],

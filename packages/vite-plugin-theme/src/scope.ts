@@ -11,6 +11,8 @@
  *   the recipe layer.
  */
 
+import { THEME_ATTRIBUTE } from "#options.ts";
+
 /**
  * Carries whatever an extension states about how something is drawn.
  */
@@ -337,7 +339,7 @@ function lineage(preset: SwitchablePreset | undefined, inherited = false): reado
  * @returns One preset per level that extends anything, oldest ancestor first.
  */
 export function scopedPreset(theme: Switchable): readonly ScopedPreset[] {
-  const selector = `[data-theme=${theme.name}] &`;
+  const selector = `[${THEME_ATTRIBUTE}=${theme.name}] &`;
   const own = `theme:${theme.name}:switched`;
 
   return lineage(theme.preset).flatMap(({ extensions, inherited, name }) => {
