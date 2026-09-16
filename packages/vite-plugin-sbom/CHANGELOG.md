@@ -1,5 +1,25 @@
 # @stealthscale/vite-plugin-sbom
 
+## 0.3.0
+
+### Minor Changes
+
+- [#17](https://github.com/stealth-scale/config/pull/17) [`2a0aaf2`](https://github.com/stealth-scale/config/commit/2a0aaf2f41b67bcee797d637f83a41a5d4840257) Thanks [@stealth-admin](https://github.com/stealth-admin)! - vite-plugin-sbom: rename the options record to Described
+  
+  - `Described` replaces `Stated` as the name of the options record. `@stealthscale/vite-plugin-base`
+    also exports a `Stated`, and two imports of one name meant two things.
+  - The plugin is packed under `@stealthscale/vite-config-plain` rather than under a copy of the node
+    tier.
+  - `engines.node` is `>=26.0.0`.
+  - `README.md` ships in the tarball, listing every `Described` and `Supplier` field against its
+    default, and what the document records.
+  - `description` is a sentence naming what the package does.
+
+### Patch Changes
+
+- Updated dependencies [[`2a0aaf2`](https://github.com/stealth-scale/config/commit/2a0aaf2f41b67bcee797d637f83a41a5d4840257)]:
+  - @stealthscale/vite-plugin-base@0.1.2
+
 ## 0.2.0
 
 ### Minor Changes
