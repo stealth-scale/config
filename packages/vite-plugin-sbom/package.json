@@ -52,8 +52,7 @@
   "dependencies": {
     "@cyclonedx/cyclonedx-library": "catalog:",
     "packageurl-js": "catalog:",
-    "spdx-expression-parse": "catalog:",
-    "yaml": "catalog:"
+    "spdx-expression-parse": "catalog:"
   },
   "devDependencies": {
     "@stealthscale/vite-config-plain": "workspace:^",

@@ -29,7 +29,7 @@ const TYPES = ["build", "chore", "ci", "docs", "feat", "fix", "perf", "refactor"
  * Read from the tree rather than listed, so a new package is a scope without anybody remembering to
  * add it here. An example takes no scope, and neither does a change spanning packages.
  */
-const SCOPES = globSync("packages/*/package.json")
+const SCOPES = globSync(["foundations/*/package.json", "packages/*/package.json"])
   .map((at) => basename(dirname(at)))
   .toSorted();
 

@@ -81,7 +81,7 @@ never stops another, so one run reports the whole set.
 | `layer.reasoned`   | Config     | A contribution, override or removal whose `because` is empty, and a preset that states one                                                                                                                                        |
 | `layer.unique`     | Config     | Two layers one factory returns under a single name and kind                                                                                                                                                                       |
 | `tier.composes`    | Config     | A tier exporting no `layers()` or no `defineConfig`, a tier composing something that is not a layer or composing one twice, and a `defineConfig` that throws under a build                                                        |
-| `plugin.named`     | Plugin     | A barrel where no export returns a plugin, a plugin named anything but `stealth:` and its export path, and a plugin without `configResolved` or `generateBundle`                                                                  |
+| `plugin.named`     | Plugin     | A barrel where no export, at the top level or inside a namespace, returns a plugin; a plugin named anything but `stealth:` and its dotted export path; and a plugin without `configResolved`                                      |
 | `plugin.peer`      | Plugin     | A plugin package peering on nothing named `vite`                                                                                                                                                                                  |
 
 Each factory is called once before the first check, so the four layer checks agree on what it

@@ -4,7 +4,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import { SIZE } from "#lint/rules/size.ts";
+import { SIZE, SPEC_SIZE } from "#lint/rules/size.ts";
 
 describe("size", () => {
   it("counts neither blank lines nor comments", () => {
@@ -21,5 +21,23 @@ describe("size", () => {
     const [, held] = SIZE["max-lines-per-function"] as [string, { max: number }];
 
     expect(held.max).toBeLessThan(file.max);
+  });
+
+  it("caps a specification at twice the lines of a source file", () => {
+    const [, file] = SIZE["max-lines"] as [string, { max: number }];
+    const [, spec] = SPEC_SIZE["max-lines"] as [string, { max: number }];
+
+    expect(spec.max).toBe(file.max * 2);
+  });
+
+  it("counts a specification's lines the way it counts a source file's", () => {
+    expect(SPEC_SIZE["max-lines"]).toStrictEqual([
+      "error",
+      expect.objectContaining({ skipBlankLines: true, skipComments: true }),
+    ]);
+  });
+
+  it("caps no function inside a specification", () => {
+    expect(SPEC_SIZE["max-lines-per-function"]).toBe("off");
   });
 });

@@ -1,0 +1,70 @@
+{
+  "name": "@stealthscale/vite-config-theme",
+  "version": "0.0.0",
+  "description": "Adds the runtime generator to a design-system package and the stylesheet compiler to an application.",
+  "keywords": [
+    "config",
+    "design-system",
+    "theme",
+    "vite"
+  ],
+  "homepage": "https://github.com/stealth-scale/config/tree/main/packages/vite-config-theme#readme",
+  "bugs": "https://github.com/stealth-scale/config/issues",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stealth-scale/config.git",
+    "directory": "packages/vite-config-theme"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "type": "module",
+  "imports": {
+    "#*": "./src/*"
+  },
+  "exports": {
+    ".": {
+      "stealth-source": "./src/index.ts",
+      "default": "./dist/index.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": "./dist/index.mjs",
+      "./package.json": "./package.json"
+    },
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vp pack",
+    "check": "vp check",
+    "test": "vp test"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/core": "catalog:",
+    "@stealthscale/vite-config": "workspace:^",
+    "@stealthscale/vite-config-core": "workspace:^",
+    "@stealthscale/vite-config-typescript": "workspace:^",
+    "@stealthscale/vite-plugin-theme": "workspace:^",
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "publint": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "@stealthscale/vite-config-core": "workspace:^",
+    "@stealthscale/vite-plugin-theme": "workspace:^",
+    "vite": "catalog:peer",
+    "vitest": "catalog:peer"
+  },
+  "engines": {
+    "node": ">=26.0.0"
+  }
+}

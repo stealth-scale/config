@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 
 import { defineConfig, type Layer, owned, remove } from "@stealthscale/vite-config-core";
 
-import { defaultExported, forbid, relax, undocumented } from "#lint/departure.ts";
+import { barrelled, defaultExported, forbid, relax, undocumented } from "#lint/departure.ts";
 
 const AT = import.meta.dirname;
 
@@ -205,9 +205,35 @@ describe("departure", () => {
     expect(held.files).toStrictEqual(["**/*.bench.ts"]);
   });
 
+  it("holds a specification to twice the lines of a source file", () => {
+    const held = undocumented(["**/*.spec.ts"]).item as { rules: Record<string, unknown> };
+
+    expect(held.rules["max-lines"]).toStrictEqual([
+      "error",
+      { max: 600, skipBlankLines: true, skipComments: true },
+    ]);
+  });
+
+  it("caps no function inside a specification", () => {
+    const held = undocumented(["**/*.spec.ts"]).item as { rules: Record<string, unknown> };
+
+    expect(held.rules["max-lines-per-function"]).toBe("off");
+  });
+
+  it("turns off the dependency cap for a barrel", () => {
+    const held = barrelled(["**/index.ts"]).item as {
+      files: string[];
+      rules: Record<string, unknown>;
+    };
+
+    expect(held.files).toStrictEqual(["**/index.ts"]);
+    expect(held.rules).toStrictEqual({ "import/max-dependencies": "off" });
+  });
+
   it("names each delegating factory for the call a consumer writes", () => {
     expect(defaultExported(["**/*.config.ts"]).name).toBe("lint.defaultExported(**/*.config.ts)");
     expect(undocumented(["**/*.spec.ts"]).name).toBe("lint.undocumented(**/*.spec.ts)");
+    expect(barrelled(["**/index.ts"]).name).toBe("lint.barrelled(**/index.ts)");
   });
 
   it("lets a repository add its own beside the preset's", async () => {

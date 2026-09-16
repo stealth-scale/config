@@ -48,6 +48,9 @@
     "prepublishOnly": "vp pack",
     "test": "vp test"
   },
+  "dependencies": {
+    "yaml": "catalog:"
+  },
   "devDependencies": {
     "@stealthscale/vite-config-plain": "workspace:^",
     "@stealthscale/vite-config-typescript": "workspace:^",

@@ -11,6 +11,7 @@ node_modules
 dist
 dist-ssr
 coverage
+generated
 .stylelintcache
 *.local
 
@@ -31,6 +32,7 @@ coverage
 *.sw?
 
 # AI agent worktrees
+.scratch/
 .claude/worktrees/
 !.vscode/
 !.vscode/settings.json

@@ -98,7 +98,7 @@ export function record(value: unknown): value is Readonly<Record<string, unknown
  *   The name decides this and the value is never consulted, so a constant holding an object is
  *   left where it is rather than walked as a namespace.
  */
-function constant(name: string): boolean {
+export function constant(name: string): boolean {
   return /^[A-Z][A-Z0-9_]*$/u.test(name);
 }
 

@@ -11,9 +11,9 @@ turns on the React and accessibility rules and gives React an import group of it
 pnpm add -D @stealthscale/vite-config-react
 ```
 
-The package peers on `@stealthscale/vite-config`, `@vitejs/plugin-react`, `happy-dom`,
-`oxc-transform-react`, `react`, `react-dom`, `vite` and `vitest`. Install all eight. It runs on Node
-26 and later.
+The package peers on `@stealthscale/vite-config`, `@testing-library/react`, `@vitejs/plugin-react`,
+`happy-dom`, `oxc-transform-react`, `react`, `react-dom`, `vite` and `vitest`. Install all nine. It
+runs on Node 26 and later.
 
 ## Usage
 
@@ -100,10 +100,11 @@ states the matching `jsxImportSource` in its own tsconfig.
 fragment then cannot be extended without its base by mistake.
 
 `./vitest.setup.ts` does two things. It sets `IS_REACT_ACT_ENVIRONMENT`, which React reads before it
-processes an update inside `act`. It also registers one `afterEach` that replaces the children of
-`document.body`, so one test never reads markup another test mounted. Reach the file through
-`test.cleanup()` rather than by path. That layer resolves it by package name, and the same layer
-works from a workspace link and from an installed copy.
+processes an update inside `act`. It also registers one `afterEach` that unmounts every root Testing
+Library rendered and then replaces the children of `document.body`, so an effect's cleanup runs and
+one test never reads markup another test mounted. Reach the file through `test.cleanup()` rather
+than by path. That layer resolves it by package name, and the same layer works from a workspace link
+and from an installed copy.
 
 Warning: a package that calls `act` without this setup file loads no such global. React then logs
 `The current testing environment is not configured to support act(...)` on every update inside an

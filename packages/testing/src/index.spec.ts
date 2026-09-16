@@ -11,13 +11,24 @@ import { describe, expect, it } from "vitest";
 import * as testing from "#index.ts";
 
 describe("testing", () => {
-  it("exports the workspace manifest and measurement helpers", () => {
+  it("exports the workspace helpers and the plugin drivers by name", () => {
     expect(Object.keys(testing).toSorted()).toStrictEqual([
+      "changed",
+      "configured",
+      "created",
+      "generated",
+      "hookContext",
+      "loaded",
       "manifest",
       "packageFiles",
       "pixels",
+      "removed",
+      "resolved",
       "scratchWorkspace",
       "seamBetween",
+      "started",
+      "transformed",
+      "updated",
       "withScratchWorkspace",
       "withScratchWorkspaceAsync",
       "workspaceFiles",

@@ -1,18 +1,15 @@
 import { type ReactElement } from "react";
-import { createRoot } from "react-dom/client";
 
-import { describe, expect, test, vi } from "vitest";
+import { render, waitFor } from "@testing-library/react";
+import { describe, expect, test } from "vitest";
 
 import { Reports } from "#reports.tsx";
 
 function drawn(element: ReactElement): Promise<string> {
-  const into = document.createElement("div");
+  const { container } = render(element);
 
-  document.body.append(into);
-  createRoot(into).render(element);
-
-  return vi.waitFor(() => {
-    const held = into.textContent ?? "";
+  return waitFor(() => {
+    const held = container.textContent;
 
     expect(held).toContain("open");
 

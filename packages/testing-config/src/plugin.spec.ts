@@ -11,7 +11,7 @@ function hook(): undefined {
 }
 
 function hookless(): Record<string, unknown> {
-  return { name: "stealth:sbom" };
+  return { generateBundle: hook, name: "stealth:sbom" };
 }
 
 function factory(name: string): () => Record<string, unknown> {
@@ -21,6 +21,10 @@ function factory(name: string): () => Record<string, unknown> {
 describe("plugin", () => {
   it("accepts a barrel whose factory returns a plugin named for it", () => {
     expect(named({ sbom: factory("stealth:sbom") }, {})).toStrictEqual([]);
+  });
+
+  it("accepts a factory inside a namespace when the plugin is named for its path", () => {
+    expect(named({ theme: { runtime: factory("stealth:theme.runtime") } }, {})).toStrictEqual([]);
   });
 
   it("reports a barrel with no function that returns a plugin", () => {
@@ -35,17 +39,36 @@ describe("plugin", () => {
     ]);
   });
 
-  it("reports a plugin without the two hooks of the house base", () => {
+  it("reports a plugin inside a namespace named for something other than its path", () => {
+    expect(named({ theme: { runtime: factory("stealth:runtime") } }, {})).toStrictEqual([
+      "theme.runtime returns a plugin named stealth:runtime, not stealth:theme.runtime",
+    ]);
+  });
+
+  it("reports a plugin without configResolved", () => {
     expect(named({ sbom: hookless }, {})).toStrictEqual([
       "sbom returns a plugin without configResolved",
-      "sbom returns a plugin without generateBundle",
     ]);
+  });
+
+  it("leaves a constant holding an object unwalked", () => {
+    expect(
+      named({ DEFAULTS: { sbom: factory("sbom") }, sbom: factory("stealth:sbom") }, {}),
+    ).toStrictEqual([]);
   });
 
   it("calls a factory with the supplied arguments", () => {
     const barrel = { sbom: (name: unknown): Record<string, unknown> => plugin(String(name)) };
 
     expect(named(barrel, { sbom: ["stealth:sbom"] })).toStrictEqual([]);
+  });
+
+  it("calls a factory inside a namespace with the arguments under its path", () => {
+    const barrel = {
+      theme: { runtime: (name: unknown): Record<string, unknown> => plugin(String(name)) },
+    };
+
+    expect(named(barrel, { "theme.runtime": ["stealth:theme.runtime"] })).toStrictEqual([]);
   });
 
   it("leaves a helper with required parameters alone", () => {

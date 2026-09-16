@@ -12,6 +12,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
+import { configured, generated } from "@stealthscale/testing";
 import { type Bundling } from "@stealthscale/vite-plugin-base";
 
 import { sbom, written } from "#index.ts";
@@ -212,31 +213,28 @@ describe("vite-plugin-sbom", () => {
     expect(field(document(stated, workspace()), "metadata", "supplier", "name")).toBe("Acme");
   });
 
-  it("writes one copy by default and every path it was given", () => {
+  it("writes one copy by default and every path it was given", async () => {
     const held = workspace();
     const emitted: string[] = [];
     const bundling = {
-      emitFile: (one: { fileName: string }) => void emitted.push(one.fileName),
-      getModuleIds: () => [],
-      getModuleInfo: () => ({ importedIds: [] }),
-    } as unknown as Bundling;
-
-    const run = (paths?: readonly string[]): void => {
-      const one = sbom(paths === undefined ? {} : { paths }) as unknown as {
-        configResolved: (config: { root: string }) => void;
-        generateBundle: (this: Bundling) => void;
-      };
-
-      one.configResolved({ root: held.at });
-      one.generateBundle.call(bundling);
+      emitFile: (one: { fileName: string }): void => void emitted.push(one.fileName),
+      getModuleIds: (): string[] => [],
+      getModuleInfo: (): { importedIds: string[] } => ({ importedIds: [] }),
     };
 
-    run();
+    const run = async (paths?: readonly string[]): Promise<void> => {
+      const one = sbom(paths === undefined ? {} : { paths });
+
+      await configured(one, { root: held.at });
+      await generated(one, bundling);
+    };
+
+    await run();
 
     expect(emitted).toStrictEqual(["cyclonedx/bom.json"]);
 
     emitted.length = 0;
-    run(["a.json", "b.json"]);
+    await run(["a.json", "b.json"]);
 
     expect(emitted).toStrictEqual(["a.json", "b.json"]);
   });

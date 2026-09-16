@@ -1,0 +1,95 @@
+{
+  "name": "@stealthscale/theme",
+  "version": "0.0.0",
+  "description": "Publishes the foundation every recipe is written against, the runtime every component binds its recipe with, and the vocabulary a theme is written in.",
+  "keywords": [
+    "design-system",
+    "design-tokens",
+    "react",
+    "theme"
+  ],
+  "homepage": "https://github.com/stealth-scale/config/tree/main/foundations/theme#readme",
+  "bugs": "https://github.com/stealth-scale/config/issues",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stealth-scale/config.git",
+    "directory": "foundations/theme"
+  },
+  "files": [
+    "dist",
+    "styles.css",
+    "LICENSE",
+    "README.md"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "imports": {
+    "#*": "./src/*",
+    "#generated/*": "./generated/*"
+  },
+  "exports": {
+    ".": {
+      "stealth-source": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./authoring": {
+      "stealth-source": "./src/authoring/index.ts",
+      "default": "./dist/authoring.js"
+    },
+    "./theme": {
+      "stealth-source": "./src/theme.ts",
+      "default": "./dist/theme.js"
+    },
+    "./package.json": "./package.json",
+    "./styles.css": "./styles.css"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": "./dist/index.js",
+      "./authoring": "./dist/authoring.js",
+      "./theme": "./dist/theme.js",
+      "./package.json": "./package.json",
+      "./styles.css": "./styles.css"
+    },
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vp pack",
+    "check": "vp check",
+    "test": "vp test"
+  },
+  "dependencies": {
+    "@pandacss/types": "catalog:"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/core": "catalog:",
+    "@stealthscale/vite-config": "workspace:^",
+    "@stealthscale/vite-config-react": "workspace:^",
+    "@stealthscale/vite-config-theme": "workspace:^",
+    "@stealthscale/vite-config-typescript": "workspace:^",
+    "@stealthscale/vite-plugin-theme": "workspace:^",
+    "@testing-library/react": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "happy-dom": "catalog:",
+    "oxc-transform-react": "catalog:",
+    "publint": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "react": "catalog:"
+  },
+  "engines": {
+    "node": ">=26.0.0"
+  }
+}

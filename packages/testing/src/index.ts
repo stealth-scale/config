@@ -1,10 +1,28 @@
 /**
- * Supplies the scratch workspaces, manifests and measurements a spec runs against, and nothing an
- * application bundle carries.
+ * Supplies the scratch workspaces, manifests, measurements and plugin drivers a spec runs against,
+ * and nothing an application bundle carries.
  *
  * @packageDocumentation
  */
 
+export {
+  type Change,
+  changed,
+  type Command,
+  type Configured,
+  configured,
+  created,
+  generated,
+  type Graphed,
+  type HookContext,
+  hookContext,
+  loaded,
+  removed,
+  resolved,
+  started,
+  transformed,
+  updated,
+} from "#hook.ts";
 export { manifest, type ManifestFields, packageFiles, workspaceFiles } from "#manifest.ts";
 export { type Box, type Measured, pixels, seamBetween } from "#measure.ts";
 export {

@@ -13,6 +13,7 @@ import { type UserConfig } from "vite";
 import { contribute, type Contribution, named } from "@stealthscale/vite-config-core";
 
 import { docblocksOff } from "#lint/rules/docblock.ts";
+import { SPEC_SIZE } from "#lint/rules/size.ts";
 import { SPEC } from "#lint/rules/spec.ts";
 
 /**
@@ -169,12 +170,14 @@ export function defaultExported(files: readonly string[]): Contribution {
 }
 
 /**
- * Excuses a specification from doc comments, function length and cast safety.
+ * Excuses a specification from doc comments and cast safety, and holds it to a specification's
+ * size limits rather than a source file's.
  *
  * @remarks
  *   A case title already states what the case checks, and a doc comment above
  *   it would say the same thing again. The cast rule comes off beside them
- *   because a specification narrows the config value it has read back.
+ *   because a specification narrows the config value it has read back. The
+ *   size limits are the ones {@link SPEC_SIZE} states.
  */
 export function undocumented(files: readonly string[]): Contribution {
   return named(
@@ -185,7 +188,7 @@ export function undocumented(files: readonly string[]): Contribution {
       files,
       rules: {
         ...docblocksOff(),
-        "max-lines-per-function": "off",
+        ...SPEC_SIZE,
         "typescript/no-unsafe-type-assertion": "off",
       },
     }),
@@ -208,6 +211,27 @@ export function specified(files: readonly string[]): Contribution {
         "a specification documents itself by its case names, so the names are held to a grammar",
       files,
       rules: SPEC,
+    }),
+  );
+}
+
+/**
+ * Excuses a barrel from the cap on dependencies.
+ *
+ * @remarks
+ *   A barrel names every module its directory publishes and nothing else, so
+ *   its dependency count is the size of the directory rather than a sign that
+ *   one module does too much. Only `import/max-dependencies` comes off, so
+ *   every other rule still reaches it.
+ */
+export function barrelled(files: readonly string[]): Contribution {
+  return named(
+    `lint.barrelled(${files.join(", ")})`,
+    relax({
+      because:
+        "a barrel names every module its directory publishes, so its dependency count is the size of the directory",
+      files,
+      rules: { "import/max-dependencies": "off" },
     }),
   );
 }

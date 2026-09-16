@@ -32,9 +32,9 @@ commit exists.
 
 ## Scope
 
-Write the directory name under `packages/` as the scope, without the `@stealthscale/` prefix:
-`vite-config-core`, `testing-react`. Omit the scope for a change spanning packages, for the
-workspace root, and for an example.
+Write the directory name under `packages/` or `foundations/` as the scope, without the
+`@stealthscale/` prefix: `vite-config-core`, `testing-react`, `theme`. Omit the scope for a change
+spanning packages, for the workspace root, and for an example.
 
 Commitlint reads the list from the tree. A new package is a scope as soon as it has a manifest.
 
