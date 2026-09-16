@@ -15,6 +15,9 @@ vite-config-react: export layers() and workspace(), and name every layer for its
 - `README.md` ships in the tarball, covering every factory, the `Refreshed` fields, the tsconfig
   fragment and the setup file.
 - `description` is a sentence naming what the package does.
+- `vitest.setup.ts` sets `IS_REACT_ACT_ENVIRONMENT`. React reads that global before it processes an
+  update inside `act`. Without it every such update logged "The current testing environment is not
+  configured to support act(...)", and the warning that reports an update outside `act` never fired.
 
 | Before                                               | After                       |
 | ---------------------------------------------------- | --------------------------- |

@@ -101,6 +101,6 @@ describe("browser", () => {
   });
 
   it("resolves the real driver when it is given no loader", async () => {
-    await expect(driver()).rejects.toThrow(/@vitest\/browser-playwright and playwright/u);
+    await expect(driver()).resolves.toHaveProperty("playwright");
   });
 });

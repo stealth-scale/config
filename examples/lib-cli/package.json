@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "description": "Adds up money amounts from the command line and exports the same function as a module.",
+  "license": "MIT",
   "bin": {
     "tally": "./src/bin/tally.ts"
   },

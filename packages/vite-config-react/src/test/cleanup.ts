@@ -1,5 +1,5 @@
 /**
- * Points the test runner at the setup file that empties the document between tests.
+ * Points the test runner at the setup file every React test runs first.
  */
 
 import { createRequire } from "node:module";
@@ -19,7 +19,7 @@ const SETUP = createRequire(import.meta.url).resolve(
 );
 
 /**
- * Adds the setup file that clears the body to whatever setup a tier already runs.
+ * Adds the React setup file to whatever setup a tier already runs.
  *
  * @remarks
  *   A consumer resolves the file by package name rather than by path, so the same layer works from
@@ -28,7 +28,9 @@ const SETUP = createRequire(import.meta.url).resolve(
 export function cleanup(): Contribution {
   return contribute({
     at: AT,
-    because: "a mounted component outlives the test that mounted it",
+    because:
+      "React accepts act only after a global says so, and a mounted component outlives the test " +
+      "that mounted it",
     item: SETUP,
     name: "react.test.cleanup",
   });

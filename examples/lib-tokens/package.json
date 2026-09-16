@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "description": "Writes the stylesheet it publishes during the pack.",
+  "license": "MIT",
   "files": [
     "dist"
   ],

@@ -19,6 +19,10 @@ vite-config: name every layer for the call that made it, and import vite
 - `README.md` ships in the tarball, covering the five tiers, every block at the package root, and
   the four kinds of layer.
 - `description` is a sentence naming what the package does.
+- `test.browser()` imports `@vitest/browser-playwright` rather than
+  `vite-plus/test/browser-playwright`. The provider is an optional peer, so the packer leaves the
+  specifier external instead of inlining `vite-plus` and emitting a chunk that re-exports a package
+  the consumer may not have installed.
 
 | Before                                | After                                                                                  |
 | ------------------------------------- | -------------------------------------------------------------------------------------- |

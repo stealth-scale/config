@@ -67,7 +67,7 @@ export interface Browsed {
 /**
  * The module the Playwright provider is taken from.
  */
-export type Driver = typeof import("vite-plus/test/browser-playwright");
+export type Driver = typeof import("@vitest/browser-playwright");
 
 /**
  * Loads the Playwright provider, and says what to install when it is absent.
@@ -81,7 +81,7 @@ export type Driver = typeof import("vite-plus/test/browser-playwright");
  * @throws {@link Error} When the provider cannot be imported.
  */
 export async function driver(
-  load: () => Promise<Driver> = () => import("vite-plus/test/browser-playwright"),
+  load: () => Promise<Driver> = () => import("@vitest/browser-playwright"),
 ): Promise<Driver> {
   try {
     return await load();

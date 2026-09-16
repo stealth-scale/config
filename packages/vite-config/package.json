@@ -85,6 +85,7 @@
     "@stealthscale/vite-config-typescript": "workspace:^",
     "@stealthscale/vite-plugin-sbom": "workspace:^",
     "@types/node": "catalog:",
+    "@vitest/browser-playwright": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "eslint-plugin-jsdoc": "catalog:",
     "eslint-plugin-perfectionist": "catalog:",
@@ -100,6 +101,7 @@
     "@module-federation/vite": "catalog:",
     "@stealthscale/vite-config-core": "workspace:^",
     "@stealthscale/vite-plugin-sbom": "workspace:^",
+    "@vitest/browser-playwright": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "eslint-plugin-jsdoc": "catalog:",
     "eslint-plugin-perfectionist": "catalog:",
@@ -115,12 +117,12 @@
     },
     "@module-federation/vite": {
       "optional": true
+    },
+    "@vitest/browser-playwright": {
+      "optional": true
     }
   },
   "engines": {
     "node": ">=26.0.0"
-  },
-  "inlinedDependencies": {
-    "vite-plus": "0.3.1"
   }
 }

@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "description": "Loads another application at run time from an address it fetches at startup.",
+  "license": "MIT",
   "type": "module",
   "imports": {
     "#*": "./src/*"

@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "description": "Routes to its own bundle on one address and to a federated remote on another.",
+  "license": "MIT",
   "type": "module",
   "imports": {
     "#*": "./src/*"

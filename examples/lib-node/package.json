@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "description": "Joins names into an English phrase on the node tier.",
+  "license": "MIT",
   "files": [
     "dist"
   ],

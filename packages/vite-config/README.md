@@ -16,9 +16,15 @@ pnpm add -D @stealthscale/vite-config
 The package peers on `vite`, `vitest`, `@stealthscale/vite-config-core`,
 `@stealthscale/vite-plugin-sbom`, `@arethetypeswrong/core`, `@vitest/coverage-v8`,
 `eslint-plugin-jsdoc`, `eslint-plugin-perfectionist`, `eslint-plugin-tsdoc` and `publint`. Install
-all ten. `happy-dom` and `@module-federation/vite` are optional. The first supplies the document the
-web tier and the app tier run their tests against. The second is imported only when
-`federation.host()` or `federation.remote()` runs.
+all ten.
+
+Three further peers are optional, and each one is loaded only by the layer that needs it.
+
+| Optional peer                | Loaded by                                                 |
+| ---------------------------- | --------------------------------------------------------- |
+| `happy-dom`                  | The document the web tier and the app tier test against   |
+| `@module-federation/vite`    | `federation.host()` and `federation.remote()`             |
+| `@vitest/browser-playwright` | `test.browser()`, which also needs `playwright` beside it |
 
 ## Usage
 

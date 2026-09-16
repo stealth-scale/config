@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "description": "Renders markup on a server and hydrates it in a browser.",
+  "license": "MIT",
   "type": "module",
   "imports": {
     "#*": "./src/*"

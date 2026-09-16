@@ -3,6 +3,7 @@
   "version": "1.4.0",
   "private": true,
   "description": "Serves a framework-free page on a pinned port and forwards /api to another origin.",
+  "license": "MIT",
   "type": "module",
   "imports": {
     "#*": "./src/*"

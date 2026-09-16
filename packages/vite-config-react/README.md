@@ -99,10 +99,15 @@ states the matching `jsxImportSource` in its own tsconfig.
 `["@stealthscale/vite-config-typescript/web.json", "@stealthscale/vite-config-react/web.json"]`. The
 fragment then cannot be extended without its base by mistake.
 
-`./vitest.setup.ts` registers one `afterEach` that replaces the children of `document.body`. One
-test then never reads markup another test mounted. Reach the file through `test.cleanup()` rather
-than by path. That layer resolves it by package name, and the same layer works from a workspace link
-and from an installed copy.
+`./vitest.setup.ts` does two things. It sets `IS_REACT_ACT_ENVIRONMENT`, which React reads before it
+processes an update inside `act`. It also registers one `afterEach` that replaces the children of
+`document.body`, so one test never reads markup another test mounted. Reach the file through
+`test.cleanup()` rather than by path. That layer resolves it by package name, and the same layer
+works from a workspace link and from an installed copy.
+
+Warning: a package that calls `act` without this setup file loads no such global. React then logs
+`The current testing environment is not configured to support act(...)` on every update inside an
+`act` scope, and the warning that reports an update outside `act` never fires at all.
 
 ## Federated applications
 

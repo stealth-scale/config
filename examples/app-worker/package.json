@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "description": "Totals amounts on a module worker and points the dependency scan at its file.",
+  "license": "MIT",
   "type": "module",
   "imports": {
     "#*": "./src/*"

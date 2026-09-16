@@ -3,6 +3,7 @@
   "version": "2.1.0",
   "private": true,
   "description": "Renders a React component on the application tier and pins the port.",
+  "license": "MIT",
   "type": "module",
   "imports": {
     "#*": "./src/*"
