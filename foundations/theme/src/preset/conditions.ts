@@ -9,16 +9,8 @@
  *   the color mode, the density, a folded screen component, and the pointer.
  */
 
+import { COLOR_MODE_ATTRIBUTE } from "#attributes.ts";
 import { type ExtendableConditions } from "#pandacss.ts";
-
-/**
- * Fixes the attribute a page writes its color mode in.
- *
- * @remarks
- *   An attribute rather than a class, so the mode is written the same way as the theme and can be
- *   set on the document root or on any element for a subtree.
- */
-export const COLOR_MODE_ATTRIBUTE = "data-color-mode";
 
 /**
  * Matches an element marked dark.
@@ -26,13 +18,9 @@ export const COLOR_MODE_ATTRIBUTE = "data-color-mode";
 const DARK = `[${COLOR_MODE_ATTRIBUTE}=dark]`;
 
 /**
- * Excludes a disabled control from a state it cannot enter, whichever of the three ways it is
- * marked disabled.
- *
- * @remarks
- *   Left open so `active` can add one more exclusion inside the same `:not()`.
+ * Lists the three ways a control is marked disabled, which a state it cannot enter excludes.
  */
-const ENABLED = ":not(:disabled, [data-disabled], [aria-disabled=true]";
+const DISABLED = ":disabled, [data-disabled], [aria-disabled=true]";
 
 /**
  * Lists the conditions this preset adds to the compiler's.
@@ -51,7 +39,7 @@ export const conditions: ExtendableConditions = {
     /**
      * A pressed control, except a disabled one or an open trigger.
      */
-    active: `&:is(:active, [data-active])${ENABLED}, [data-state=open])`,
+    active: `&:is(:active, [data-active]):not(${DISABLED}, [data-state=open])`,
 
     /**
      * An element inside a subtree at comfortable density, which is an attribute on any element.
@@ -73,7 +61,7 @@ export const conditions: ExtendableConditions = {
      */
     hover: {
       "@media (hover: hover)": {
-        [`&:is(:hover, [data-hover])${ENABLED})`]: "@slot",
+        [`&:is(:hover, [data-hover]):not(${DISABLED})`]: "@slot",
       },
     },
 

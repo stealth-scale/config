@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { COLOR_MODE_ATTRIBUTE, conditions } from "#preset/conditions.ts";
+import { conditions } from "#preset/conditions.ts";
 
 describe("conditions", () => {
   it("adds to the compiler's conditions rather than replacing them", () => {
@@ -8,7 +8,6 @@ describe("conditions", () => {
   });
 
   it("reads the color mode from the attribute", () => {
-    expect(COLOR_MODE_ATTRIBUTE).toBe("data-color-mode");
     expect(conditions.extend?.["dark"]).toBe("[data-color-mode=dark] &");
   });
 

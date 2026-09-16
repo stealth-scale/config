@@ -9,8 +9,8 @@
  *   any of this, because no recipe owns the page.
  */
 
+import { COLOR_MODE_ATTRIBUTE } from "#attributes.ts";
 import { type GlobalStyleObject } from "#pandacss.ts";
-import { COLOR_MODE_ATTRIBUTE } from "#preset/conditions.ts";
 
 /**
  * Lists the global styles.
