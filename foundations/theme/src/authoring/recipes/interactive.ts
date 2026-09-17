@@ -15,7 +15,9 @@ import type { SystemStyleObject } from "#generated/types/system.d.mts";
  */
 export function interactive(): SystemStyleObject {
   return {
-    _disabled: { layerStyle: "disabled" },
+    _active: { scale: "0.98" },
+    _disabled: { _active: { scale: "1" }, layerStyle: "disabled" },
+    _motionReduce: { _active: { scale: "1" } },
     cursor: "button",
     focusRingColor: "colorPalette.focusRing",
     focusVisibleRing: "outside",

@@ -135,6 +135,7 @@ describe("layerStyles", () => {
 
   it("draws a solid fill in the palette with its hover inside it", () => {
     expect(tokenAt(layerStyles, "fill.solid")).toStrictEqual({
+      _active: { background: "colorPalette.solid.hover" },
       _hover: { background: "colorPalette.solid.hover" },
       background: "colorPalette.solid",
       color: "colorPalette.contrast",
@@ -150,7 +151,10 @@ describe("layerStyles", () => {
   });
 
   it("draws a plain look as the ink alone", () => {
-    expect(tokenAt(layerStyles, "fill.plain")).toStrictEqual({ color: "colorPalette.fg" });
+    expect(tokenAt(layerStyles, "fill.plain")).toStrictEqual({
+      _active: { color: "colorPalette.solid" },
+      color: "colorPalette.fg",
+    });
   });
 
   it("draws an outline in the palette's solid or its border", () => {
@@ -160,6 +164,26 @@ describe("layerStyles", () => {
     expect(tokenAt(layerStyles, "outline.subtle")).toMatchObject({
       _hover: { borderColor: "colorPalette.border.hover" },
       borderColor: "colorPalette.border",
+    });
+  });
+
+  it("fills an outline in as it is hovered and further as it is pressed", () => {
+    expect(tokenAt(layerStyles, "outline.solid")).toMatchObject({
+      _active: { background: "colorPalette.muted" },
+      _hover: { background: "colorPalette.subtle" },
+    });
+    expect(tokenAt(layerStyles, "outline.subtle")).toMatchObject({
+      _active: { background: "colorPalette.muted" },
+      _hover: { background: "colorPalette.subtle" },
+    });
+  });
+
+  it("presses a fill to the palette's emphasized and a solid fill to the ink it hovers to", () => {
+    expect(tokenAt(layerStyles, "fill.subtle")).toMatchObject({
+      _active: { background: "colorPalette.emphasized" },
+    });
+    expect(tokenAt(layerStyles, "fill.solid")).toMatchObject({
+      _active: { background: "colorPalette.solid.hover" },
     });
   });
 

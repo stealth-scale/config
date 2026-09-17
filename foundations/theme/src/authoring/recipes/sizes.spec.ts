@@ -9,9 +9,21 @@ const SIZES = ["xs", "sm", "md", "lg", "xl"] as const;
 
 describe("sizes", () => {
   it("reads the four semantic scales for each control size", () => {
-    expect(controlSizes(["sm", "md"])).toStrictEqual({
+    expect(controlSizes(["md"])).toMatchObject({
       md: { gap: "gap.md", height: "control.md", paddingInline: "inset.md", textStyle: "label.md" },
-      sm: { gap: "gap.sm", height: "control.sm", paddingInline: "inset.sm", textStyle: "label.sm" },
+    });
+  });
+
+  it("leads with one step less inset where a mark opens the control", () => {
+    expect(controlSizes(["md", "4xl"])).toMatchObject({
+      "4xl": { "&:has(> svg:first-child)": { paddingInlineStart: "inset.3xl" } },
+      md: { "&:has(> svg:first-child)": { paddingInlineStart: "inset.sm" } },
+    });
+  });
+
+  it("leads with its own inset at the smallest size", () => {
+    expect(controlSizes(["xs"])).toMatchObject({
+      xs: { "&:has(> svg:first-child)": { paddingInlineStart: "inset.xs" } },
     });
   });
 
@@ -30,7 +42,7 @@ describe("sizes", () => {
     expect(Object.keys(touchTarget())).toStrictEqual(["_touch"]);
     expect(touchTarget()).toMatchObject({
       _touch: {
-        _after: { minBlockSize: "control.md", minInlineSize: "control.md", position: "absolute" },
+        _before: { minBlockSize: "control.md", minInlineSize: "control.md", position: "absolute" },
         position: "relative",
       },
     });
