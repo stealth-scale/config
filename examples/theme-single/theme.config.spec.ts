@@ -1,7 +1,7 @@
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
-import { configured, hookContext, started, transformed } from "@stealthscale/testing";
+import { configured, declared, hookContext, started, transformed } from "@stealthscale/testing";
 import { theme } from "@stealthscale/vite-plugin-theme";
 
 import statement from "./theme.config.ts";
@@ -27,27 +27,17 @@ async function compile(): Promise<string> {
 
 const css = await compile();
 
-function declared(selector: string, property: string): string | undefined {
-  const escaped = selector.replaceAll(/[.()[\]]/gu, String.raw`\$&`);
-  const pattern = new RegExp(
-    `(?:^|[{}\\n])\\s*${escaped}\\s*\\{[^}]*?${property}:\\s*([^;}]+)`,
-    "u",
-  );
-
-  return pattern.exec(css)?.[1]?.trim();
-}
-
 describe("theme.config", () => {
   it("lists fathom alone", () => {
     expect(statement.themes.map((each) => each.name)).toStrictEqual(["fathom"]);
   });
 
   it("compiles the theme's page color where no attribute is set", () => {
-    expect(declared(":where(:root, :host)", "--colors-bg")).toBe("oklch(96.0% 0.0160 195.0)");
+    expect(declared(css, ":where(:root, :host)", "--colors-bg")).toBe("oklch(96.0% 0.0160 195.0)");
   });
 
   it("compiles the theme under its attribute as well", () => {
-    expect(declared("[data-theme=fathom]", "--colors-bg")).toBe("oklch(96.0% 0.0160 195.0)");
+    expect(declared(css, "[data-theme=fathom]", "--colors-bg")).toBe("oklch(96.0% 0.0160 195.0)");
   });
 
   it("compiles the dark values under the color mode attribute", () => {
@@ -56,7 +46,7 @@ describe("theme.config", () => {
   });
 
   it("compiles the button recipe the component package publishes", () => {
-    expect(declared(".button", "border-radius")).toBe("var(--radii-l2)");
+    expect(declared(css, ".button", "border-radius")).toBe("var(--radii-l2)");
     expect(css).toContain(".button--variant-outline");
   });
 

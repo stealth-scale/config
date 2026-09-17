@@ -6,6 +6,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  declared,
   manifest,
   packageFiles,
   type ScratchFiles,
@@ -84,13 +85,6 @@ const APP: ScratchFiles = {
   "themes/abyss.ts": theme("abyss", tracking("0.06em")),
   "themes/fathom.ts": theme("fathom", tracking("0.01em")),
 };
-
-function declared(css: string, selector: string, property: string): string | undefined {
-  const escaped = selector.replaceAll(/[.()[\]]/gu, String.raw`\$&`);
-  const pattern = new RegExp(`${escaped}\\s*\\{[^}]*?${property}:\\s*([^;}]+)`, "u");
-
-  return pattern.exec(css)?.[1]?.trim();
-}
 
 async function compiled(workspace: ScratchWorkspace): Promise<string> {
   const { compiler } = await assemble({ root: workspace.root }, RESOLVED);

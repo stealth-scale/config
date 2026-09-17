@@ -32,3 +32,4 @@ export {
   withScratchWorkspace,
   withScratchWorkspaceAsync,
 } from "#scratch.ts";
+export { declared } from "#stylesheet.ts";
