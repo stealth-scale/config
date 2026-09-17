@@ -14,7 +14,7 @@
  *   root's list style with the shorthand and a type on the root would lose to it.
  */
 
-import { defineSlotRecipe } from "@stealthscale/theme/authoring";
+import { defineSlotRecipe, gapSizes, motionVariants, onSlot } from "@stealthscale/theme/authoring";
 
 /**
  * Draws a list with the browser's markers at the middle gap until a caller says otherwise, with
@@ -41,16 +41,7 @@ export const recipe = defineSlotRecipe({
       end: { item: { alignItems: "flex-end" } },
       start: { item: { alignItems: "flex-start" } },
     },
-    gap: {
-      "2xl": { root: { gap: "gap.2xl" } },
-      "3xl": { root: { gap: "gap.3xl" } },
-      "4xl": { root: { gap: "gap.4xl" } },
-      lg: { root: { gap: "gap.lg" } },
-      md: { root: { gap: "gap.md" } },
-      sm: { root: { gap: "gap.sm" } },
-      xl: { root: { gap: "gap.xl" } },
-      xs: { root: { gap: "gap.xs" } },
-    },
+    gap: onSlot("root", gapSizes()),
     marker: {
       circle: { item: { listStyleType: "circle" } },
       dash: { item: { listStyleType: '"– "' } },
@@ -64,10 +55,7 @@ export const recipe = defineSlotRecipe({
       "upper-alpha": { item: { listStyleType: "upper-alpha" } },
       "upper-roman": { item: { listStyleType: "upper-roman" } },
     },
-    motion: {
-      reveal: { item: { animationStyle: "reveal" } },
-      rise: { item: { animationStyle: "rise" } },
-    },
+    motion: onSlot("item", motionVariants(["rise", "reveal"])),
     variant: {
       marker: {
         item: { _marker: { color: "fg.muted" } },

@@ -9,7 +9,14 @@
  *   the lines prettily, which keeps one word off the last line of a paragraph.
  */
 
-import { defineRecipe } from "@stealthscale/theme/authoring";
+import {
+  defineRecipe,
+  motionVariants,
+  textSizes,
+  toneVariants,
+  truncate,
+  weightVariants,
+} from "@stealthscale/theme/authoring";
 
 /**
  * Draws a paragraph in the middle body size until a caller says otherwise, and in the ink, the
@@ -31,35 +38,10 @@ export const recipe = defineRecipe({
     mask: {
       bottom: { layerStyle: "mask.bottom" },
     },
-    motion: {
-      fade: { animationStyle: "fade.in" },
-      reveal: { animationStyle: "reveal" },
-      rise: { animationStyle: "rise" },
-    },
-    size: {
-      lg: { textStyle: "body.lg" },
-      md: { textStyle: "body.md" },
-      sm: { textStyle: "body.sm" },
-      xl: { textStyle: "body.xl" },
-      xs: { textStyle: "body.xs" },
-    },
-    tone: {
-      default: { color: "fg" },
-      error: { color: "fg.error" },
-      info: { color: "fg.info" },
-      inverted: { color: "fg.inverted" },
-      muted: { color: "fg.muted" },
-      success: { color: "fg.success" },
-      warning: { color: "fg.warning" },
-    },
-    truncate: {
-      true: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
-    },
-    weight: {
-      bold: { fontWeight: "bold" },
-      medium: { fontWeight: "medium" },
-      normal: { fontWeight: "normal" },
-      semibold: { fontWeight: "semibold" },
-    },
+    motion: motionVariants(["fade", "rise", "reveal"]),
+    size: textSizes("body"),
+    tone: toneVariants(),
+    truncate: { true: truncate() },
+    weight: weightVariants(),
   },
 });

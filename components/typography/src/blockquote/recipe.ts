@@ -10,7 +10,12 @@
  *   because the mark is the icon component, and its own recipe sizes it.
  */
 
-import { defineSlotRecipe } from "@stealthscale/theme/authoring";
+import {
+  defineSlotRecipe,
+  motionVariants,
+  onSlot,
+  statusVariants,
+} from "@stealthscale/theme/authoring";
 
 /**
  * Draws a quotation on the neutral palette in the subtle look and the middle size until a caller
@@ -38,10 +43,7 @@ export const recipe = defineSlotRecipe({
       end: { root: { alignItems: "flex-end", textAlign: "end" } },
       start: { root: { alignItems: "flex-start", textAlign: "start" } },
     },
-    motion: {
-      reveal: { root: { animationStyle: "reveal" } },
-      rise: { root: { animationStyle: "rise" } },
-    },
+    motion: onSlot("root", motionVariants(["rise", "reveal"])),
     size: {
       lg: {
         content: { textStyle: "body.lg" },
@@ -64,12 +66,7 @@ export const recipe = defineSlotRecipe({
         root: { gap: "gap.xs", paddingInlineStart: "inset.xs" },
       },
     },
-    status: {
-      error: { root: { colorPalette: "error" } },
-      info: { root: { colorPalette: "info" } },
-      success: { root: { colorPalette: "success" } },
-      warning: { root: { colorPalette: "warning" } },
-    },
+    status: onSlot("root", statusVariants()),
     variant: {
       glass: {
         icon: { color: "colorPalette.solid" },

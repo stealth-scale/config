@@ -12,7 +12,13 @@
  *   on the last.
  */
 
-import { defineRecipe } from "@stealthscale/theme/authoring";
+import {
+  defineRecipe,
+  motionVariants,
+  textSizes,
+  toneVariants,
+  truncate,
+} from "@stealthscale/theme/authoring";
 
 /**
  * Draws a heading in the large heading role until a caller says otherwise, in the ink it inherits
@@ -28,32 +34,9 @@ export const recipe = defineRecipe({
       gradient: { layerStyle: "text.gradient" },
       shine: { animationStyle: "shimmer", layerStyle: "text.shine" },
     },
-    motion: {
-      fade: { animationStyle: "fade.in" },
-      reveal: { animationStyle: "reveal" },
-      rise: { animationStyle: "rise" },
-    },
-    size: {
-      "2xl": { textStyle: "heading.2xl" },
-      "3xl": { textStyle: "heading.3xl" },
-      "4xl": { textStyle: "heading.4xl" },
-      lg: { textStyle: "heading.lg" },
-      md: { textStyle: "heading.md" },
-      sm: { textStyle: "heading.sm" },
-      xl: { textStyle: "heading.xl" },
-      xs: { textStyle: "heading.xs" },
-    },
-    tone: {
-      default: { color: "fg" },
-      error: { color: "fg.error" },
-      info: { color: "fg.info" },
-      inverted: { color: "fg.inverted" },
-      muted: { color: "fg.muted" },
-      success: { color: "fg.success" },
-      warning: { color: "fg.warning" },
-    },
-    truncate: {
-      true: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
-    },
+    motion: motionVariants(["fade", "rise", "reveal"]),
+    size: textSizes("heading"),
+    tone: toneVariants(),
+    truncate: { true: truncate() },
   },
 });
