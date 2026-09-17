@@ -21,7 +21,9 @@ hooks: add the React hooks a component reads the page with
 - `useIsOverflowing` watches an element and reports whether its content is cut off on each axis,
   measured again on a resize, a content change, a parent resize and after the fonts load.
 - `useStickyOffsets` sets a custom property on each sticky band holding the height of the bands
-  above it, and one on the column holding the height of all of them.
+  above it, and one on the column holding the height of all of them. Its effect depends on the
+  options encoded, so a caller writing the object inline does not rebuild the observers on every
+  render.
 - `useMatrixCrosshair` lights the row and column under the pointer in a grid, written through the
   DOM because a matrix of a few hundred items either way is tens of thousands of cells.
 - `useAnnounce` says a message to a screen reader through one shared region per politeness, with a
