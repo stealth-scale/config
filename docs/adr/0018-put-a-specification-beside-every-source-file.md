@@ -33,7 +33,8 @@ We will put a specification beside every source file, the barrels included, beca
 one place a component's public surface is written and the one place it changes unseen.
 
 A barrel's specification names every export and nothing beside it, as a sorted list, and asserts
-that the recipe and the binding are not among them. It is four lines.
+that the recipe and the binding are not among them. It is four lines. The conformance suite holds a
+package to it where the package asks with `barrels: true`, which every component package does.
 
 ## Alternatives Considered
 
@@ -62,4 +63,5 @@ leaked recipe, a leaked binding and a dropped export.
 **Neutral:**
 
 - The packages under `packages/` and `foundations/` keep their conformance specifications, which
-  already read the package barrel through the library contract.
+  already read the package barrel through the library contract, and the suite leaves their barrels
+  alone unless they ask.

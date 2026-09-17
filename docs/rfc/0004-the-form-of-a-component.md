@@ -334,7 +334,7 @@ Every source file has a specification beside it, the barrels included. The cases
 The package keeps `conformance.spec.ts` for the library contract, `theme.spec.ts` for the preset,
 and `index.spec.ts` naming every export of the package barrel.
 
-### The three kit changes
+### The kit changes
 
 The conformance kit gains an `as` check:
 
@@ -386,6 +386,18 @@ export function slotClasses(container: ParentNode, name: string, slot: string): 
 `slotElement` selects `.${slotClass(name, slot)}`, with `slotClass` from the naming package. It
 keeps the `data-part` selector for a part an Ark anatomy stamps. `recipeElement` and `recipeClasses`
 keep their signatures, because `data-recipe` stays.
+
+Four more checks close what a recipe could pass with a class no rule reaches. `recipeViolations`
+reports a value or a compound that states no styles, a default naming a value the axis does not
+offer, a compound matched on such a value, and, given `names`, a `jsx` pattern that misses a name a
+consumer writes the component under. `violations` on a theme reports an extension styling an axis or
+a value the recipe does not offer or a part the recipe's value does not style, and a compound
+styling a part the recipe's compound does not. `boundViolations` renders a bound component once with
+nothing picked and once per value of every axis, and reports each class the element lacks and each
+class it has that the recipe does not write, so a component's specification no longer lists its
+classes by hand. The conformance suite holds a package's barrels to a specification where the
+package asks with `barrels: true`. And `accessibilityViolations` in `@stealthscale/testing-react`
+renders a component under the same options and returns each rule of axe it breaks.
 
 ### The README and the manifest
 
@@ -505,8 +517,6 @@ a value no theme moves. Both are the constraints the theming design set.
 - A lint rule that reports `unstyled` in application code is not proposed here.
 - A specimen kit, and a specimen beside every component, are not proposed here.
 - A `useHighlight` hook in the hooks foundation, and the `Highlight` component that needs it, are
-  not proposed here.
-- A conformance check that reads a recipe's `jsx` patterns against the names the barrel exports is
   not proposed here.
 - A `Prose` component, a recipe of descendant rules over markup that arrives from elsewhere, needs
   its own reading before it is written.
