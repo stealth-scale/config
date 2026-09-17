@@ -4,8 +4,8 @@
 `@stealthscale/example-lib-actions` in one theme, Fathom, and switches its color mode. An
 application with one theme is the smallest themed application there is. `theme.config.ts` lists the
 theme. A stylesheet import is answered by the build plugin. One attribute on the document root
-switches the color mode, and the page writes it. The theme attribute is never written, because the
-one theme is the default.
+switches the color mode, and `ThemeProvider` writes it. The theme attribute is never written,
+because the one theme is the default.
 
 ## Run it
 
@@ -34,12 +34,14 @@ change to the page.
 
 ## The page
 
-`src/app.tsx` keeps the color mode in state and writes it onto the document root in an effect, under
-`COLOR_MODE_ATTRIBUTE` from `@stealthscale/theme`. The buttons are written with literal variants,
-which is what the compiler extracts the rules for. The page's own layout is written with `css` from
-the same package, reading the semantic spacing and the text styles a recipe reads, so the theme
-moves the page as it moves the buttons. `src/main.tsx` imports `@stealthscale/theme/styles.css`
-before the application, and the build plugin appends the compiled rules to it.
+`src/app.tsx` keeps the color mode in state and hands it to `ThemeProvider` from
+`@stealthscale/theme`, which writes it onto the document root. It hands the provider no theme, and
+the provider removes the theme attribute rather than writing one, which is what an application with
+a single theme wants. The buttons are written with literal variants, which is what the compiler
+extracts the rules for. The page's own layout is written with `css` from the same package, reading
+the semantic spacing and the text styles a recipe reads, so the theme moves the page as it moves the
+buttons. `src/main.tsx` imports `@stealthscale/theme/styles.css` before the application, and the
+build plugin appends the compiled rules to it.
 
 ## The configuration
 
