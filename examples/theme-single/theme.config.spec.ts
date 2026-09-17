@@ -2,11 +2,9 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { configured, declared, hookContext, started, transformed } from "@stealthscale/testing";
-import { theme } from "@stealthscale/vite-plugin-theme";
+import { LAYER_DECLARATION, theme } from "@stealthscale/vite-plugin-theme";
 
 import statement from "./theme.config.ts";
-
-const DECLARED = "@layer reset, base, tokens, recipes, utilities;\n";
 
 const CONDITIONS = ["stealth-source", "node"];
 
@@ -21,7 +19,12 @@ async function compile(): Promise<string> {
   await started(plugin, context);
 
   return (
-    (await transformed(plugin, context, DECLARED, join(import.meta.dirname, "styles.css"))) ?? ""
+    (await transformed(
+      plugin,
+      context,
+      LAYER_DECLARATION,
+      join(import.meta.dirname, "styles.css"),
+    )) ?? ""
   );
 }
 
@@ -43,6 +46,11 @@ describe("theme.config", () => {
   it("compiles the dark values under the color mode attribute", () => {
     expect(css).toContain("[data-color-mode=dark]");
     expect(css).toContain("oklch(11.0% 0.0160 195.0)");
+  });
+
+  it("states the color scheme on either color mode attribute", () => {
+    expect(declared(css, "[data-color-mode=dark]", "color-scheme")).toBe("dark");
+    expect(declared(css, "[data-color-mode=light]", "color-scheme")).toBe("light");
   });
 
   it("compiles the button recipe the component package publishes", () => {

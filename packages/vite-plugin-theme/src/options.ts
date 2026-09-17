@@ -205,3 +205,13 @@ export function layerPattern(layers: StylesheetLayers): RegExp {
 
   return new RegExp(String.raw`@layer\s+${names.join(String.raw`\s*,\s*`)}\s*;`, "u");
 }
+
+/**
+ * Declares the cascade order under the names an application gets without stating any.
+ *
+ * @remarks
+ *   An application's stylesheet opens with this line, and it is the line the compiled rules are
+ *   appended to. A specification that drives the plugin writes it rather than a literal of its
+ *   own, so renaming a layer does not leave a specification asserting against the old names.
+ */
+export const LAYER_DECLARATION = `${layerDeclaration(resolveOptions().layers)}\n`;
