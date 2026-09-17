@@ -1,0 +1,13 @@
+# @stealthscale/component-a11y
+
+Draws what a keyboard and a screen reader need, and an eye does not. Every component binds a recipe
+and draws nothing of its own, so a theme moves all of them by extending the recipe. The preset under
+`./theme` registers the recipes with an application's compiler.
+
+## Install
+
+```bash
+pnpm add @stealthscale/component-a11y
+```
+
+The package peers on `react` and `@stealthscale/theme`.
