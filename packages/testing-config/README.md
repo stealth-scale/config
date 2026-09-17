@@ -65,7 +65,7 @@ and this package cannot.
 
 ## What it checks
 
-Thirteen checks run over a package. Every check the kind selects runs, and a breach found by one
+Fourteen checks run over a package. Every check the kind selects runs, and a breach found by one
 never stops another, so one run reports the whole set.
 
 | Check              | Kind       | Reports                                                                                                                                                                                                                           |
@@ -74,6 +74,7 @@ never stops another, so one run reports the whole set.
 | `manifest.files`   | Every kind | `LICENSE` or `README.md` missing from `files`, a listed entry other than `dist` that is not on disk, and a built target no entry covers                                                                                           |
 | `manifest.engines` | Every kind | An unstated `engines.node`, and a range differing from the one the workspace root states                                                                                                                                          |
 | `manifest.peers`   | Every kind | A peer that is also a dependency, `vite` or `vitest` peered as anything but `catalog:peer`, a peer on `vite-plus`, and a config package peering on nothing named `vite`                                                           |
+| `source.specs`     | Every kind | A file under `src` with no `.spec.ts` or `.spec.tsx` beside it. A barrel, a fixture, a declaration file and a module whose every export is an `export type` are left alone, none of them holding behaviour of its own             |
 | `module.factories` | Config     | An export that is neither a function, a namespace nor a constant, and a factory with required parameters and no entry in `arguments`                                                                                              |
 | `readme.exports`   | Config     | A block the README's `Blocks` table names that the barrel does not export, and a top-level namespace the table leaves out                                                                                                         |
 | `layer.kind`       | Config     | A factory that throws, a return value shaped like a layer without being one, and an array mixing layers with other values                                                                                                         |
