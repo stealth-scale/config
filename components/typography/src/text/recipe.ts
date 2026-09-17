@@ -4,9 +4,9 @@
  *
  * @remarks
  *   Every value is a body role, a foreground role, a font weight token, an animation style or a
- *   layer style, so a theme moves all of them. The base states nothing, because a paragraph reads
- *   as the page reads until a caller picks a value, and the recipe is the key a theme extends
- *   every paragraph by.
+ *   layer style, so a theme moves all of them. A paragraph reads as the page reads until a caller
+ *   picks a value, and the recipe is the key a theme extends every paragraph by. The base wraps
+ *   the lines prettily, which keeps one word off the last line of a paragraph.
  */
 
 import { defineRecipe } from "@stealthscale/theme/authoring";
@@ -17,7 +17,7 @@ import { defineRecipe } from "@stealthscale/theme/authoring";
  * fades its bottom edge out, where a caller asks.
  */
 export const recipe = defineRecipe({
-  base: {},
+  base: { textWrap: "pretty" },
   className: "text",
   defaultVariants: { size: "md" },
   jsx: [/Text$/u],

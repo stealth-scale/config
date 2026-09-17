@@ -7,7 +7,9 @@
  *   so a theme moves all of them. The size axis names the heading roles and not the steps of the
  *   type scale. A heading states how loud it is. Which level it is stays with the element, where
  *   a screen reader reads it, and a caller changes the level with `as`. The shine effect carries
- *   the shimmer that moves it, because a shine that stands still is a gradient.
+ *   the shimmer that moves it, because a shine that stands still is a gradient. The base balances
+ *   the lines, so a heading that wraps breaks into even lines rather than leaving one word alone
+ *   on the last.
  */
 
 import { defineRecipe } from "@stealthscale/theme/authoring";
@@ -17,7 +19,7 @@ import { defineRecipe } from "@stealthscale/theme/authoring";
  * until a caller picks one, and with no effect and no motion until a caller asks for one.
  */
 export const recipe = defineRecipe({
-  base: {},
+  base: { textWrap: "balance" },
   className: "heading",
   defaultVariants: { size: "lg" },
   jsx: [/Heading$/u],
