@@ -229,11 +229,6 @@ function toSlotRuntimeConfig<Slots extends string, Variants extends SlotRecipeVa
 }
 
 /**
- * Lists the keys of a compound that are not axes.
- */
-const UNMATCHED = new Set(["className", "classNames", "css", "name"]);
-
-/**
  * Writes the key one value of one axis is read under.
  */
 function keyOf(axis: string, value: unknown): string {
@@ -256,47 +251,18 @@ function styles(styled: Styled, axis: string, value: unknown, slot: string): voi
 }
 
 /**
- * Records the slots each variant value styles through its own styles.
- */
-function styledByVariants<Slots extends string, Variants extends SlotRecipeVariantRecord<Slots>>(
-  recipe: SlotRecipe<Slots, Variants>,
-  styled: Styled,
-): void {
-  for (const [axis, values] of Object.entries(recipe.variants ?? {})) {
-    for (const [value, slotStyles] of Object.entries(values)) {
-      for (const slot of Object.keys(slotStyles)) styles(styled, axis, value, slot);
-    }
-  }
-}
-
-/**
- * Records the slots each value styles through a compound matched on it.
- */
-function styledByCompounds<Slots extends string, Variants extends SlotRecipeVariantRecord<Slots>>(
-  recipe: SlotRecipe<Slots, Variants>,
-  styled: Styled,
-): void {
-  for (const compound of recipe.compoundVariants ?? []) {
-    for (const [axis, selected] of Object.entries(compound)) {
-      if (UNMATCHED.has(axis)) continue;
-      for (const value of Array.isArray(selected) ? selected : [selected]) {
-        for (const slot of Object.keys(compound.css)) styles(styled, axis, value, slot);
-      }
-    }
-  }
-}
-
-/**
- * Lists, for each value of each axis, the slots the value styles: through its own styles, or
- * through a compound matched on it.
+ * Lists, for each value of each axis, the slots the value styles.
  */
 function styledSlots<Slots extends string, Variants extends SlotRecipeVariantRecord<Slots>>(
   recipe: SlotRecipe<Slots, Variants>,
 ): ReadonlyMap<string, ReadonlySet<string>> {
   const styled: Styled = new Map();
 
-  styledByVariants(recipe, styled);
-  styledByCompounds(recipe, styled);
+  for (const [axis, values] of Object.entries(recipe.variants ?? {})) {
+    for (const [value, slotStyles] of Object.entries(values)) {
+      for (const slot of Object.keys(slotStyles)) styles(styled, axis, value, slot);
+    }
+  }
 
   return styled;
 }
@@ -307,9 +273,11 @@ function styledSlots<Slots extends string, Variants extends SlotRecipeVariantRec
  * @remarks
  *   The runtime hands every slot the whole variant map, so a slot carried a class for every value
  *   the caller picked whether or not the value styled it, which was fifteen dead classes on one
- *   card. A value styles a slot through its own styles or through a compound matched on it, and
- *   the class of any other value is dropped from that slot. The classes are derived here as the
- *   runtime writes them, through the naming scheme.
+ *   card. A value styles a slot through the styles it names for that slot, and the class of any
+ *   other value is dropped from that slot. A compound keeps no value's class, because the compiler
+ *   emits a compound's styles under the compound's own class, which the runtime writes on the
+ *   slot where the selection matches. The classes are derived here as the runtime writes them,
+ *   through the naming scheme.
  * @typeParam Slots - Every part the recipe styles.
  * @typeParam Variants - Each axis it offers, against the values it takes.
  */
