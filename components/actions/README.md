@@ -18,8 +18,12 @@ The package peers on `react` and `@stealthscale/theme`. An application lists the
 
 ## Button
 
-Draws the element a person presses, in a look, a size and a status, with a glow where a page asks.
-The element is `button`, and `type` defaults to `button` so one inside a form does not send it.
+Draws the element a person presses, in a look, a size and a status, raised off the page and glowing
+or rippling where a page asks. Under a press the look fills to its pressed colour, the box squeezes
+to 98 percent, and an elevated button drops towards the page. A button that opens with a mark leads
+with one step less inset, so the room before the mark is the width of the gap after it rather than a
+word's worth. The element is `button`, and `type` defaults to `button` so one inside a form does not
+send it.
 
 ```tsx
 import { Button, ButtonPropsProvider } from "@stealthscale/component-actions";
@@ -41,13 +45,14 @@ The `glass` look is translucent, so the contrast of its label depends on what si
 theme's contrast gate measures the opaque looks alone, and a page puts a glass button on a surface
 it has checked.
 
-| Axis      | Values                                                             | Default |
-| --------- | ------------------------------------------------------------------ | ------- |
-| `variant` | `solid`, `subtle`, `surface`, `outline`, `ghost`, `plain`, `glass` | `solid` |
-| `size`    | `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`, `4xl`                  | `md`    |
-| `status`  | `info`, `success`, `warning`, `error`                              | primary |
-| `shape`   | `square`                                                           | none    |
-| `effect`  | `glow`                                                             | none    |
+| Axis        | Values                                                             | Default |
+| ----------- | ------------------------------------------------------------------ | ------- |
+| `variant`   | `solid`, `subtle`, `surface`, `outline`, `ghost`, `plain`, `glass` | `solid` |
+| `size`      | `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`, `4xl`                  | `md`    |
+| `status`    | `info`, `success`, `warning`, `error`                              | primary |
+| `shape`     | `square`                                                           | none    |
+| `effect`    | `glow`, `ripple`                                                   | none    |
+| `elevation` | `raised`, `floating`                                               | flat    |
 
 ## IconButton
 

@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { axesOf, defaultsOf, recipeViolations, valuesOf } from "@stealthscale/testing-theme";
+import {
+  axesOf,
+  defaultsOf,
+  recipeViolations,
+  scaleOf,
+  valuesOf,
+} from "@stealthscale/testing-theme";
 
 import { recipe } from "#button/recipe.ts";
 
@@ -13,8 +19,15 @@ describe("recipe", () => {
     expect(recipe.className).toBe("button");
   });
 
-  it("offers the five axes a button takes", () => {
-    expect(axesOf(recipe)).toStrictEqual(["effect", "shape", "size", "status", "variant"]);
+  it("offers the six axes a button takes", () => {
+    expect(axesOf(recipe)).toStrictEqual([
+      "effect",
+      "elevation",
+      "shape",
+      "size",
+      "status",
+      "variant",
+    ]);
   });
 
   it("draws the middle size in the solid look when nothing is asked for", () => {
@@ -54,8 +67,29 @@ describe("recipe", () => {
     expect(valuesOf(recipe, "shape")).toStrictEqual(["square"]);
   });
 
-  it("offers the glow as an effect", () => {
-    expect(valuesOf(recipe, "effect")).toStrictEqual(["glow"]);
+  it("offers the glow and the ripple as effects", () => {
+    expect(valuesOf(recipe, "effect")).toStrictEqual(["glow", "ripple"]);
+  });
+
+  it("offers a raised and a floating elevation", () => {
+    expect(valuesOf(recipe, "elevation")).toStrictEqual(["floating", "raised"]);
+  });
+
+  it("drops the shadow of an elevated button as it is pressed", () => {
+    expect(scaleOf(recipe, "elevation", "_active", ["raised", "floating"])).toStrictEqual([
+      { boxShadow: "none" },
+      { boxShadow: "sm" },
+    ]);
+  });
+
+  it("clears the inset a leading mark takes off a square button", () => {
+    expect(recipe.compoundVariants).toStrictEqual([
+      {
+        className: "button--squared",
+        css: { "&:has(> svg:first-child)": { paddingInline: "0" } },
+        shape: "square",
+      },
+    ]);
   });
 
   it("tracks every tag whose name ends in Button", () => {
