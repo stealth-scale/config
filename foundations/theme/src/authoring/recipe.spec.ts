@@ -2,6 +2,7 @@ import { describe, expect, expectTypeOf, it } from "vitest";
 
 import {
   compoundClassName,
+  compoundSelection,
   defineRecipe,
   defineSlotRecipe,
   defineStyles,
@@ -61,6 +62,18 @@ describe("defineRecipe", () => {
     expect(() => compoundClassName("button", { size: { lg: true } })).toThrow(
       "size is matched on a object, which a class name cannot carry",
     );
+  });
+
+  it("writes the selection a compound matches on without a class before it", () => {
+    expect(compoundSelection({ css: {}, size: "lg", variant: "solid" })).toBe(
+      "size-lg__variant-solid",
+    );
+    expect(compoundSelection({ css: {}, size: ["lg", "md"] })).toBe("size-lg|md");
+  });
+
+  it("returns nothing for a selection a class name cannot carry", () => {
+    expect(compoundSelection({ css: {}, size: { lg: true } })).toBeUndefined();
+    expect(compoundSelection({ css: {}, size: ["lg", { md: true }] })).toBeUndefined();
   });
 
   it("splits a slot compound into one named compound per slot it styles", () => {

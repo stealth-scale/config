@@ -53,6 +53,7 @@ export {
 export {
   type Compound,
   compoundClassName,
+  compoundSelection,
   defineRecipe,
   defineSlotRecipe,
   defineStyles,

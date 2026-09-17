@@ -2,7 +2,13 @@ import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { violations } from "@stealthscale/testing-react";
-import { slotClass, slotClasses, slotElement, slotVariantClass } from "@stealthscale/testing-theme";
+import {
+  recipeElement,
+  slotClass,
+  slotClasses,
+  slotElement,
+  slotVariantClass,
+} from "@stealthscale/testing-theme";
 
 import { Card } from "#index.ts";
 
@@ -60,6 +66,7 @@ describe("Card", () => {
       </Card.Root>,
     );
 
+    expect(recipeElement(container, "card")).toBe(slotElement(container, "root"));
     expect(slotElement(container, "root").tagName).toBe("ARTICLE");
     expect(slotElement(container, "header").tagName).toBe("HEADER");
     expect(slotElement(container, "content").tagName).toBe("DIV");

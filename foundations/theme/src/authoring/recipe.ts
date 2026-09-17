@@ -194,20 +194,62 @@ export type RecipeProps<Bound> =
 export const SEPARATOR = "-";
 
 /**
- * Writes one value a compound matches on the way a class name carries it.
+ * Fixes what the compiler writes between a class and the selection a compound matches on.
+ */
+const COMPOUND = "--compound__";
+
+/**
+ * Lists the two keys of a compound that are not axes.
+ */
+const UNMATCHED = new Set(["className", "css"]);
+
+/**
+ * Writes one value a compound matches on the way a class name carries it, or nothing where a
+ * class name cannot carry it.
  *
  * @remarks
  *   An array is the values the axis may hold, joined by a bar.
- * @throws {@link Error} When the value is not a string, a number, a boolean or a list of those.
  */
-function written(axis: string, value: unknown): string {
-  if (Array.isArray(value)) return value.map((each: unknown) => written(axis, each)).join("|");
+function written(value: unknown): string | undefined {
+  if (Array.isArray(value)) {
+    const each = value.map((one: unknown) => written(one));
 
-  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
-    return String(value);
+    return each.includes(undefined) ? undefined : each.join("|");
   }
 
-  throw new Error(`${axis} is matched on a ${typeof value}, which a class name cannot carry`);
+  return typeof value === "string" || typeof value === "number" || typeof value === "boolean"
+    ? String(value)
+    : undefined;
+}
+
+/**
+ * Lists the axes a compound matches on, sorted, against the value each is matched on.
+ */
+function matched(compound: object): ReadonlyArray<readonly [axis: string, value: unknown]> {
+  return Object.keys(compound)
+    .filter((axis) => !UNMATCHED.has(axis))
+    .toSorted()
+    .map((axis) => [axis, Reflect.get(compound, axis)] as const);
+}
+
+/**
+ * Writes the selection a compound matches on, in the scheme the compiler names it by, or nothing
+ * where a class name cannot carry one of the values.
+ *
+ * @remarks
+ *   The axes sorted, each written as the axis, the separator and the value, with a list joined by
+ *   a bar and the pairs joined by two underscores. A reader that has a compound and wants the name
+ *   the compiler gave it asks for this rather than taking a class apart.
+ * @param compound - The compound, read for every key but `css` and `className`.
+ */
+export function compoundSelection(compound: object): string | undefined {
+  const pairs = matched(compound).map(([axis, value]) => {
+    const one = written(value);
+
+    return one === undefined ? undefined : `${axis}${SEPARATOR}${one}`;
+  });
+
+  return pairs.includes(undefined) ? undefined : pairs.join("__");
 }
 
 /**
@@ -216,20 +258,23 @@ function written(axis: string, value: unknown): string {
  *
  * @remarks
  *   The scheme is the compiler's own, so a theme's compound for the same selection, which the
- *   compiler names itself, is emitted under the same class: the axes sorted, each written as
- *   the axis, the separator and the value, with a list joined by `|`, the pairs joined by `__`,
- *   after `--compound__`.
+ *   compiler names itself, is emitted under the same class.
  * @param className - The class of the recipe, or of the slot for a slot recipe.
  * @param compound - The compound, read for every key but `css` and `className`.
  * @throws {@link Error} When the compound matches an axis on a value a class name cannot carry.
  */
 export function compoundClassName(className: string, compound: object): string {
-  const pairs = Object.keys(compound)
-    .filter((axis) => axis !== "className" && axis !== "css")
-    .toSorted()
-    .map((axis) => `${axis}${SEPARATOR}${written(axis, Reflect.get(compound, axis))}`);
+  const pairs = matched(compound).map(([axis, value]) => {
+    const one = written(value);
 
-  return `${className}--compound__${pairs.join("__")}`;
+    if (one === undefined) {
+      throw new Error(`${axis} is matched on a ${typeof value}, which a class name cannot carry`);
+    }
+
+    return `${axis}${SEPARATOR}${one}`;
+  });
+
+  return `${className}${COMPOUND}${pairs.join("__")}`;
 }
 
 /**

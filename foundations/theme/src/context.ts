@@ -249,9 +249,30 @@ export function createRecipeContext<const Variants extends RecipeVariantRecord>(
 }
 
 /**
+ * Writes the recipe's name into the props a part starts from, keeping anything the caller stated.
+ *
+ * @typeParam Props - The props of the element the part is bound to.
+ */
+function stamped<Props>(
+  className: string,
+  given?: DataAttrs & Partial<Props>,
+): DataAttrs & Partial<Props> {
+  const props: unknown = { "data-recipe": className, ...given };
+
+  // eslint-disable-next-line typescript/no-unsafe-type-assertion -- every prop of an element is optional here, so a data attribute beside them satisfies the type, which the checker cannot settle while the element is a type parameter
+  return props as DataAttrs & Partial<Props>;
+}
+
+/**
  * Binds a recipe that draws several parts and returns the three factories a compound component
  * is built from.
  *
+ * @remarks
+ *   The part that provides the variants carries the recipe's name as `data-recipe`, so a compound
+ *   component is found by the same handle as one that draws a single element. Every part carries
+ *   its own slot as `data-slot`, which the generated factories write. The compiler's own
+ *   `dataAttr` option does nothing here, because it reads a name off the recipe a part is styled
+ *   with and a part is styled with the slot's styles alone.
  * @typeParam Slots - Every part the recipe styles.
  * @typeParam Variants - Each axis it offers, against the values it takes.
  */
@@ -262,5 +283,26 @@ export function createSlotRecipeContext<
   const generated: unknown = bindSlots(createSlotRecipe(toSlotRuntimeConfig(recipe)));
 
   // eslint-disable-next-line typescript/no-unsafe-type-assertion -- as above, and the slot a part is bound to is one of the recipe's, which the generated type resolves through a conditional the checker cannot settle for a generic recipe
-  return generated as SlotRecipeBinding<Slots, Variants>;
+  const bound = generated as SlotRecipeBinding<Slots, Variants>;
+
+  return {
+    ...bound,
+    withProvider: <Tag extends ElementType>(
+      Component: Tag,
+      slot: Slots,
+      options?: JsxFactoryOptions<ComponentProps<Tag>>,
+    ) =>
+      bound.withProvider(Component, slot, {
+        ...options,
+        defaultProps: stamped<ComponentProps<Tag>>(recipe.className, options?.defaultProps),
+      }),
+    withRootProvider: <Tag extends ElementType>(
+      Component: Tag,
+      options?: RootProviderOptions<ComponentProps<Tag>>,
+    ) =>
+      bound.withRootProvider(Component, {
+        ...options,
+        defaultProps: stamped<ComponentProps<Tag>>(recipe.className, options?.defaultProps),
+      }),
+  };
 }

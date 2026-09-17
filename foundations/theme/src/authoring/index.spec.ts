@@ -16,6 +16,7 @@ const SURFACE = [
   "COLOR_MODE_ATTRIBUTE",
   "colorScale",
   "compoundClassName",
+  "compoundSelection",
   "contract",
   "contrast",
   "controls",

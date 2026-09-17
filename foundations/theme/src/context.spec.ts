@@ -69,6 +69,35 @@ describe("createRecipeContext", () => {
     expect(container.querySelector("h2")?.className).toBe("dialog__title dialog__title--size-lg");
   });
 
+  it("stamps the recipe's name on the part that provides the variants", () => {
+    const { withContext, withProvider } = createSlotRecipeContext(dialog);
+    const Content = withProvider("section", "content");
+    const Title = withContext("h2", "title");
+    const { container } = render(createElement(Content, null, createElement(Title, null, "Hello")));
+
+    expect(container.querySelector("section")?.dataset["recipe"]).toBe("dialog");
+    expect(container.querySelector("section")?.dataset["slot"]).toBe("content");
+    expect(container.querySelector("h2")?.dataset["recipe"]).toBeUndefined();
+    expect(container.querySelector("h2")?.dataset["slot"]).toBe("title");
+  });
+
+  it("stamps the recipe's name on a root provider that draws no slot of its own", () => {
+    const { withRootProvider } = createSlotRecipeContext(dialog);
+    const Root = withRootProvider("div");
+    const { container } = render(createElement(Root, null, "Hello"));
+
+    expect(container.querySelector("div")?.dataset["recipe"]).toBe("dialog");
+  });
+
+  it("keeps a default prop the caller states beside the recipe's name", () => {
+    const { withProvider } = createSlotRecipeContext(dialog);
+    const Content = withProvider("section", "content", { defaultProps: { role: "note" } });
+    const { container } = render(createElement(Content, null, "Hello"));
+
+    expect(container.querySelector("section")?.getAttribute("role")).toBe("note");
+    expect(container.querySelector("section")?.dataset["recipe"]).toBe("dialog");
+  });
+
   it("binds a recipe with no variants and no defaults", () => {
     const Tag = createRecipeContext(defineRecipe({ className: "tag" })).withContext("span");
     const { container } = render(createElement(Tag, null, "New"));
