@@ -9,8 +9,7 @@
  *   steps they read are the ones the accessibility gate accepts on every surface.
  */
 
-import { type ThemeColors } from "#authoring/contract.ts";
-import { backgrounds, borders, foregrounds } from "#scales/color.ts";
+import { families as drawn, type Families } from "#scales/palettes.ts";
 
 /**
  * Fixes where the page sits in each mode.
@@ -31,8 +30,4 @@ const TINT_CHROMA = 0.006;
 /**
  * Lists the three families.
  */
-export const families: Pick<ThemeColors, "bg" | "border" | "fg"> = {
-  bg: backgrounds(PAGE, TINT_HUE, TINT_CHROMA),
-  border: borders(),
-  fg: foregrounds(),
-};
+export const families: Families = drawn(PAGE, TINT_HUE, TINT_CHROMA);

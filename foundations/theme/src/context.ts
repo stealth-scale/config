@@ -8,13 +8,15 @@
  *   definition could not be extended by a theme. The definition is turned into the compiler's
  *   runtime recipe here first, which is what a config recipe binds through, and the factories are
  *   handed that. A compound's class is the one its recipe named, which the compiler emitted the
- *   compound's styles under.
+ *   compound's styles under. Every factory returns a component typed by a name this package
+ *   publishes, so a package that exports a bound component emits a declaration that names this
+ *   package and nothing under it.
  */
+
+import { type ElementType, type JSX, type Provider } from "react";
 
 import { type Recipe, type SlotCompound, type SlotRecipe } from "#authoring/recipe.ts";
 import { toVariantMap } from "#generated/helpers.mjs";
-import type { RecipeContext } from "#generated/jsx/create-recipe-context.d.mts";
-import type { SlotRecipeContext } from "#generated/jsx/create-slot-recipe-context.d.mts";
 import {
   createRecipeContext as bindRecipe,
   createSlotRecipeContext as bindSlots,
@@ -26,38 +28,105 @@ import {
   type SlotRecipeRuntimeConfig,
 } from "#generated/recipes/runtime.mjs";
 import type {
+  ComponentProps,
+  DataAttrs,
+  JsxFactoryOptions,
+  StyledComponent,
+  UnstyledProps,
+} from "#generated/types/jsx.d.mts";
+import type {
   RecipeConfigVariantMap,
-  RecipeRuntimeFn,
   RecipeSelection,
   RecipeVariantRecord,
-  SlotRecipeRuntimeFn,
   SlotRecipeVariantRecord,
   SlotRecord,
 } from "#generated/types/recipe.d.mts";
 
-export type { RecipeContext, SlotRecipeContext };
+/**
+ * Describes what a root provider is given beside the element's own props.
+ *
+ * @typeParam Props - The props of the element the provider is bound to.
+ */
+export interface RootProviderOptions<Props> {
+  /**
+   * The props every instance starts from.
+   */
+  defaultProps?: (DataAttrs & Partial<Props>) | undefined;
+}
 
 /**
- * Describes the runtime function the generated factory is handed for a recipe that draws one
- * element.
+ * Draws the root of a compound component: an element that takes the recipe's variants and hands
+ * them to every part below it.
+ *
+ * @typeParam Tag - The element or component the root is bound to.
+ * @typeParam Variants - Each axis the recipe offers, against the values it takes.
+ */
+export type RootProvider<Tag extends ElementType, Variants extends RecipeVariantRecord> = (
+  props: ComponentProps<Tag> & DataAttrs & RecipeSelection<Variants> & UnstyledProps,
+) => JSX.Element;
+
+/**
+ * Describes what binding a recipe that draws one element returns.
  *
  * @typeParam Variants - Each axis the recipe offers, against the values it takes.
  */
-type Bound<Variants extends RecipeVariantRecord> = RecipeRuntimeFn<
-  RecipeSelection<Variants>,
-  RecipeConfigVariantMap<Variants>
->;
+export interface RecipeBinding<Variants extends RecipeVariantRecord> {
+  /**
+   * Sets variants for every bound element below it.
+   */
+  PropsProvider: Provider<DataAttrs & Partial<RecipeSelection<Variants>>>;
+
+  /**
+   * Reads the variants a provider above set, or undefined outside one.
+   */
+  usePropsContext: () => RecipeSelection<Variants> | undefined;
+
+  /**
+   * Binds an element, which then takes the recipe's variants beside its own props.
+   */
+  withContext: <Tag extends ElementType>(
+    Component: Tag,
+    options?: JsxFactoryOptions<ComponentProps<Tag>>,
+  ) => StyledComponent<Tag, RecipeSelection<Variants>>;
+}
 
 /**
- * Describes the runtime function the generated factory is handed for a recipe with slots.
+ * Describes what binding a recipe that draws several parts returns.
  *
  * @typeParam Slots - Every part the recipe styles.
  * @typeParam Variants - Each axis it offers, against the values it takes.
  */
-type BoundSlots<
+export interface SlotRecipeBinding<
   Slots extends string,
   Variants extends SlotRecipeVariantRecord<Slots>,
-> = SlotRecipeRuntimeFn<Slots, RecipeSelection<Variants>, RecipeConfigVariantMap<Variants>>;
+> {
+  /**
+   * Binds a part below the provider, which draws the slot in the variants the provider set.
+   */
+  withContext: <Tag extends ElementType>(
+    Component: Tag,
+    slot: Slots,
+    options?: JsxFactoryOptions<ComponentProps<Tag>>,
+  ) => StyledComponent<Tag>;
+
+  /**
+   * Binds the part that takes the variants and draws a slot itself.
+   */
+  withProvider: <Tag extends ElementType>(
+    Component: Tag,
+    slot: Slots,
+    options?: JsxFactoryOptions<ComponentProps<Tag>>,
+  ) => StyledComponent<Tag, RecipeSelection<Variants>>;
+
+  /**
+   * Binds the part that takes the variants and draws no slot, for a root that renders nothing of
+   * its own.
+   */
+  withRootProvider: <Tag extends ElementType>(
+    Component: Tag,
+    options?: RootProviderOptions<ComponentProps<Tag>>,
+  ) => RootProvider<Tag, Variants>;
+}
 
 /**
  * Maps each variant axis to the values it takes, which is all the runtime reads of the variants.
@@ -160,21 +229,23 @@ function toSlotRuntimeConfig<Slots extends string, Variants extends SlotRecipeVa
  * Binds a recipe that draws one element and returns the element factory and the provider that
  * sets variants from above.
  *
+ * @remarks
+ *   Every bound element carries the recipe's name as `data-recipe`, which is the handle a
+ *   specification finds it by.
  * @typeParam Variants - Each axis the recipe offers, against the values it takes.
  */
 export function createRecipeContext<const Variants extends RecipeVariantRecord>(
   recipe: Recipe<Variants>,
-): RecipeContext<Bound<Variants>> {
-  const bound = bindRecipe(createRecipe(toRuntimeConfig(recipe)));
+): RecipeBinding<Variants> {
+  const generated: unknown = bindRecipe(createRecipe(toRuntimeConfig(recipe)));
+  // eslint-disable-next-line typescript/no-unsafe-type-assertion -- the generated context is typed by names private to the runtime, and the element it draws takes the props the published type describes, with the style props and the variants assigned in the other order
+  const bound = generated as RecipeBinding<Variants>;
 
-  /**
-   * Binds an element with the recipe's name stamped on it as `data-recipe`, which is the handle a
-   * specification finds the element by.
-   */
-  const withContext: RecipeContext<Bound<Variants>>["withContext"] = (Component, options) =>
-    bound.withContext(Component, { dataAttr: true, ...options });
-
-  return { ...bound, withContext };
+  return {
+    ...bound,
+    withContext: (Component, options) =>
+      bound.withContext(Component, { dataAttr: true, ...options }),
+  };
 }
 
 /**
@@ -187,6 +258,9 @@ export function createRecipeContext<const Variants extends RecipeVariantRecord>(
 export function createSlotRecipeContext<
   const Slots extends string,
   const Variants extends SlotRecipeVariantRecord<Slots>,
->(recipe: SlotRecipe<Slots, Variants>): SlotRecipeContext<BoundSlots<Slots, Variants>> {
-  return bindSlots(createSlotRecipe(toSlotRuntimeConfig(recipe)));
+>(recipe: SlotRecipe<Slots, Variants>): SlotRecipeBinding<Slots, Variants> {
+  const generated: unknown = bindSlots(createSlotRecipe(toSlotRuntimeConfig(recipe)));
+
+  // eslint-disable-next-line typescript/no-unsafe-type-assertion -- as above, and the slot a part is bound to is one of the recipe's, which the generated type resolves through a conditional the checker cannot settle for a generic recipe
+  return generated as SlotRecipeBinding<Slots, Variants>;
 }

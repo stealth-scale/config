@@ -12,7 +12,7 @@
 import { contract, type ThemeTokens } from "#authoring/contract.ts";
 import { type RecipeExtension, type SlotRecipeExtension } from "#authoring/extension.ts";
 import { deepMerge } from "#authoring/merge.ts";
-import { definePreset } from "#authoring/preset.ts";
+import { definePreset, type PresetExtension } from "#authoring/preset.ts";
 import {
   type AnimationStyles,
   type GlobalFontface,
@@ -151,28 +151,19 @@ export interface Theme {
 }
 
 /**
- * Describes what the compiler accepts under a preset's `theme.extend`.
- */
-type Extension = NonNullable<NonNullable<Preset["theme"]>["extend"]>;
-
-/**
  * Collects everything a theme adds under `extend`, which is what makes an extension merge over
  * the recipe rather than replace it.
  */
-function extension(config: ThemeConfig): Extension {
+function extension(config: ThemeConfig): PresetExtension {
   const { animationStyles, layerStyles, recipes, semanticTokens, slotRecipes, textStyles, tokens } =
     config;
 
   return {
     ...(animationStyles === undefined ? {} : { animationStyles }),
     ...(layerStyles === undefined ? {} : { layerStyles }),
-    // eslint-disable-next-line typescript/no-unsafe-type-assertion -- an extension is a partial recipe, which is what the compiler merges over the whole one
-    ...(recipes === undefined ? {} : { recipes: recipes as NonNullable<Extension["recipes"]> }),
+    ...(recipes === undefined ? {} : { recipes }),
     ...(semanticTokens === undefined ? {} : { semanticTokens }),
-    ...(slotRecipes === undefined
-      ? {}
-      : // eslint-disable-next-line typescript/no-unsafe-type-assertion -- as above
-        { slotRecipes: slotRecipes as NonNullable<Extension["slotRecipes"]> }),
+    ...(slotRecipes === undefined ? {} : { slotRecipes }),
     ...(textStyles === undefined ? {} : { textStyles }),
     ...(tokens === undefined ? {} : { tokens }),
   };

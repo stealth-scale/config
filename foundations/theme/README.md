@@ -53,7 +53,22 @@ export const recipe = defineRecipe({
 ```
 
 A theme states values and recipe extensions, and never names a component. A root theme fills the
-contract with the scales. A derived theme states what differs:
+contract in two calls, and redraws the ramps it moves:
+
+```ts
+import { colorScale, defineTheme, families, palettes, radii } from "@stealthscale/theme/authoring";
+
+export const fathom = defineTheme({
+  name: "fathom",
+  semanticTokens: {
+    colors: { ...families({ dark: 11, light: 96 }, 195, 0.016), ...palettes({ primary: "teal" }) },
+    radii: radii("1rem"),
+  },
+  tokens: { colors: { teal: colorScale(185, 0.12) } },
+});
+```
+
+A derived theme states what differs:
 
 ```ts
 import { defineTheme, paletteAlias, radii } from "@stealthscale/theme/authoring";
@@ -81,20 +96,31 @@ export default { themes: [fathom, abyss] } satisfies Application;
 ```
 
 A page switches its theme and its color mode with two attributes, on the document root or on any
-element for a subtree:
+element for a subtree. Where neither is written, the first theme draws the page and the reader's
+operating system decides the mode:
 
 ```html
 <html data-theme="fathom" data-color-mode="dark"></html>
 ```
 
+A React page writes both through the provider, and a part below reads them with `useTheme()`:
+
+```tsx
+import { ThemeProvider } from "@stealthscale/theme";
+
+<ThemeProvider colorMode="dark" theme="abyss">
+  <App />
+</ThemeProvider>;
+```
+
 ## Entry points
 
-| Subpath        | Importer                          | Publishes                                                                                                                                                                                         |
-| -------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `.`            | A component                       | `css`, `cx`, `styled` and `token` from the generated runtime, the runtime types, `createRecipeContext`, `createSlotRecipeContext`, `breakpointKeys`, `THEME_ATTRIBUTE` and `COLOR_MODE_ATTRIBUTE` |
-| `./authoring`  | A recipe, a theme, an application | The definitions, the contract, the scales, the recipe helpers, the patterns, the contrast measurement, and every authoring type                                                                   |
-| `./theme`      | The build plugin                  | The foundation, as a default export                                                                                                                                                               |
-| `./styles.css` | An application                    | The cascade order, which the build plugin answers for with the compiled stylesheet                                                                                                                |
+| Subpath        | Importer                          | Publishes                                                                                                                                                                                                                      |
+| -------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `.`            | A component                       | `css`, `cx`, `styled` and `token` from the generated runtime, the runtime types, `createRecipeContext`, `createSlotRecipeContext`, `ThemeProvider`, `useTheme`, `breakpointKeys`, `THEME_ATTRIBUTE` and `COLOR_MODE_ATTRIBUTE` |
+| `./authoring`  | A recipe, a theme, an application | The definitions, the contract, the scales, the recipe helpers, the patterns, the contrast measurement, and every authoring type                                                                                                |
+| `./theme`      | The build plugin                  | The foundation, as a default export                                                                                                                                                                                            |
+| `./styles.css` | An application                    | The cascade order, which the build plugin answers for with the compiled stylesheet                                                                                                                                             |
 
 A recipe file imports `./authoring` and never `.`. The compiler's configuration reaches this package
 through every theme, and a recipe that imported the runtime would put every generated file behind
@@ -137,21 +163,23 @@ as references into the status palettes.
 
 ### Scales
 
-| Export                                              | Draws                                                                                 |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| `colorScale(hue, chroma)`                           | Eleven OKLCH steps, `50` to `950`                                                     |
-| `alphaScale("white" \| "black")`                    | Eleven steps of an overlay                                                            |
-| `backgrounds(pages, hue, chroma)`                   | The `bg` family from the page's lightness in each mode                                |
-| `foregrounds(ramp)`, `borders(ramp)`                | The `fg` and `border` families from a grey ramp                                       |
-| `paletteRoles(ramp)`                                | The twelve roles of a hue palette                                                     |
-| `paletteAlias(hue)`                                 | The twelve roles of a semantic palette, by reference                                  |
-| `neutralFills()`                                    | The neutral palette's quiet fills, pointed at the page's surfaces                     |
-| `radii(largest)`                                    | Three concentric corners                                                              |
-| `shadows(hue, depth)`                               | Six heights, an inner shadow and an inset line, per mode                              |
-| `controls()`, `icons()`, `insets()`, `gaps()`       | The semantic sizes and spacing, five steps each                                       |
-| `fontSizes(base, ratio)`, `typography(base, ratio)` | The type scale, and the text styles that name each size with its leading and tracking |
-| `slides()`                                          | The sixteen slide keyframes                                                           |
-| `oklch(lightness, chroma, hue)`                     | One color as CSS writes it                                                            |
+| Export                                              | Draws                                                                                                               |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `colorScale(hue, chroma)`                           | Eleven OKLCH steps, `50` to `950`                                                                                   |
+| `alphaScale("white" \| "black")`                    | Eleven steps of an overlay                                                                                          |
+| `backgrounds(pages, hue, chroma)`                   | The `bg` family from the page's lightness in each mode                                                              |
+| `foregrounds(ramp)`, `borders(ramp)`                | The `fg` and `border` families from a grey ramp                                                                     |
+| `paletteRoles(ramp)`                                | The twelve roles of a hue palette                                                                                   |
+| `paletteAlias(hue)`                                 | The twelve roles of a semantic palette, by reference                                                                |
+| `neutralFills()`                                    | The neutral palette's quiet fills, pointed at the page's surfaces                                                   |
+| `families(pages, hue, chroma)`                      | The three families in one call                                                                                      |
+| `palettes(aliases)`                                 | Every hue palette from its ramp, and every semantic palette pointed at the hue named for it, or at the foundation's |
+| `radii(largest)`                                    | Three concentric corners                                                                                            |
+| `shadows(hue, depth)`                               | Six heights, an inner shadow and an inset line, per mode                                                            |
+| `controls()`, `icons()`, `insets()`, `gaps()`       | The semantic sizes and spacing, five steps each                                                                     |
+| `fontSizes(base, ratio)`, `typography(base, ratio)` | The type scale, and the text styles that name each size with its leading and tracking                               |
+| `slides()`                                          | The sixteen slide keyframes                                                                                         |
+| `oklch(lightness, chroma, hue)`                     | One color as CSS writes it                                                                                          |
 
 ### Recipe helpers
 
@@ -176,8 +204,60 @@ as references into the status palettes.
 
 Each pattern is a function from typed props to a style object, and nothing is generated from any of
 them: `stack`, `hstack`, `vstack`, `flex`, `center`, `grid`, `simpleGrid`, `visuallyHidden`,
-`absoluteCenter`, `cluster`, `sidebar`, `switcher`, `cover`, `frame`, `reel` and `scrollable`.
+`absoluteCenter`, `cluster`, `sidebar`, `switcher`, `cover`, `frame`, `reel`, `scrollable`,
+`sticky`, and `bento` with `bentoCell` for a dense grid of tiles that span columns and rows.
 `responsive(value, transform)` applies a function to every breakpoint of a responsive prop.
+
+### Looks and motions
+
+A recipe picks a look with `layerStyle` and a motion with `animationStyle`. The looks read the
+virtual palette, so each draws in whichever palette the recipe points at, and the motions are turned
+off for a reader who asked for less.
+
+| Look                                            | Draws                                                                               |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `fill.{solid,subtle,muted,surface,ghost,plain}` | A control's fill with its hover                                                     |
+| `outline.{solid,subtle}`                        | A control's edge with its hover                                                     |
+| `indicator.{top,bottom,start,end}`              | A bar along one edge                                                                |
+| `disabled`                                      | The disabled cursor and opacity                                                     |
+| `glow.{sm,md,lg}`                               | A shadow in the palette's solid at half strength                                    |
+| `border.moving`                                 | A conic sweep of the palette's solid round the panel surface, moved by `sweep`      |
+| `glass`                                         | The panel surface at seventy percent behind a blur, solid where transparency is off |
+| `text.gradient`                                 | Text from the palette's solid to the accent's                                       |
+| `text.shine`                                    | Text in the palette's ink with a band of its solid, moved by `shimmer`              |
+| `backdrop.{dots,grid,stripes,checker}`          | A field of dots, a grid, diagonal stripes or a checkerboard in the quiet colors     |
+| `backdrop.noise`                                | A tile of fractal noise over the surface, carried inline                            |
+| `backdrop.vignette`                             | A darkening towards the edges                                                       |
+| `backdrop.spotlight`                            | A radial pool of the palette's muted fill at `--spotlight-x` and `--spotlight-y`    |
+| `backdrop.aurora`                               | The aurora gradient, moved by `aurora`                                              |
+| `blur.{sm,md,lg}`                               | A blur of the element by a step of the blur scale                                   |
+| `dim.others`                                    | The siblings of a hovered child blurred and muted                                   |
+| `mask.{bottom,edges,radial}`                    | The element faded out at the bottom, at both sides, or towards its edges            |
+| `ripple`                                        | A circle of the ink that grows and fades from the centre on release                 |
+
+| Motion                                         | Runs                                                                            |
+| ---------------------------------------------- | ------------------------------------------------------------------------------- |
+| `fade`, `scale-fade`, `slide-fade`, `collapse` | In and out, the slide from the side the placement states                        |
+| `shimmer`                                      | A background across and back at the slow ambient pace                           |
+| `sweep`                                        | The registered angle round once at the slow ambient pace                        |
+| `marquee`                                      | A row half its width across at the slower ambient pace                          |
+| `float`                                        | A bob of six percent of the element's height                                    |
+| `pulse-glow`                                   | A shadow breathing out to a size token and back                                 |
+| `aurora`                                       | A background drifting across and back at the slower ambient pace                |
+| `meteor`                                       | A streak across the viewport that fades at the end                              |
+| `spin`                                         | A turn round at the ambient pace                                                |
+| `twinkle`                                      | A small decoration's opacity between a fifth and full, staggered by `--stagger` |
+| `rise`                                         | A fade up once, delayed by `--stagger` so a list rises in turn                  |
+| `reveal`                                       | The rise driven by the element's passage into the viewport                      |
+| `parallax`                                     | A drift of fifteen percent either way driven by the scroll                      |
+| `progress`                                     | A bar filled from the left in step with the scroll                              |
+
+The gradients `brand`, `shine` and `aurora` are semantic tokens, so a theme moves them per mode, and
+`--angle` is registered as an angle so a browser interpolates the sweep. The scrolled motions read
+the scroll position rather than the clock, and a browser without scroll-driven animations leaves the
+element at rest. A component that ripples from the pointer or lights a spotlight under it writes the
+custom properties the look reads. A backdrop is a background image, so a recipe that pairs one with
+a fill writes `backgroundColor`, because the `background` shorthand resets the image.
 
 ### Contrast
 

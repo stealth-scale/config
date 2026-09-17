@@ -3,16 +3,51 @@ import { describe, expect, it } from "vitest";
 import { animationStyles } from "#preset/styles/animation-styles.ts";
 import { tokenAt } from "#tokens.fixtures.ts";
 
+const LOOPS = [
+  "aurora",
+  "float",
+  "marquee",
+  "meteor",
+  "pulse-glow",
+  "shimmer",
+  "spin",
+  "sweep",
+  "twinkle",
+];
+
+const SCROLLED = ["parallax", "progress", "reveal"];
+
 describe("animationStyles", () => {
-  it("names an entering and a leaving form of each motion and the shimmer", () => {
-    expect(Object.keys(animationStyles).toSorted()).toStrictEqual([
-      "collapse",
-      "fade",
-      "scale-fade",
-      "shimmer",
-      "slide-fade",
-    ]);
+  it("names the pairs and the loops and the scrolled motions and the rise", () => {
+    expect(Object.keys(animationStyles).toSorted()).toStrictEqual(
+      ["collapse", "fade", "scale-fade", "slide-fade", "rise", ...LOOPS, ...SCROLLED].toSorted(),
+    );
     expect(Object.keys(tokenAt(animationStyles, "fade") ?? {})).toStrictEqual(["in", "out"]);
+  });
+
+  it("drives the scrolled motions from the scroll position and not the clock", () => {
+    expect(tokenAt(animationStyles, "parallax")).toMatchObject({
+      animationName: "parallax",
+      animationTimeline: "scroll()",
+    });
+    expect(tokenAt(animationStyles, "progress")).toMatchObject({
+      animationTimeline: "scroll()",
+      transformOrigin: "left",
+    });
+    expect(tokenAt(animationStyles, "reveal")).toMatchObject({
+      animationFillMode: "both",
+      animationName: "rise",
+      animationRange: "entry 0% cover 30%",
+      animationTimeline: "view()",
+    });
+  });
+
+  it("rises each element in turn by a stagger a recipe counts", () => {
+    expect(tokenAt(animationStyles, "rise")).toMatchObject({
+      animationDelay: "calc(var(--stagger, 0) * {durations.faster})",
+      animationFillMode: "both",
+      animationName: "rise",
+    });
   });
 
   it("runs a fade in at the moderate pace and out at the fast pace", () => {
@@ -29,7 +64,15 @@ describe("animationStyles", () => {
   });
 
   it("turns every motion off for a reader who asked for less", () => {
-    for (const path of ["fade.in", "scale-fade.out", "collapse.in", "slide-fade.in", "shimmer"]) {
+    for (const path of [
+      "fade.in",
+      "scale-fade.out",
+      "collapse.in",
+      "slide-fade.in",
+      "rise",
+      ...LOOPS,
+      ...SCROLLED,
+    ]) {
       expect(tokenAt(animationStyles, path)).toMatchObject({
         _motionReduce: { animation: "none" },
       });
@@ -53,12 +96,38 @@ describe("animationStyles", () => {
     });
   });
 
-  it("sweeps the shimmer at the slow ambient pace without easing", () => {
+  it("runs every loop until the element goes", () => {
+    for (const name of LOOPS) {
+      expect(tokenAt(animationStyles, name)).toMatchObject({ animationIterationCount: "infinite" });
+    }
+  });
+
+  it("sweeps the shimmer and the marquee without easing at an ambient pace", () => {
     expect(tokenAt(animationStyles, "shimmer")).toMatchObject({
       animationDuration: "ambientSlow",
-      animationIterationCount: "infinite",
       animationName: "bg-position",
       animationTimingFunction: "linear",
+    });
+    expect(tokenAt(animationStyles, "marquee")).toMatchObject({
+      animationDuration: "ambientSlower",
+      animationName: "marquee",
+      animationTimingFunction: "linear",
+    });
+  });
+
+  it("sweeps the registered angle round at the slow ambient pace", () => {
+    expect(tokenAt(animationStyles, "sweep")).toMatchObject({
+      animationDuration: "ambientSlow",
+      animationName: "rotate-angle",
+      animationTimingFunction: "linear",
+    });
+  });
+
+  it("breathes the glow in and out by alternating one keyframe", () => {
+    expect(tokenAt(animationStyles, "pulse-glow")).toMatchObject({
+      animationDirection: "alternate",
+      animationName: "pulse-glow",
+      animationTimingFunction: "in-out",
     });
   });
 });

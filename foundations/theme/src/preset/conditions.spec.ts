@@ -7,14 +7,22 @@ describe("conditions", () => {
     expect(Object.keys(conditions)).toStrictEqual(["extend"]);
   });
 
-  it("reads the color mode from the attribute", () => {
-    expect(conditions.extend?.["dark"]).toBe("[data-color-mode=dark] &");
+  it("reads dark from the attribute above or from the preference outside a light subtree", () => {
+    expect(conditions.extend?.["dark"]).toStrictEqual({
+      "[data-color-mode=dark] &": "@slot",
+      "@media (prefers-color-scheme: dark)": {
+        "&:not([data-color-mode=light], [data-color-mode=light] *)": "@slot",
+      },
+    });
   });
 
-  it("draws light as the complement of dark", () => {
-    expect(conditions.extend?.["light"]).toBe(
-      "&:not([data-color-mode=dark], [data-color-mode=dark] *)",
-    );
+  it("reads light from the attribute above or from the preference outside a dark subtree", () => {
+    expect(conditions.extend?.["light"]).toStrictEqual({
+      "[data-color-mode=light] &": "@slot",
+      "@media (prefers-color-scheme: light)": {
+        "&:not([data-color-mode=dark], [data-color-mode=dark] *)": "@slot",
+      },
+    });
   });
 
   it("holds hover inside a media query and excludes a disabled control", () => {

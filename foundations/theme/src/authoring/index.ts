@@ -40,7 +40,13 @@ export {
 export { contrast, type Level, luminance, readable } from "#authoring/contrast.ts";
 export { type RecipeExtension, type SlotRecipeExtension } from "#authoring/extension.ts";
 export { deepMerge } from "#authoring/merge.ts";
-export { definePreset, type Preset } from "#authoring/preset.ts";
+export {
+  definePreset,
+  type Preset,
+  type PresetConfig,
+  type PresetExtension,
+  type Registrable,
+} from "#authoring/preset.ts";
 export {
   type Compound,
   compoundClassName,
@@ -82,8 +88,19 @@ export {
   type ThemeConfig,
 } from "#authoring/theme.ts";
 export {
+  type AnimationStyles,
+  type LayerStyles,
+  type SemanticTokens,
+  type TextStyles,
+  type Tokens,
+} from "#pandacss.ts";
+export {
   absoluteCenter,
   type AbsoluteCenterProps,
+  bento,
+  bentoCell,
+  type BentoCellProps,
+  type BentoProps,
   center,
   type CenterProps,
   cluster,
@@ -109,6 +126,8 @@ export {
   type SimpleGridProps,
   stack,
   type StackProps,
+  sticky,
+  type StickyProps,
   switcher,
   type SwitcherProps,
   visuallyHidden,
@@ -120,6 +139,8 @@ export {
   borders,
   colorScale,
   controls,
+  families,
+  type Families,
   fontSizes,
   foregrounds,
   gaps,
@@ -129,7 +150,10 @@ export {
   oklch,
   type PageLightness,
   paletteAlias,
+  type PaletteAliases,
   paletteRoles,
+  palettes,
+  type Palettes,
   radii,
   type Scale,
   shadows,

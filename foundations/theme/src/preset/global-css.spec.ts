@@ -26,4 +26,19 @@ describe("globalCss", () => {
   it("follows the dark mode attribute with the color scheme", () => {
     expect(globalCss["[data-color-mode=dark]"]).toStrictEqual({ colorScheme: "dark" });
   });
+
+  it("scrolls smoothly and jumps for a reader who asked for less motion", () => {
+    expect(globalCss["html"]).toMatchObject({
+      "@media (prefers-reduced-motion: reduce)": { scrollBehavior: "auto" },
+      scrollBehavior: "smooth",
+    });
+  });
+
+  it("follows the dark preference with the color scheme where the page writes no light mode", () => {
+    expect(globalCss["html"]).toMatchObject({
+      "@media (prefers-color-scheme: dark)": {
+        "&:not([data-color-mode=light])": { colorScheme: "dark" },
+      },
+    });
+  });
 });
