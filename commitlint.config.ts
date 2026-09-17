@@ -50,6 +50,7 @@ function named(at: string): string {
  * add it here. An example takes no scope, and neither does a change spanning packages.
  */
 const SCOPES = globSync([
+  "components/*/package.json",
   "foundations/*/package.json",
   "foundations/providers/*/package.json",
   "packages/*/package.json",
