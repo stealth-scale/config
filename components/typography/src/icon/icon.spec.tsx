@@ -1,23 +1,28 @@
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { violations } from "@stealthscale/testing-react";
-import { recipeClasses, recipeElement, variantClass } from "@stealthscale/testing-theme";
+import { accessibilityViolations, violations } from "@stealthscale/testing-react";
+import { boundViolations, recipeElement } from "@stealthscale/testing-theme";
 
 import { Icon } from "#icon/icon.ts";
+import { recipe } from "#icon/recipe.ts";
 
 describe("Icon", () => {
   it("conforms as an svg element", () => {
     expect(violations(Icon, { as: true, children: true, element: "SVG" })).toStrictEqual([]);
   });
 
-  it("draws the recipe's class and the class of the inherited size", () => {
-    const { container } = render(<Icon />);
+  it("breaks no accessibility rule hidden from assistive technology or labelled", async () => {
+    await expect(accessibilityViolations(Icon)).resolves.toStrictEqual([]);
+    await expect(
+      accessibilityViolations(Icon, { props: { "aria-hidden": false, "aria-label": "Warning" } }),
+    ).resolves.toStrictEqual([]);
+  });
 
-    expect(recipeClasses(container, "icon")).toStrictEqual([
-      "icon",
-      variantClass("icon", "size", "inherit"),
-    ]);
+  it("writes the class of every value its recipe offers", () => {
+    expect(boundViolations(recipe, (props) => render(<Icon {...props} />).container)).toStrictEqual(
+      [],
+    );
   });
 
   it("draws the artwork it was given", () => {
@@ -36,30 +41,6 @@ describe("Icon", () => {
 
     expect(recipeElement(hidden.container, "icon").getAttribute("aria-hidden")).toBe("true");
     expect(recipeElement(labelled.container, "icon").getAttribute("aria-hidden")).toBe("false");
-  });
-
-  it("draws the class of the size a caller picks", () => {
-    const { container } = render(<Icon size="lg" />);
-
-    expect(recipeClasses(container, "icon")).toContain(variantClass("icon", "size", "lg"));
-  });
-
-  it("draws the class of the tone a caller picks", () => {
-    const { container } = render(<Icon tone="error" />);
-
-    expect(recipeClasses(container, "icon")).toContain(variantClass("icon", "tone", "error"));
-  });
-
-  it("draws the class of the motion a caller picks", () => {
-    const { container } = render(<Icon motion="spin" />);
-
-    expect(recipeClasses(container, "icon")).toContain(variantClass("icon", "motion", "spin"));
-  });
-
-  it("draws the mirrored class where a caller asks for one", () => {
-    const { container } = render(<Icon mirrored />);
-
-    expect(recipeClasses(container, "icon")).toContain(variantClass("icon", "mirrored", true));
   });
 
   it("draws the element as names", () => {

@@ -1,9 +1,12 @@
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { violations } from "@stealthscale/testing-react";
-import { slotClass, slotClasses, slotElement, slotVariantClass } from "@stealthscale/testing-theme";
+import { accessibilityViolations, violations } from "@stealthscale/testing-react";
+import { boundViolations, slotElement } from "@stealthscale/testing-theme";
 
+import { Caption } from "#blockquote/caption.ts";
+import { Content } from "#blockquote/content.ts";
+import { recipe } from "#blockquote/recipe.ts";
 import { Root } from "#blockquote/root.ts";
 
 describe("Root", () => {
@@ -11,41 +14,25 @@ describe("Root", () => {
     expect(violations(Root, { as: true, children: true, element: "FIGURE" })).toStrictEqual([]);
   });
 
-  it("draws its slot class and the classes of the default variants", () => {
-    const { container } = render(<Root />);
-
-    expect(slotClasses(container, "blockquote", "root")).toStrictEqual(
-      [
-        slotClass("blockquote", "root"),
-        slotVariantClass("blockquote", "root", "justify", "start"),
-        slotVariantClass("blockquote", "root", "size", "md"),
-        slotVariantClass("blockquote", "root", "variant", "subtle"),
-      ].toSorted(),
-    );
+  it("breaks no accessibility rule holding a quotation and a caption", async () => {
+    await expect(
+      accessibilityViolations(Root, {
+        props: {
+          children: (
+            <>
+              <Content>Said</Content>
+              <Caption>Someone</Caption>
+            </>
+          ),
+        },
+      }),
+    ).resolves.toStrictEqual([]);
   });
 
-  it("draws the class of the look a caller picks", () => {
-    const { container } = render(<Root variant="glass" />);
-
-    expect(slotClasses(container, "blockquote", "root")).toContain(
-      slotVariantClass("blockquote", "root", "variant", "glass"),
-    );
-  });
-
-  it("draws the class of the status a caller picks", () => {
-    const { container } = render(<Root status="warning" />);
-
-    expect(slotClasses(container, "blockquote", "root")).toContain(
-      slotVariantClass("blockquote", "root", "status", "warning"),
-    );
-  });
-
-  it("draws the class of the motion a caller picks", () => {
-    const { container } = render(<Root motion="reveal" />);
-
-    expect(slotClasses(container, "blockquote", "root")).toContain(
-      slotVariantClass("blockquote", "root", "motion", "reveal"),
-    );
+  it("writes the class of every value its recipe offers", () => {
+    expect(
+      boundViolations(recipe, (props) => render(<Root {...props} />).container, { slot: "root" }),
+    ).toStrictEqual([]);
   });
 
   it("draws the element as names", () => {

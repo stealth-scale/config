@@ -5,14 +5,14 @@ import { describe, expect, it } from "vitest";
 
 import { violations } from "@stealthscale/testing-react";
 import {
-  slotClass,
+  boundViolations,
   slotClasses,
   slotElement,
-  slotVariantClass,
   variantClass,
 } from "@stealthscale/testing-theme";
 
 import { Icon } from "#blockquote/icon.ts";
+import { recipe } from "#blockquote/recipe.ts";
 import { Root } from "#blockquote/root.ts";
 
 function quoted(children: ReactNode): ReactElement {
@@ -32,17 +32,19 @@ describe("Icon", () => {
     ).toStrictEqual([]);
   });
 
-  it("draws its slot class and the class of the default look beside the icon's own classes", () => {
-    const { container } = render(quoted(<Icon />));
-
-    expect(slotClasses(container, "blockquote", "icon")).toStrictEqual(
-      [
-        "icon",
-        variantClass("icon", "size", "inherit"),
-        slotClass("blockquote", "icon"),
-        slotVariantClass("blockquote", "icon", "variant", "subtle"),
-      ].toSorted(),
-    );
+  it("writes the class of every value its recipe offers", () => {
+    expect(
+      boundViolations(
+        recipe,
+        (props) =>
+          render(
+            <Root {...props}>
+              <Icon />
+            </Root>,
+          ).container,
+        { slot: "icon" },
+      ),
+    ).toStrictEqual([]);
   });
 
   it("takes the icon's size axis", () => {
@@ -50,18 +52,6 @@ describe("Icon", () => {
 
     expect(slotClasses(container, "blockquote", "icon")).toContain(
       variantClass("icon", "size", "lg"),
-    );
-  });
-
-  it("draws the class of the look the root was given", () => {
-    const { container } = render(
-      <Root variant="solid">
-        <Icon />
-      </Root>,
-    );
-
-    expect(slotClasses(container, "blockquote", "icon")).toContain(
-      slotVariantClass("blockquote", "icon", "variant", "solid"),
     );
   });
 

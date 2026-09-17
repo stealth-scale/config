@@ -6,7 +6,12 @@ import { recipe } from "#list/recipe.ts";
 
 describe("recipe", () => {
   it("writes no value a theme cannot move", () => {
-    expect(recipeViolations(recipe, { parts: ["root", "item", "indicator"] })).toStrictEqual([]);
+    expect(
+      recipeViolations(recipe, {
+        names: ["List.Root", "List.Item", "List.Indicator"],
+        parts: ["root", "item", "indicator"],
+      }),
+    ).toStrictEqual([]);
   });
 
   it("names its class list", () => {

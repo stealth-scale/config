@@ -6,7 +6,7 @@ import { recipe } from "#kbd/recipe.ts";
 
 describe("recipe", () => {
   it("writes no value a theme cannot move", () => {
-    expect(recipeViolations(recipe)).toStrictEqual([]);
+    expect(recipeViolations(recipe, { names: ["Kbd"] })).toStrictEqual([]);
   });
 
   it("names its class kbd", () => {

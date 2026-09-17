@@ -7,7 +7,10 @@ import { recipe } from "#blockquote/recipe.ts";
 describe("recipe", () => {
   it("writes no value a theme cannot move", () => {
     expect(
-      recipeViolations(recipe, { parts: ["root", "content", "caption", "icon"] }),
+      recipeViolations(recipe, {
+        names: ["Blockquote.Root", "Blockquote.Content", "Blockquote.Caption", "Blockquote.Icon"],
+        parts: ["root", "content", "caption", "icon"],
+      }),
     ).toStrictEqual([]);
   });
 

@@ -4,9 +4,10 @@ import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { violations } from "@stealthscale/testing-react";
-import { slotClass, slotClasses, slotElement } from "@stealthscale/testing-theme";
+import { boundViolations, slotElement } from "@stealthscale/testing-theme";
 
 import { Caption } from "#blockquote/caption.ts";
+import { recipe } from "#blockquote/recipe.ts";
 import { Root } from "#blockquote/root.ts";
 
 function quoted(children: ReactNode): ReactElement {
@@ -26,11 +27,18 @@ describe("Caption", () => {
     ).toStrictEqual([]);
   });
 
-  it("draws its slot class and no variant class because no value styles it", () => {
-    const { container } = render(quoted(<Caption>Someone</Caption>));
-
-    expect(slotClasses(container, "blockquote", "caption")).toStrictEqual([
-      slotClass("blockquote", "caption"),
-    ]);
+  it("writes the class of every value its recipe offers", () => {
+    expect(
+      boundViolations(
+        recipe,
+        (props) =>
+          render(
+            <Root {...props}>
+              <Caption>Someone</Caption>
+            </Root>,
+          ).container,
+        { slot: "caption" },
+      ),
+    ).toStrictEqual([]);
   });
 });

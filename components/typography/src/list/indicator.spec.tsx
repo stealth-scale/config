@@ -4,10 +4,11 @@ import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { violations } from "@stealthscale/testing-react";
-import { slotClass, slotClasses, slotElement } from "@stealthscale/testing-theme";
+import { boundViolations, slotElement } from "@stealthscale/testing-theme";
 
 import { Indicator } from "#list/indicator.ts";
 import { Item } from "#list/item.ts";
+import { recipe } from "#list/recipe.ts";
 import { Root } from "#list/root.ts";
 
 function listed(children: ReactNode): ReactElement {
@@ -31,11 +32,20 @@ describe("Indicator", () => {
     ).toStrictEqual([]);
   });
 
-  it("draws its slot class and no variant class because no value styles it", () => {
-    const { container } = render(listed(<Indicator>•</Indicator>));
-
-    expect(slotClasses(container, "list", "indicator")).toStrictEqual([
-      slotClass("list", "indicator"),
-    ]);
+  it("writes the class of every value its recipe offers", () => {
+    expect(
+      boundViolations(
+        recipe,
+        (props) =>
+          render(
+            <Root {...props}>
+              <Item>
+                <Indicator>•</Indicator>
+              </Item>
+            </Root>,
+          ).container,
+        { slot: "indicator" },
+      ),
+    ).toStrictEqual([]);
   });
 });
