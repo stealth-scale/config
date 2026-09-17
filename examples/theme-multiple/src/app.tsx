@@ -1,6 +1,7 @@
 /**
  * Draws the page: the controls that switch the theme and the color mode of the document, a row
- * of buttons in every look, a panel wearing a theme of its own, and the candy panel.
+ * of buttons in every look, a panel wearing a theme of its own, the candy panel, the looks, the
+ * motions and a bento.
  *
  * @remarks
  *   The provider writes the two attributes onto the document root, so the whole page switches at
@@ -16,6 +17,8 @@ import { type ColorMode, css, ThemeProvider } from "@stealthscale/theme";
 
 import { Bento } from "#bento.tsx";
 import { Candy } from "#candy.tsx";
+import { Looks } from "#looks.tsx";
+import { Motions } from "#motions.tsx";
 
 /**
  * Lists the themes the application installed, in the order `theme.config.ts` states them.
@@ -138,6 +141,8 @@ export function App(): ReactElement {
           </p>
         </section>
         <Candy />
+        <Looks />
+        <Motions />
         <Bento />
       </main>
     </ThemeProvider>

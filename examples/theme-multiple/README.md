@@ -38,13 +38,20 @@ the page wears whatever the reader picked.
 `@stealthscale/theme`, which writes them onto the document root. The buttons are written with
 literal variants, which is what the compiler extracts the rules for. The page's own layout and the
 two panels are written with `css` from the same package, reading the semantic surfaces, spacing and
-text styles a recipe reads, so every theme moves the page as it moves the buttons. The last panel is
-dressed in the foundation's candy: a moving border swept by `sweep`, a heading in `text.shine` moved
-by `shimmer`, a glowing button, a breathing one, a rippling one, and a marquee that fades at both
-edges and rises into view as the page scrolls, all of them drawn in whichever palette the theme
-points at and all of them still under `prefers-reduced-motion`. Below it a bento of five tiles, two
-of them spanning, each on a backdrop of its own, dims the others while one is hovered. The switches
-stick to the top of the page while the rest scrolls past. `src/main.tsx` imports
+text styles a recipe reads, so every theme moves the page as it moves the buttons. The candy panel
+is dressed in a moving border swept by `sweep`, a heading in `text.shine` moved by `shimmer`, a
+glowing button, a breathing one, a rippling one, and a marquee that fades at both edges and rises
+into view as the page scrolls. Two sections below it show the rest. The looks are a heading in
+`text.gradient`, a card of `glass` over a drifting aurora, the three glows and the three blurs on
+chips, a paragraph under `mask.bottom`, a grid under `mask.radial`, and a tile under
+`backdrop.spotlight` whose handler writes the pointer's position into the two custom properties the
+look reads. The motions are a bar along the top of the viewport that `progress` fills with the
+scroll, a chip under `float`, a ring under `spin`, three dots under `twinkle`, a `meteor` across a
+dark sky, stripes under `parallax` behind a pane, and a list under `rise` that runs again from a
+button by mounting under a new key. All of it is drawn in whichever palette the theme points at, and
+all of it holds still under `prefers-reduced-motion`. Below them a bento of five tiles, two of them
+spanning, each on a backdrop of its own, dims the others while one is hovered. The switches stick to
+the top of the page while the rest scrolls past. `src/main.tsx` imports
 `@stealthscale/theme/styles.css` before the application, and the build plugin appends the compiled
 rules to it.
 

@@ -7,8 +7,10 @@
  *   The grid and the spans are the `bento` and `bentoCell` patterns written out, because a page
  *   writes its styles as literals the compiler extracts, and a pattern is a function a recipe
  *   calls. A tile fills with `backgroundColor` rather than `background`, so the backdrop's image
- *   survives beside the fill. The tiles read the panel surface and the border, so every theme
- *   moves them.
+ *   survives beside the fill, and each tile states its own fill, because two classes that set one
+ *   property are ordered by the stylesheet and not by the attribute. The vignette's tile fills
+ *   with the emphasized surface, because a darkening towards the edges of a dark panel is no
+ *   darkening. The tiles read the surfaces and the border, so every theme moves them.
  */
 
 import { type ReactElement } from "react";
@@ -23,16 +25,15 @@ const box = css({
   display: "grid",
   gap: "gap.md",
   gridAutoFlow: "dense",
-  gridAutoRows: "32",
+  gridAutoRows: "{sizes.32}",
   gridTemplateColumns: { base: "repeat(1, minmax(0, 1fr))", md: "repeat(3, minmax(0, 1fr))" },
   layerStyle: "dim.others",
 });
 
 /**
- * Draws one tile on the panel surface with a border and the medium corner.
+ * Draws one tile with a border and the medium corner, over whichever fill it states.
  */
 const tile = css({
-  backgroundColor: "bg.panel",
   borderColor: "border",
   borderRadius: "l2",
   borderWidth: "sm",
@@ -52,27 +53,28 @@ const hero = css({
 });
 
 /**
- * Spans the wide tile over two columns on a desk, over stripes.
+ * Spans the wide tile over two columns on a desk, over stripes on the panel surface.
  */
 const wide = css({
+  backgroundColor: "bg.panel",
   gridColumn: { base: "span 1", md: "span 2" },
   layerStyle: "backdrop.stripes",
 });
 
 /**
- * Darkens a tile towards its edges.
+ * Darkens a tile of the emphasized surface towards its edges.
  */
-const vignette = css({ layerStyle: "backdrop.vignette" });
+const vignette = css({ backgroundColor: "bg.emphasized", layerStyle: "backdrop.vignette" });
 
 /**
- * Dresses a tile in grain.
+ * Dresses a tile of the panel surface in grain.
  */
-const grain = css({ layerStyle: "backdrop.noise" });
+const grain = css({ backgroundColor: "bg.panel", layerStyle: "backdrop.noise" });
 
 /**
- * Dresses a tile in a checkerboard.
+ * Dresses a tile of the panel surface in a checkerboard.
  */
-const checker = css({ layerStyle: "backdrop.checker" });
+const checker = css({ backgroundColor: "bg.panel", layerStyle: "backdrop.checker" });
 
 /**
  * Draws the bento.

@@ -81,4 +81,12 @@ describe("App", () => {
 
     expect(getByRole("heading", { name: "Eye candy" })).toBeDefined();
   });
+
+  it("draws the looks, the motions and the bento below the candy", () => {
+    const { getByRole } = render(<App />);
+
+    expect(getByRole("heading", { name: "Looks" })).toBeDefined();
+    expect(getByRole("heading", { name: "Motions" })).toBeDefined();
+    expect(getByRole("region", { name: "Bento" })).toBeDefined();
+  });
 });
