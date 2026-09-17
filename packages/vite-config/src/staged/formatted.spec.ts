@@ -2,7 +2,7 @@
  * Proves the staged formatting matches what the checker does not read.
  */
 
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { formatted } from "#staged/formatted.ts";

@@ -2,7 +2,7 @@
  * Checks a browser run against a driver that never launches anything.
  */
 
-import { type ConfigEnv } from "vite-plus";
+import { type ConfigEnv } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { defineConfig } from "@stealthscale/vite-config-core";

@@ -2,7 +2,7 @@
  * Lets a test read back the configuration a tier's defineConfig produced.
  */
 
-import { type ConfigEnv, type UserConfig } from "vite-plus";
+import { type ConfigEnv, type UserConfig } from "vite";
 
 /**
  * The command and mode a configuration is evaluated under unless a test names

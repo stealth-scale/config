@@ -17,4 +17,21 @@ describe("style", () => {
   it("asks for a return type", () => {
     expect(STYLE["explicit-function-return-type"]).toBe("error");
   });
+
+  it("refuses an import of the toolchain and of its subpaths", () => {
+    expect(STYLE["no-restricted-imports"]).toStrictEqual([
+      "error",
+      {
+        paths: [
+          { message: "Import vite. ADR-0006 names the toolchain nowhere else.", name: "vite-plus" },
+        ],
+        patterns: [
+          {
+            group: ["vite-plus/*"],
+            message: "Import vitest or vite. ADR-0006 names the toolchain nowhere else.",
+          },
+        ],
+      },
+    ]);
+  });
 });

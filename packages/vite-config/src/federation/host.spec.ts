@@ -1,4 +1,4 @@
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { type Contribution, type Preset } from "@stealthscale/vite-config";

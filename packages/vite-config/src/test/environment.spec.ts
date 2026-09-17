@@ -2,7 +2,7 @@
  * Checks that a test file runs in the environment it was given, and says so.
  */
 
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { environment } from "#test/environment.ts";

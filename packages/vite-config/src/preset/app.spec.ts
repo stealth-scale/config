@@ -2,7 +2,7 @@
  * Proves the application tier builds what the library tier would have packed.
  */
 
-import { type ConfigEnv, type UserConfig } from "vite-plus";
+import { type ConfigEnv, type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { type Layer } from "@stealthscale/vite-config-core";

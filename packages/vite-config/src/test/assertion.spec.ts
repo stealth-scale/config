@@ -2,7 +2,7 @@
  * Checks what the runner demands of a test before it counts as passing.
  */
 
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { assertion } from "#test/assertion.ts";

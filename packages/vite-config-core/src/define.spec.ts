@@ -2,7 +2,7 @@
  * Covers what `extends` composes and how a package's own keys land on top of it.
  */
 
-import { type ConfigEnv, type UserConfig } from "vite-plus";
+import { type ConfigEnv, type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { defineConfig } from "#define.ts";

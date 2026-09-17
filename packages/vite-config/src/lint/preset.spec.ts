@@ -2,7 +2,7 @@
  * Specifies what each tier puts in the block and which departures it brings.
  */
 
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { type Layer, type Preset } from "@stealthscale/vite-config-core";

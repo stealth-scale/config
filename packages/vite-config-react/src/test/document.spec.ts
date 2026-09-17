@@ -2,7 +2,7 @@
  * Checks which document implementation the runner is given, and under which layer name.
  */
 
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { document } from "#test/document.ts";

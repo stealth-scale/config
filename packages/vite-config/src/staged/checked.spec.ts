@@ -2,7 +2,7 @@
  * Proves the staged check matches source alone and fixes what it can.
  */
 
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { checked } from "#staged/checked.ts";

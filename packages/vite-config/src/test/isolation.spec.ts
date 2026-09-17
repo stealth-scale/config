@@ -2,7 +2,7 @@
  * Checks what is put back between one test and the next.
  */
 
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { isolation } from "#test/isolation.ts";

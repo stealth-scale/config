@@ -2,7 +2,7 @@
  * Checks that the formatter writes the doc comment shape the linter accepts.
  */
 
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { docblocks } from "#fmt/docblock.ts";

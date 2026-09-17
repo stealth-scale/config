@@ -24,6 +24,24 @@ export const STYLE: Rules = {
   "no-default-export": "error",
   "no-inferrable-types": "error",
   "no-relative-parent-imports": "error",
+
+  // ADR-0006: a package imports vite and vitest, and the toolchain is named in the tsconfig types
+  // and the vp scripts alone, so replacing it rewrites no import.
+  "no-restricted-imports": [
+    "error",
+    {
+      paths: [
+        { message: "Import vite. ADR-0006 names the toolchain nowhere else.", name: "vite-plus" },
+      ],
+      patterns: [
+        {
+          group: ["vite-plus/*"],
+          message: "Import vitest or vite. ADR-0006 names the toolchain nowhere else.",
+        },
+      ],
+    },
+  ],
+
   "prefer-string-raw": "error",
 
   // An interface where a shape is named, and a namespace never: modules replaced it, and the two

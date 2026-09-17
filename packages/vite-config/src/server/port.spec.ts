@@ -3,7 +3,7 @@
  * server.
  */
 
-import { resolveConfig, type ResolvedConfig, type UserConfig } from "vite-plus";
+import { resolveConfig, type ResolvedConfig, type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { defineConfig } from "@stealthscale/vite-config-core";

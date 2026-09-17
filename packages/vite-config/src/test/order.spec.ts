@@ -2,7 +2,7 @@
  * Checks that the test files are shuffled rather than run in a fixed order.
  */
 
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { order } from "#test/order.ts";

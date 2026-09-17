@@ -2,7 +2,7 @@
  * Checks the coverage and setup departures a repository states for itself.
  */
 
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { omit, prepare, thresholds } from "#test/departure.ts";

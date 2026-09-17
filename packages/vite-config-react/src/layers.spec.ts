@@ -2,7 +2,7 @@
  * Drives the package-level call against both tiers a rendering package is built on.
  */
 
-import { type ConfigEnv, type UserConfig } from "vite-plus";
+import { type ConfigEnv, type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { defineConfig as application } from "@stealthscale/vite-config/preset/app";

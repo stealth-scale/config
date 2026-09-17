@@ -2,7 +2,7 @@
  * Checks what coverage counts, what it leaves out, and what it demands.
  */
 
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { FOREIGN } from "#ignore/foreign.ts";

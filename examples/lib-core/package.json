@@ -34,7 +34,6 @@
     "@stealthscale/vite-config": "workspace:^",
     "@stealthscale/vite-config-typescript": "workspace:^",
     "typescript": "catalog:",
-    "vite-plus": "catalog:",
     "vitest": "catalog:"
   }
 }

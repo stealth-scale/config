@@ -2,7 +2,7 @@
  * Proves a fixed preview port reaches the preview alone.
  */
 
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { port } from "#preview/port.ts";

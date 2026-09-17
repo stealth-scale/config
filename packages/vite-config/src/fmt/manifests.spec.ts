@@ -2,7 +2,7 @@
  * Checks that a package manifest is sorted rather than left as it was typed.
  */
 
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { manifests } from "#fmt/manifests.ts";

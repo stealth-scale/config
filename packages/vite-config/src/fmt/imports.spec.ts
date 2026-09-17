@@ -2,7 +2,7 @@
  * Checks the band order imports are sorted into, and what counts as internal.
  */
 
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { imports } from "#fmt/imports.ts";
