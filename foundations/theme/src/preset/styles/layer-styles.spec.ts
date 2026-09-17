@@ -25,7 +25,7 @@ describe("layerStyles", () => {
     ]);
   });
 
-  it("names three glows and eight backdrops and two gradient texts", () => {
+  it("names three glows and nine backdrops and two gradient texts", () => {
     expect(Object.keys(tokenAt(layerStyles, "glow") ?? {}).toSorted()).toStrictEqual([
       "lg",
       "md",
@@ -38,6 +38,7 @@ describe("layerStyles", () => {
       "grid",
       "noise",
       "spotlight",
+      "stars",
       "stripes",
       "vignette",
     ]);
@@ -88,20 +89,36 @@ describe("layerStyles", () => {
     });
   });
 
-  it("ripples from the centre on release after a press snapped the circle small", () => {
+  it("grows the ripple from the point a press names and centres it where none is named", () => {
     expect(tokenAt(layerStyles, "ripple")).toMatchObject({
-      _active: { _after: { opacity: "0.4", transform: "scale(0)", transition: "none" } },
-      _after: { background: "currentColor", opacity: "0", transform: "scale(4)" },
+      _active: {
+        _after: {
+          opacity: "0.12",
+          transform: "translate(-50%, -50%) scale(var(--ripple-scale, 3))",
+        },
+      },
+      _after: {
+        aspectRatio: "1",
+        background: "radial-gradient(closest-side, currentColor 75%, transparent 100%)",
+        left: "var(--ripple-x, 50%)",
+        opacity: "0",
+        top: "var(--ripple-y, 50%)",
+        transform: "translate(-50%, -50%) scale(0.3)",
+        width: "100%",
+      },
       overflow: "hidden",
       position: "relative",
     });
   });
 
-  it("draws the patterned backdrops from the lines and the fills", () => {
-    expect(tokenAt(layerStyles, "backdrop.stripes")).toStrictEqual({
-      backgroundImage:
-        "repeating-linear-gradient(135deg, {colors.border} 0 {borderWidths.xs}, transparent {borderWidths.xs} {sizes.4})",
+  it("holds the ripple still for a reader who asked for less motion", () => {
+    expect(tokenAt(layerStyles, "ripple")).toMatchObject({
+      _motionReduce: { "--ripple-pace": "0" },
+      "--ripple-pace": "1",
     });
+  });
+
+  it("draws the patterned backdrops from the lines and the fills", () => {
     expect(tokenAt(layerStyles, "backdrop.checker")).toStrictEqual({
       backgroundImage:
         "conic-gradient({colors.bg.emphasized} 25%, transparent 0 50%, {colors.bg.emphasized} 0 75%, transparent 0)",
@@ -234,6 +251,35 @@ describe("layerStyles", () => {
       "--spotlight-color": "var(--colors-color-palette-muted)",
       backgroundImage:
         "radial-gradient(circle at var(--spotlight-x, 50%) var(--spotlight-y, 0%), var(--spotlight-color) 0%, transparent 55%)",
+    });
+  });
+
+  it("tiles a star field of nine dots in the ink the surface is written in", () => {
+    expect(tokenAt(layerStyles, "backdrop.stars")).toStrictEqual({
+      backgroundImage: [
+        "radial-gradient({borderWidths.md} {borderWidths.md} at 8% 14%, currentcolor 99%, transparent)",
+        "radial-gradient({borderWidths.sm} {borderWidths.sm} at 23% 62%, currentcolor 99%, transparent)",
+        "radial-gradient({borderWidths.sm} {borderWidths.sm} at 37% 9%, currentcolor 99%, transparent)",
+        "radial-gradient({borderWidths.md} {borderWidths.md} at 46% 41%, currentcolor 99%, transparent)",
+        "radial-gradient({borderWidths.sm} {borderWidths.sm} at 58% 77%, currentcolor 99%, transparent)",
+        "radial-gradient({borderWidths.sm} {borderWidths.sm} at 67% 23%, currentcolor 99%, transparent)",
+        "radial-gradient({borderWidths.md} {borderWidths.md} at 79% 55%, currentcolor 99%, transparent)",
+        "radial-gradient({borderWidths.sm} {borderWidths.sm} at 88% 31%, currentcolor 99%, transparent)",
+        "radial-gradient({borderWidths.sm} {borderWidths.sm} at 94% 86%, currentcolor 99%, transparent)",
+      ].join(", "),
+      backgroundSize: "{sizes.96} {sizes.48}",
+    });
+  });
+
+  it("rules a diagonal line a whole pixel wide where an upright one holds at half", () => {
+    expect(tokenAt(layerStyles, "backdrop.stripes")).toStrictEqual({
+      backgroundImage:
+        "repeating-linear-gradient(135deg, {colors.border} 0 {borderWidths.sm}, transparent {borderWidths.sm} {sizes.4})",
+    });
+    expect(tokenAt(layerStyles, "backdrop.grid")).toStrictEqual({
+      backgroundImage:
+        "linear-gradient(to right, {colors.border} {borderWidths.xs}, transparent {borderWidths.xs}), linear-gradient(to bottom, {colors.border} {borderWidths.xs}, transparent {borderWidths.xs})",
+      backgroundSize: "{sizes.8} {sizes.8}",
     });
   });
 });

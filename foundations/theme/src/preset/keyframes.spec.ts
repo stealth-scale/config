@@ -39,7 +39,10 @@ describe("keyframes", () => {
     });
     expect(keyframes["float"]).toMatchObject({ "50%": { transform: "translateY(-6%)" } });
     expect(keyframes["meteor"]).toMatchObject({
-      to: { opacity: "0", transform: "rotate(215deg) translateX(-100vw)" },
+      to: {
+        opacity: "0",
+        transform: "rotate(215deg) translateX(calc(-1 * var(--meteor-travel, 100vw)))",
+      },
     });
     expect(keyframes["bg-drift"]).toMatchObject({ "50%": { backgroundPosition: "100% 50%" } });
   });

@@ -5,6 +5,8 @@
  *   The sizes a panel expands to and collapses from are custom properties the component measures
  *   and writes, so one keyframe serves every panel. The loops that run while nothing is pressed
  *   move by a share of the element's own size or of the viewport, so none of them names a length.
+ *   How far a meteor falls is the exception, because it crosses a box rather than the page, and it
+ *   is a custom property the sky sets, over the viewport where a sky sets none.
  */
 
 import { type CssKeyframes } from "#pandacss.ts";
@@ -55,7 +57,10 @@ export const keyframes: CssKeyframes = {
   meteor: {
     "70%": { opacity: "1" },
     from: { opacity: "1", transform: "rotate(215deg) translateX(0)" },
-    to: { opacity: "0", transform: "rotate(215deg) translateX(-100vw)" },
+    to: {
+      opacity: "0",
+      transform: "rotate(215deg) translateX(calc(-1 * var(--meteor-travel, 100vw)))",
+    },
   },
   parallax: { from: { transform: "translateY(-15%)" }, to: { transform: "translateY(15%)" } },
   ping: { "75%, 100%": { opacity: "0", transform: "scale(2)" } },

@@ -42,6 +42,14 @@ describe("animationStyles", () => {
     });
   });
 
+  it("offsets each meteor by a stagger a sky counts", () => {
+    expect(tokenAt(animationStyles, "meteor")).toMatchObject({
+      animationDelay: "calc(-1 * var(--stagger, 0) * {durations.ambient})",
+      animationIterationCount: "infinite",
+      animationName: "meteor",
+    });
+  });
+
   it("rises each element in turn by a stagger a recipe counts", () => {
     expect(tokenAt(animationStyles, "rise")).toMatchObject({
       animationDelay: "calc(var(--stagger, 0) * {durations.faster})",

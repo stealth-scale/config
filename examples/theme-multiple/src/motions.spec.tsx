@@ -20,10 +20,17 @@ describe("Motions", () => {
     expect(new Set(dots.map((each) => each.className)).size).toBe(3);
   });
 
-  it("crosses the sky with a streak and frames the stripes in a pane", () => {
+  it("crosses the sky with five streaks, each at its own place in the stagger", () => {
+    const { getByText } = render(<Motions />);
+    const streaks = [...getByText("A shower of meteors across the sky").querySelectorAll("span")];
+
+    expect(streaks).toHaveLength(5);
+    expect(new Set(streaks.map((each) => each.className)).size).toBe(5);
+  });
+
+  it("frames the stripes in a pane", () => {
     const { getByText } = render(<Motions />);
 
-    expect(getByText("A meteor across the sky").querySelector("span")).not.toBeNull();
     expect(getByText("Stripes that drift with the scroll").parentElement?.className).not.toBe("");
   });
 

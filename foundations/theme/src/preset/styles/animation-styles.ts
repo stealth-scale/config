@@ -104,7 +104,12 @@ export const animationStyles: AnimationStyles = {
   },
   float: loop("float", "ambientSlow", "in-out"),
   marquee: loop("marquee", "ambientSlower", "linear"),
-  meteor: loop("meteor", "ambientSlow", "linear"),
+  meteor: {
+    value: {
+      ...loop("meteor", "ambientSlow", "linear").value,
+      animationDelay: "calc(-1 * var(--stagger, 0) * {durations.ambient})",
+    },
+  },
   parallax: scrolled("parallax", "scroll()", {}),
   progress: scrolled("progress", "scroll()", { transformOrigin: "left" }),
   "pulse-glow": {

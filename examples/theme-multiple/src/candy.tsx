@@ -9,7 +9,7 @@
  *   points at. The marquee runs its words twice, so the loop has no seam where it starts again.
  */
 
-import { type ReactElement } from "react";
+import { type PointerEvent, type ReactElement } from "react";
 
 import { Button } from "@stealthscale/example-lib-actions";
 import { css } from "@stealthscale/theme";
@@ -49,9 +49,21 @@ const glow = css({ layerStyle: "glow.md" });
 const breathing = css({ animationStyle: "pulse-glow", boxShadowColor: "colorPalette.solid/50" });
 
 /**
- * Ripples from the centre on release.
+ * Ripples from the point of the press.
  */
 const ripple = css({ layerStyle: "ripple" });
+
+/**
+ * Writes where the pointer went down, as a share of the control's box, for the ripple to grow
+ * from. Without it the ripple grows from the centre, which is what a press by the keyboard gets.
+ */
+function pressed(event: PointerEvent<HTMLElement>): void {
+  const box = event.currentTarget.getBoundingClientRect();
+  const { style } = event.currentTarget;
+
+  style.setProperty("--ripple-x", `${String(((event.clientX - box.left) / box.width) * 100)}%`);
+  style.setProperty("--ripple-y", `${String(((event.clientY - box.top) / box.height) * 100)}%`);
+}
 
 /**
  * Hides whatever runs past the edge of the marquee, fades both edges, and rises into view.
@@ -85,7 +97,7 @@ export function Candy(): ReactElement {
         <Button className={breathing} status="success">
           Breathing
         </Button>
-        <Button className={ripple} variant="subtle">
+        <Button className={ripple} onPointerDown={pressed} variant="subtle">
           Rippling
         </Button>
       </p>

@@ -1,14 +1,14 @@
 /**
  * Draws the motions that loop or read the scroll: a bar along the top of the viewport that fills
- * as the page is read, a floating chip, a spinning ring, three twinkling dots, a meteor across a
- * dark sky, stripes that drift with the scroll, and the list that rises in turn.
+ * as the page is read, a floating chip, a spinning ring, three twinkling dots, a shower of meteors
+ * across a starry sky, stripes that drift with the scroll, and the list that rises in turn.
  *
  * @remarks
  *   Every motion is the foundation's, named by `animationStyle`, and every one holds still under
- *   `prefers-reduced-motion`. The `twinkle` motion reads `--stagger` off the element, so each dot
- *   carries its place as a class of its own. The pane round the stripes clips rather than hides,
- *   because a hidden overflow is a scroll container, and the drift would read that container's
- *   scroll instead of the page's.
+ *   `prefers-reduced-motion`. The `twinkle` and `meteor` motions read `--stagger` off the element,
+ *   so each dot and each meteor carries its place as a class of its own. The pane round the
+ *   stripes clips rather than hides, because a hidden overflow is a scroll container, and the
+ *   drift would read that container's scroll instead of the page's.
  */
 
 import { type ReactElement } from "react";
@@ -96,12 +96,14 @@ const DOTS: ReadonlyArray<readonly [name: string, place: string]> = [
 ];
 
 /**
- * Draws a dark sky for the meteor to cross, in the inverted ink.
+ * Draws a starry sky for the meteors to cross, in the inverted ink. The fill is written as a color
+ * rather than the shorthand, which would reset the star field the backdrop draws.
  */
 const sky = css({
-  background: "bg.inverted",
+  backgroundColor: "bg.inverted",
   borderRadius: "l2",
   color: "fg.inverted",
+  layerStyle: "backdrop.stars",
   minHeight: "32",
   overflow: "hidden",
   padding: "inset.md",
@@ -111,16 +113,37 @@ const sky = css({
 /**
  * Draws a streak of the inverted ink that crosses the sky and fades. The sky is the other mode's
  * page, so the palette's solid, drawn for this mode's surfaces, would sit in it unseen.
+ *
+ * @remarks
+ *   The meteor falls to the right at 35 degrees below the horizontal, which is where the rotation
+ *   the keyframe turns it by leaves it, so it enters above the top edge and leaves through the
+ *   bottom. The travel is the fall the sky needs: 128 pixels of height at that angle is 223 of
+ *   travel, and the streak is 128 long, so 384 carries the tail out after the head.
  */
 const streak = css({
+  "--meteor-travel": "{sizes.96}",
   animationStyle: "meteor",
   background: "linear-gradient(to right, {colors.fg.inverted}, transparent)",
   height: "0.5",
   position: "absolute",
-  right: "0",
-  top: "0",
-  width: "32",
+  top: "-8",
 });
+
+/**
+ * Lists the shower, each meteor by where it enters along the top, how long its streak is, and its
+ * place in the stagger, which holds it back by a share of the loop.
+ *
+ * @remarks
+ *   The places are shuffled against the order along the edge, so two meteors side by side do not
+ *   fall together, and the lengths vary so the shower reads as depth rather than as a comb.
+ */
+const METEORS: ReadonlyArray<readonly [name: string, place: string]> = [
+  ["first", css({ "--stagger": "2", left: "6%", width: "32" })],
+  ["second", css({ "--stagger": "0", left: "24%", width: "24" })],
+  ["third", css({ "--stagger": "3", left: "42%", width: "40" })],
+  ["fourth", css({ "--stagger": "1", left: "61%", width: "28" })],
+  ["fifth", css({ "--stagger": "4", left: "79%", width: "32" })],
+];
 
 /**
  * Frames stripes taller than itself, clipped rather than hidden.
@@ -157,8 +180,10 @@ export function Motions(): ReactElement {
         ))}
       </p>
       <div className={sky}>
-        A meteor across the sky
-        <span aria-hidden className={streak} />
+        A shower of meteors across the sky
+        {METEORS.map(([name, place]) => (
+          <span aria-hidden className={cx(streak, place)} key={name} />
+        ))}
       </div>
       <div className={pane}>
         <div className={drifting}>Stripes that drift with the scroll</div>
