@@ -52,6 +52,15 @@ describe("specs", () => {
     expect(checked({ "src/lint/index.ts": VALUE })).toStrictEqual([]);
   });
 
+  it("names a barrel with no specification beside it where the package asks for barrels", () => {
+    const found = withScratchWorkspace(
+      { "src/index.ts": VALUE, "src/list/index.spec.ts": "", "src/list/index.ts": VALUE },
+      (workspace) => specs(workspace.root, true),
+    );
+
+    expect(found).toStrictEqual(["src/index.ts has no specification beside it"]);
+  });
+
   it("leaves a fixture alone because it holds no behaviour", () => {
     expect(checked({ "src/held.fixtures.tsx": VALUE })).toStrictEqual([]);
   });

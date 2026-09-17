@@ -58,6 +58,12 @@ export interface Conformance {
   readonly at: string;
 
   /**
+   * Whether a barrel needs a specification beside it too, which a component package asks for
+   * because a barrel there is where a component's public surface is written.
+   */
+  readonly barrels?: boolean | undefined;
+
+  /**
    * Which contract the package is held to.
    */
   readonly kind: manifest.Kind;
@@ -182,7 +188,7 @@ const RUNNERS: Readonly<Record<Check, Runner>> = {
   "plugin.named": ({ stated }) => plugin.named(stated.module, stated.arguments ?? {}),
   "plugin.peer": ({ published }) => plugin.peer(published),
   "readme.exports": ({ stated, walked: barrel }) => readme.exports(stated.at, barrel.namespaces),
-  "source.specs": ({ stated }) => source.specs(stated.at),
+  "source.specs": ({ stated }) => source.specs(stated.at, stated.barrels === true),
   "tier.composes": ({ published, stated }) => composes(published, stated.tiers ?? {}, stated.at),
 };
 

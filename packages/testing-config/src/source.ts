@@ -42,12 +42,13 @@ const EXPORTS = /^export\b/mu;
 const EXPORTS_TYPE = /^export type\b/mu;
 
 /**
- * Tells whether a path is a source rather than a specification, a fixture or a barrel.
+ * Tells whether a path is a source rather than a specification or a fixture, and rather than a
+ * barrel unless barrels count.
  */
-function named(path: string): boolean {
+function named(path: string, barrels: boolean): boolean {
   const file = basename(path);
 
-  return !APART.some((one) => file.endsWith(one)) && !BARRELS.has(file);
+  return !APART.some((one) => file.endsWith(one)) && (barrels || !BARRELS.has(file));
 }
 
 /**
@@ -69,15 +70,20 @@ function declares(at: string, path: string): boolean {
  * Reports every source file with no specification beside it.
  *
  * @remarks
- *   A barrel is left alone. It re-exports what the files around it declare, and the conformance
- *   specification every package already runs is what reads a barrel. A fixture, a declaration file
- *   and a module exporting types alone are left alone for the same reason: none of them holds
- *   behaviour of its own.
+ *   A barrel is left alone unless the package asks for barrels. It re-exports what the files
+ *   around it declare, and the conformance specification every package already runs is what
+ *   reads a barrel. A component package asks for barrels, because a barrel there is where a
+ *   component's public surface is written and where a recipe or a binding leaks out. A fixture,
+ *   a declaration file and a module exporting types alone are left alone in every package, since
+ *   none of them holds behaviour of its own.
  * @param at - The directory holding the package's manifest.
+ * @param barrels - Whether a barrel needs a specification beside it too.
  * @returns One violation per source file with no specification, or an empty array.
  */
-export function specs(at: string): readonly string[] {
-  const found = globSync(SOURCES, { cwd: at }).filter((path) => named(path) && declares(at, path));
+export function specs(at: string, barrels = false): readonly string[] {
+  const found = globSync(SOURCES, { cwd: at }).filter(
+    (path) => named(path, barrels) && declares(at, path),
+  );
 
   return found
     .filter((path) => !BESIDE.some((one) => existsSync(join(at, path.replace(/\.tsx?$/u, one)))))
