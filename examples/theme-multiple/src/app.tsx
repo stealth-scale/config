@@ -1,7 +1,8 @@
 /**
  * Draws the page: the controls that switch the theme and the color mode of the document with a
  * badge naming the mode, a row of buttons in every look, a panel wearing a theme of its own, four
- * cards, the candy panel, the looks, the motions and a bento.
+ * cards, the candy panel, the looks, the motions, a bento, and the typography and actions
+ * packages' components.
  *
  * @remarks
  *   The provider writes the two attributes onto the document root, so the whole page switches at
@@ -21,6 +22,7 @@ import { Candy } from "#candy.tsx";
 import { Cards } from "#cards.tsx";
 import { Looks } from "#looks.tsx";
 import { Motions } from "#motions.tsx";
+import { Published } from "#published.tsx";
 
 /**
  * Lists the themes the application installed, in the order `theme.config.ts` states them.
@@ -149,6 +151,7 @@ export function App(): ReactElement {
         <Looks />
         <Motions />
         <Bento />
+        <Published />
       </main>
     </ThemeProvider>
   );

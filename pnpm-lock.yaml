@@ -1935,6 +1935,12 @@ importers:
 
   examples/theme-multiple:
     dependencies:
+      '@stealthscale/component-actions':
+        specifier: workspace:^
+        version: link:../../components/actions
+      '@stealthscale/component-typography':
+        specifier: workspace:^
+        version: link:../../components/typography
       '@stealthscale/example-lib-actions':
         specifier: workspace:^
         version: link:../lib-actions

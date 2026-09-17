@@ -61,9 +61,12 @@ under `spin`, three dots under `twinkle`, a `meteor` across a dark sky, stripes 
 behind a pane, and a list under `rise` that runs again from a button by mounting under a new key.
 All of it is drawn in whichever palette the theme points at, and all of it holds still under
 `prefers-reduced-motion`. Below them a bento of five tiles, two of them spanning, each on a backdrop
-of its own, dims the others while one is hovered. The switches stick to the top of the page while
-the rest scrolls past. `src/main.tsx` imports `@stealthscale/theme/styles.css` before the
-application, and the build plugin appends the compiled rules to it.
+of its own, dims the others while one is hovered. Two sections below the bento draw the published
+components: the typography package's headings, paragraph, code, key, icons, lists and quotation, and
+the actions package's button in every look, size and status, with two icon buttons named in words
+and a pair under `ButtonPropsProvider`. The switches stick to the top of the page while the rest
+scrolls past. `src/main.tsx` imports `@stealthscale/theme/styles.css` before the application, and
+the build plugin appends the compiled rules to it.
 
 ## The configuration
 
