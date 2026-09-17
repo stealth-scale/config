@@ -120,6 +120,12 @@ export { Root, type RootProps } from "#list/root.ts";
 The namespace is the one name a component with parts has. The card example proves the form against
 the compiler's extraction, with `jsx: [/^Card(\.\w+)?$/u]` on its recipe.
 
+`button/icon-button.ts` binds the button's recipe a second time, with the square shape as a default
+prop and a props type that requires an accessible name. It has no recipe and no context of its own,
+because a theme that moves the button is meant to move the square with it, and it is named for what
+it exports, as every file is. A directory holds one recipe and binds it as often as it has
+components.
+
 ### The element
 
 The compiler's generated factory reads two props of its own off every styled component:
