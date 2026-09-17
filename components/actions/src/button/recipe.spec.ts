@@ -21,8 +21,17 @@ describe("recipe", () => {
     expect(defaultsOf(recipe)).toStrictEqual({ size: "md", variant: "solid" });
   });
 
-  it("offers the five control sizes", () => {
-    expect(valuesOf(recipe, "size")).toStrictEqual(["lg", "md", "sm", "xl", "xs"]);
+  it("offers the eight control sizes", () => {
+    expect(valuesOf(recipe, "size")).toStrictEqual([
+      "2xl",
+      "3xl",
+      "4xl",
+      "lg",
+      "md",
+      "sm",
+      "xl",
+      "xs",
+    ]);
   });
 
   it("offers the six looks and the glass", () => {

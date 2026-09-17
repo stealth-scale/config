@@ -55,7 +55,7 @@ export const recipe = defineRecipe({
     shape: {
       square: { aspectRatio: "square", paddingInline: "0" },
     },
-    size: controlSizes(["xs", "sm", "md", "lg", "xl"]),
+    size: controlSizes(["xs", "sm", "md", "lg", "xl", "2xl", "3xl", "4xl"]),
     status: statusVariants(),
     variant: {
       ...lookVariants(LOOKS),

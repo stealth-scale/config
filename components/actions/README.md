@@ -44,7 +44,7 @@ it has checked.
 | Axis      | Values                                                             | Default |
 | --------- | ------------------------------------------------------------------ | ------- |
 | `variant` | `solid`, `subtle`, `surface`, `outline`, `ghost`, `plain`, `glass` | `solid` |
-| `size`    | `xs`, `sm`, `md`, `lg`, `xl`                                       | `md`    |
+| `size`    | `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`, `4xl`                  | `md`    |
 | `status`  | `info`, `success`, `warning`, `error`                              | primary |
 | `shape`   | `square`                                                           | none    |
 | `effect`  | `glow`                                                             | none    |
