@@ -78,3 +78,29 @@ theme: name every compound in its recipe and read the sizes from the tokens
   compiler names reads `button--compound__size_lg__variant_solid` before the plugin renames the
   stylesheet and the runtime. The package depends on `@stealthscale/pandacss-naming`, which its
   generated runtime imports, so a bound element's variant class reads `button--lg`.
+- The `meteor` keyframe falls by `--meteor-travel`, the viewport where the element states none, so a
+  sky bounded by a box states the fall it needs. It fell 100vw at 35 degrees below the horizontal,
+  which carried it out of a sky 128 pixels tall inside the first percent of the loop. The `meteor`
+  animation style offsets each streak by `--stagger`, a share of the loop, as `twinkle` offsets each
+  dot.
+- `backdrop.stars` tiles a field of nine dots drawn in `currentcolor`, in a tile twice as wide as it
+  is tall. It is laid over a surface a recipe inverts, and the ink of that surface is the only color
+  that follows it. A square tile repeats often enough across a wide sky to read as a rhythm, and its
+  lower half falls outside a short one.
+- `backdrop.stripes` rules its diagonal a whole pixel wide. Half a pixel across a diagonal samples
+  to a dashed line. `backdrop.grid` holds at half, because an upright line does not.
+- The aurora alternates the emphasized fill with the muted one, so it moves through lightness as
+  well as hue, and it reads as the palette rather than as a haze. Every fill of one role sits at one
+  lightness, and the muted fill is two points of chroma from the emphasized one.
+- A compound takes a `name`, and `defineRecipe` writes its class from it through
+  `@stealthscale/pandacss-naming`, so a large solid button named `hero` carries `button--hero` and a
+  slot compound `card__root--hero`. The name is removed once the class is written, because the
+  compiler and the runtime read every other key as an axis. A compound without a name keeps the
+  compiler's own class, which the testing kit reports.
+- The ripple grows from the point of the press, which a component writes as `--ripple-x` and
+  `--ripple-y` and which falls at the centre where it writes none, and it fades at full size over
+  the release rather than shrinking back. It was a rounded rectangle cut to the control's outline.
+  The press snapped it to nothing and the release grew it, so a reader pressing the control saw
+  nothing until they let go. Its rim is soft, and it is tinted at the opacity a pressed state layer
+  takes. `--ripple-scale` is how far it grows, as a multiple of its own width, and `--ripple-pace`
+  scales every duration at once, which a reader who asked for less motion sets to zero.

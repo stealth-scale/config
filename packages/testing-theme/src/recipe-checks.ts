@@ -9,6 +9,7 @@
  *   from the compiler, so the token check is what catches a name typed wrongly.
  */
 
+import { slotClass, variantClass } from "@stealthscale/pandacss-naming";
 import { HUES, PALETTES, type Preset, ROLES } from "@stealthscale/theme/authoring";
 import foundation from "@stealthscale/theme/theme";
 
@@ -23,12 +24,14 @@ import { walked, type Walked, type Written } from "#walk.ts";
 export type RecipeCheck =
   | "recipe.className"
   | "recipe.colors"
+  | "recipe.compounds"
   | "recipe.conditions"
   | "recipe.lengths"
   | "recipe.modes"
   | "recipe.slots"
   | "recipe.subtle"
-  | "recipe.tokens";
+  | "recipe.tokens"
+  | "recipe.values";
 
 /**
  * Describes what a recipe specification states beside the recipe.
@@ -60,6 +63,11 @@ export interface RecipeChecks {
  * Matches a class name a stylesheet and a specification can both write.
  */
 const CLASS_NAME = /^[a-z][a-z0-9-]*$/u;
+
+/**
+ * Marks the class the compiler names a compound by where the recipe gave it no name.
+ */
+const UNNAMED = "--compound__";
 
 /**
  * Lists the conditions that switch on the color mode, which a recipe never writes.
@@ -151,6 +159,101 @@ const SUBTLE = "fg.subtle";
  */
 function bare(value: string): string {
   return value.replace(/\/\d+$/u, "");
+}
+
+/**
+ * Reports whether a value is a plain object, which an axis's values and a compound are.
+ */
+function isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Lists each axis of a recipe against the values it takes.
+ */
+function axesOf(
+  recipe: Declared,
+): ReadonlyArray<readonly [axis: string, values: readonly string[]]> {
+  return Object.entries(recipe.variants ?? {}).map(([axis, values]) => [
+    axis,
+    isRecord(values) ? Object.keys(values) : [],
+  ]);
+}
+
+/**
+ * Lists the classes a recipe emits its base rules under: its own, or one per slot.
+ */
+function ownersOf(recipe: Declared): readonly string[] {
+  return recipe.slots === undefined
+    ? [recipe.className]
+    : recipe.slots.map((slot) => slotClass(recipe.className, slot));
+}
+
+/**
+ * Reports every value that writes the class another value or a boolean axis writes.
+ *
+ * @remarks
+ *   The scheme writes a variant's class from the value alone, and a boolean axis at `true` from
+ *   the axis, so two axes sharing a value, or a value that is also a boolean axis's name, would
+ *   draw two variants under one class.
+ */
+function valueViolations(recipe: Declared): readonly string[] {
+  const written = new Map<string, string>();
+  const found: string[] = [];
+
+  for (const [axis, values] of axesOf(recipe)) {
+    for (const value of values) {
+      const className = variantClass(recipe.className, axis, value);
+
+      if (className === "") continue;
+
+      const other = written.get(className);
+
+      if (other === undefined) written.set(className, `${axis} ${value}`);
+      else
+        found.push(`${recipe.className} writes ${className} for ${axis} ${value} and for ${other}`);
+    }
+  }
+
+  return found;
+}
+
+/**
+ * Reports a compound without a name, two compounds under one name, and a compound whose name
+ * writes the class of a variant.
+ *
+ * @remarks
+ *   A compound without a name is one `defineRecipe` named by the compiler's own scheme, which
+ *   reads as the axes it matches on rather than as a word.
+ */
+function compoundViolations(recipe: Declared): readonly string[] {
+  const variants = new Set(
+    ownersOf(recipe).flatMap((owner) =>
+      axesOf(recipe).flatMap(([axis, values]) =>
+        values.map((value) => variantClass(owner, axis, value)),
+      ),
+    ),
+  );
+  const named = new Set<string>();
+
+  return (recipe.compoundVariants ?? []).flatMap((compound, index) => {
+    if (!isRecord(compound)) return [];
+
+    const className = compound["className"];
+    const ordinal = `compound ${String(index + 1)}`;
+
+    if (typeof className !== "string" || className.includes(UNNAMED)) {
+      return [`${recipe.className} declares ${ordinal} without a name`];
+    }
+    if (named.has(className)) {
+      return [`${recipe.className} names ${ordinal} ${className}, as it names another`];
+    }
+    named.add(className);
+
+    return variants.has(className)
+      ? [`${recipe.className} names ${ordinal} ${className}, which is the class of a variant`]
+      : [];
+  });
 }
 
 /**
@@ -336,6 +439,8 @@ const RUNNERS: ReadonlyArray<readonly [RecipeCheck, Runner]> = [
         ? []
         : [`${recipe.className} is not a class name in kebab case`],
   ],
+  ["recipe.values", (recipe) => valueViolations(recipe)],
+  ["recipe.compounds", (recipe) => compoundViolations(recipe)],
   [
     "recipe.colors",
     (recipe, found, _options, preset) =>

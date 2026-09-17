@@ -40,7 +40,7 @@ const KIT = packageFiles(
       '  name: "@acme/kit",',
       "  theme: {",
       "    extend: {",
-      '      recipes: { button: { className: "button", jsx: ["Button"], base: { color: "brand", letterSpacing: "0em" }, variants: { size: { lg: { padding: "8px" }, md: { padding: "4px" } }, variant: { ghost: { color: "green" }, solid: { color: "red" } } }, compoundVariants: [{ className: "button--compound__size_lg__variant_solid", css: { fontWeight: "700" }, size: "lg", variant: "solid" }, { className: "button--compound__size_md__variant_ghost", css: { fontStyle: "italic" }, size: "md", variant: "ghost" }] } },',
+      '      recipes: { button: { className: "button", jsx: ["Button"], base: { color: "brand", letterSpacing: "0em" }, variants: { size: { lg: { padding: "8px" }, md: { padding: "4px" } }, variant: { ghost: { color: "green" }, solid: { color: "red" } } }, compoundVariants: [{ className: "button--expose", css: { fontWeight: "700" }, size: "lg", variant: "solid" }, { className: "button--quiet", css: { fontStyle: "italic" }, size: "md", variant: "ghost" }] } },',
       '      slotRecipes: { dialog: { className: "dialog", slots: ["content", "backdrop"], base: { content: { padding: "4px" } } } },',
       "    },",
       "  },",
@@ -204,7 +204,7 @@ describe("assemble", () => {
   it("compiles a compound under the class its recipe names", async () => {
     const css = await withScratchWorkspaceAsync(APP, compiled);
 
-    expect(declared(css, ".button--compound__size-lg__variant-solid", "font-weight")).toBe("700");
+    expect(declared(css, ".button--expose", "font-weight")).toBe("700");
   });
 
   it("compiles a theme's compound for the same selection under the same class", async () => {
@@ -213,13 +213,8 @@ describe("assemble", () => {
     const files = { ...APP, "themes/abyss.ts": theme("abyss", extend) };
     const css = await withScratchWorkspaceAsync(files, compiled);
 
-    expect(
-      declared(
-        css,
-        "[data-theme=abyss] .button--compound__size-lg__variant-solid",
-        "letter-spacing",
-      ),
-    ).toBe("0.2em");
+    expect(declared(css, "[data-theme=abyss] .button--expose", "letter-spacing")).toBe("0.2em");
+    expect(css).not.toContain("compound__");
   });
 
   it("compiles the compound a page selects alone", async () => {
@@ -242,8 +237,8 @@ describe("assemble", () => {
     };
     const css = await withScratchWorkspaceAsync(files, compiled);
 
-    expect(declared(css, ".button--compound__size-lg__variant-solid", "font-weight")).toBe("700");
-    expect(css).not.toContain("size-md__variant-ghost");
+    expect(declared(css, ".button--expose", "font-weight")).toBe("700");
+    expect(css).not.toContain("button--quiet");
   });
 
   it("scopes a slot recipe's styles inside the slot", async () => {

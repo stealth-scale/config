@@ -20,3 +20,8 @@ vite-plugin-theme: declare the class a compound's styles are emitted under
   `card__root`, and an atomic class `grid-ar-sizes-32` or `md:grid-tc-repeat-3-minmax-0-1fr`. What
   the rename found is reported as a third stage, `the class names`. `SEPARATOR` and
   `THEME_ATTRIBUTE` are exported, so a package that writes the same names can hold itself to them.
+- A theme's compound takes the class the published recipe emits its own compound for the same
+  selection under, so a theme that extends the `hero` compound of a button draws under
+  `[data-theme=forge] .button--hero`. A compound over a slot recipe is split per slot it styles, as
+  the recipe's own was. `publishedCompounds(presets)` reads the classes, and `scopedPresets` takes
+  them.

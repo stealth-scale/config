@@ -22,7 +22,7 @@ import { basePreset, type Compiler, startCompiler } from "#compiler.ts";
 import { renderStylesheetConfig } from "#config.ts";
 import { type Contributor, contributors, workspaceSources } from "#contributors.ts";
 import { CACHE, type Resolved } from "#options.ts";
-import { scopedPresets } from "#scope.ts";
+import { publishedCompounds, scopedPresets } from "#scope.ts";
 import {
   type Application,
   fontPackages,
@@ -166,6 +166,7 @@ export async function assemble(
   const { presets: own = [], themes } = statement.application;
   const [first] = themes;
   const configPath = join(root, CACHE, CONFIG);
+  const published = [...rest.map((each) => each.preset), ...own];
 
   writeIfChanged(
     configPath,
@@ -175,11 +176,10 @@ export async function assemble(
       include: [...new Set([...resolved.include, ...workspaceSources(root, graph)])],
       layers: resolved.layers,
       presets: [
-        ...rest.map((each) => each.preset),
-        ...own,
+        ...published,
         defaultPreset(first),
         ...(first.preset === undefined ? [] : [first.preset]),
-        ...scopedPresets(themes),
+        ...scopedPresets(themes, publishedCompounds([foundation.preset, ...published])),
       ],
       staticCss: staticCssOf(statement.application),
       system: resolved.systemPackage,

@@ -11,6 +11,8 @@
  *   from the same object.
  */
 
+import { compoundClass } from "@stealthscale/pandacss-naming";
+
 import type {
   RecipeCompoundSelection,
   RecipeSelection,
@@ -50,14 +52,21 @@ interface Meta {
 }
 
 /**
- * Carries the class a compound's styles are emitted under.
+ * Carries the name of a compound and the class its styles are emitted under.
  */
 interface Named {
   /**
-   * The class name. `defineRecipe` and `defineSlotRecipe` write it from the values the compound
-   * matches on, and the compiler emits the compound's styles under it.
+   * The class name. `defineRecipe` and `defineSlotRecipe` write it from the name, as
+   * `<class>--<name>`, and the compiler emits the compound's styles under it.
    */
   className?: string | undefined;
+
+  /**
+   * The name the author gives the compound, which reads on the element as `button--hero` reads.
+   * `defineRecipe` and `defineSlotRecipe` remove it once the class is written, because the
+   * compiler and the runtime read every other key of a compound as an axis.
+   */
+  name?: string | undefined;
 }
 
 /**
@@ -199,9 +208,9 @@ export const SEPARATOR = "_";
 const COMPOUND = "--compound__";
 
 /**
- * Lists the two keys of a compound that are not axes.
+ * Lists the keys of a compound that are not axes.
  */
-const UNMATCHED = new Set(["className", "css"]);
+const UNMATCHED = new Set(["className", "css", "name"]);
 
 /**
  * Writes one value a compound matches on the way a class name carries it, or nothing where a
@@ -257,10 +266,12 @@ export function compoundSelection(compound: object): string | undefined {
  * the compound matches on.
  *
  * @remarks
- *   The scheme is the compiler's own, so a theme's compound for the same selection, which the
- *   compiler names itself, is emitted under the same class.
+ *   The scheme is the compiler's own, which it names a compound by where nothing names it. A
+ *   compound the author named is written by the naming scheme instead, and the build plugin gives
+ *   a theme's compound for the same selection the same class, so this form is the one the testing
+ *   kit reports as a compound without a name.
  * @param className - The class of the recipe, or of the slot for a slot recipe.
- * @param compound - The compound, read for every key but `css` and `className`.
+ * @param compound - The compound, read for every key but `css`, `className` and `name`.
  * @throws {@link Error} When the compound matches an axis on a value a class name cannot carry.
  */
 export function compoundClassName(className: string, compound: object): string {
@@ -278,7 +289,17 @@ export function compoundClassName(className: string, compound: object): string {
 }
 
 /**
- * Returns a compound with the class its styles are emitted under.
+ * Writes the class a compound's styles are emitted under: from its name where the author gave one,
+ * and by the compiler's own scheme otherwise.
+ */
+function classOf(className: string, compound: Named & object): string {
+  return compound.name === undefined
+    ? compoundClassName(className, compound)
+    : compoundClass(className, compound.name);
+}
+
+/**
+ * Returns a compound with the class its styles are emitted under and without its name.
  *
  * @typeParam Variants - Each axis the recipe offers, against the values it takes.
  */
@@ -286,12 +307,16 @@ function named<Variants extends RecipeVariantRecord>(
   className: string,
   compound: Compound<Variants>,
 ): Compound<Variants> {
-  return { ...compound, className: compoundClassName(className, compound) };
+  const built: Compound<Variants> = { ...compound, className: classOf(className, compound) };
+
+  delete built.name;
+
+  return built;
 }
 
 /**
  * Returns a compound restricted to one slot, with the class its styles are emitted under for that
- * slot.
+ * slot and without its name.
  *
  * @typeParam Slots - Every part the recipe styles.
  * @typeParam Variants - Each axis it offers, against the values it takes.
@@ -302,11 +327,15 @@ function forSlot<Slots extends string, Variants extends SlotRecipeVariantRecord<
   compound: SlotCompound<Slots, Variants>,
   styles: SystemStyleObject,
 ): SlotCompound<Slots, Variants> {
-  return {
+  const built: SlotCompound<Slots, Variants> = {
     ...compound,
-    className: compoundClassName(`${className}__${slot}`, compound),
+    className: classOf(`${className}__${slot}`, compound),
     css: recordOf([slot], () => styles),
   };
+
+  delete built.name;
+
+  return built;
 }
 
 /**

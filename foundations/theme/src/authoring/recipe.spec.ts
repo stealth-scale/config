@@ -46,7 +46,7 @@ describe("defineRecipe", () => {
     expect(named({ level: 2 })).toBe("button--compound__level_2");
   });
 
-  it("keeps the styles and the selection of a named compound", () => {
+  it("keeps the styles and the selection of a compound the compiler names", () => {
     const recipe = defineRecipe({
       className: "button",
       compoundVariants: [{ css: { fontWeight: "bold" }, size: "lg" }],
@@ -55,6 +55,40 @@ describe("defineRecipe", () => {
 
     expect(recipe.compoundVariants).toStrictEqual([
       { className: "button--compound__size_lg", css: { fontWeight: "bold" }, size: "lg" },
+    ]);
+  });
+
+  it("writes a named compound's class from its name and removes the name", () => {
+    const recipe = defineRecipe({
+      className: "button",
+      compoundVariants: [
+        { css: { fontWeight: "bold" }, name: "hero", size: "lg", variant: "solid" },
+      ],
+      variants: AXES,
+    });
+
+    expect(recipe.compoundVariants).toStrictEqual([
+      { className: "button--hero", css: { fontWeight: "bold" }, size: "lg", variant: "solid" },
+    ]);
+  });
+
+  it("writes a named slot compound's class per slot from its name", () => {
+    const recipe = defineSlotRecipe({
+      className: "card",
+      compoundVariants: [
+        {
+          css: { root: { fontWeight: "bold" }, title: { letterSpacing: "wide" } },
+          name: "hero",
+          size: "lg",
+        },
+      ],
+      slots: ["root", "title"],
+      variants: { size: { lg: {}, md: {} } },
+    });
+
+    expect(recipe.compoundVariants).toStrictEqual([
+      { className: "card__root--hero", css: { root: { fontWeight: "bold" } }, size: "lg" },
+      { className: "card__title--hero", css: { title: { letterSpacing: "wide" } }, size: "lg" },
     ]);
   });
 

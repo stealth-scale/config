@@ -139,14 +139,14 @@ that configuration.
 
 ### Definitions
 
-| Export                     | Returns                                                                                                                                               |
-| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `defineRecipe(recipe)`     | The recipe, typed against the vocabulary, with the literal values of each variant and every compound named for the class its styles are emitted under |
-| `defineSlotRecipe(recipe)` | The slot recipe, typed the same way, with each compound split per slot it styles                                                                      |
-| `defineStyles(styles)`     | A style object two recipes share, typed                                                                                                               |
-| `definePreset(preset)`     | The preset a component package publishes under `./theme`                                                                                              |
-| `defineTheme(config)`      | A `Theme`: its name, its font packages, a preset and a variant                                                                                        |
-| `contract(variant)`        | The variant unchanged. The parameter's type is the check                                                                                              |
+| Export                     | Returns                                                                                                                                                |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `defineRecipe(recipe)`     | The recipe, typed against the vocabulary, with the literal values of each variant and each compound's class written from its `name`, as `button--hero` |
+| `defineSlotRecipe(recipe)` | The slot recipe, typed the same way, with each compound split per slot it styles, as `card__root--hero`                                                |
+| `defineStyles(styles)`     | A style object two recipes share, typed                                                                                                                |
+| `definePreset(preset)`     | The preset a component package publishes under `./theme`                                                                                               |
+| `defineTheme(config)`      | A `Theme`: its name, its font packages, a preset and a variant                                                                                         |
+| `contract(variant)`        | The variant unchanged. The parameter's type is the check                                                                                               |
 
 `RecipeProps<typeof recipe>` names the props a recipe lets a caller choose, for a component the
 binding cannot type on its own.

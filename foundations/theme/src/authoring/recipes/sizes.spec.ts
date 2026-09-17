@@ -43,6 +43,12 @@ describe("sizes", () => {
       variants: { icon: iconSizes(SIZES), only: iconOnly(SIZES), size: controlSizes(SIZES) },
     });
 
-    expect(recipeViolations(recipe)).toStrictEqual([]);
+    expect(
+      recipeViolations(recipe, {
+        skip: {
+          "recipe.values": "the three scales share their steps, so one recipe reads them all",
+        },
+      }),
+    ).toStrictEqual([]);
   });
 });

@@ -91,6 +91,8 @@ out, each with a reason.
 | Check               | Reports                                                                                                                                                                                                                       |
 | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `recipe.className`  | A class name outside `[a-z][a-z0-9-]*`                                                                                                                                                                                        |
+| `recipe.values`     | A value that writes the class another value writes, across the recipe's axes, or that a boolean axis writes at `true`                                                                                                         |
+| `recipe.compounds`  | A compound without a name, two compounds under one name, and a compound whose name writes the class of a variant                                                                                                              |
 | `recipe.colors`     | A color written outright, a ramp step, a reference, a hue, a palette role that does not exist, or `colorPalette` pointed at a hue                                                                                             |
 | `recipe.tokens`     | A token the preset does not define, named by one word or by a path, in any category a property reads, and any composition name it does not define. A CSS-wide keyword and a size a box takes from its content are passed over |
 | `recipe.conditions` | A condition neither the compiler's base preset nor the preset defines                                                                                                                                                         |
@@ -113,13 +115,13 @@ unless a theme package states its own.
 
 ### Readers
 
-| Export                                                                      | Reads                                                                                                                                                                        |
-| --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `recipeClass`, `variantClass`, `slotClass`, `slotVariantClass`              | The classes a recipe emits, in the naming scheme of `@stealthscale/pandacss-naming`                                                                                          |
-| `axesOf`, `valuesOf`, `defaultsOf`, `slotsOf`, `scaleOf`, `byStep`          | What a recipe declares, without rendering                                                                                                                                    |
-| `recipeElement`, `slotElement`, `classesOf`, `recipeClasses`, `slotClasses` | What a rendered component drew, by `data-recipe` on the element a recipe was bound to and on the root of a compound component, and by `data-part` or `data-slot` on one part |
-| `resolved`, `palettesOf`, `extendedRecipes`, `fontsOf`                      | What a theme states, with every reference followed                                                                                                                           |
-| `publishedRecipes`                                                          | Every recipe the presets of the component packages register, keyed as they register it, for `options.recipes`                                                                |
+| Export                                                                          | Reads                                                                                                                                                                        |
+| ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `recipeClass`, `variantClass`, `slotClass`, `slotVariantClass`, `compoundClass` | The classes a recipe emits, in the naming scheme of `@stealthscale/pandacss-naming`                                                                                          |
+| `axesOf`, `valuesOf`, `defaultsOf`, `slotsOf`, `scaleOf`, `byStep`              | What a recipe declares, without rendering                                                                                                                                    |
+| `recipeElement`, `slotElement`, `classesOf`, `recipeClasses`, `slotClasses`     | What a rendered component drew, by `data-recipe` on the element a recipe was bound to and on the root of a compound component, and by `data-part` or `data-slot` on one part |
+| `resolved`, `palettesOf`, `extendedRecipes`, `fontsOf`                          | What a theme states, with every reference followed                                                                                                                           |
+| `publishedRecipes`                                                              | Every recipe the presets of the component packages register, keyed as they register it, for `options.recipes`                                                                |
 
 ## Licence
 

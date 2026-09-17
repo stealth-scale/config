@@ -28,9 +28,31 @@ export interface Compound {
   [axis: string]: unknown;
 
   /**
+   * The class the compound's styles are emitted under. A published recipe names its own, and a
+   * theme's compound takes the class of the published compound for the same selection.
+   */
+  className?: string | undefined;
+
+  /**
    * The styles it applies where every axis it names matches.
    */
   css?: Styles | undefined;
+}
+
+/**
+ * Lists the compounds every published recipe declares, by recipe key, for the class each is
+ * emitted under.
+ */
+export interface Compounds {
+  /**
+   * The compounds of each recipe that draws one element, by key.
+   */
+  recipes: Readonly<Record<string, readonly Compound[]>>;
+
+  /**
+   * The compounds of each recipe that draws several parts, by key, one per slot each styles.
+   */
+  slotRecipes: Readonly<Record<string, readonly Compound[]>>;
 }
 
 /**
@@ -178,10 +200,90 @@ interface Level {
 }
 
 /**
+ * Lists the keys of a compound that are not axes.
+ */
+const UNMATCHED = new Set(["className", "css"]);
+
+/**
+ * The compounds of no recipe, for a theme scoped without the published presets.
+ */
+const NONE: Compounds = { recipes: {}, slotRecipes: {} };
+
+/**
  * Reports whether a value is a style object.
  */
 function isStyles(value: unknown): value is Styles {
   return typeof value === "object" && value !== null;
+}
+
+/**
+ * Writes the selection a compound matches on, for equality with another's.
+ */
+function selectionOf(compound: Compound): string {
+  return JSON.stringify(
+    Object.entries(compound)
+      .filter(([axis]) => !UNMATCHED.has(axis))
+      .toSorted(([one], [other]) => one.localeCompare(other)),
+  );
+}
+
+/**
+ * Finds the class a published recipe emits its compound for one selection under, for one slot
+ * where the recipe draws several parts.
+ */
+function classOf(
+  published: readonly Compound[],
+  selection: string,
+  slot?: string,
+): string | undefined {
+  return published.find(
+    (each) =>
+      selectionOf(each) === selection &&
+      (slot === undefined || (isStyles(each.css) && slot in each.css)),
+  )?.className;
+}
+
+/**
+ * Restricts a theme's compound to one slot, under the class the published recipe emits that
+ * slot's compound under where it has one.
+ */
+function forSlot(
+  axes: Compound,
+  slot: string,
+  styles: unknown,
+  className: string | undefined,
+): Compound {
+  return { ...axes, css: { [slot]: styles }, ...(className === undefined ? {} : { className }) };
+}
+
+/**
+ * Gives a theme's compound the class the published recipe emits its own compound for the same
+ * selection under, so the theme's styles reach the element under that class.
+ *
+ * @remarks
+ *   The compiler takes one class per compound and applies it to every slot the compound styles,
+ *   so a theme's compound over a slot recipe is split per slot it styles, as the recipe's own was,
+ *   and each part takes that slot's class. A compound no published compound matches is left as it
+ *   is: the compiler names it, and the testing kit reports it.
+ */
+function adopted(
+  compound: Compound,
+  published: readonly Compound[],
+  slotted: boolean,
+): readonly Compound[] {
+  const selection = selectionOf(compound);
+  const { css, ...axes } = compound;
+
+  if (!slotted) {
+    const className = classOf(published, selection);
+
+    return [className === undefined ? compound : { ...compound, className }];
+  }
+  if (!isStyles(css)) return [compound];
+
+  return Object.entries(css).map(([slot, styles]) =>
+    forSlot(axes, slot, styles, classOf(published, selection, slot)),
+  );
 }
 
 /**
@@ -212,9 +314,15 @@ function nestedCompound(compound: Compound, slotted: boolean, selector: string):
 }
 
 /**
- * Rewrites one extension so everything it states applies only under a selector.
+ * Rewrites one extension so everything it states applies only under a selector, with each of its
+ * compounds under the class the published recipe emits the same selection under.
  */
-function scoped(extension: Extension, slotted: boolean, selector: string): Extension {
+function scoped(
+  extension: Extension,
+  slotted: boolean,
+  selector: string,
+  published: readonly Compound[],
+): Extension {
   const { base, compoundVariants, variants } = extension;
 
   return {
@@ -222,8 +330,10 @@ function scoped(extension: Extension, slotted: boolean, selector: string): Exten
     ...(compoundVariants === undefined
       ? {}
       : {
-          compoundVariants: compoundVariants.map((compound) =>
-            nestedCompound(compound, slotted, selector),
+          compoundVariants: compoundVariants.flatMap((compound) =>
+            adopted(compound, published, slotted).map((each) =>
+              nestedCompound(each, slotted, selector),
+            ),
           ),
         }),
     ...(variants === undefined
@@ -251,9 +361,13 @@ function all(
   held: Readonly<Record<string, Extension>>,
   slotted: boolean,
   selector: string,
+  compounds: Readonly<Record<string, readonly Compound[]>>,
 ): Record<string, Extension> {
   return Object.fromEntries(
-    Object.entries(held).map(([key, extension]) => [key, scoped(extension, slotted, selector)]),
+    Object.entries(held).map(([key, extension]) => [
+      key,
+      scoped(extension, slotted, selector, compounds[key] ?? []),
+    ]),
   );
 }
 
@@ -286,7 +400,11 @@ function compositions(held: Styles, selector: string): Styles {
 /**
  * Rewrites one level's extensions so everything they state applies only under a selector.
  */
-function scopedExtensions(extensions: Extensions, selector: string): Extensions {
+function scopedExtensions(
+  extensions: Extensions,
+  selector: string,
+  compounds: Compounds,
+): Extensions {
   const { animationStyles, layerStyles, recipes, slotRecipes, textStyles } = extensions;
 
   return {
@@ -294,10 +412,47 @@ function scopedExtensions(extensions: Extensions, selector: string): Extensions 
       ? {}
       : { animationStyles: compositions(animationStyles, selector) }),
     ...(layerStyles === undefined ? {} : { layerStyles: compositions(layerStyles, selector) }),
-    ...(recipes === undefined ? {} : { recipes: all(recipes, false, selector) }),
-    ...(slotRecipes === undefined ? {} : { slotRecipes: all(slotRecipes, true, selector) }),
+    ...(recipes === undefined ? {} : { recipes: all(recipes, false, selector, compounds.recipes) }),
+    ...(slotRecipes === undefined
+      ? {}
+      : { slotRecipes: all(slotRecipes, true, selector, compounds.slotRecipes) }),
     ...(textStyles === undefined ? {} : { textStyles: compositions(textStyles, selector) }),
   };
+}
+
+/**
+ * Reads the compounds every recipe of one map declares, by key, beside the ones read already.
+ */
+function compoundsOf(
+  held: Readonly<Record<string, Extension>> | undefined,
+  into: Record<string, readonly Compound[]>,
+): void {
+  for (const [key, extension] of Object.entries(held ?? {})) {
+    into[key] = [...(into[key] ?? []), ...(extension.compoundVariants ?? [])];
+  }
+}
+
+/**
+ * Reads the compounds every published preset declares, for the class each is emitted under.
+ *
+ * @remarks
+ *   Read structurally, as a theme's preset is, so the plugin depends on no design-system package.
+ *   A recipe two presets declare contributes the compounds of both, as the compiler merges them.
+ * @param presets - Every preset installed before the themes: the packages' and the application's
+ *   own.
+ */
+export function publishedCompounds(presets: readonly unknown[]): Compounds {
+  const recipes: Record<string, readonly Compound[]> = {};
+  const slotRecipes: Record<string, readonly Compound[]> = {};
+
+  for (const preset of presets) {
+    if (!isPreset(preset)) continue;
+
+    compoundsOf(preset.theme?.extend?.recipes, recipes);
+    compoundsOf(preset.theme?.extend?.slotRecipes, slotRecipes);
+  }
+
+  return { recipes, slotRecipes };
 }
 
 /**
@@ -336,14 +491,20 @@ function lineage(preset: SwitchablePreset | undefined, inherited = false): reado
  *   One preset per level of the theme's lineage rather than one merged here, so that the compiler
  *   merges them the way it merges the unscoped chain and nothing here restates how. A level that
  *   extends nothing produces no preset.
+ * @param theme - The theme to scope.
+ * @param compounds - The compounds the published recipes declare, whose classes the theme's
+ *   compounds for the same selections take.
  * @returns One preset per level that extends anything, oldest ancestor first.
  */
-export function scopedPreset(theme: Switchable): readonly ScopedPreset[] {
+export function scopedPreset(
+  theme: Switchable,
+  compounds: Compounds = NONE,
+): readonly ScopedPreset[] {
   const selector = `[${THEME_ATTRIBUTE}=${theme.name}] &`;
   const own = `theme:${theme.name}:switched`;
 
   return lineage(theme.preset).flatMap(({ extensions, inherited, name }) => {
-    const extend = scopedExtensions(extensions, selector);
+    const extend = scopedExtensions(extensions, selector, compounds);
 
     if (Object.keys(extend).length === 0) return [];
 
@@ -364,6 +525,9 @@ export function scopedPreset(theme: Switchable): readonly ScopedPreset[] {
  *   that applies while no attribute is set. Scoping it as well is what lets a subtree inside
  *   another theme switch back to it.
  */
-export function scopedPresets(themes: readonly Switchable[]): readonly ScopedPreset[] {
-  return themes.flatMap((each) => scopedPreset(each));
+export function scopedPresets(
+  themes: readonly Switchable[],
+  compounds: Compounds = NONE,
+): readonly ScopedPreset[] {
+  return themes.flatMap((each) => scopedPreset(each, compounds));
 }

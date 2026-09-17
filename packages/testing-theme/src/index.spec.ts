@@ -20,6 +20,7 @@ const SURFACE = [
   "axesOf",
   "byStep",
   "classesOf",
+  "compoundClass",
   "defaultsOf",
   "extendedRecipes",
   "fontsOf",

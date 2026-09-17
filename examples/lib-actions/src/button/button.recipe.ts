@@ -19,7 +19,8 @@ import {
 
 /**
  * Draws a button: the hand and the focus ring, a row of its children, a corner of the middle
- * size, and the primary palette until a status says otherwise.
+ * size, and the primary palette until a status says otherwise. A large solid button is the hero
+ * of a page, set in bold and tracked wide.
  */
 export const recipe = defineRecipe({
   base: {
@@ -32,6 +33,14 @@ export const recipe = defineRecipe({
     whiteSpace: "nowrap",
   },
   className: "button",
+  compoundVariants: [
+    {
+      css: { fontWeight: "bold", letterSpacing: "wide" },
+      name: "hero",
+      size: "lg",
+      variant: "solid",
+    },
+  ],
   defaultVariants: { size: "md", variant: "solid" },
   jsx: [/Button$/u],
   variants: {

@@ -2,7 +2,12 @@ import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { violations } from "@stealthscale/testing-react";
-import { recipeClasses, recipeElement, variantClass } from "@stealthscale/testing-theme";
+import {
+  compoundClass,
+  recipeClasses,
+  recipeElement,
+  variantClass,
+} from "@stealthscale/testing-theme";
 
 import { Button } from "#button/button.ts";
 
@@ -33,6 +38,18 @@ describe("Button", () => {
     const { container } = render(<Button status="error">Go</Button>);
 
     expect(recipeClasses(container, "button")).toContain(variantClass("button", "status", "error"));
+  });
+
+  it("draws the hero compound's class on a large solid button and on no other", () => {
+    const hero = render(<Button size="lg">Go</Button>);
+    const plain = render(
+      <Button size="lg" variant="ghost">
+        Go
+      </Button>,
+    );
+
+    expect(recipeClasses(hero.container, "button")).toContain(compoundClass("button", "hero"));
+    expect(recipeClasses(plain.container, "button")).not.toContain(compoundClass("button", "hero"));
   });
 
   it("renders the button element the recipe is bound to", () => {

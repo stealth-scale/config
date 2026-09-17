@@ -11,9 +11,9 @@
  *   right class reaches the right element.
  */
 
-import { slotClass, variantClass } from "@stealthscale/pandacss-naming";
+import { compoundClass, slotClass, variantClass } from "@stealthscale/pandacss-naming";
 
-export { slotClass, variantClass };
+export { compoundClass, slotClass, variantClass };
 
 /**
  * Writes the class a recipe emits its base rules under, which is its class name unchanged.

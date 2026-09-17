@@ -77,6 +77,14 @@ describe("theme.config", () => {
     expect(css).toContain(".button--ghost");
   });
 
+  it("compiles the hero compound under the name the recipe gave it and forge's extension of it", () => {
+    expect(declared(css, ".button--hero", "letter-spacing")).toBe("var(--letter-spacings-wide)");
+    expect(declared(css, "[data-theme=forge] .button--hero", "box-shadow")).toBe(
+      "var(--shadows-xl)",
+    );
+    expect(css).not.toContain("compound__");
+  });
+
   it("compiles the card slot recipe the surfaces package publishes with one class per slot", () => {
     expect(declared(css, ".card__root", "border-radius")).toBe("var(--radii-l2)");
     expect(declared(css, ".card__root--subtle", "background")).toBe("var(--colors-bg-subtle)");

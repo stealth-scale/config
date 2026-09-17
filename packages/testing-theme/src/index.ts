@@ -7,7 +7,7 @@
  * @packageDocumentation
  */
 
-export { recipeClass, slotClass, slotVariantClass, variantClass } from "#classes.ts";
+export { compoundClass, recipeClass, slotClass, slotVariantClass, variantClass } from "#classes.ts";
 export { THRESHOLDS, type Thresholds } from "#contrast.ts";
 export { type PresetCheck, type PresetChecks, presetViolations } from "#preset-checks.ts";
 export { type RecipeCheck, type RecipeChecks, recipeViolations } from "#recipe-checks.ts";

@@ -1,12 +1,29 @@
 import { describe, expect, it } from "vitest";
 
-import { axesOf, defaultsOf, recipeViolations, valuesOf } from "@stealthscale/testing-theme";
+import {
+  axesOf,
+  compoundClass,
+  defaultsOf,
+  recipeViolations,
+  valuesOf,
+} from "@stealthscale/testing-theme";
 
 import { recipe } from "#button/button.recipe.ts";
 
 describe("recipe", () => {
   it("writes no value a theme cannot move", () => {
     expect(recipeViolations(recipe)).toStrictEqual([]);
+  });
+
+  it("names its one compound hero for a large solid button", () => {
+    expect(recipe.compoundVariants).toStrictEqual([
+      {
+        className: compoundClass("button", "hero"),
+        css: { fontWeight: "bold", letterSpacing: "wide" },
+        size: "lg",
+        variant: "solid",
+      },
+    ]);
   });
 
   it("offers a size axis and a status axis and a look axis", () => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { recipeClass, slotClass, slotVariantClass, variantClass } from "#classes.ts";
+import { compoundClass, recipeClass, slotClass, slotVariantClass, variantClass } from "#classes.ts";
 
 describe("classes", () => {
   it("writes the base class as the class name unchanged", () => {
@@ -26,5 +26,9 @@ describe("classes", () => {
 
   it("writes a slot variant's class on the slot", () => {
     expect(slotVariantClass("dialog", "content", "size", "lg")).toBe("dialog__content--lg");
+  });
+
+  it("writes a compound's class from the name its recipe gave it", () => {
+    expect(compoundClass("button", "hero")).toBe("button--hero");
   });
 });

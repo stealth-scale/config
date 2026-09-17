@@ -38,7 +38,12 @@ testing-theme: add the theme testing kit
 - `publishedRecipes(...presets)` maps every recipe the component packages register to its key, for
   `options.recipes`. A theme specification that passed a list of names left the compound check out,
   because the check needs the recipes themselves.
-- `variantClass`, `slotClass` and `slotVariantClass` write the naming scheme through
-  `@stealthscale/pandacss-naming`, so `variantClass("button", "size", "lg")` returns `button--lg`
-  and `variantClass("button", "loading", true)` returns `button--loading`, and the kit holds the
-  separator and the theme attribute equal between the design-system package and the build plugin.
+- `variantClass`, `slotClass`, `slotVariantClass` and `compoundClass` write the naming scheme
+  through `@stealthscale/pandacss-naming`, so `variantClass("button", "size", "lg")` returns
+  `button--lg`, `variantClass("button", "loading", true)` returns `button--loading` and
+  `compoundClass("button", "hero")` returns `button--hero`, and the kit holds the separator and the
+  theme attribute equal between the design-system package and the build plugin.
+- `recipe.values` reports a value that writes the class another value writes across the recipe's
+  axes, or that a boolean axis writes at `true`, since the scheme writes a variant's class from the
+  value alone. `recipe.compounds` reports a compound without a name, two compounds under one name,
+  and a name that writes the class of a variant.

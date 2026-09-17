@@ -34,6 +34,75 @@ describe("recipeViolations", () => {
     ]);
   });
 
+  it("reports a value two axes share", () => {
+    const recipe = { className: "button", variants: { radius: { lg: {} }, size: { lg: {} } } };
+
+    expect(recipeViolations(recipe)).toStrictEqual([
+      "recipe.values: button writes button--lg for size lg and for radius lg",
+    ]);
+  });
+
+  it("reports a value that is also the name of a boolean axis", () => {
+    const recipe = {
+      className: "button",
+      variants: { loading: { false: {}, true: {} }, state: { loading: {} } },
+    };
+
+    expect(recipeViolations(recipe)).toStrictEqual([
+      "recipe.values: button writes button--loading for state loading and for loading true",
+    ]);
+  });
+
+  it("reports a compound without a name", () => {
+    const recipe = defineRecipe({
+      className: "button",
+      compoundVariants: [{ css: {}, size: "lg" }],
+      variants: { size: { lg: {}, md: {} } },
+    });
+
+    expect(recipeViolations(recipe)).toStrictEqual([
+      "recipe.compounds: button declares compound 1 without a name",
+    ]);
+  });
+
+  it("reports a compound without a class as one without a name", () => {
+    expect(
+      recipeViolations({ className: "button", compoundVariants: [{ css: {}, size: "lg" }] }),
+    ).toStrictEqual(["recipe.compounds: button declares compound 1 without a name"]);
+  });
+
+  it("reads no values off an axis that is not an object", () => {
+    expect(recipeViolations({ className: "button", variants: { size: "odd" } })).toStrictEqual([]);
+  });
+
+  it("reports two compounds under one name and a name that is a variant's class", () => {
+    const recipe = defineRecipe({
+      className: "button",
+      compoundVariants: [
+        { css: {}, name: "hero", size: "lg" },
+        { css: {}, name: "hero", size: "md" },
+        { css: {}, name: "md", size: "lg" },
+      ],
+      variants: { size: { lg: {}, md: {} } },
+    });
+
+    expect(recipeViolations(recipe)).toStrictEqual([
+      "recipe.compounds: button names compound 2 button--hero, as it names another",
+      "recipe.compounds: button names compound 3 button--md, which is the class of a variant",
+    ]);
+  });
+
+  it("passes a slot recipe whose compound is named per slot", () => {
+    const recipe = defineSlotRecipe({
+      className: "card",
+      compoundVariants: [{ css: { root: {}, title: {} }, name: "hero", size: "lg" }],
+      slots: ["root", "title"],
+      variants: { size: { lg: {}, md: {} } },
+    });
+
+    expect(recipeViolations(recipe)).toStrictEqual([]);
+  });
+
   it.each([
     ["#fff", "writes the color #fff"],
     ["oklch(50% 0.1 200)", "writes the color oklch(50% 0.1 200)"],

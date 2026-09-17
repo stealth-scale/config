@@ -1,8 +1,29 @@
 import { describe, expect, it } from "vitest";
 
-import { scopedPreset, scopedPresets, type Switchable, type SwitchablePreset } from "#scope.ts";
+import {
+  type Compounds,
+  publishedCompounds,
+  scopedPreset,
+  scopedPresets,
+  type Switchable,
+  type SwitchablePreset,
+} from "#scope.ts";
 
 const ABYSS = "[data-theme=abyss] &";
+
+const PUBLISHED: Compounds = {
+  recipes: {
+    button: [
+      { className: "button--hero", css: { fontWeight: "bold" }, size: "lg", variant: "solid" },
+    ],
+  },
+  slotRecipes: {
+    card: [
+      { className: "card__root--hero", css: { root: { fontWeight: "bold" } }, size: "lg" },
+      { className: "card__title--hero", css: { title: { letterSpacing: "wide" } }, size: "lg" },
+    ],
+  },
+};
 
 function theme(name: string, extend?: Record<string, unknown>): Switchable {
   return { name, ...(extend === undefined ? {} : { preset: { theme: { extend } } }) };
@@ -164,6 +185,129 @@ describe("scope", () => {
     expect(scoped).toMatchObject([
       { theme: { extend: { recipes: { button: { compoundVariants: [{ size: "lg" }] } } } } },
     ]);
+  });
+
+  it("gives a compound the class the published recipe emits the same selection under", () => {
+    const scoped = scopedPreset(
+      theme("abyss", {
+        recipes: {
+          button: {
+            compoundVariants: [{ css: { letterSpacing: "wide" }, size: "lg", variant: "solid" }],
+          },
+        },
+      }),
+      PUBLISHED,
+    );
+
+    expect(scoped).toMatchObject([
+      {
+        theme: {
+          extend: {
+            recipes: {
+              button: {
+                compoundVariants: [
+                  {
+                    className: "button--hero",
+                    css: { [ABYSS]: { letterSpacing: "wide" } },
+                    size: "lg",
+                    variant: "solid",
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+    ]);
+  });
+
+  it("leaves a compound no published compound matches without a class", () => {
+    const scoped = scopedPreset(
+      theme("abyss", {
+        recipes: { button: { compoundVariants: [{ css: { letterSpacing: "wide" }, size: "sm" }] } },
+      }),
+      PUBLISHED,
+    );
+
+    expect(scoped[0]?.theme.extend.recipes?.["button"]?.compoundVariants?.[0]).toStrictEqual({
+      css: { [ABYSS]: { letterSpacing: "wide" } },
+      size: "sm",
+    });
+  });
+
+  it("splits a slot compound per slot it styles under each slot's published class", () => {
+    const scoped = scopedPreset(
+      theme("abyss", {
+        slotRecipes: {
+          card: {
+            compoundVariants: [
+              { css: { root: { gap: "4" }, title: { color: "fg" } }, size: "lg" },
+              { size: "md" },
+            ],
+          },
+        },
+      }),
+      PUBLISHED,
+    );
+
+    expect(scoped[0]?.theme.extend.slotRecipes?.["card"]?.compoundVariants).toStrictEqual([
+      { className: "card__root--hero", css: { root: { [ABYSS]: { gap: "4" } } }, size: "lg" },
+      { className: "card__title--hero", css: { title: { [ABYSS]: { color: "fg" } } }, size: "lg" },
+      { size: "md" },
+    ]);
+  });
+
+  it("splits a slot the published recipe styles no compound for without a class", () => {
+    const scoped = scopedPreset(
+      theme("abyss", {
+        slotRecipes: {
+          card: {
+            compoundVariants: [{ css: { footer: { gap: "2" }, root: { gap: "4" } }, size: "lg" }],
+          },
+        },
+      }),
+      PUBLISHED,
+    );
+
+    expect(scoped[0]?.theme.extend.slotRecipes?.["card"]?.compoundVariants).toStrictEqual([
+      { css: { footer: { [ABYSS]: { gap: "2" } } }, size: "lg" },
+      { className: "card__root--hero", css: { root: { [ABYSS]: { gap: "4" } } }, size: "lg" },
+    ]);
+  });
+
+  it("reads the compounds every published preset declares by key", () => {
+    const published = publishedCompounds([
+      {
+        theme: {
+          extend: {
+            recipes: { button: { compoundVariants: [{ className: "button--hero", size: "lg" }] } },
+          },
+        },
+      },
+      {
+        theme: {
+          extend: {
+            recipes: { button: { compoundVariants: [{ className: "button--quiet", size: "sm" }] } },
+            slotRecipes: {
+              card: { compoundVariants: [{ className: "card__root--hero", size: "lg" }] },
+            },
+          },
+        },
+      },
+      "@pandacss/preset-base",
+      { theme: { extend: { recipes: { badge: {} } } } },
+    ]);
+
+    expect(published).toStrictEqual({
+      recipes: {
+        badge: [],
+        button: [
+          { className: "button--hero", size: "lg" },
+          { className: "button--quiet", size: "sm" },
+        ],
+      },
+      slotRecipes: { card: [{ className: "card__root--hero", size: "lg" }] },
+    });
   });
 
   it("nests the value of a text style under the attribute", () => {
