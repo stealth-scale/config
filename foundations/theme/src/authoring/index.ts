@@ -6,10 +6,13 @@
  *   Every name here is read at build time. Separate from the package's own entry because that
  *   entry re-exports the generated runtime, and the compiler's configuration reaches this package
  *   through whatever a theme imports. A theme importing the entry would put every generated file
- *   behind the configuration, and regenerating them would read as the configuration changing.
+ *   behind the configuration, and regenerating them would read as the configuration changing. The
+ *   two attributes are published here as well as on the entry, so a package that does not render,
+ *   such as the testing kit, reads them without loading the provider and its React transform.
  * @packageDocumentation
  */
 
+export { COLOR_MODE_ATTRIBUTE, THEME_ATTRIBUTE } from "#attributes.ts";
 export { type Application } from "#authoring/application.ts";
 export {
   BACKGROUNDS,

@@ -11,7 +11,9 @@ theme: name every compound in its recipe and read the sizes from the tokens
 - `typography()` writes each size as a reference to the `fontSizes` token of the same name.
 - `slide-fade.out` leaves towards the side the anchor is on: `top` to `slide-to-bottom`.
 - `Elevation` names the shadow step `surface()` takes. `Level` is the contrast level alone.
-- `THEME_ATTRIBUTE` and `COLOR_MODE_ATTRIBUTE` are defined once, in `attributes.ts`.
+- `THEME_ATTRIBUTE` and `COLOR_MODE_ATTRIBUTE` are defined once, in `attributes.ts`, and published
+  from `./authoring` beside the entry, so a package that does not render reads them without loading
+  the provider.
 - `switcher()` reads its threshold against the size scale where it is a name, as `simpleGrid()`
   reads its narrowest column, and switches at `md` when nothing is stated.
 - `RecipeExtension` and `SlotRecipeExtension` take `compoundVariants` as an open record of axes with

@@ -1,7 +1,11 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
 
-import { THEME_ATTRIBUTE } from "@stealthscale/theme";
-import { type Application, SEPARATOR, type Theme } from "@stealthscale/theme/authoring";
+import {
+  type Application,
+  SEPARATOR,
+  type Theme,
+  THEME_ATTRIBUTE,
+} from "@stealthscale/theme/authoring";
 import {
   type Theme as Loaded,
   THEME_ATTRIBUTE as pluginAttribute,
