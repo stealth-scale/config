@@ -1,5 +1,17 @@
 # @stealthscale/testing
 
+## 0.3.0
+
+### Minor Changes
+
+- [#21](https://github.com/stealth-scale/config/pull/21) [`012b4d5`](https://github.com/stealth-scale/config/commit/012b4d523dd89ff15f1a4906d502b471f592f880) Thanks [@stealth-rklopper](https://github.com/stealth-rklopper)! - testing: read a declaration out of a compiled stylesheet
+  
+  - `declared(css, selector, property)` returns what one selector declares a property as. The selector
+    is matched literally, so one carrying a wildcard or a bracket reads the same as any other, and it
+    is found wherever it sits in a selector list.
+  - The two application specifications and the plugin's assembly specification each carried a copy,
+    and the copies escaped four characters of the seven a pattern reads as syntax.
+
 ## 0.2.0
 
 ### Minor Changes

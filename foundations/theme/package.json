@@ -1,6 +1,6 @@
 {
   "name": "@stealthscale/theme",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Publishes the foundation every recipe is written against, the runtime every component binds its recipe with, and the vocabulary a theme is written in.",
   "keywords": [
     "design-system",
