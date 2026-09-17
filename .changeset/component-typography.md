@@ -1,0 +1,13 @@
+---
+"@stealthscale/component-typography": minor
+---
+
+component-typography: publish the first seven components
+
+- `Text`, `Heading`, `Code`, `Kbd` and `Icon` each bind one element through the compiler's factory,
+  so a caller changes the element with `as`. `List` and `Blockquote` are published as namespaces of
+  their parts, `List.Root` and `Blockquote.Content`.
+- Every axis the vocabulary lets a theme move on a component is an axis of its recipe: the body and
+  heading roles as sizes, the foreground roles as tones, the looks, the statuses, the semantic
+  scales, and the text effects, masks and motions as `effect`, `mask` and `motion`.
+- The preset under `./theme` registers all seven recipes.

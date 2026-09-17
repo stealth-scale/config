@@ -9,7 +9,20 @@
 
 import { definePreset } from "@stealthscale/theme/authoring";
 
+import { recipe as blockquote } from "#blockquote/recipe.ts";
+import { recipe as code } from "#code/recipe.ts";
+import { recipe as heading } from "#heading/recipe.ts";
+import { recipe as icon } from "#icon/recipe.ts";
+import { recipe as kbd } from "#kbd/recipe.ts";
+import { recipe as list } from "#list/recipe.ts";
+import { recipe as text } from "#text/recipe.ts";
+
 export default definePreset({
   name: "@stealthscale/component-typography",
-  theme: { extend: { recipes: {} } },
+  theme: {
+    extend: {
+      recipes: { code, heading, icon, kbd, text },
+      slotRecipes: { blockquote, list },
+    },
+  },
 });
