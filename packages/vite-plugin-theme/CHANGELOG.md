@@ -1,5 +1,18 @@
 # @stealthscale/vite-plugin-theme
 
+## 0.1.2
+
+### Patch Changes
+
+- [#25](https://github.com/stealth-scale/config/pull/25) [`4d6bed5`](https://github.com/stealth-scale/config/commit/4d6bed5a3c60bb5518b7defac65cd812911e9f8c) Thanks [@stealth-rklopper](https://github.com/stealth-rklopper)! - vite-plugin-theme: complete a theme with the tokens the themes disagree on alone
+  
+  - A theme's variant is completed with the foundation's value for each token another theme states and
+    it leaves unstated, and for no other. A token no theme states has the foundation's value
+    everywhere already, so restating every token under every theme doubled the gzipped stylesheet for
+    nothing. `stated(variants)` lists the tokens any theme states, and `completed` takes that shape.
+- Updated dependencies []:
+  - @stealthscale/pandacss-compiler@0.1.1
+
 ## 0.1.1
 
 ### Patch Changes
