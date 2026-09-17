@@ -1,7 +1,7 @@
 import { fireEvent, render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { variantClass } from "@stealthscale/testing-theme";
+import { compoundClass, variantClass } from "@stealthscale/testing-theme";
 
 import { App } from "#app.tsx";
 
@@ -82,6 +82,17 @@ describe("App", () => {
     expect(
       getByRole("button", { name: "Solid in forge" }).closest("section")?.dataset["theme"],
     ).toBe("forge");
+  });
+
+  it("draws the hero compound on the large solid button of the page and of the forge panel", () => {
+    const { getByRole } = render(<App />);
+    const hero = getByRole("button", { name: "Hero in forge" });
+
+    expect(getByRole("button", { name: "Large" }).className).toContain(
+      compoundClass("button", "hero"),
+    );
+    expect(hero.className).toContain(compoundClass("button", "hero"));
+    expect(hero.closest("section")?.dataset["theme"]).toBe("forge");
   });
 
   it("draws the candy panel below the forge panel", () => {

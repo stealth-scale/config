@@ -141,6 +141,7 @@ export function App(): ReactElement {
           <p className={row}>
             <Button>Solid in forge</Button>
             <Button variant="subtle">Subtle in forge</Button>
+            <Button size="lg">Hero in forge</Button>
           </p>
         </section>
         <Cards />
