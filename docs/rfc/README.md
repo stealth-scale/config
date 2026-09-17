@@ -13,6 +13,7 @@ the decision, and the standards hold the rules that are refined.
 | [0001](0001-one-grammar-for-config-packages.md)       | One grammar for config and plugin packages          | Accepted |
 | [0002](0002-conformance-suite-for-config-packages.md) | A conformance suite for config and plugin packages  | Accepted |
 | [0003](0003-theming.md)                               | Theming: the vocabulary, recipes, themes and scopes | Accepted |
+| [0004](0004-the-form-of-a-component.md)               | The form of a component                             | Accepted |
 
 ## Status
 
