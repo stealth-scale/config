@@ -49,8 +49,18 @@ export interface ExtensionFile {
 
 /**
  * Matches the line a recipe file exports its recipe on.
+ *
+ * @remarks
+ *   The name alone, because the definition may carry a type and may be written on the next line.
+ *   Matching the definition as well left such a file unread, and the preset check then reported
+ *   the registered key as backed by no file and passed over a second recipe file.
  */
-const RECIPE = /^export const recipe = define(?<kind>Slot)?Recipe\(/mu;
+const RECIPE = /^export const recipe\b/mu;
+
+/**
+ * Matches the call a slot recipe is defined by, wherever the file writes it.
+ */
+const SLOTTED = /\bdefineSlotRecipe\s*\(/u;
 
 /**
  * Matches the line an extension file exports its extension on.
@@ -90,15 +100,15 @@ export function recipeFiles(at: string): readonly RecipeFile[] {
   return sourcesUnder(at)
     .filter((file) => file.endsWith(RECIPE_SUFFIX))
     .flatMap((file) => {
-      const found = RECIPE.exec(readFileSync(join(at, file), "utf8"));
+      const source = readFileSync(join(at, file), "utf8");
 
-      if (found === null) return [];
+      if (!RECIPE.test(source)) return [];
 
       return [
         {
           file,
           key: camelCased(basename(file, RECIPE_SUFFIX)),
-          slotted: found.groups?.["kind"] === "Slot",
+          slotted: SLOTTED.test(source),
         },
       ];
     });

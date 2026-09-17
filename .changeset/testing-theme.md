@@ -17,6 +17,24 @@ testing-theme: add the theme testing kit
 - `slotElement` and `slotClasses` find a part by the `data-slot` a slot binding stamps as well as by
   the `data-part` an anatomy stamps, so a compound component with no machine behind it is read the
   same way.
+- `recipe.tokens` reads a token named by one word, so `l9` and `stiky` are reported where the dotted
+  form alone was. Nine of the categories a theme states are keyed by one word. A CSS-wide keyword
+  and a size a box takes from its content are passed over.
+- `recipe.lengths` leaves out what the compiler resolves, so `token(spacing.4, 4px)` is no longer
+  read as a hard-coded length.
+- The walk reads a key as a property where the compiler resolves one of that name, so a value under
+  a range breakpoint such as `smDown` is checked against the property above it. A written list of
+  six breakpoint names had left every derived form unchecked.
+- `recipeFiles` finds a recipe whose export carries a type, and one whose definition is written on
+  the next line, and reads whether it is slotted from the call. One spelling was recognised, and a
+  file written any other way was reported as backed by no file.
+- `contract.modes` reports a color whose value states no mode the kit knows, an empty object or a
+  pair of keys misspelt, which every check passed over.
+- `contract.compounds` reports rather than throws where the component's own recipe carries a
+  compound matched on a value a class name cannot carry.
+- `publishedRecipes(...presets)` maps every recipe the component packages register to its key, for
+  `options.recipes`. A theme specification that passed a list of names left the compound check out,
+  because the check needs the recipes themselves.
 - `variantClass` and `slotVariantClass` write the separator `@stealthscale/theme/authoring`
   publishes, so `variantClass("button", "size", "lg")` returns `button--size-lg`, and the kit holds
   the separator and the theme attribute equal between the design-system package and the build

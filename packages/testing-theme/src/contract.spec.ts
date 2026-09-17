@@ -55,6 +55,15 @@ describe("contract", () => {
     expect(modes(paletteTheme({ solid: { value: "x" } }))).toStrictEqual([]);
   });
 
+  it("reports a color whose value states no mode at all", () => {
+    expect(modes(paletteTheme({ solid: { value: {} } }))).toStrictEqual([
+      "audited primary.solid states no mode",
+    ]);
+    expect(modes(paletteTheme({ solid: { value: { _osDark: "x", light: "y" } } }))).toStrictEqual([
+      "audited primary.solid states no mode",
+    ]);
+  });
+
   it("reports a reference that points at a step nothing defines", () => {
     const theme = paletteTheme({ solid: { value: { _dark: "x", base: "{colors.primary.999}" } } });
 
@@ -129,12 +138,41 @@ describe("contract", () => {
     const theme = defineTheme({
       extends: foundationTheme(),
       name: "abyss",
-      recipes: { button: { compoundVariants: [{ css: {}, size: { color: "fg" } }] } },
+      recipes: { button: { base: {} } },
     });
+    const extend = theme.preset.theme?.extend?.recipes?.["button"];
     const recipe = { ...button, compoundVariants: [null] };
+
+    Object.assign(extend ?? {}, { compoundVariants: [{ css: {}, size: { color: "fg" } }] });
 
     expect(compounds(theme, { button: recipe })).toStrictEqual([
       "abyss extends button with a compound matched on a value a class name cannot carry",
+    ]);
+  });
+
+  it("passes over a theme's compound that is not an object", () => {
+    const theme = defineTheme({
+      extends: foundationTheme(),
+      name: "abyss",
+      recipes: { button: { base: {} } },
+    });
+    const extend = theme.preset.theme?.extend?.recipes?.["button"];
+
+    Object.assign(extend ?? {}, { compoundVariants: [null] });
+
+    expect(compounds(theme, { button })).toStrictEqual([]);
+  });
+
+  it("reports rather than throws when the recipe's own compound carries such a value", () => {
+    const theme = defineTheme({
+      extends: foundationTheme(),
+      name: "abyss",
+      recipes: { button: { compoundVariants: [{ css: {}, size: "lg" }] } },
+    });
+    const recipe = { ...button, compoundVariants: [{ css: {}, size: { bad: true } }] };
+
+    expect(compounds(theme, { button: recipe })).toStrictEqual([
+      "abyss extends button with a compound for size-lg, which the recipe does not declare",
     ]);
   });
 

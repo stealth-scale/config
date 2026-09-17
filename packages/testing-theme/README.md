@@ -15,13 +15,14 @@ The package peers on `@stealthscale/theme` and `vitest`. Install both.
 
 ## Usage
 
-A theme package runs its theme through the gate, naming the preset it is layered on and the recipe
-keys the workspace publishes:
+A theme package runs its theme through the gate, naming the preset it is layered on and the recipes
+the workspace publishes:
 
 ```ts
 import { describe, expect, it } from "vitest";
 
-import { violations } from "@stealthscale/testing-theme";
+import actions from "@acme/actions/theme";
+import { publishedRecipes, violations } from "@stealthscale/testing-theme";
 import foundation from "@stealthscale/theme/theme";
 
 import { fathom } from "#index.ts";
@@ -29,7 +30,11 @@ import { fathom } from "#index.ts";
 describe("fathom", () => {
   it("keeps the theme contract", () => {
     expect(
-      violations(fathom, { at: import.meta.dirname, base: foundation, recipes: ["button"] }),
+      violations(fathom, {
+        at: import.meta.dirname,
+        base: foundation,
+        recipes: publishedRecipes(actions),
+      }),
     ).toStrictEqual([]);
   });
 });
@@ -75,22 +80,24 @@ expect(recipeClasses(container, "button")).toContain(variantClass("button", "var
 | `fonts.installed`     | A font package the theme names that does not resolve from `at`                                                                     |
 
 `options.recipes` lists the recipe keys the workspace publishes, or maps each key to its recipe,
-which adds the compound check. `options.base` names the preset the theme is layered on, which the
-resolver follows a reference into. `options.thresholds` moves any of the three ratios.
-`options.skip` leaves a check out, each with a reason.
+which adds the compound check. `publishedRecipes(...presets)` builds that map out of the presets the
+component packages publish, so the list is the one an application installs rather than one written
+out by hand. `options.base` names the preset the theme is layered on, which the resolver follows a
+reference into. `options.thresholds` moves any of the three ratios. `options.skip` leaves a check
+out, each with a reason.
 
 ### `recipeViolations(recipe, options)`
 
-| Check               | Reports                                                                                                                           |
-| ------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `recipe.className`  | A class name outside `[a-z][a-z0-9-]*`                                                                                            |
-| `recipe.colors`     | A color written outright, a ramp step, a reference, a hue, a palette role that does not exist, or `colorPalette` pointed at a hue |
-| `recipe.tokens`     | A token path the preset does not define, in any category a property reads, and any composition name it does not define            |
-| `recipe.conditions` | A condition neither the compiler's base preset nor the preset defines                                                             |
-| `recipe.lengths`    | A length in `px`, `rem` or `pt` on a property outside `options.lengths`                                                           |
-| `recipe.modes`      | `_dark`, `_light`, `_osDark` or `_osLight` anywhere in the recipe                                                                 |
-| `recipe.slots`      | A slot `options.parts` stamps no part for, and a part no slot styles                                                              |
-| `recipe.subtle`     | `fg.subtle` as a text color                                                                                                       |
+| Check               | Reports                                                                                                                                                                                                                       |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `recipe.className`  | A class name outside `[a-z][a-z0-9-]*`                                                                                                                                                                                        |
+| `recipe.colors`     | A color written outright, a ramp step, a reference, a hue, a palette role that does not exist, or `colorPalette` pointed at a hue                                                                                             |
+| `recipe.tokens`     | A token the preset does not define, named by one word or by a path, in any category a property reads, and any composition name it does not define. A CSS-wide keyword and a size a box takes from its content are passed over |
+| `recipe.conditions` | A condition neither the compiler's base preset nor the preset defines                                                                                                                                                         |
+| `recipe.lengths`    | A length in `px`, `rem` or `pt` on a property outside `options.lengths`, the compiler's token function and a custom property's fallback left out                                                                              |
+| `recipe.modes`      | `_dark`, `_light`, `_osDark` or `_osLight` anywhere in the recipe                                                                                                                                                             |
+| `recipe.slots`      | A slot `options.parts` stamps no part for, and a part no slot styles                                                                                                                                                          |
+| `recipe.subtle`     | `fg.subtle` as a text color                                                                                                                                                                                                   |
 
 The color properties and the category each property reads are taken from the compiler's base preset
 at run time. The tokens and conditions are read from `options.preset`, which is the foundation
@@ -106,12 +113,13 @@ unless a theme package states its own.
 
 ### Readers
 
-| Export                                                                      | Reads                                                            |
-| --------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| `recipeClass`, `variantClass`, `slotClass`, `slotVariantClass`              | The classes a recipe emits, in the compiler's scheme             |
-| `axesOf`, `valuesOf`, `defaultsOf`, `slotsOf`, `scaleOf`, `byStep`          | What a recipe declares, without rendering                        |
-| `recipeElement`, `slotElement`, `classesOf`, `recipeClasses`, `slotClasses` | What a rendered component drew, by `data-recipe` and `data-part` |
-| `resolved`, `palettesOf`, `extendedRecipes`, `fontsOf`                      | What a theme states, with every reference followed               |
+| Export                                                                      | Reads                                                                                                                                                                        |
+| --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `recipeClass`, `variantClass`, `slotClass`, `slotVariantClass`              | The classes a recipe emits, in the compiler's scheme                                                                                                                         |
+| `axesOf`, `valuesOf`, `defaultsOf`, `slotsOf`, `scaleOf`, `byStep`          | What a recipe declares, without rendering                                                                                                                                    |
+| `recipeElement`, `slotElement`, `classesOf`, `recipeClasses`, `slotClasses` | What a rendered component drew, by `data-recipe` on the element a recipe was bound to and on the root of a compound component, and by `data-part` or `data-slot` on one part |
+| `resolved`, `palettesOf`, `extendedRecipes`, `fontsOf`                      | What a theme states, with every reference followed                                                                                                                           |
+| `publishedRecipes`                                                          | Every recipe the presets of the component packages register, keyed as they register it, for `options.recipes`                                                                |
 
 ## Licence
 

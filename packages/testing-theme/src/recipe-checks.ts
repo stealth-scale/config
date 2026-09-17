@@ -13,6 +13,7 @@ import { HUES, PALETTES, type Preset, ROLES } from "@stealthscale/theme/authorin
 import foundation from "@stealthscale/theme/theme";
 
 import { conditionNames, semanticColorPaths, tokenPaths } from "#categories.ts";
+import { gated } from "#gate.ts";
 import { type Declared } from "#recipe.ts";
 import { walked, type Walked, type Written } from "#walk.ts";
 
@@ -87,10 +88,47 @@ const STEP = /^[a-zA-Z]+\.\d+$/u;
 const PASSES = /^(?:transparent|current|currentColor|inherit|initial|unset|none|var\(--)/u;
 
 /**
- * Matches a value that names a token: a dotted path, or the compiler's token function anywhere
- * in the value.
+ * Matches a value that names a token: one word, a dotted path, or the compiler's token function
+ * anywhere in the value.
+ *
+ * @remarks
+ *   A dot is not required. Nine of the categories a theme states are keyed by one word, `radii`
+ *   and `zIndex` among them, so a value written `l9` or `stiky` reached the page as raw CSS with
+ *   the dotted form alone.
  */
-const TOKEN = /^[a-zA-Z][\w-]*(?:\.[\w-]+)+$|token\(/u;
+const TOKEN = /^[a-zA-Z][\w-]*(?:\.[\w-]+)*$|token\(/u;
+
+/**
+ * Matches a call whose arguments the compiler resolves: its token function, and a custom
+ * property with a fallback.
+ *
+ * @remarks
+ *   One level of nesting inside the call, which is as deep as a fallback goes.
+ */
+const RESOLVED = /(?:token|var)\((?:[^()]|\([^()]*\))*\)/gu;
+
+/**
+ * Lists the words a property takes that no category defines: the CSS-wide keywords, and the
+ * sizes a box takes from its content or its context.
+ *
+ * @remarks
+ *   A word that is also a token name needs no entry, because the category defines it. Only the
+ *   words no theme can move are listed, so a name typed wrongly is still reported.
+ */
+const KEYWORDS = new Set([
+  "auto",
+  "fit-content",
+  "inherit",
+  "initial",
+  "max-content",
+  "min-content",
+  "none",
+  "normal",
+  "revert",
+  "revert-layer",
+  "stretch",
+  "unset",
+]);
 
 /**
  * Matches the category and the path inside the compiler's token function, wherever it is in the
@@ -168,6 +206,10 @@ function colorViolations(
 
 /**
  * Says what is wrong with a token a value names, or nothing where the preset defines it.
+ *
+ * @remarks
+ *   A word every property takes is passed over, because no theme can move it. Everything else
+ *   that reads as a name is held against the paths the preset defines in the category.
  */
 function tokenFault(category: string, value: string, preset: Preset): string | undefined {
   const call = TOKEN_CALL.exec(value);
@@ -181,6 +223,7 @@ function tokenFault(category: string, value: string, preset: Preset): string | u
   }
 
   if (!TOKEN.test(value) && !COMPOSITIONS.has(category)) return undefined;
+  if (KEYWORDS.has(bare(value))) return undefined;
 
   return tokenPaths(category, preset).has(bare(value))
     ? undefined
@@ -220,6 +263,10 @@ function conditionViolations(recipe: Declared, found: Walked, preset: Preset): r
 
 /**
  * Reports every length a recipe writes in a unit a theme cannot move.
+ *
+ * @remarks
+ *   A length inside the compiler's token function or a custom property's fallback is the theme's
+ *   own, so the calls come out of the value before it is read.
  */
 function lengthViolations(
   recipe: Declared,
@@ -227,7 +274,9 @@ function lengthViolations(
   allowed: readonly string[],
 ): readonly string[] {
   return found.flatMap(({ path, property, value }) =>
-    property !== undefined && !allowed.includes(property) && LENGTH.test(value)
+    property !== undefined &&
+    !allowed.includes(property) &&
+    LENGTH.test(value.replaceAll(RESOLVED, ""))
       ? [`${recipe.className} sets ${property} to ${value} at ${path}, a length in px, rem or pt`]
       : [],
   );
@@ -321,15 +370,6 @@ const RUNNERS: ReadonlyArray<readonly [RecipeCheck, Runner]> = [
 ];
 
 /**
- * Reports a skip that gives no reason.
- */
-function unreasoned(options: RecipeChecks): readonly string[] {
-  return Object.entries(options.skip ?? {})
-    .filter(([, because]) => because.trim() === "")
-    .map(([check]) => `skip of ${check} gives no reason`);
-}
-
-/**
  * Runs every check the specification leaves standing over a recipe.
  *
  * @returns Each violation, opening with the check that reported it, or an empty array for a
@@ -338,10 +378,9 @@ function unreasoned(options: RecipeChecks): readonly string[] {
 export function recipeViolations(recipe: Declared, options: RecipeChecks = {}): readonly string[] {
   const found = walked(recipe);
   const preset = options.preset ?? foundation;
-  const reported = RUNNERS.filter(([check]) => options.skip?.[check] === undefined).flatMap(
-    ([check, run]) =>
-      run(recipe, found, options, preset).map((violation) => `${check}: ${violation}`),
-  );
 
-  return unreasoned(options).concat(reported);
+  return gated(
+    RUNNERS.map(([check, run]) => [check, () => run(recipe, found, options, preset)] as const),
+    options,
+  );
 }

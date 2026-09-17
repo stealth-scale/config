@@ -10,7 +10,7 @@ import { existsSync } from "node:fs";
 import {
   BACKGROUNDS,
   BORDERS,
-  compoundClassName,
+  compoundSelection,
   FOREGROUNDS,
   MODES,
   ROLES,
@@ -22,11 +22,6 @@ import { extensionFiles } from "#files.ts";
 import { type Declared } from "#recipe.ts";
 import { colorsOf, extendedRecipes, palettesOf, resolved, type Resolving } from "#theme.ts";
 import { leaves, nodeAt, stated } from "#tokens.ts";
-
-/**
- * Fixes the prefix the compiler writes before a compound's selection in its class.
- */
-const COMPOUND = "--compound__";
 
 /**
  * Lists the three families against the members each states.
@@ -77,11 +72,14 @@ export function roles(theme: Theme): readonly string[] {
 }
 
 /**
- * Reports a color stated in one mode and not the other.
+ * Reports a color stated in one mode and not the other, and one whose value states no mode at all.
  *
  * @remarks
  *   A color stated once as a string covers both modes, and a reference inherits both from the
- *   token it names, so only a pair with one side missing is reported.
+ *   token it names, so a string is passed over. An object value names the modes, so one that names
+ *   neither states nothing the compiler will emit: an empty object, or a pair of keys misspelt.
+ *   Nothing else reports those, because a reference check reads the same keys and a contrast pair
+ *   covers the roles it names and no other.
  */
 export function modes(theme: Theme): readonly string[] {
   return leaves(colorsOf(theme)).flatMap(({ path, value }) => {
@@ -89,9 +87,9 @@ export function modes(theme: Theme): readonly string[] {
 
     const missing = MODES.filter((mode) => !(mode in value));
 
-    return missing.length === MODES.length || missing.length === 0
-      ? []
-      : missing.map((mode) => `${theme.name} ${path} is not stated in ${mode}`);
+    if (missing.length === MODES.length) return [`${theme.name} ${path} states no mode`];
+
+    return missing.map((mode) => `${theme.name} ${path} is not stated in ${mode}`);
   });
 }
 
@@ -139,13 +137,11 @@ export function extensions(theme: Theme, recipes?: readonly string[]): readonly 
 
 /**
  * Writes a compound's selection in the compiler's scheme, or undefined for an entry that is not an
- * object.
- *
- * @throws {@link Error} When the compound matches an axis on a value a class name cannot carry.
+ * object and for one matched on a value a class name cannot carry.
  */
 function selectionOf(compound: unknown): string | undefined {
   return typeof compound === "object" && compound !== null
-    ? compoundClassName("", compound).slice(COMPOUND.length)
+    ? compoundSelection(compound)
     : undefined;
 }
 
@@ -176,19 +172,21 @@ export function compounds(
     );
 
     return (extension.compoundVariants ?? []).flatMap((compound) => {
-      try {
-        const selection = selectionOf(compound);
+      if (typeof compound !== "object" || compound === null) return [];
 
-        return selection === undefined || declared.has(selection)
-          ? []
-          : [
-              `${theme.name} extends ${key} with a compound for ${selection}, which the recipe does not declare`,
-            ];
-      } catch {
+      const selection = selectionOf(compound);
+
+      if (selection === undefined) {
         return [
           `${theme.name} extends ${key} with a compound matched on a value a class name cannot carry`,
         ];
       }
+
+      return declared.has(selection)
+        ? []
+        : [
+            `${theme.name} extends ${key} with a compound for ${selection}, which the recipe does not declare`,
+          ];
     });
   });
 }

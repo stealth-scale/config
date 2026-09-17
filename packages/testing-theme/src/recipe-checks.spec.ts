@@ -122,6 +122,39 @@ describe("recipeViolations", () => {
     expect(recipeViolations({ base: { paddingInline: "4px" }, className: "x" })).toStrictEqual([
       "recipe.lengths: x sets paddingInline to 4px at base.paddingInline, a length in px, rem or pt",
     ]);
+  });
+
+  it("passes a length the compiler resolves inside a token call or a fallback", () => {
+    expect(
+      recipeViolations({ base: { paddingInline: "token(spacing.4, 4px)" }, className: "x" }),
+    ).toStrictEqual([]);
+    expect(
+      recipeViolations({ base: { marginTop: "var(--offset, 4px)" }, className: "x" }),
+    ).toStrictEqual([]);
+  });
+
+  it("reports a token named by one word that the preset does not define", () => {
+    expect(recipeViolations({ base: { borderRadius: "l9" }, className: "x" })).toStrictEqual([
+      "recipe.tokens: x names l9, which is not a radii token at base.borderRadius",
+    ]);
+    expect(recipeViolations({ base: { zIndex: "stiky" }, className: "x" })).toStrictEqual([
+      "recipe.tokens: x names stiky, which is not a zIndex token at base.zIndex",
+    ]);
+  });
+
+  it("passes a token named by one word that the preset defines", () => {
+    expect(
+      recipeViolations({ base: { borderRadius: "l2", zIndex: "sticky" }, className: "x" }),
+    ).toStrictEqual([]);
+  });
+
+  it("reads a value under a range breakpoint against the property above it", () => {
+    expect(
+      recipeViolations({ base: { color: { smDown: "#fff", smToLg: "red.500" } }, className: "x" }),
+    ).toStrictEqual([
+      "recipe.colors: x writes the color #fff at base.color.smDown",
+      "recipe.colors: x names the ramp step red.500 at base.color.smToLg",
+    ]);
     expect(recipeViolations({ base: { inset: "calc(1rem + 2%)" }, className: "x" })).toHaveLength(
       1,
     );

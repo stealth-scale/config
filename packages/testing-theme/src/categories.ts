@@ -83,37 +83,87 @@ function categoriesOf(utility: Utility): readonly string[] {
 }
 
 /**
- * Builds the map from every property and shorthand to the first category it reads.
+ * Carries what the compiler's base preset says about properties.
  */
-function mapped(): ReadonlyMap<string, string> {
-  const found = new Map<string, string>(Object.entries(COMPOSITIONS));
+interface Vocabulary {
+  /**
+   * Every property and shorthand that reads a token, against the category it reads.
+   */
+  categories: ReadonlyMap<string, string>;
 
-  for (const [property, utility] of Object.entries({ ...base.utilities })) {
-    const [category] = categoriesOf({ ...utility });
-
-    if (category === undefined) continue;
-
-    const shorthand = utility?.shorthand ?? [];
-
-    for (const name of [property, ...(typeof shorthand === "string" ? [shorthand] : shorthand)]) {
-      found.set(name, category);
-    }
-  }
-
-  return found;
+  /**
+   * Every property and shorthand the compiler resolves, whether or not it reads a token.
+   */
+  properties: ReadonlySet<string>;
 }
 
 /**
- * Maps every property and shorthand to the token category it reads, built once.
+ * Lists a utility's names: the property and every shorthand it answers to.
  */
-const CATEGORIES = mapped();
+function namesOf(property: string, utility: Utility): readonly string[] {
+  const shorthand = utility.shorthand ?? [];
+
+  return [property, ...(typeof shorthand === "string" ? [shorthand] : shorthand)];
+}
+
+/**
+ * Reads the base preset's utilities into the two lookups.
+ */
+function read(): Vocabulary {
+  const categories = new Map<string, string>(Object.entries(COMPOSITIONS));
+  const properties = new Set<string>(Object.keys(COMPOSITIONS));
+
+  for (const [property, utility] of Object.entries({ ...base.utilities })) {
+    const names = namesOf(property, { ...utility });
+    const [category] = categoriesOf({ ...utility });
+
+    for (const name of names) {
+      properties.add(name);
+
+      if (category !== undefined) categories.set(name, category);
+    }
+  }
+
+  return { categories, properties };
+}
+
+/**
+ * Caches the two lookups, once something has asked for them.
+ */
+let vocabulary: undefined | Vocabulary;
+
+/**
+ * Reads the vocabulary, building it on the first ask.
+ *
+ * @remarks
+ *   Built on the first ask rather than on import, because a specification that reads only the
+ *   classes a recipe emits pays for the whole utility map otherwise.
+ */
+function known(): Vocabulary {
+  vocabulary ??= read();
+
+  return vocabulary;
+}
 
 /**
  * Reads the category a property takes its value from, or undefined for a property that reads no
  * token.
  */
 export function categoryOf(property: string): string | undefined {
-  return CATEGORIES.get(property);
+  return known().categories.get(property);
+}
+
+/**
+ * Reports whether a key names a property the compiler resolves, rather than a condition, a
+ * selector, a slot or a breakpoint.
+ *
+ * @remarks
+ *   The compiler derives a condition from each breakpoint, `smDown` and `smToLg` beside `sm`, so a
+ *   list of breakpoint names written here would go stale the moment a theme states one more. What
+ *   the compiler resolves as a property is the list that cannot.
+ */
+export function isProperty(key: string): boolean {
+  return known().properties.has(key);
 }
 
 /**

@@ -1,9 +1,15 @@
 /**
  * Walks every style a recipe writes and reports each string with the property it is written
  * under and the category that property reads.
+ *
+ * @remarks
+ *   A key is a property where the compiler resolves one of that name, and nests otherwise, so a
+ *   breakpoint, a condition, a selector and a slot each carry the property above them down to the
+ *   value. The compiler derives a condition from every breakpoint, so a value written under
+ *   `smDown` is read against the same property as one written under `sm`.
  */
 
-import { categoryOf } from "#categories.ts";
+import { categoryOf, isProperty } from "#categories.ts";
 import { type Declared } from "#recipe.ts";
 
 /**
@@ -79,19 +85,6 @@ interface Site {
    * The property in force.
    */
   property: string | undefined;
-}
-
-/**
- * Lists the breakpoints, which nest a value without being properties.
- */
-const BREAKPOINTS = new Set(["base", "sm", "md", "lg", "xl", "2xl"]);
-
-/**
- * Reports whether a key names a property rather than a condition, a selector, a slot's own
- * value or a breakpoint.
- */
-function isProperty(key: string): boolean {
-  return /^[a-zA-Z][a-zA-Z0-9]*$/u.test(key) && !BREAKPOINTS.has(key);
 }
 
 /**

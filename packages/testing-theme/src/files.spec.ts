@@ -41,6 +41,22 @@ describe("files", () => {
     expect(found.map((file) => file.file)).toStrictEqual(["button.recipe.ts"]);
   });
 
+  it("lists a recipe whose export carries a type or sits on the next line", () => {
+    const found = withScratchWorkspace(
+      {
+        "src/annotated.recipe.ts":
+          'export const recipe: Recipe = defineRecipe({ className: "a" });\n',
+        "src/wrapped.recipe.ts": 'export const recipe =\n  defineSlotRecipe({ className: "w" });\n',
+      },
+      (workspace) => recipeFiles(workspace.path("src")),
+    );
+
+    expect(found.map((file) => [file.file, file.slotted])).toStrictEqual([
+      ["annotated.recipe.ts", false],
+      ["wrapped.recipe.ts", true],
+    ]);
+  });
+
   it("lists nothing under a directory that is absent", () => {
     expect(recipeFiles("/nowhere/at/all")).toStrictEqual([]);
   });
