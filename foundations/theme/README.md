@@ -96,8 +96,11 @@ export default { themes: [fathom, abyss] } satisfies Application;
 ```
 
 A page switches its theme and its color mode with two attributes, on the document root or on any
-element for a subtree. Where neither is written, the first theme draws the page and the reader's
-operating system decides the mode:
+element for a subtree. The element carrying an attribute switches its own tokens, so everything
+drawn from a token follows, and the rules a theme or a recipe writes for that theme or mode reach
+the elements below it, because the compiler scopes them to descendants. A component whose own rules
+must switch is put inside the element that carries the attribute. Where neither is written, the
+first theme draws the page and the reader's operating system decides the mode:
 
 ```html
 <html data-theme="fathom" data-color-mode="dark"></html>

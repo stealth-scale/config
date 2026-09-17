@@ -7,7 +7,11 @@
  *   no attribute is written the operating system's preference decides, so a page that writes
  *   nothing follows the reader's setting and a page that writes the attribute overrides it. Each
  *   mode is two blocks: the attribute on an ancestor, or the preference outside a subtree that
- *   states the other mode.
+ *   states the other mode. The attribute block names an ancestor and not the element itself, as
+ *   the compiler's theme attribute does, because the compiler writes the same selector round a
+ *   token block, and a block that matched every element below the carrier would let a mode
+ *   nested inside the other one be decided by stylesheet order rather than by the nearest
+ *   carrier.
  */
 
 import { COLOR_MODE_ATTRIBUTE } from "#attributes.ts";
