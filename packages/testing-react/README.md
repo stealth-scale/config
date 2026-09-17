@@ -118,6 +118,20 @@ A phrase states what the component did. The order of the list is the order the c
 | `does not honour as`                            | `as` was given and the element is not the one it named                                      |
 | `does not honour asChild`                       | `asChild` was given and the element is not the child's                                      |
 
+## Accessibility
+
+`accessibilityViolations(Component, options)` renders the component under the same `props` and
+`wrapper` the conformance check takes, runs axe over what it rendered, and returns each rule it
+breaks as `id: help`. A rule axe cannot decide, which it reports as incomplete, is left out.
+
+```tsx
+import { accessibilityViolations } from "@stealthscale/testing-react";
+
+await expect(
+  accessibilityViolations(Button, { props: { children: "Save" } }),
+).resolves.toStrictEqual([]);
+```
+
 ## Licence
 
 MIT. See [LICENSE](LICENSE).
