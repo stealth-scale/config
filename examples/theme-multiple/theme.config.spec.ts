@@ -90,6 +90,11 @@ describe("theme.config", () => {
     expect(css).not.toContain("compound__");
   });
 
+  it("compiles the square the icon button fixes through a default prop", () => {
+    expect(declared(css, ".button--square", "aspect-ratio")).toBe("var(--aspect-ratios-square)");
+    expect(declared(css, ".button--square", "padding-inline")).toBe("var(--spacing-0)");
+  });
+
   it("compiles the card slot recipe the surfaces package publishes with one class per slot", () => {
     expect(declared(css, ".card__root", "border-radius")).toBe("var(--radii-l2)");
     expect(declared(css, ".card__root--subtle", "background")).toBe("var(--colors-bg-subtle)");
