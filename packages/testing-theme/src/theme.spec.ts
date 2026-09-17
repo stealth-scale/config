@@ -1,10 +1,15 @@
 import { describe, expect, it } from "vitest";
 
-import { defineTheme } from "@stealthscale/theme/authoring";
+import {
+  definePreset,
+  defineRecipe,
+  defineSlotRecipe,
+  defineTheme,
+} from "@stealthscale/theme/authoring";
 import foundation from "@stealthscale/theme/theme";
 
 import { foundationTheme, paletteTheme } from "#theme.fixtures.ts";
-import { extendedRecipes, fontsOf, palettesOf, resolved } from "#theme.ts";
+import { extendedRecipes, fontsOf, palettesOf, publishedRecipes, resolved } from "#theme.ts";
 
 describe("theme", () => {
   it("reads a color written outright in one mode", () => {
@@ -106,5 +111,37 @@ describe("theme", () => {
       "@f/body",
       "@f/mono",
     ]);
+  });
+
+  it("maps every recipe the presets publish to the key it is registered under", () => {
+    const actions = definePreset({
+      name: "@acme/actions",
+      theme: { extend: { recipes: { button: defineRecipe({ className: "button" }) } } },
+    });
+    const surfaces = definePreset({
+      name: "@acme/surfaces",
+      theme: {
+        extend: { slotRecipes: { card: defineSlotRecipe({ className: "card", slots: ["root"] }) } },
+      },
+    });
+
+    expect(publishedRecipes(actions, surfaces)).toStrictEqual({
+      button: { className: "button" },
+      card: { className: "card", slots: ["root"] },
+    });
+  });
+
+  it("maps nothing for a preset that registers no recipe", () => {
+    expect(publishedRecipes(definePreset({ name: "@acme/bare" }))).toStrictEqual({});
+  });
+
+  it("leaves out an entry that names no class", () => {
+    const theme = defineTheme({
+      extends: foundationTheme(),
+      name: "abyss",
+      recipes: { button: { base: {} } },
+    });
+
+    expect(publishedRecipes(theme.preset)).toStrictEqual({});
   });
 });

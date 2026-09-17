@@ -315,6 +315,12 @@ importers:
       '@commitlint/cli':
         specifier: 'catalog:'
         version: 21.2.2(@types/node@26.5.1)(conventional-commits-parser@7.1.2)(typescript@7.0.2)
+      '@stealthscale/example-lib-actions':
+        specifier: workspace:^
+        version: link:examples/lib-actions
+      '@stealthscale/example-lib-surfaces':
+        specifier: workspace:^
+        version: link:examples/lib-surfaces
       '@stealthscale/testing':
         specifier: workspace:^
         version: link:packages/testing

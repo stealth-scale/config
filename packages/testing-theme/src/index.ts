@@ -25,5 +25,12 @@ export {
   valuesOf,
 } from "#recipe.ts";
 export { classesOf, recipeClasses, recipeElement, slotClasses, slotElement } from "#rendered.ts";
-export { extendedRecipes, fontsOf, palettesOf, resolved, type Resolving } from "#theme.ts";
+export {
+  extendedRecipes,
+  fontsOf,
+  palettesOf,
+  publishedRecipes,
+  resolved,
+  type Resolving,
+} from "#theme.ts";
 export { type ThemeCheck, type ThemeChecks, violations } from "#violations.ts";

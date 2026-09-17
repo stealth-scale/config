@@ -8,7 +8,7 @@ import { fathom } from "#index.ts";
 describe("fathom", () => {
   it("keeps the theme contract and clears every contrast pair in both modes", () => {
     expect(
-      violations(fathom, { at: import.meta.dirname, base: foundation, recipes: [] }),
+      violations(fathom, { at: import.meta.dirname, base: foundation, recipes: {} }),
     ).toStrictEqual([]);
   });
 

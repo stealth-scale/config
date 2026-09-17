@@ -13,6 +13,8 @@
     "@changesets/changelog-github": "catalog:",
     "@changesets/cli": "catalog:",
     "@commitlint/cli": "catalog:",
+    "@stealthscale/example-lib-actions": "workspace:^",
+    "@stealthscale/example-lib-surfaces": "workspace:^",
     "@stealthscale/testing": "workspace:^",
     "@stealthscale/testing-config": "workspace:^",
     "@stealthscale/testing-react": "workspace:^",

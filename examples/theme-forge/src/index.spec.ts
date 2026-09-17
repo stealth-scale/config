@@ -1,9 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { extendedRecipes, violations } from "@stealthscale/testing-theme";
+import actions from "@stealthscale/example-lib-actions/theme";
+import surfaces from "@stealthscale/example-lib-surfaces/theme";
+import { extendedRecipes, publishedRecipes, violations } from "@stealthscale/testing-theme";
 import foundation from "@stealthscale/theme/theme";
 
 import { forge } from "#index.ts";
+
+const published = publishedRecipes(actions, surfaces);
 
 describe("forge", () => {
   it("keeps the theme contract and clears every contrast pair in both modes", () => {
@@ -11,7 +15,7 @@ describe("forge", () => {
       violations(forge, {
         at: import.meta.dirname,
         base: foundation,
-        recipes: ["button", "card"],
+        recipes: published,
       }),
     ).toStrictEqual([]);
   });

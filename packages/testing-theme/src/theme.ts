@@ -11,6 +11,8 @@
 
 import { type Mode, type Preset, type Theme } from "@stealthscale/theme/authoring";
 
+import { type Declared } from "#recipe.ts";
+
 /**
  * Describes the preset a theme is layered on, for the scales a reference names and the theme does
  * not restate.
@@ -125,6 +127,38 @@ export function palettesOf(theme: Theme): readonly string[] {
   return Object.keys(typeof colors === "object" && colors !== null ? colors : {})
     .filter((name) => at(at(colors, name), FILL) !== undefined)
     .toSorted();
+}
+
+/**
+ * Maps every recipe the presets register to the key it is registered under, slot recipes among
+ * them.
+ *
+ * @remarks
+ *   A preset is what a component package publishes for the compiler, so this is the same list an
+ *   application installs. A theme specification hands it to `violations` as `options.recipes`,
+ *   which then checks the theme's extensions against the recipes a workspace really publishes
+ *   rather than against a list of names written out by hand. An entry without a class name is a
+ *   theme's own extension rather than a recipe, and is left out.
+ * @param presets - The preset of each package whose recipes the theme may extend.
+ */
+export function publishedRecipes(
+  ...presets: readonly Preset[]
+): Readonly<Record<string, Declared>> {
+  const found: Record<string, Declared> = {};
+
+  for (const preset of presets) {
+    const extend = preset.theme?.extend;
+
+    for (const block of [extend?.recipes, extend?.slotRecipes]) {
+      for (const [key, recipe] of Object.entries({ ...block })) {
+        const className: unknown = Reflect.get(recipe, "className");
+
+        if (typeof className === "string") found[key] = { ...recipe, className };
+      }
+    }
+  }
+
+  return found;
 }
 
 /**

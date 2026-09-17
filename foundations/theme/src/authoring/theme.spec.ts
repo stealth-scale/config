@@ -170,4 +170,31 @@ describe("defineTheme", () => {
 
     expect(Object.keys(theme.preset.theme?.extend?.recipes ?? {})).toStrictEqual(["button"]);
   });
+
+  it("refuses a compound matched on a value a class name cannot carry", () => {
+    const written = (): Theme =>
+      defineTheme({
+        extends: root(),
+        name: "abyss",
+        recipes: {
+          button: { compoundVariants: [{ css: { fontWeight: "bold" }, size: { color: "fg" } }] },
+        },
+      });
+
+    expect(written).toThrow(
+      "button is extended with a compound matched on a value a class name cannot carry",
+    );
+  });
+
+  it("takes a compound whose every value a class name carries", () => {
+    const theme = defineTheme({
+      extends: root(),
+      name: "abyss",
+      slotRecipes: {
+        card: { compoundVariants: [{ css: { root: { fontWeight: "bold" } }, size: "lg" }] },
+      },
+    });
+
+    expect(Object.keys(theme.preset.theme?.extend?.slotRecipes ?? {})).toStrictEqual(["card"]);
+  });
 });

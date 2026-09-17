@@ -8,7 +8,7 @@ import { folio } from "#index.ts";
 describe("folio", () => {
   it("keeps the theme contract and clears every contrast pair in both modes", () => {
     expect(
-      violations(folio, { at: import.meta.dirname, base: foundation, recipes: [] }),
+      violations(folio, { at: import.meta.dirname, base: foundation, recipes: {} }),
     ).toStrictEqual([]);
   });
 

@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 
+import actions from "@stealthscale/example-lib-actions/theme";
 import { fathom } from "@stealthscale/example-theme-fathom";
-import { extendedRecipes, violations } from "@stealthscale/testing-theme";
+import { extendedRecipes, publishedRecipes, violations } from "@stealthscale/testing-theme";
 import foundation from "@stealthscale/theme/theme";
 
 import { abyss } from "#index.ts";
@@ -12,7 +13,7 @@ describe("abyss", () => {
       violations(abyss, {
         at: import.meta.dirname,
         base: foundation,
-        recipes: ["badge", "button"],
+        recipes: { ...publishedRecipes(actions), badge: { className: "badge" } },
       }),
     ).toStrictEqual([]);
   });

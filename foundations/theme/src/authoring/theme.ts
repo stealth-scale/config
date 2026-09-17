@@ -12,7 +12,8 @@
 import { contract, type ThemeTokens } from "#authoring/contract.ts";
 import { type RecipeExtension, type SlotRecipeExtension } from "#authoring/extension.ts";
 import { deepMerge } from "#authoring/merge.ts";
-import { definePreset, type PresetExtension } from "#authoring/preset.ts";
+import { definePreset, type PresetExtension, type Registrable } from "#authoring/preset.ts";
+import { compoundSelection } from "#authoring/recipe.ts";
 import {
   type AnimationStyles,
   type GlobalFontface,
@@ -151,12 +152,38 @@ export interface Theme {
 }
 
 /**
+ * Refuses a compound matched on a value a class name cannot carry.
+ *
+ * @remarks
+ *   The compiler names a theme's compound by the same scheme as the component's, so a value it
+ *   cannot write is a compound that is compiled and never applied. Refused where the theme is
+ *   defined, so no application has to find it in a compiled stylesheet.
+ * @throws {@link Error} When a compound matches an axis on such a value.
+ */
+function nameable(extensions: Readonly<Record<string, Registrable>> | undefined): void {
+  for (const [key, extended] of Object.entries(extensions ?? {})) {
+    for (const compound of extended.compoundVariants ?? []) {
+      if (compoundSelection(compound) !== undefined) continue;
+
+      throw new Error(
+        `${key} is extended with a compound matched on a value a class name cannot carry`,
+      );
+    }
+  }
+}
+
+/**
  * Collects everything a theme adds under `extend`, which is what makes an extension merge over
  * the recipe rather than replace it.
+ *
+ * @throws {@link Error} When a compound matches an axis on a value a class name cannot carry.
  */
 function extension(config: ThemeConfig): PresetExtension {
   const { animationStyles, layerStyles, recipes, semanticTokens, slotRecipes, textStyles, tokens } =
     config;
+
+  nameable(recipes);
+  nameable(slotRecipes);
 
   return {
     ...(animationStyles === undefined ? {} : { animationStyles }),

@@ -25,6 +25,7 @@ const SURFACE = [
   "fontsOf",
   "palettesOf",
   "presetViolations",
+  "publishedRecipes",
   "recipeClass",
   "recipeClasses",
   "recipeElement",
