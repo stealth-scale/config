@@ -14,6 +14,17 @@ describe("Heroes", () => {
     expect(heroes[2]?.className).toContain(variantClass("button", "size", "4xl"));
   });
 
+  it("raises a button off the page and floats another", () => {
+    const { getByRole } = render(<Heroes />);
+
+    expect(getByRole("button", { name: "Raised" }).className).toContain(
+      variantClass("button", "elevation", "raised"),
+    );
+    expect(getByRole("button", { name: "Floating" }).className).toContain(
+      variantClass("button", "elevation", "floating"),
+    );
+  });
+
   it("names the button by its words and hides the icon beside them", () => {
     const { getByRole } = render(<Heroes />);
     const button = getByRole("button", { name: "Attach" });
