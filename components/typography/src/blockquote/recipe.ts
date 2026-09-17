@@ -55,6 +55,14 @@ export const recipe = defineSlotRecipe({
         content: { textStyle: "body.sm" },
         root: { gap: "gap.sm", paddingInlineStart: "inset.sm" },
       },
+      xl: {
+        content: { textStyle: "body.xl" },
+        root: { gap: "gap.xl", paddingInlineStart: "inset.xl" },
+      },
+      xs: {
+        content: { textStyle: "body.xs" },
+        root: { gap: "gap.xs", paddingInlineStart: "inset.xs" },
+      },
     },
     status: {
       error: { root: { colorPalette: "error" } },

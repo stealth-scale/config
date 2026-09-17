@@ -15,4 +15,8 @@ component-typography: publish the first seven components
 - `List` takes a `marker`: the three bullets, a dash, decimal with or without a leading zero, roman
   and alphabetic numbering in both cases, and greek letters. The element's own marker stays until a
   caller picks one.
+- The sizes run on the foundation's full scale where a component has a use for the step: `Heading`
+  and `Icon` from `xs` to `4xl`, `Text` from `xs` to `xl`, and `List` gaps to `4xl`.
+- `Icon` fills its artwork in the current colour, so a path with no fill of its own follows the ink
+  into dark mode rather than staying black.
 - The preset under `./theme` registers all seven recipes.

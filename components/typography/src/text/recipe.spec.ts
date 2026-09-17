@@ -29,8 +29,8 @@ describe("recipe", () => {
     expect(defaultsOf(recipe)).toStrictEqual({ size: "md" });
   });
 
-  it("offers the three body sizes", () => {
-    expect(valuesOf(recipe, "size")).toStrictEqual(["lg", "md", "sm"]);
+  it("offers the five body sizes", () => {
+    expect(valuesOf(recipe, "size")).toStrictEqual(["lg", "md", "sm", "xl", "xs"]);
   });
 
   it("offers the foreground roles and the four statuses as tones", () => {

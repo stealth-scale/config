@@ -40,6 +40,8 @@ export const recipe = defineRecipe({
       lg: { textStyle: "body.lg" },
       md: { textStyle: "body.md" },
       sm: { textStyle: "body.sm" },
+      xl: { textStyle: "body.xl" },
+      xs: { textStyle: "body.xs" },
     },
     tone: {
       default: { color: "fg" },

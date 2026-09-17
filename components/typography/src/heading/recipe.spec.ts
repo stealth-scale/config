@@ -21,8 +21,17 @@ describe("recipe", () => {
     expect(defaultsOf(recipe)).toStrictEqual({ size: "lg" });
   });
 
-  it("offers the five heading roles as sizes", () => {
-    expect(valuesOf(recipe, "size")).toStrictEqual(["2xl", "lg", "md", "sm", "xl"]);
+  it("offers the eight heading roles as sizes", () => {
+    expect(valuesOf(recipe, "size")).toStrictEqual([
+      "2xl",
+      "3xl",
+      "4xl",
+      "lg",
+      "md",
+      "sm",
+      "xl",
+      "xs",
+    ]);
   });
 
   it("offers the two text effects", () => {

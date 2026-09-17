@@ -21,8 +21,18 @@ describe("recipe", () => {
     expect(defaultsOf(recipe)).toStrictEqual({ size: "inherit" });
   });
 
-  it("offers the five icon sizes and the inherited one", () => {
-    expect(valuesOf(recipe, "size")).toStrictEqual(["inherit", "lg", "md", "sm", "xl", "xs"]);
+  it("offers the eight icon sizes and the inherited one", () => {
+    expect(valuesOf(recipe, "size")).toStrictEqual([
+      "2xl",
+      "3xl",
+      "4xl",
+      "inherit",
+      "lg",
+      "md",
+      "sm",
+      "xl",
+      "xs",
+    ]);
   });
 
   it("offers the current colour and the muted ink and the four statuses as tones", () => {

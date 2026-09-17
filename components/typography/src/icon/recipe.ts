@@ -6,9 +6,10 @@
  *   Every value is a semantic icon size, a foreground role or an animation style, so a theme moves
  *   all of them. The component draws no artwork of its own. The inherit size follows the font
  *   size around the mark, which is what keeps a mark beside a word the height of the word, and
- *   the ink is the current colour until a caller picks a tone. A mark that points, an arrow or a
- *   chevron, is mirrored in a right-to-left page, and a mark that does not, a clock or a star, is
- *   not.
+ *   the ink is the current colour until a caller picks a tone. The fill follows the ink too,
+ *   because a path with no fill of its own is drawn black by the browser, which vanishes on a dark
+ *   surface; a path that states `fill="none"` keeps it. A mark that points, an arrow or a chevron,
+ *   is mirrored in a right-to-left page, and a mark that does not, a clock or a star, is not.
  */
 
 import { defineRecipe, iconSizes } from "@stealthscale/theme/authoring";
@@ -21,6 +22,7 @@ export const recipe = defineRecipe({
   base: {
     color: "currentcolor",
     display: "inline-block",
+    fill: "currentcolor",
     flexShrink: "0",
     verticalAlign: "middle",
   },
@@ -37,7 +39,7 @@ export const recipe = defineRecipe({
       twinkle: { animationStyle: "twinkle" },
     },
     size: {
-      ...iconSizes(["xs", "sm", "md", "lg", "xl"]),
+      ...iconSizes(["xs", "sm", "md", "lg", "xl", "2xl", "3xl", "4xl"]),
       inherit: { boxSize: "1em" },
     },
     tone: {

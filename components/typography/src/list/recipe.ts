@@ -42,6 +42,9 @@ export const recipe = defineSlotRecipe({
       start: { item: { alignItems: "flex-start" } },
     },
     gap: {
+      "2xl": { root: { gap: "gap.2xl" } },
+      "3xl": { root: { gap: "gap.3xl" } },
+      "4xl": { root: { gap: "gap.4xl" } },
       lg: { root: { gap: "gap.lg" } },
       md: { root: { gap: "gap.md" } },
       sm: { root: { gap: "gap.sm" } },

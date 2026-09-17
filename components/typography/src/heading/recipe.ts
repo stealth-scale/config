@@ -33,10 +33,13 @@ export const recipe = defineRecipe({
     },
     size: {
       "2xl": { textStyle: "heading.2xl" },
+      "3xl": { textStyle: "heading.3xl" },
+      "4xl": { textStyle: "heading.4xl" },
       lg: { textStyle: "heading.lg" },
       md: { textStyle: "heading.md" },
       sm: { textStyle: "heading.sm" },
       xl: { textStyle: "heading.xl" },
+      xs: { textStyle: "heading.xs" },
     },
     tone: {
       default: { color: "fg" },

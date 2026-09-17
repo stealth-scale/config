@@ -34,8 +34,8 @@ describe("recipe", () => {
     expect(valuesOf(recipe, "variant")).toStrictEqual(["glass", "plain", "solid", "subtle"]);
   });
 
-  it("offers the three body sizes", () => {
-    expect(valuesOf(recipe, "size")).toStrictEqual(["lg", "md", "sm"]);
+  it("offers the five body sizes", () => {
+    expect(valuesOf(recipe, "size")).toStrictEqual(["lg", "md", "sm", "xl", "xs"]);
   });
 
   it("offers the four statuses", () => {

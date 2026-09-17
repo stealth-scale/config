@@ -46,8 +46,17 @@ describe("recipe", () => {
     expect(defaultsOf(recipe)).toStrictEqual({ gap: "md", variant: "marker" });
   });
 
-  it("offers the five gaps", () => {
-    expect(valuesOf(recipe, "gap")).toStrictEqual(["lg", "md", "sm", "xl", "xs"]);
+  it("offers the eight gaps", () => {
+    expect(valuesOf(recipe, "gap")).toStrictEqual([
+      "2xl",
+      "3xl",
+      "4xl",
+      "lg",
+      "md",
+      "sm",
+      "xl",
+      "xs",
+    ]);
   });
 
   it("offers the marker look and the plain look", () => {

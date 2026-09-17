@@ -37,7 +37,7 @@ import { Text } from "@stealthscale/component-typography";
 
 | Axis       | Values                                                                | Default |
 | ---------- | --------------------------------------------------------------------- | ------- |
-| `size`     | `sm`, `md`, `lg`                                                      | `md`    |
+| `size`     | `xs`, `sm`, `md`, `lg`, `xl`                                          | `md`    |
 | `tone`     | `default`, `muted`, `inverted`, `info`, `success`, `warning`, `error` | inherit |
 | `weight`   | `normal`, `medium`, `semibold`, `bold`                                | inherit |
 | `align`    | `start`, `center`, `end`, `justify`                                   | inherit |
@@ -61,7 +61,7 @@ import { Heading } from "@stealthscale/component-typography";
 
 | Axis       | Values                                                                | Default |
 | ---------- | --------------------------------------------------------------------- | ------- |
-| `size`     | `sm`, `md`, `lg`, `xl`, `2xl`                                         | `lg`    |
+| `size`     | `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`, `4xl`                     | `lg`    |
 | `tone`     | `default`, `muted`, `inverted`, `info`, `success`, `warning`, `error` | inherit |
 | `effect`   | `gradient`, `shine`                                                   | none    |
 | `motion`   | `fade`, `rise`, `reveal`                                              | none    |
@@ -125,12 +125,12 @@ import { Icon } from "@stealthscale/component-typography";
 </Icon>;
 ```
 
-| Axis       | Values                                                    | Default   |
-| ---------- | --------------------------------------------------------- | --------- |
-| `size`     | `inherit`, `xs`, `sm`, `md`, `lg`, `xl`                   | `inherit` |
-| `tone`     | `current`, `muted`, `info`, `success`, `warning`, `error` | inherit   |
-| `motion`   | `spin`, `float`, `twinkle`                                | none      |
-| `mirrored` | `true`                                                    | off       |
+| Axis       | Values                                                       | Default   |
+| ---------- | ------------------------------------------------------------ | --------- |
+| `size`     | `inherit`, `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`, `4xl` | `inherit` |
+| `tone`     | `current`, `muted`, `info`, `success`, `warning`, `error`    | inherit   |
+| `motion`   | `spin`, `float`, `twinkle`                                   | none      |
+| `mirrored` | `true`                                                       | off       |
 
 ## List
 
@@ -157,7 +157,7 @@ import { List } from "@stealthscale/component-typography";
 | Axis      | Values                                                                                                                                   | Default       | Styles                |
 | --------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------- | --------------------- |
 | `variant` | `marker`, `plain`                                                                                                                        | `marker`      | the root and the item |
-| `gap`     | `xs`, `sm`, `md`, `lg`, `xl`                                                                                                             | `md`          | the root              |
+| `gap`     | `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`, `4xl`                                                                                        | `md`          | the root              |
 | `align`   | `start`, `center`, `end`                                                                                                                 | inherit       | the item              |
 | `marker`  | `disc`, `circle`, `square`, `dash`, `decimal`, `leading-zero`, `lower-roman`, `upper-roman`, `lower-alpha`, `upper-alpha`, `lower-greek` | the element's | the item              |
 | `motion`  | `rise`, `reveal`                                                                                                                         | none          | the item              |
@@ -186,7 +186,7 @@ import { Blockquote } from "@stealthscale/component-typography";
 | Axis      | Values                                | Default  | Styles                   |
 | --------- | ------------------------------------- | -------- | ------------------------ |
 | `variant` | `subtle`, `solid`, `plain`, `glass`   | `subtle` | the root and the icon    |
-| `size`    | `sm`, `md`, `lg`                      | `md`     | the root and the content |
+| `size`    | `xs`, `sm`, `md`, `lg`, `xl`          | `md`     | the root and the content |
 | `justify` | `start`, `center`, `end`              | `start`  | the root                 |
 | `status`  | `info`, `success`, `warning`, `error` | none     | the root                 |
 | `motion`  | `rise`, `reveal`                      | none     | the root                 |
