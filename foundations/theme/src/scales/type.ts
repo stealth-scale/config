@@ -101,11 +101,15 @@ export function fontSizes(base = 1, ratio = 1.125): Sizes {
 }
 
 /**
- * Draws the text styles, keyed `2xs` to `7xl`: each size with the leading and tracking it is read
- * at.
+ * Draws the text styles, keyed `2xs` to `7xl`: each size by the name of its token, with the
+ * leading and tracking it is read at.
  *
  * @remarks
- *   A recipe states `textStyle` rather than `fontSize`, so the three move together.
+ *   A recipe states `textStyle` rather than `fontSize`, so the three move together. The size is a
+ *   reference to the `fontSizes` token of the same name, so a theme that restates
+ *   `fontSizes(base, ratio)` moves every size style with it. The leading and the tracking are
+ *   computed from the rems the same arguments produce, so a theme writes `typography(base, ratio)`
+ *   beside `fontSizes(base, ratio)`.
  * @param base - The body size, in rem.
  * @param ratio - The step between rungs.
  */
@@ -115,7 +119,7 @@ export function typography(base = 1, ratio = 1.125): TextStyles {
       name,
       {
         value: {
-          fontSize: `${rem.toFixed(4)}rem`,
+          fontSize: name,
           letterSpacing: letterSpacingFor(rem),
           lineHeight: String(lineHeightFor(rem)),
         },

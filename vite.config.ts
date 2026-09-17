@@ -3,7 +3,6 @@ import * as react from "@stealthscale/vite-config-react";
 
 import { layers as exampleAppWorker } from "./examples/app-worker/vite.layers.ts";
 import { layers as exampleLibUi } from "./examples/lib-ui/vite.layers.ts";
-import { layers as foundationTheme } from "./foundations/theme/vite.layers.ts";
 import { fmt } from "./packages/vite-config/src/index.ts";
 import { defineConfig } from "./packages/vite-config/src/preset/workspace.ts";
 
@@ -22,6 +21,5 @@ export default defineConfig(import.meta.dirname, {
 
     exampleAppWorker,
     exampleLibUi,
-    foundationTheme,
   ],
 });

@@ -13,6 +13,12 @@ import { createRequire } from "node:module";
 import { dirname, join, resolve, sep } from "node:path";
 
 import {
+  compilerConfig,
+  type Renamed,
+  renameSelectors,
+  rewriteRuntime,
+} from "@stealthscale/pandacss-compiler";
+import {
   emptyDir,
   exportTarget,
   manifestAt,
@@ -20,7 +26,7 @@ import {
   writeIfChanged,
 } from "@stealthscale/vite-plugin-base";
 
-import { CACHE } from "#options.ts";
+import { CACHE, SEPARATOR, THEME_ATTRIBUTE } from "#options.ts";
 
 /**
  * Marks a path that belongs to an installed package rather than to the workspace.
@@ -55,7 +61,8 @@ const SCRATCH = join(CACHE, "runtime");
  *   stylesheet: the name, the class name, the slots, the values of each axis, the defaults and the
  *   compound variants. The declaration types that configuration from the generated recipe types,
  *   so the package binding a recipe states the variants it was written with and receives the
- *   runtime function typed the way the compiler's own `cva` and `sva` are.
+ *   runtime function typed the way the compiler's own `cva` and `sva` are. A compound carries the
+ *   class its styles are emitted under, which the recipe names and the compiler honours.
  */
 const RUNTIME_DECLARATION = [
   "/*",
@@ -79,7 +86,9 @@ const RUNTIME_DECLARATION = [
   " */",
   "export interface RecipeRuntimeConfig<Variants extends RecipeVariantRecord> {",
   "  className?: string;",
-  "  compoundVariants?: ReadonlyArray<RecipeCompoundSelection<Variants> & { css: SystemStyleObject }>;",
+  "  compoundVariants?: ReadonlyArray<",
+  "    RecipeCompoundSelection<Variants> & { className?: string | undefined; css: SystemStyleObject }",
+  "  >;",
   "  defaultVariants?: RecipeSelection<Variants>;",
   "  name: string;",
   "  variantMap?: RecipeConfigVariantMap<Variants>;",
@@ -94,7 +103,11 @@ const RUNTIME_DECLARATION = [
   "> {",
   "  className?: string;",
   "  compoundVariants?: ReadonlyArray<",
-  "    RecipeCompoundSelection<Variants> & { css: SlotRecord<Slot, SystemStyleObject> }",
+  "    RecipeCompoundSelection<Variants> & {",
+  "      className?: string | undefined;",
+  "      classNames?: SlotRecord<Slot, string> | undefined;",
+  "      css: SlotRecord<Slot, SystemStyleObject>;",
+  "    }",
   "  >;",
   "  defaultVariants?: RecipeSelection<Variants>;",
   "  name: string;",
@@ -160,13 +173,14 @@ export async function startCompiler(root: string, configPath: string): Promise<C
 }
 
 /**
- * Runs the compiler's codegen, declares what it leaves undeclared, and syncs the result into the
- * generated directory.
+ * Runs the compiler's codegen, declares what it leaves undeclared, rewrites the class names the
+ * runtime writes into the scheme, and syncs the result into the generated directory.
  *
  * @remarks
  *   Codegen runs into a scratch directory that is emptied first, so the sync sees exactly what
  *   this run wrote: a file the compiler stopped writing is deleted from the generated directory,
- *   and a file whose content did not change is left as it was.
+ *   and a file whose content did not change is left as it was. The rewrite runs on the scratch
+ *   directory, so the generated directory only ever holds a runtime that writes the scheme.
  * @returns The compiler, for the files behind its configuration.
  */
 export async function generateRuntime(
@@ -180,6 +194,7 @@ export async function generateRuntime(
   emptyDir(scratch);
   compiler.driver.codegen({ cwd: root, outdir: scratch });
   writeIfChanged(join(scratch, "recipes", "runtime.d.mts"), RUNTIME_DECLARATION);
+  rewriteRuntime(scratch, SEPARATOR);
   syncDir(scratch, outdir);
   emptyDir(scratch);
 
@@ -196,7 +211,21 @@ export async function generateRuntime(
  *   appends.
  */
 export function cleaned(css: string): string {
-  return css.replaceAll(ATTRIBUTE, "[data-theme=").replaceAll(SIGNATURE, "");
+  return css.replaceAll(ATTRIBUTE, `[${THEME_ATTRIBUTE}=`).replaceAll(SIGNATURE, "");
+}
+
+/**
+ * Finishes a compiled stylesheet: removes what the compiler names itself in, and renames every
+ * class selector into the scheme the generated runtime writes.
+ *
+ * @remarks
+ *   The recipes and the separator the rename reads come from the compiler's own resolved
+ *   configuration, so the stylesheet and the runtime are read against the same recipes.
+ * @returns The stylesheet, with a diagnostic for each collision, one for the classes whose rules
+ *   were removed, and one for the classes kept under a raw condition.
+ */
+export function rewritten(compiler: Compiler, css: string): Renamed {
+  return renameSelectors(cleaned(css), compilerConfig(compiler.driver.config));
 }
 
 /**

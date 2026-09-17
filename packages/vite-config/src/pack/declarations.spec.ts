@@ -1,4 +1,4 @@
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { declarations } from "#pack/declarations.ts";

@@ -8,14 +8,32 @@ import * as plugin from "#plugin/index.ts";
 import * as test from "#test/index.ts";
 
 /**
- * Composes the JSX transform and the document its tests render into.
+ * Says what a package renders beyond its components.
+ */
+export interface Rendering {
+  /**
+   * Whether the package writes documents in MDX, which adds the plugin that compiles them.
+   */
+  mdx?: boolean;
+}
+
+/**
+ * Composes the JSX transform, the document its tests render into, and the MDX compiler where a
+ * package asks for one.
  *
  * @remarks
  *   No rule and no format appears here. A linter and a formatter read the root configuration only,
  *   so a package repeating them lints nothing extra and slows its own build down.
+ * @param stated - The document formats the package renders beside its components. Omitting it
+ *   compiles JSX alone.
  * @returns Each layer under the name of the call that produced it, so a consumer can drop one by
- *   name and keep the other two.
+ *   name and keep the rest.
  */
-export function layers(): readonly Layer[] {
-  return [plugin.refresh(), test.cleanup(), test.document()];
+export function layers(stated: Rendering = {}): readonly Layer[] {
+  return [
+    plugin.refresh(),
+    test.cleanup(),
+    test.document(),
+    ...(stated.mdx === true ? plugin.mdx() : []),
+  ];
 }

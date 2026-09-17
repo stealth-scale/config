@@ -1,15 +1,17 @@
 /**
  * Publishes the vocabulary a recipe, a theme and an application are written in, and nothing that
- * runs in a browser.
+ * runs in a browser. Every name here is read at build time. It is separate from the package's own
+ * entry because that entry re-exports the generated runtime, and the compiler's configuration
+ * reaches this package through whatever a theme imports: a theme importing the entry would put
+ * every generated file behind the configuration, and regenerating them would read as the
+ * configuration changing. The two attributes are published here as well as on the entry, so a
+ * package that does not render, such as the testing kit, reads them without loading the provider
+ * and its React transform.
  *
- * @remarks
- *   Every name here is read at build time. Separate from the package's own entry because that
- *   entry re-exports the generated runtime, and the compiler's configuration reaches this package
- *   through whatever a theme imports. A theme importing the entry would put every generated file
- *   behind the configuration, and regenerating them would read as the configuration changing.
  * @packageDocumentation
  */
 
+export { COLOR_MODE_ATTRIBUTE, THEME_ATTRIBUTE } from "#attributes.ts";
 export { type Application } from "#authoring/application.ts";
 export {
   BACKGROUNDS,
@@ -40,16 +42,48 @@ export {
 export { contrast, type Level, luminance, readable } from "#authoring/contrast.ts";
 export { type RecipeExtension, type SlotRecipeExtension } from "#authoring/extension.ts";
 export { deepMerge } from "#authoring/merge.ts";
-export { definePreset, type Preset } from "#authoring/preset.ts";
 export {
+  definePreset,
+  type Preset,
+  type PresetConfig,
+  type PresetExtension,
+  type Registrable,
+} from "#authoring/preset.ts";
+export {
+  type Compound,
+  compoundClassName,
+  compoundSelection,
   defineRecipe,
   defineSlotRecipe,
   defineStyles,
   type Recipe,
   type RecipeProps,
+  SEPARATOR,
+  type SlotCompound,
   type SlotRecipe,
 } from "#authoring/recipe.ts";
-export * from "#authoring/recipes/index.ts";
+export {
+  type Anatomy,
+  controlSizes,
+  dense,
+  divider,
+  type Elevation,
+  field,
+  floating,
+  iconOnly,
+  iconSizes,
+  interactive,
+  link,
+  type Look,
+  LOOKS,
+  lookVariants,
+  motion,
+  overlay,
+  slotsOf,
+  statusVariants,
+  surface,
+  touchTarget,
+} from "#authoring/recipes/index.ts";
 export {
   defineTheme,
   type DerivedThemeConfig,
@@ -57,5 +91,76 @@ export {
   type Theme,
   type ThemeConfig,
 } from "#authoring/theme.ts";
-export * from "#patterns/index.ts";
-export * from "#scales/index.ts";
+export {
+  type AnimationStyles,
+  type LayerStyles,
+  type SemanticTokens,
+  type TextStyles,
+  type Tokens,
+} from "#pandacss.ts";
+export {
+  absoluteCenter,
+  type AbsoluteCenterProps,
+  bento,
+  bentoCell,
+  type BentoCellProps,
+  type BentoProps,
+  center,
+  type CenterProps,
+  cluster,
+  type ClusterProps,
+  cover,
+  type CoverProps,
+  type FixedStackProps,
+  flex,
+  type FlexProps,
+  frame,
+  type FrameProps,
+  grid,
+  type GridProps,
+  hstack,
+  reel,
+  type ReelProps,
+  responsive,
+  scrollable,
+  type ScrollableProps,
+  sidebar,
+  type SidebarProps,
+  simpleGrid,
+  type SimpleGridProps,
+  stack,
+  type StackProps,
+  sticky,
+  type StickyProps,
+  switcher,
+  type SwitcherProps,
+  visuallyHidden,
+  vstack,
+} from "#patterns/index.ts";
+export {
+  alphaScale,
+  backgrounds,
+  borders,
+  colorScale,
+  controls,
+  families,
+  type Families,
+  fontSizes,
+  foregrounds,
+  gaps,
+  icons,
+  insets,
+  neutralFills,
+  oklch,
+  type PageLightness,
+  paletteAlias,
+  type PaletteAliases,
+  paletteRoles,
+  palettes,
+  type Palettes,
+  radii,
+  type Scale,
+  shadows,
+  slides,
+  typography,
+} from "#scales/index.ts";

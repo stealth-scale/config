@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
 
+import { recipeViolations } from "@stealthscale/testing-theme";
+
+import { defineRecipe } from "#authoring/recipe.ts";
 import { hstack, stack, vstack } from "#patterns/stack.ts";
 
 describe("stack", () => {
@@ -32,5 +35,11 @@ describe("stack", () => {
       flexDirection: "column",
       gap: "gap.lg",
     });
+  });
+
+  it("passes the recipe checks in every direction", () => {
+    for (const base of [stack(), hstack(), vstack({ gap: "gap.lg" })]) {
+      expect(recipeViolations(defineRecipe({ base, className: "x" }))).toStrictEqual([]);
+    }
   });
 });

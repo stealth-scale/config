@@ -2,7 +2,7 @@
  * Proves both resolvers try source first and keep their own defaults below it.
  */
 
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { SOURCE } from "#resolve/condition.ts";

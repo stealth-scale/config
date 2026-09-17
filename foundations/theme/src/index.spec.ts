@@ -11,7 +11,9 @@ const SURFACE = [
   "cx",
   "styled",
   "THEME_ATTRIBUTE",
+  "ThemeProvider",
   "token",
+  "useTheme",
 ];
 
 describe("theme", () => {

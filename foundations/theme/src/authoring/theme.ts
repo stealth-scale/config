@@ -12,7 +12,8 @@
 import { contract, type ThemeTokens } from "#authoring/contract.ts";
 import { type RecipeExtension, type SlotRecipeExtension } from "#authoring/extension.ts";
 import { deepMerge } from "#authoring/merge.ts";
-import { definePreset } from "#authoring/preset.ts";
+import { definePreset, type PresetExtension, type Registrable } from "#authoring/preset.ts";
+import { compoundSelection } from "#authoring/recipe.ts";
 import {
   type AnimationStyles,
   type GlobalFontface,
@@ -151,28 +152,45 @@ export interface Theme {
 }
 
 /**
- * Describes what the compiler accepts under a preset's `theme.extend`.
+ * Refuses a compound matched on a value a class name cannot carry.
+ *
+ * @remarks
+ *   The compiler names a theme's compound by the same scheme as the component's, so a value it
+ *   cannot write is a compound that is compiled and never applied. Refused where the theme is
+ *   defined, so no application has to find it in a compiled stylesheet.
+ * @throws {@link Error} When a compound matches an axis on such a value.
  */
-type Extension = NonNullable<NonNullable<Preset["theme"]>["extend"]>;
+function nameable(extensions: Readonly<Record<string, Registrable>> | undefined): void {
+  for (const [key, extended] of Object.entries(extensions ?? {})) {
+    for (const compound of extended.compoundVariants ?? []) {
+      if (compoundSelection(compound) !== undefined) continue;
+
+      throw new Error(
+        `${key} is extended with a compound matched on a value a class name cannot carry`,
+      );
+    }
+  }
+}
 
 /**
  * Collects everything a theme adds under `extend`, which is what makes an extension merge over
  * the recipe rather than replace it.
+ *
+ * @throws {@link Error} When a compound matches an axis on a value a class name cannot carry.
  */
-function extension(config: ThemeConfig): Extension {
+function extension(config: ThemeConfig): PresetExtension {
   const { animationStyles, layerStyles, recipes, semanticTokens, slotRecipes, textStyles, tokens } =
     config;
+
+  nameable(recipes);
+  nameable(slotRecipes);
 
   return {
     ...(animationStyles === undefined ? {} : { animationStyles }),
     ...(layerStyles === undefined ? {} : { layerStyles }),
-    // eslint-disable-next-line typescript/no-unsafe-type-assertion -- an extension is a partial recipe, which is what the compiler merges over the whole one
-    ...(recipes === undefined ? {} : { recipes: recipes as NonNullable<Extension["recipes"]> }),
+    ...(recipes === undefined ? {} : { recipes }),
     ...(semanticTokens === undefined ? {} : { semanticTokens }),
-    ...(slotRecipes === undefined
-      ? {}
-      : // eslint-disable-next-line typescript/no-unsafe-type-assertion -- as above
-        { slotRecipes: slotRecipes as NonNullable<Extension["slotRecipes"]> }),
+    ...(slotRecipes === undefined ? {} : { slotRecipes }),
     ...(textStyles === undefined ? {} : { textStyles }),
     ...(tokens === undefined ? {} : { tokens }),
   };

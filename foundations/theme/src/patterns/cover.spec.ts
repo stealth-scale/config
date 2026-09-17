@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
 
+import { recipeViolations } from "@stealthscale/testing-theme";
+
+import { defineRecipe } from "#authoring/recipe.ts";
 import { cover } from "#patterns/cover.ts";
 
 describe("cover", () => {
@@ -27,5 +30,9 @@ describe("cover", () => {
       minHeight: "sm",
       padding: "inset.md",
     });
+  });
+
+  it("passes the recipe checks", () => {
+    expect(recipeViolations(defineRecipe({ base: cover(), className: "x" }))).toStrictEqual([]);
   });
 });

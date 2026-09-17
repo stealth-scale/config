@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
 
+import { recipeViolations } from "@stealthscale/testing-theme";
+
+import { defineRecipe } from "#authoring/recipe.ts";
 import { scrollable } from "#patterns/scrollable.ts";
 
 describe("scrollable", () => {
@@ -23,5 +26,11 @@ describe("scrollable", () => {
       "&::-webkit-scrollbar": { display: "none" },
       scrollbarWidth: "none",
     });
+  });
+
+  it("passes the recipe checks with the scrollbar hidden", () => {
+    const recipe = defineRecipe({ base: scrollable({ hideScrollbar: true }), className: "x" });
+
+    expect(recipeViolations(recipe)).toStrictEqual([]);
   });
 });

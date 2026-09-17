@@ -12,6 +12,7 @@ catalog:
   "@changesets/changelog-github": ^1.0.1
   "@changesets/cli": ^3.0.2
   "@cyclonedx/cyclonedx-library": ^10.2.0
+  "@mdx-js/rollup": ^3.1.1
   "@module-federation/runtime": 2.9.0
   "@module-federation/vite": 1.21.5
   "@pandacss/compiler": 2.0.0-beta.17
@@ -20,6 +21,7 @@ catalog:
   "@pandacss/types": 2.0.0-beta.17
   "@tanstack/react-router": 1.170.34
   "@testing-library/react": ^16.3.0
+  "@types/mdx": ^2.0.14
   "@types/node": ^26.5.1
   "@types/react": ^19.3.0
   "@types/react-dom": ^19.3.0
@@ -36,6 +38,8 @@ catalog:
   lefthook: ^2.1.12
   oxc-transform-react: ^0.149.0
   packageurl-js: ^2.0.1
+  postcss: ^8.5.28
+  postcss-selector-parser: ^7.1.6
   publint: ^0.3.24
   react: ^19.3.0
   react-dom: ^19.3.0
@@ -64,6 +68,10 @@ catalogs:
 
 overrides:
   vite@*: "catalog:"
+  # The MDX plugin peers on rollup for one type and imports nothing from it. Left in place, the
+  # peer is auto-installed, which is 5 MB and a native binary for a bundler nothing here runs.
+  "@mdx-js/rollup>rollup": "-"
+  "@rollup/pluginutils>rollup": "-"
 
 # `vite` here is Vite+ under an alias, so its version reads as 0.3.1 and every package asking for
 # a real Vite range reports an unmet peer. The range they ask for is satisfied; the number they

@@ -22,7 +22,7 @@ export type Report = (message: string) => void;
 /**
  * Tells which compile a run of diagnostics belongs to.
  */
-export type Stage = "the design system" | "the stylesheet";
+export type Stage = "the class names" | "the design system" | "the stylesheet";
 
 /**
  * Lists the severities worth interrupting somebody for.

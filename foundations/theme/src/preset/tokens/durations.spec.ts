@@ -16,9 +16,10 @@ describe("durations", () => {
     }
   });
 
-  it("runs the ambient loops over a second", () => {
+  it("runs the ambient loops over a second and each slower than the last", () => {
     expect(millisOf("ambient")).toBeGreaterThan(1000);
     expect(millisOf("ambientSlow")).toBeGreaterThan(millisOf("ambient"));
+    expect(millisOf("ambientSlower")).toBeGreaterThan(millisOf("ambientSlow"));
   });
 
   it("names no time at all", () => {

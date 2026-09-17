@@ -6,6 +6,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  declared,
   manifest,
   packageFiles,
   type ScratchFiles,
@@ -13,7 +14,7 @@ import {
   withScratchWorkspaceAsync,
 } from "@stealthscale/testing";
 
-import { cleaned } from "#compiler.ts";
+import { rewritten } from "#compiler.ts";
 import { resolveOptions } from "#options.ts";
 import { assemble } from "#theme/assembly.ts";
 
@@ -39,7 +40,7 @@ const KIT = packageFiles(
       '  name: "@acme/kit",',
       "  theme: {",
       "    extend: {",
-      '      recipes: { button: { className: "button", base: { color: "brand", letterSpacing: "0em" }, variants: { size: { lg: { padding: "8px" } } } } },',
+      '      recipes: { button: { className: "button", jsx: ["Button"], base: { color: "brand", letterSpacing: "0em" }, variants: { size: { lg: { padding: "8px" }, md: { padding: "4px" } }, variant: { ghost: { color: "green" }, solid: { color: "red" } } }, compoundVariants: [{ className: "button--expose", css: { fontWeight: "700" }, size: "lg", variant: "solid" }, { className: "button--quiet", css: { fontStyle: "italic" }, size: "md", variant: "ghost" }] } },',
       '      slotRecipes: { dialog: { className: "dialog", slots: ["content", "backdrop"], base: { content: { padding: "4px" } } } },',
       "    },",
       "  },",
@@ -85,17 +86,10 @@ const APP: ScratchFiles = {
   "themes/fathom.ts": theme("fathom", tracking("0.01em")),
 };
 
-function declared(css: string, selector: string, property: string): string | undefined {
-  const escaped = selector.replaceAll(/[.()[\]]/gu, String.raw`\$&`);
-  const pattern = new RegExp(`${escaped}\\s*\\{[^}]*?${property}:\\s*([^;}]+)`, "u");
-
-  return pattern.exec(css)?.[1]?.trim();
-}
-
 async function compiled(workspace: ScratchWorkspace): Promise<string> {
   const { compiler } = await assemble({ root: workspace.root }, RESOLVED);
 
-  return cleaned(compiler.driver.cssgen({ emitLayerDeclaration: false }).css);
+  return rewritten(compiler, compiler.driver.cssgen({ emitLayerDeclaration: false }).css).css;
 }
 
 describe("assemble", () => {
@@ -112,6 +106,30 @@ describe("assemble", () => {
     expect(declared(css, "[data-theme=fathom] .button", "letter-spacing")).toBe("0.01em");
   });
 
+  it("installs the presets the application states after the packages and before the themes", async () => {
+    const files: ScratchFiles = {
+      ...APP,
+      "theme.config.ts": [
+        'import { abyss } from "./themes/abyss.ts";',
+        'import { fathom } from "./themes/fathom.ts";',
+        "",
+        'const own = { name: "@acme/app", theme: { extend: { recipes: { badge: { className: "badge", jsx: ["Badge"], base: { letterSpacing: "0.02em" } } } } } };',
+        "",
+        'export default { presets: [own], static: "*", themes: [fathom, abyss] };',
+        "",
+      ].join("\n"),
+      "themes/abyss.ts": theme(
+        "abyss",
+        'recipes: { badge: { base: { letterSpacing: "0.09em" } }, button: { base: { letterSpacing: "0.06em" } } }',
+      ),
+    };
+    const css = await withScratchWorkspaceAsync(files, compiled);
+
+    expect(declared(css, ".badge", "letter-spacing")).toBe("0.02em");
+    expect(declared(css, "[data-theme=abyss] .badge", "letter-spacing")).toBe("0.09em");
+    expect(declared(css, "[data-theme=abyss] .button", "letter-spacing")).toBe("0.06em");
+  });
+
   it("draws a theme's token values under its attribute", async () => {
     const files = {
       ...APP,
@@ -123,6 +141,21 @@ describe("assemble", () => {
     };
     const css = await withScratchWorkspaceAsync(files, compiled);
 
+    expect(declared(css, "[data-theme=abyss]", "--colors-brand")).toBe("#222");
+  });
+
+  it("restates the foundation's token values under every theme's attribute", async () => {
+    const files = {
+      ...APP,
+      "themes/abyss.ts": theme(
+        "abyss",
+        tracking("0.06em"),
+        ' tokens: { colors: { brand: { value: "#222" } } } ',
+      ),
+    };
+    const css = await withScratchWorkspaceAsync(files, compiled);
+
+    expect(declared(css, "[data-theme=fathom]", "--colors-brand")).toBe("#111");
     expect(declared(css, "[data-theme=abyss]", "--colors-brand")).toBe("#222");
   });
 
@@ -170,8 +203,8 @@ describe("assemble", () => {
     };
     const css = await withScratchWorkspaceAsync(files, compiled);
 
-    expect(declared(css, ".textStyle_brand", "font-size")).toBe("12px");
-    expect(declared(css, "[data-theme=abyss] .textStyle_brand", "font-size")).toBe("14px");
+    expect(declared(css, ".text-style-brand", "font-size")).toBe("12px");
+    expect(declared(css, "[data-theme=abyss] .text-style-brand", "font-size")).toBe("14px");
   });
 
   it("scopes a variant's styles under the attribute", async () => {
@@ -179,8 +212,48 @@ describe("assemble", () => {
     const files = { ...APP, "themes/abyss.ts": theme("abyss", extend) };
     const css = await withScratchWorkspaceAsync(files, compiled);
 
-    expect(declared(css, ".button--size_lg", "padding")).toBe("8px");
-    expect(declared(css, "[data-theme=abyss] .button--size_lg", "padding")).toBe("12px");
+    expect(declared(css, ".button--lg", "padding")).toBe("8px");
+    expect(declared(css, "[data-theme=abyss] .button--lg", "padding")).toBe("12px");
+  });
+
+  it("compiles a compound under the class its recipe names", async () => {
+    const css = await withScratchWorkspaceAsync(APP, compiled);
+
+    expect(declared(css, ".button--expose", "font-weight")).toBe("700");
+  });
+
+  it("compiles a theme's compound for the same selection under the same class", async () => {
+    const extend =
+      'recipes: { button: { compoundVariants: [{ size: "lg", variant: "solid", css: { letterSpacing: "0.2em" } }] } }';
+    const files = { ...APP, "themes/abyss.ts": theme("abyss", extend) };
+    const css = await withScratchWorkspaceAsync(files, compiled);
+
+    expect(declared(css, "[data-theme=abyss] .button--expose", "letter-spacing")).toBe("0.2em");
+    expect(css).not.toContain("compound__");
+  });
+
+  it("compiles the compound a page selects alone", async () => {
+    const files = {
+      ...APP,
+      "src/button.tsx": "export const Button = (props: object) => <button {...props} />;\n",
+      "src/page.tsx": [
+        'import { Button } from "./button.tsx";',
+        "",
+        'export const Page = () => <Button variant="solid" size="lg">Go</Button>;',
+        "",
+      ].join("\n"),
+      "theme.config.ts": [
+        'import { abyss } from "./themes/abyss.ts";',
+        'import { fathom } from "./themes/fathom.ts";',
+        "",
+        "export default { themes: [fathom, abyss] };",
+        "",
+      ].join("\n"),
+    };
+    const css = await withScratchWorkspaceAsync(files, compiled);
+
+    expect(declared(css, ".button--expose", "font-weight")).toBe("700");
+    expect(css).not.toContain("button--quiet");
   });
 
   it("scopes a slot recipe's styles inside the slot", async () => {
@@ -233,14 +306,15 @@ describe("assemble", () => {
     expect(declared(css, "[data-theme=abyss] .button", "letter-spacing")).toBe("0.3em");
   });
 
-  it("stops scoping a theme that no longer extends anything", async () => {
+  it("stops scoping a theme's rules once it extends nothing and keeps its token block", async () => {
     const files = {
       ...APP,
       "themes/abyss.ts": 'export const abyss = { fonts: [], name: "abyss", variant: {} };\n',
     };
     const css = await withScratchWorkspaceAsync(files, compiled);
 
-    expect(css).not.toContain("data-theme=abyss");
+    expect(css).not.toContain("[data-theme=abyss] .button");
+    expect(declared(css, "[data-theme=abyss]", "--colors-brand")).toBe("#111");
   });
 
   it("lists every file the configuration was built from as watched", async () => {

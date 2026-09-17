@@ -108,6 +108,16 @@ supplies the last part of the directory name, so two calls never collide.
 | `pixels`      | `(length: string) => number`                    | Reads the number in front of a CSS unit, and returns 0 where there is no number to read                                                                                 |
 | `seamBetween` | `(first: Measured, second: Measured) => number` | Returns the distance in CSS pixels between the first element's right edge and the second element's left edge                                                            |
 
+### Stylesheets
+
+| Export     | Signature                                                                  | What it does                                                                                                                                                        |
+| ---------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `declared` | `(css: string, selector: string, property: string) => string \| undefined` | Returns what one selector declares a property as, or undefined where it declares it nowhere. The selector is matched literally, wherever it sits in a selector list |
+
+A specification that drives a style compiler gets one string back, and what it wants to know is what
+a named selector declares. `declared` matches the rule the selector opens rather than parsing the
+sheet, so no CSS parser is needed in the test tier.
+
 ## Cleanup
 
 Call `remove` on any `ScratchWorkspace` you made directly. No deletion is scheduled for you, and a

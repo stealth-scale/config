@@ -32,6 +32,48 @@ describe("keyframes", () => {
     expect(Object.keys(keyframes).filter((name) => name.startsWith("slide-"))).toHaveLength(16);
   });
 
+  it("draws the ambient loops by a share of the element or the viewport", () => {
+    expect(keyframes["marquee"]).toStrictEqual({
+      from: { transform: "translateX(0)" },
+      to: { transform: "translateX(-50%)" },
+    });
+    expect(keyframes["float"]).toMatchObject({ "50%": { transform: "translateY(-6%)" } });
+    expect(keyframes["meteor"]).toMatchObject({
+      to: {
+        opacity: "0",
+        transform: "rotate(215deg) translateX(calc(-1 * var(--meteor-travel, 100vw)))",
+      },
+    });
+    expect(keyframes["bg-drift"]).toMatchObject({ "50%": { backgroundPosition: "100% 50%" } });
+  });
+
+  it("moves each scrolled motion by a share of the box rather than a length", () => {
+    expect(keyframes["rise"]).toStrictEqual({
+      from: { opacity: "0", transform: "translateY(20%)" },
+      to: { opacity: "1", transform: "none" },
+    });
+    expect(keyframes["parallax"]).toStrictEqual({
+      from: { transform: "translateY(-15%)" },
+      to: { transform: "translateY(15%)" },
+    });
+    expect(keyframes["progress"]).toStrictEqual({
+      from: { transform: "scaleX(0)" },
+      to: { transform: "scaleX(1)" },
+    });
+    expect(keyframes["twinkle"]).toStrictEqual({
+      "0%, 100%": { opacity: "0.2" },
+      "50%": { opacity: "1" },
+    });
+  });
+
+  it("sweeps the registered angle round once and breathes a glow out to a size token", () => {
+    expect(keyframes["rotate-angle"]).toStrictEqual({ to: { "--angle": "360deg" } });
+    expect(keyframes["pulse-glow"]).toStrictEqual({
+      from: { boxShadow: "0 0 0 var(--shadow-color)" },
+      to: { boxShadow: "0 0 {sizes.8} var(--shadow-color)" },
+    });
+  });
+
   it("defines a keyframe for every animation token", () => {
     const named = Object.keys(animations).map(
       (name) => String(tokenAt(animations, name)).split(" ")[0],

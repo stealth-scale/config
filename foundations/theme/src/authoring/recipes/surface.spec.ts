@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
 
+import { recipeViolations } from "@stealthscale/testing-theme";
+
+import { defineRecipe } from "#authoring/recipe.ts";
 import { divider, surface } from "#authoring/recipes/surface.ts";
 
 describe("surface", () => {
@@ -32,5 +35,14 @@ describe("surface", () => {
       borderColor: "border",
       borderInlineEndWidth: "sm",
     });
+  });
+
+  it("passes the recipe checks for a panel and for a hairline", () => {
+    expect(recipeViolations(defineRecipe({ base: surface("2xl"), className: "x" }))).toStrictEqual(
+      [],
+    );
+    expect(
+      recipeViolations(defineRecipe({ base: divider("vertical"), className: "x" })),
+    ).toStrictEqual([]);
   });
 });

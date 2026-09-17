@@ -62,7 +62,8 @@
     "test": "vp test"
   },
   "dependencies": {
-    "@pandacss/types": "catalog:"
+    "@pandacss/types": "catalog:",
+    "@stealthscale/pandacss-naming": "workspace:^"
   },
   "devDependencies": {
     "@arethetypeswrong/core": "catalog:",
@@ -83,7 +84,6 @@
     "react-dom": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vite-plus": "catalog:",
     "vitest": "catalog:"
   },
   "peerDependencies": {

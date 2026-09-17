@@ -5,7 +5,7 @@
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { projects } from "#test/projects.ts";

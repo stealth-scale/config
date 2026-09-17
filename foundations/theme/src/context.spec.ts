@@ -32,14 +32,21 @@ describe("createRecipeContext", () => {
     const Button = createRecipeContext(button).withContext("button");
     const { container } = render(createElement(Button, null, "Go"));
 
-    expect(container.firstElementChild?.className).toBe("button button--variant_solid");
+    expect(container.firstElementChild?.className).toBe("button button--solid");
+  });
+
+  it("stamps the recipe's name on the element it binds", () => {
+    const Button = createRecipeContext(button).withContext("button");
+    const { container } = render(createElement(Button, null, "Go"));
+
+    expect(container.querySelector("button")?.dataset["recipe"]).toBe("button");
   });
 
   it("draws the class of the variant a caller picks", () => {
     const Button = createRecipeContext(button).withContext("button");
     const { container } = render(createElement(Button, { variant: "ghost" }, "Go"));
 
-    expect(container.firstElementChild?.className).toBe("button button--variant_ghost");
+    expect(container.firstElementChild?.className).toBe("button button--ghost");
   });
 
   it("returns the three factories a compound component is built from", () => {
@@ -58,8 +65,37 @@ describe("createRecipeContext", () => {
       createElement(Content, { size: "lg" }, createElement(Title, null, "Hello")),
     );
 
-    expect(container.firstElementChild?.className).toBe("dialog__content dialog__content--size_lg");
-    expect(container.querySelector("h2")?.className).toBe("dialog__title dialog__title--size_lg");
+    expect(container.firstElementChild?.className).toBe("dialog__content dialog__content--lg");
+    expect(container.querySelector("h2")?.className).toBe("dialog__title dialog__title--lg");
+  });
+
+  it("stamps the recipe's name on the part that provides the variants", () => {
+    const { withContext, withProvider } = createSlotRecipeContext(dialog);
+    const Content = withProvider("section", "content");
+    const Title = withContext("h2", "title");
+    const { container } = render(createElement(Content, null, createElement(Title, null, "Hello")));
+
+    expect(container.querySelector("section")?.dataset["recipe"]).toBe("dialog");
+    expect(container.querySelector("section")?.dataset["slot"]).toBe("content");
+    expect(container.querySelector("h2")?.dataset["recipe"]).toBeUndefined();
+    expect(container.querySelector("h2")?.dataset["slot"]).toBe("title");
+  });
+
+  it("stamps the recipe's name on a root provider that draws no slot of its own", () => {
+    const { withRootProvider } = createSlotRecipeContext(dialog);
+    const Root = withRootProvider("div");
+    const { container } = render(createElement(Root, null, "Hello"));
+
+    expect(container.querySelector("div")?.dataset["recipe"]).toBe("dialog");
+  });
+
+  it("keeps a default prop the caller states beside the recipe's name", () => {
+    const { withProvider } = createSlotRecipeContext(dialog);
+    const Content = withProvider("section", "content", { defaultProps: { role: "note" } });
+    const { container } = render(createElement(Content, null, "Hello"));
+
+    expect(container.querySelector("section")?.getAttribute("role")).toBe("note");
+    expect(container.querySelector("section")?.dataset["recipe"]).toBe("dialog");
   });
 
   it("binds a recipe with no variants and no defaults", () => {
@@ -69,17 +105,21 @@ describe("createRecipeContext", () => {
     expect(container.firstElementChild?.className).toBe("tag");
   });
 
-  it("carries the compound variants into the runtime recipe", () => {
+  it("draws the class of a compound whose selection matches", () => {
     const Button = createRecipeContext(
       defineRecipe({
         className: "button",
         compoundVariants: [{ css: { fontWeight: "bold" }, variant: "solid" }],
-        variants: { variant: { solid: {} } },
+        variants: { variant: { ghost: {}, solid: {} } },
       }),
     ).withContext("button");
-    const { container } = render(createElement(Button, { variant: "solid" }, "Go"));
+    const solid = render(createElement(Button, { variant: "solid" }, "Go"));
+    const ghost = render(createElement(Button, { variant: "ghost" }, "Go"));
 
-    expect(container.firstElementChild?.className).toContain("button--variant_solid");
+    expect(solid.container.firstElementChild?.className).toBe(
+      "button button--solid button--compound__variant-solid",
+    );
+    expect(ghost.container.firstElementChild?.className).toBe("button button--ghost");
   });
 
   it("binds a slot recipe with no variants and no defaults", () => {
@@ -91,17 +131,36 @@ describe("createRecipeContext", () => {
     expect(container.firstElementChild?.className).toBe("card__root");
   });
 
-  it("carries the compound variants into the runtime slot recipe", () => {
-    const Root = createSlotRecipeContext(
-      defineSlotRecipe({
-        className: "card",
-        compoundVariants: [{ css: { root: { fontWeight: "bold" } }, size: "lg" }],
-        slots: ["root"],
-        variants: { size: { lg: {} } },
-      }),
-    ).withProvider("div", "root");
+  it("draws no compound class for a slot compound that carries no name", () => {
+    const Root = createSlotRecipeContext({
+      className: "card",
+      compoundVariants: [{ css: { root: { fontWeight: "bold" } }, size: "lg" }],
+      slots: ["root"],
+      variants: { size: { lg: {}, md: {} } },
+    }).withProvider("div", "root");
     const { container } = render(createElement(Root, { size: "lg" }, "Body"));
 
-    expect(container.firstElementChild?.className).toContain("card__root--size_lg");
+    expect(container.firstElementChild?.className).toBe("card__root card__root--lg");
+  });
+
+  it("draws the class of a slot compound on the slot it styles and on no other", () => {
+    const { withContext, withProvider } = createSlotRecipeContext(
+      defineSlotRecipe({
+        className: "card",
+        compoundVariants: [{ css: { title: { fontWeight: "bold" } }, size: "lg" }],
+        slots: ["root", "title"],
+        variants: { size: { lg: {}, md: {} } },
+      }),
+    );
+    const Root = withProvider("div", "root");
+    const Title = withContext("h2", "title");
+    const { container } = render(
+      createElement(Root, { size: "lg" }, createElement(Title, null, "Hello")),
+    );
+
+    expect(container.firstElementChild?.className).toBe("card__root card__root--lg");
+    expect(container.querySelector("h2")?.className).toBe(
+      "card__title card__title--lg card__title--compound__size-lg",
+    );
   });
 });

@@ -10,11 +10,11 @@ import { createRoot } from "react-dom/client";
 
 import "#card.css";
 
-import { Badge } from "#badge.tsx";
+import Notes from "#notes.mdx";
 
 /**
  * Selects the element this application renders into, and is null when the page has none.
  */
 const root = document.querySelector("#root");
 
-if (root !== null) createRoot(root).render(<Badge />);
+if (root !== null) createRoot(root).render(<Notes />);

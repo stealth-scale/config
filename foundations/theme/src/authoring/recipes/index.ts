@@ -17,4 +17,4 @@ export { motion } from "#authoring/recipes/motion.ts";
 export { controlSizes, iconOnly, iconSizes, touchTarget } from "#authoring/recipes/sizes.ts";
 export { type Anatomy, slotsOf } from "#authoring/recipes/slots.ts";
 export { statusVariants } from "#authoring/recipes/status.ts";
-export { divider, type Level, surface } from "#authoring/recipes/surface.ts";
+export { divider, type Elevation, surface } from "#authoring/recipes/surface.ts";

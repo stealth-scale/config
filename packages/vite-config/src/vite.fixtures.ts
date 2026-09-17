@@ -2,7 +2,7 @@
  * Evaluates a layer for a test that has no Vite running around it.
  */
 
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 
 import { type Context, type Preset } from "@stealthscale/vite-config-core";
 

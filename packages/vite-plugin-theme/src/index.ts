@@ -4,7 +4,13 @@
  * @packageDocumentation
  */
 
-export { type Options, type RuntimeOptions } from "#options.ts";
+export {
+  LAYER_DECLARATION,
+  type Options,
+  type RuntimeOptions,
+  SEPARATOR,
+  THEME_ATTRIBUTE,
+} from "#options.ts";
 export { type Extension, type Extensions, type Switchable, type SwitchablePreset } from "#scope.ts";
 export { type Application, type Theme } from "#statement.ts";
 export * as theme from "#theme/index.ts";

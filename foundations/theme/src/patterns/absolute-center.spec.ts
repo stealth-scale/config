@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
 
+import { recipeViolations } from "@stealthscale/testing-theme";
+
+import { defineRecipe } from "#authoring/recipe.ts";
 import { absoluteCenter } from "#patterns/absolute-center.ts";
 
 describe("absoluteCenter", () => {
@@ -20,5 +23,13 @@ describe("absoluteCenter", () => {
   it("centres on one axis when asked", () => {
     expect(absoluteCenter({ axis: "vertical" })).toMatchObject({ top: "50%", translate: "0 -50%" });
     expect(absoluteCenter({ axis: "vertical" })).not.toHaveProperty("insetInlineStart");
+  });
+
+  it("passes the recipe checks on every axis", () => {
+    for (const axis of ["both", "horizontal", "vertical"] as const) {
+      expect(
+        recipeViolations(defineRecipe({ base: absoluteCenter({ axis }), className: "x" })),
+      ).toStrictEqual([]);
+    }
   });
 });

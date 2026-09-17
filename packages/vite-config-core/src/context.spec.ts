@@ -9,7 +9,7 @@
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { type ConfigEnv } from "vite-plus";
+import { type ConfigEnv } from "vite";
 import { describe, expect, it, vi } from "vitest";
 
 import { contextOf, rooted } from "#context.ts";

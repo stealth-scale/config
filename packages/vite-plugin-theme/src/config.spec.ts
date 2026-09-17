@@ -37,6 +37,7 @@ describe("config", () => {
       expect(written).toContain('jsxFramework: "react",');
       expect(written).toContain("forceImportExtension: true,");
       expect(written).toContain("patterns: {},");
+      expect(written).toContain('separator: "_",');
     }
   });
 
@@ -90,14 +91,20 @@ describe("config", () => {
     expect(written).toContain('staticCss: {"recipes": "*"}');
   });
 
-  it("writes every theme's variant and lists the names under the static rule", () => {
+  it("writes every theme's variant", () => {
+    const themes = { abyss: { tokens: {} }, fathom: { semanticTokens: {} } };
+    const written = renderStylesheetConfig({ ...SOURCE, staticCss: { recipes: "*" }, themes });
+
+    expect(written).toContain(
+      'themes: {"abyss": {"tokens": {}}, "fathom": {"semanticTokens": {}}}',
+    );
+  });
+
+  it("lists every theme's name under the static rule", () => {
     const themes = { abyss: { tokens: {} }, fathom: { semanticTokens: {} } };
     const written = renderStylesheetConfig({ ...SOURCE, staticCss: { recipes: "*" }, themes });
 
     expect(written).toContain('staticCss: {"recipes": "*", "themes": ["abyss", "fathom"]}');
-    expect(written).toContain(
-      'themes: {"abyss": {"tokens": {}}, "fathom": {"semanticTokens": {}}}',
-    );
   });
 
   it("throws with the path of a function inside a preset", () => {

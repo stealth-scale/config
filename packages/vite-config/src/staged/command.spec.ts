@@ -3,7 +3,7 @@
  * list.
  */
 
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { command } from "#staged/command.ts";

@@ -16,6 +16,7 @@ describe("testing", () => {
       "changed",
       "configured",
       "created",
+      "declared",
       "generated",
       "hookContext",
       "loaded",

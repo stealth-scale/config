@@ -2,7 +2,7 @@
  * Checks which files the runner collects and which directories it skips.
  */
 
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { files } from "#test/files.ts";

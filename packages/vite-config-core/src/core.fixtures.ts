@@ -6,7 +6,7 @@
  *   using them reads the file system.
  */
 
-import { type ConfigEnv, type UserConfig } from "vite-plus";
+import { type ConfigEnv, type UserConfig } from "vite";
 
 import { type Context } from "#context.ts";
 

@@ -5,7 +5,7 @@
 
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { source } from "#pack/source.ts";

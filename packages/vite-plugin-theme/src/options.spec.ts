@@ -1,8 +1,22 @@
 import { describe, expect, it } from "vitest";
 
-import { layerDeclaration, layerPattern, resolveOptions } from "#options.ts";
+import {
+  layerDeclaration,
+  layerPattern,
+  resolveOptions,
+  SEPARATOR,
+  THEME_ATTRIBUTE,
+} from "#options.ts";
 
 describe("options", () => {
+  it("names the attribute a theme is switched under without naming the compiler", () => {
+    expect(THEME_ATTRIBUTE).toBe("data-theme");
+  });
+
+  it("separates an axis from its value with the compiler's underscore", () => {
+    expect(SEPARATOR).toBe("_");
+  });
+
   it("fills in every default when nothing is stated", () => {
     expect(resolveOptions()).toStrictEqual({
       include: ["src/**/*.{ts,tsx}"],
@@ -22,7 +36,7 @@ describe("options", () => {
     expect(resolveOptions({ include: ["app/**/*.tsx"] }).include).toStrictEqual(["app/**/*.tsx"]);
   });
 
-  it("renames one layer and keeps the default name of the rest", () => {
+  it("renames one layer over the default names", () => {
     expect(resolveOptions({ layers: { reset: "acme-reset" } }).layers).toStrictEqual({
       base: "base",
       recipes: "recipes",

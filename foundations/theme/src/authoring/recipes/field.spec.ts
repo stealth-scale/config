@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
 
+import { recipeViolations } from "@stealthscale/testing-theme";
+
+import { defineRecipe } from "#authoring/recipe.ts";
 import { field } from "#authoring/recipes/field.ts";
 
 describe("field", () => {
@@ -34,5 +37,9 @@ describe("field", () => {
       _disabled: { layerStyle: "disabled" },
       _readOnly: { background: "bg.subtle" },
     });
+  });
+
+  it("passes the recipe checks", () => {
+    expect(recipeViolations(defineRecipe({ base: field(), className: "x" }))).toStrictEqual([]);
   });
 });

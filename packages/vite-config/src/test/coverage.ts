@@ -49,6 +49,15 @@ const ENOUGH = {
 };
 
 /**
+ * The directory the reports are written to, which the development server leaves unwatched.
+ *
+ * @remarks
+ *   The engine's default, stated here because the watcher has to know it: a test run beside a
+ *   running server rewrites the report and every page reloaded on it.
+ */
+const REPORTS = "**/coverage/**";
+
+/**
  * Measures coverage on every run and holds the package to all of it.
  *
  * @remarks
@@ -59,6 +68,7 @@ const ENOUGH = {
 export function coverage(): Preset {
   return preset({
     config: {
+      server: { watch: { ignored: [REPORTS] } },
       test: {
         coverage: {
           enabled: true,

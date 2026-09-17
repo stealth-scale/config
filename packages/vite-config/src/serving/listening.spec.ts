@@ -2,7 +2,7 @@
  * Checks where each of the two servers listens, and what it answers to.
  */
 
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { type Context, type Preset } from "@stealthscale/vite-config-core";

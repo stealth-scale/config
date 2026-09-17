@@ -1,24 +1,3 @@
-# The release, on every push to main here and in every stealth repository that calls this
-# file. `ci` runs first, on the same commit, so nothing reaches the registry that was not
-# proved on the tree it was cut from.
-#
-# Then the shape Changesets documents for trusted publishing, one job per step so each holds
-# only the permission it needs. `select-mode` reads the pending changesets and says which of
-# two things this push is. With changesets pending, `version` turns them into one version pull
-# request, and while that pull request is open every push updates it. With none pending, which
-# is the merge of that pull request, `pack` builds every package and packs the ones whose
-# version is not on the registry yet, and `publish` publishes those tarballs with provenance
-# from the job's identity token. No long-lived token anywhere, and the identity token is
-# granted to `publish` alone.
-#
-# The version pull request is written with the job's own token, so no workflow runs on it:
-# this one runs again when it merges, proves the tree, and publishes.
-#
-# What the workspace cannot set up for itself: npm's trusted publishing has to be configured
-# on npmjs.com for each package, naming the calling repository and this workflow file, and
-# the repository has to be public, which provenance requires. A repository calling this file
-# has to grant the three permissions below at its calling job, because a called workflow can
-# reduce what it was given and never raise it.
 name: release
 
 on:
@@ -29,11 +8,7 @@ on:
 concurrency: release
 
 jobs:
-  ci:
-    uses: ./.github/workflows/ci.yml
-
   select-mode:
-    needs: ci
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -90,9 +65,7 @@ jobs:
       - uses: pnpm/setup@v2
         with:
           runtime: node@26
-      # A config file is read before any task graph exists, and every package's config imports
-      # other packages' builds, so `bootstrap` packs the packages first, in dependency order.
-      # Then every package builds, since a tarball is packed from `dist`.
+          cache: true
       - run: pnpm run bootstrap
       - run: pnpm exec vp run -r build
       - id: pack

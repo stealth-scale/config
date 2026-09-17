@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
 
+import { recipeViolations } from "@stealthscale/testing-theme";
+
+import { defineRecipe } from "#authoring/recipe.ts";
 import { cluster } from "#patterns/cluster.ts";
 
 describe("cluster", () => {
@@ -18,5 +21,9 @@ describe("cluster", () => {
       gap: "gap.md",
       justifyContent: "end",
     });
+  });
+
+  it("passes the recipe checks", () => {
+    expect(recipeViolations(defineRecipe({ base: cluster(), className: "x" }))).toStrictEqual([]);
   });
 });

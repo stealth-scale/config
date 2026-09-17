@@ -1,6 +1,6 @@
 /**
- * Assembles the semantic tokens: the values that change with the color mode, and the sizes and
- * spacing a recipe reads by use.
+ * Assembles the semantic tokens: the values that change with the color mode, the gradients drawn
+ * from them, and the sizes and spacing a recipe reads by use.
  *
  * @remarks
  *   Typed as the tokens a root theme states, so the foundation is held to the same contract as
@@ -9,6 +9,7 @@
 
 import { type ThemeTokens } from "#authoring/contract.ts";
 import { families } from "#preset/semantic-tokens/colors.ts";
+import { gradients } from "#preset/semantic-tokens/gradients.ts";
 import { palettes } from "#preset/semantic-tokens/palettes.ts";
 import { radii } from "#preset/semantic-tokens/radii.ts";
 import { shadows } from "#preset/semantic-tokens/shadows.ts";
@@ -20,6 +21,7 @@ import { spacing } from "#preset/semantic-tokens/spacing.ts";
  */
 export const semanticTokens: ThemeTokens = {
   colors: { ...families, ...palettes },
+  gradients,
   radii,
   shadows,
   sizes,

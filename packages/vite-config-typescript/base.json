@@ -25,6 +25,12 @@
     "noEmit": true,
     "skipLibCheck": true
   },
-  "include": ["${configDir}/src", "${configDir}/vite.config.ts", "${configDir}/vite.layers.ts"],
-  "_include": "What every package compiles: its source, the config that builds it, and the layers the root states on its behalf where it has any. `${configDir}` is what makes this shareable: a relative path here would resolve against this file and compile nothing. A package with another shape states its own `include`, which replaces this rather than adding to it."
+  "include": [
+    "${configDir}/src",
+    "${configDir}/theme.config.ts",
+    "${configDir}/theme.config.spec.ts",
+    "${configDir}/vite.config.ts",
+    "${configDir}/vite.layers.ts"
+  ],
+  "_include": "What every package compiles: its source, the config that builds it, the layers the root states on its behalf where it has any, and the theme statement an application writes beside its config with the specification that reads it. `${configDir}` is what makes this shareable: a relative path here would resolve against this file and compile nothing. A package with another shape states its own `include`, which replaces this rather than adding to it."
 }

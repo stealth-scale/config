@@ -1,0 +1,75 @@
+{
+  "name": "@stealthscale/testing-theme",
+  "version": "0.0.0",
+  "description": "Lists every part of the theme contract a theme, a recipe or a preset breaks, and reads what a recipe declares and what a rendered component drew.",
+  "keywords": [
+    "accessibility",
+    "contrast",
+    "design-system",
+    "testing",
+    "theme"
+  ],
+  "homepage": "https://github.com/stealth-scale/config/tree/main/packages/testing-theme#readme",
+  "bugs": "https://github.com/stealth-scale/config/issues",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stealth-scale/config.git",
+    "directory": "packages/testing-theme"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "imports": {
+    "#*": "./src/*"
+  },
+  "exports": {
+    ".": {
+      "stealth-source": "./src/index.ts",
+      "default": "./dist/index.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": "./dist/index.mjs",
+      "./package.json": "./package.json"
+    },
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vp pack",
+    "check": "vp check",
+    "test": "vp test"
+  },
+  "dependencies": {
+    "@pandacss/preset-base": "catalog:",
+    "@stealthscale/pandacss-naming": "workspace:^"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/core": "catalog:",
+    "@stealthscale/theme": "workspace:^",
+    "@stealthscale/vite-config": "workspace:^",
+    "@stealthscale/vite-config-typescript": "workspace:^",
+    "@stealthscale/vite-plugin-theme": "workspace:^",
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "happy-dom": "catalog:",
+    "publint": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "@stealthscale/theme": "workspace:^",
+    "vitest": "catalog:peer"
+  },
+  "engines": {
+    "node": ">=26.0.0"
+  }
+}

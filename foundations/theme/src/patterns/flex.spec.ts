@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
 
+import { recipeViolations } from "@stealthscale/testing-theme";
+
+import { defineRecipe } from "#authoring/recipe.ts";
 import { center, flex } from "#patterns/flex.ts";
 
 describe("flex", () => {
@@ -40,5 +43,12 @@ describe("flex", () => {
 
   it("centres inline when asked", () => {
     expect(center({ inline: true })).toMatchObject({ display: "inline-flex" });
+  });
+
+  it("passes the recipe checks for a container and for a centring box", () => {
+    expect(
+      recipeViolations(defineRecipe({ base: flex({ wrap: "wrap" }), className: "x" })),
+    ).toStrictEqual([]);
+    expect(recipeViolations(defineRecipe({ base: center(), className: "x" }))).toStrictEqual([]);
   });
 });

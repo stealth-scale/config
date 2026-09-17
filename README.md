@@ -1,16 +1,18 @@
 # @stealthscale/scale
 
-`@stealthscale/scale` is the stealthscale monorepo. The packages here configure, check, test and
-release every other stealthscale package. The component libraries, the providers, the SDKs and the
-plugins move in from their own repositories.
+`@stealthscale/scale` holds the building blocks a stealthscale application is built from. Today that
+is the design system every interface is drawn from, the configuration tiers every package is built
+and released through, and the testing kits both are held to. The component libraries and the
+platform SDK move in next, from their own repositories.
 
 ## What is here
 
-| Directory   | What it contains                                                      |
-| ----------- | --------------------------------------------------------------------- |
-| `packages/` | What npm publishes under `@stealthscale/`                             |
-| `examples/` | Private applications that each demonstrate one configuration decision |
-| `docs/`     | The decision records, the design proposals and the writing standards  |
+| Directory      | What it contains                                                      |
+| -------------- | --------------------------------------------------------------------- |
+| `packages/`    | What npm publishes under `@stealthscale/`                             |
+| `foundations/` | The design system every stealthscale interface is drawn from          |
+| `examples/`    | Private applications that each demonstrate one configuration decision |
+| `docs/`        | The decision records, the design proposals and the writing standards  |
 
 ## The contract
 
@@ -34,19 +36,36 @@ configures. `import.meta.dirname` names the directory from there and nothing els
 
 ## The packages
 
-| Package                                                     | What it does                                                                                 |
-| ----------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| [`vite-config-core`](packages/vite-config-core)             | Defines the four kinds of layer and composes a list of them into one Vite configuration      |
-| [`vite-config`](packages/vite-config)                       | Publishes the five tiers and a namespace of layers for each part of a Vite configuration     |
-| [`vite-config-typescript`](packages/vite-config-typescript) | Publishes the three TypeScript configurations a package extends: base, node and web          |
-| [`vite-config-plain`](packages/vite-config-plain)           | Packs and tests the kernel and the two plugins that every tier depends on                    |
-| [`vite-config-react`](packages/vite-config-react)           | Adds the JSX transform, the React lint rules and the DOM a test renders into                 |
-| [`vite-config-css`](packages/vite-config-css)               | Adds the Stylelint rules a stylesheet is checked against and the plugin that runs them       |
-| [`vite-plugin-base`](packages/vite-plugin-base)             | Supplies the typed plugin and the module-graph readers every bundler plugin here is built on |
-| [`vite-plugin-sbom`](packages/vite-plugin-sbom)             | Writes a CycloneDX bill of materials from the modules a build reached                        |
-| [`testing`](packages/testing)                               | Builds the scratch workspaces and manifests a specification runs a tree from                 |
-| [`testing-react`](packages/testing-react)                   | Reads a rendered component through the part names and data attributes on its anatomy         |
-| [`testing-config`](packages/testing-config)                 | Checks a config, plugin or library package against the contract its kind keeps               |
+| Package                                                     | What it does                                                                                               |
+| ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| [`vite-config-core`](packages/vite-config-core)             | Defines the four kinds of layer and composes a list of them into one Vite configuration                    |
+| [`vite-config`](packages/vite-config)                       | Publishes the five tiers and a namespace of layers for each part of a Vite configuration                   |
+| [`vite-config-typescript`](packages/vite-config-typescript) | Publishes the three TypeScript configurations a package extends: base, node and web                        |
+| [`vite-config-plain`](packages/vite-config-plain)           | Packs and tests the kernel and the two plugins that every tier depends on                                  |
+| [`vite-config-react`](packages/vite-config-react)           | Adds the JSX transform, the React lint rules, the DOM a test renders into and the MDX compiler             |
+| [`vite-config-css`](packages/vite-config-css)               | Adds the Stylelint rules a stylesheet is checked against and the plugin that runs them                     |
+| [`vite-config-theme`](packages/vite-config-theme)           | Adds the runtime generator to a design-system package and the stylesheet compiler to an application        |
+| [`vite-plugin-base`](packages/vite-plugin-base)             | Supplies the typed plugin and the module-graph readers every bundler plugin here is built on               |
+| [`vite-plugin-sbom`](packages/vite-plugin-sbom)             | Writes a CycloneDX bill of materials from the modules a build reached                                      |
+| [`vite-plugin-theme`](packages/vite-plugin-theme)           | Generates the styling runtime of a design system and compiles the stylesheet of an application             |
+| [`pandacss-naming`](packages/pandacss-naming)               | Writes the class names of a design system in one readable scheme, for the stylesheet and the browser alike |
+| [`pandacss-compiler`](packages/pandacss-compiler)           | Renames a compiled stylesheet and its generated runtime into that scheme                                   |
+| [`testing`](packages/testing)                               | Builds the scratch workspaces and manifests a specification runs a tree from                               |
+| [`testing-react`](packages/testing-react)                   | Reads a rendered component through the part names and data attributes on its anatomy                       |
+| [`testing-config`](packages/testing-config)                 | Checks a config, plugin or library package against the contract its kind keeps                             |
+| [`testing-theme`](packages/testing-theme)                   | Checks a theme, a recipe or a preset against the theme contract and the contrast table                     |
+
+## The design system
+
+| Package                      | What it does                                                                                                                               |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| [`theme`](foundations/theme) | Publishes the foundation every recipe is written against, the runtime every component binds with, and the vocabulary a theme is written in |
+
+A recipe is written against the foundation's vocabulary alone, so a component reads it in a browser
+and a configuration reads it in node alike. Filling the contract takes two calls, and a theme moves
+whatever it wants from there. The build plugin compiles one stylesheet from every preset and theme
+in the dependency graph, and scopes each theme under `data-theme`. It renames every class into the
+naming scheme, so `button--lg` reaches the page rather than the compiler's own name.
 
 ## The tiers
 
@@ -62,7 +81,7 @@ configures. `import.meta.dirname` names the directory from there and nothing els
 
 An add-on configuration package exports `layers()` for a package and `workspace()` for a root. A
 package that renders adds `react.layers()` beside its tier. A package with stylesheets adds
-`css.layers()`.
+`css.layers()`. A design-system package and an application that wears one add `theme.layers()`.
 
 The tiers build on the kernel and the two bundler plugins. All three pack under
 `@stealthscale/vite-config-plain` rather than extending a tier.
@@ -86,21 +105,29 @@ a package composes and merges like any other. Both tools then ignore it.
 
 ## The examples
 
-| Example                                 | What it shows                                                                   |
-| --------------------------------------- | ------------------------------------------------------------------------------- |
-| [`app-host`](examples/app-host)         | An application that loads another one at run time through Module Federation     |
-| [`app-remote`](examples/app-remote)     | An application built to be loaded by another one                                |
-| [`app-tanstack`](examples/app-tanstack) | A routed application with a federated remote mounted under one of its addresses |
-| [`app-react`](examples/app-react)       | What the React configuration package adds to an application that renders        |
-| [`app-web`](examples/app-web)           | A pinned port and a proxied path, with no framework in the page                 |
-| [`app-ssr`](examples/app-ssr)           | Server-side rendering and the dependency the server bundle has to contain       |
-| [`app-worker`](examples/app-worker)     | Arithmetic on a worker thread that the dependency scan finds                    |
-| [`lib-bare`](examples/lib-bare)         | A library that takes the workspace root's configuration                         |
-| [`lib-core`](examples/lib-core)         | A library that reaches for neither node's globals nor the browser's             |
-| [`lib-node`](examples/lib-node)         | A library published for node                                                    |
-| [`lib-cli`](examples/lib-cli)           | A library that installs a command named for what it does                        |
-| [`lib-tokens`](examples/lib-tokens)     | A pack hook that writes part of what the library ships                          |
-| [`lib-ui`](examples/lib-ui)             | A component library four of the example applications share                      |
+| Example                                     | What it shows                                                                    |
+| ------------------------------------------- | -------------------------------------------------------------------------------- |
+| [`app-host`](examples/app-host)             | An application that loads another one at run time through Module Federation      |
+| [`app-remote`](examples/app-remote)         | An application built to be loaded by another one                                 |
+| [`app-tanstack`](examples/app-tanstack)     | A routed application with a federated remote mounted under one of its addresses  |
+| [`app-react`](examples/app-react)           | What the React configuration package adds to an application that renders         |
+| [`app-web`](examples/app-web)               | A pinned port and a proxied path, with no framework in the page                  |
+| [`app-ssr`](examples/app-ssr)               | Server-side rendering and the dependency the server bundle has to contain        |
+| [`app-worker`](examples/app-worker)         | Arithmetic on a worker thread that the dependency scan finds                     |
+| [`lib-bare`](examples/lib-bare)             | A library that takes the workspace root's configuration                          |
+| [`lib-core`](examples/lib-core)             | A library that reaches for neither node's globals nor the browser's              |
+| [`lib-node`](examples/lib-node)             | A library published for node                                                     |
+| [`lib-cli`](examples/lib-cli)               | A library that installs a command named for what it does                         |
+| [`lib-tokens`](examples/lib-tokens)         | A pack hook that writes part of what the library ships                           |
+| [`lib-ui`](examples/lib-ui)                 | A component library four of the example applications share                       |
+| [`lib-actions`](examples/lib-actions)       | A button drawn by a recipe, with the preset that registers it                    |
+| [`lib-surfaces`](examples/lib-surfaces)     | A card of four parts drawn by one slot recipe, with the preset that registers it |
+| [`theme-fathom`](examples/theme-fathom)     | A deep teal theme on marine greys, rounder than the foundation                   |
+| [`theme-folio`](examples/theme-folio)       | An editorial theme with a violet brand and a serif to read it in                 |
+| [`theme-forge`](examples/theme-forge)       | A warm console theme with cream surfaces, an amber brand and flat shadows        |
+| [`theme-abyss`](examples/theme-abyss)       | A theme derived from another one rather than from the foundation                 |
+| [`theme-single`](examples/theme-single)     | A page in one theme that switches its color mode                                 |
+| [`theme-multiple`](examples/theme-multiple) | A page that switches between four themes and two color modes                     |
 
 ## Working on it
 
@@ -122,7 +149,8 @@ the task name. Anything after the task name goes to the task. `vp run -v ci` is 
 [CONTRIBUTING.md](CONTRIBUTING.md) covers the pull request, the changeset and the three standards
 under [docs/standards/](docs/standards/). The [architecture decision records](docs/adr/) record what
 every package here inherits and what each decision cost. The [RFCs](docs/rfc/) set out the designs
-that were argued before they were accepted.
+that were argued before they were accepted. [SECURITY.md](SECURITY.md) covers how to report a
+vulnerability.
 
 ## Licence
 

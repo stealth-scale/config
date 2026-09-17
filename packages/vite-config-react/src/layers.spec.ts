@@ -2,7 +2,7 @@
  * Drives the package-level call against both tiers a rendering package is built on.
  */
 
-import { type ConfigEnv, type UserConfig } from "vite-plus";
+import { type ConfigEnv, type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { defineConfig as application } from "@stealthscale/vite-config/preset/app";
@@ -21,6 +21,25 @@ describe("layers", () => {
       "react.test.cleanup",
       "react.test.document",
     ]);
+  });
+
+  it("adds the MDX compiler in the build and in the packer when asked", () => {
+    expect(layers({ mdx: true }).map((one) => one.name)).toStrictEqual([
+      "react.plugin.refresh",
+      "react.test.cleanup",
+      "react.test.document",
+      "react.plugin.mdx",
+      "react.plugin.mdx(pack)",
+    ]);
+  });
+
+  it("leaves MDX out unless asked", () => {
+    expect(layers({}).map((one) => one.name)).toStrictEqual(layers().map((one) => one.name));
+    expect(
+      layers({ mdx: false })
+        .map((one) => one.name)
+        .join(),
+    ).not.toContain("mdx");
   });
 
   it("declares no rules of its own", () => {

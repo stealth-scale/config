@@ -2,7 +2,7 @@
  * Proves two proxy routes coexist, and that a later route naming a path wins.
  */
 
-import { resolveConfig, type ResolvedConfig, type UserConfig } from "vite-plus";
+import { resolveConfig, type ResolvedConfig, type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { defineConfig } from "@stealthscale/vite-config-core";

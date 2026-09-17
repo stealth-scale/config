@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
+import { recipeViolations } from "@stealthscale/testing-theme";
+
+import { defineRecipe } from "#authoring/recipe.ts";
 import { controlSizes, iconOnly, iconSizes, touchTarget } from "#authoring/recipes/sizes.ts";
+
+const SIZES = ["xs", "sm", "md", "lg", "xl"] as const;
 
 describe("sizes", () => {
   it("reads the four semantic scales for each control size", () => {
@@ -29,5 +34,21 @@ describe("sizes", () => {
         position: "relative",
       },
     });
+  });
+
+  it("reads tokens the foundation defines at every size of every scale", () => {
+    const recipe = defineRecipe({
+      base: touchTarget(),
+      className: "x",
+      variants: { icon: iconSizes(SIZES), only: iconOnly(SIZES), size: controlSizes(SIZES) },
+    });
+
+    expect(
+      recipeViolations(recipe, {
+        skip: {
+          "recipe.values": "the three scales share their steps, so one recipe reads them all",
+        },
+      }),
+    ).toStrictEqual([]);
   });
 });

@@ -2,7 +2,7 @@
  * Checks what coverage counts, what it leaves out, and what it demands.
  */
 
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { FOREIGN } from "#ignore/foreign.ts";
@@ -76,5 +76,11 @@ describe("coverage", () => {
     expect(excluded).toContain("**/src/main.{ts,tsx}");
     expect(excluded).toContain("**/src/bin/**");
     expect(excluded).toContain("**/*.worker.{ts,tsx}");
+  });
+
+  it("keeps the development server from watching the reports it writes", () => {
+    expect((coverage().config as UserConfig).server?.watch?.ignored).toStrictEqual([
+      "**/coverage/**",
+    ]);
   });
 });

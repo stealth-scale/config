@@ -6,10 +6,19 @@
  *   `className` decides what every class a recipe emits is called, and the classes are already in
  *   the markup when a theme is read, so renaming it orphans every one of them. `slots` is a list,
  *   and a list under `extend` is appended to rather than replaced, so a restated one names every
- *   slot twice. Both fail without a report, so both are refused by type.
+ *   slot twice. Both fail without a report, so both are refused by type. A compound is typed apart
+ *   from the recipe's own, because a theme does not carry the component's variant types, and the
+ *   compiler's selection over every axis is an index signature that admits no `css` key beside it.
  */
 
 import { type Recipe, type SlotRecipe } from "#authoring/recipe.ts";
+import type { SlotRecord } from "#generated/types/recipe.d.mts";
+import type { SystemStyleObject } from "#generated/types/system.d.mts";
+
+/**
+ * Lists the values a compound matches an axis on, which are the ones a class name carries.
+ */
+type Matched = boolean | number | ReadonlyArray<boolean | number | string> | string;
 
 /**
  * Refuses the two keys a theme never restates.
@@ -27,12 +36,55 @@ interface Owned {
 }
 
 /**
+ * Describes a compound a theme adds to a recipe: the values it matches on, by axis, and the
+ * styles.
+ *
+ * @remarks
+ *   The axes are open, so the index signature has to admit the styles as well. The recipe
+ *   helpers and the testing kit hold a value to what a class name carries.
+ * @typeParam Styles - The styles the compound applies, for one element or keyed by slot.
+ */
+export interface ExtensionCompound<Styles = SystemStyleObject> {
+  /**
+   * The value each axis has to hold for the styles to apply.
+   */
+  [axis: string]: Matched | Styles | undefined;
+
+  /**
+   * Never stated. The class comes from the component's compound for the same selection.
+   */
+  className?: never;
+
+  /**
+   * The styles that apply where every axis the compound names matches.
+   */
+  css: Styles;
+}
+
+/**
+ * Carries the compounds a theme adds.
+ *
+ * @typeParam Styles - The styles each compound applies, for one element or keyed by slot.
+ */
+interface Compounded<Styles> {
+  /**
+   * The styles that apply where a combination of values matches, each in the class the component
+   * emits for the same selection.
+   */
+  compoundVariants?: Array<ExtensionCompound<Styles>> | undefined;
+}
+
+/**
  * Describes a theme's change to a recipe that draws one element.
  */
-export type RecipeExtension = Omit<Partial<Recipe>, "className" | "slots"> & Owned;
+export type RecipeExtension = Compounded<SystemStyleObject> &
+  Omit<Partial<Recipe>, "className" | "compoundVariants" | "slots"> &
+  Owned;
 
 /**
  * Describes a theme's change to a recipe that draws several parts, keyed by slot where the change
  * is a style.
  */
-export type SlotRecipeExtension = Omit<Partial<SlotRecipe>, "className" | "slots"> & Owned;
+export type SlotRecipeExtension = Compounded<SlotRecord<string, SystemStyleObject>> &
+  Omit<Partial<SlotRecipe>, "className" | "compoundVariants" | "slots"> &
+  Owned;

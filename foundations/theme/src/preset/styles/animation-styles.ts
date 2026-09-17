@@ -1,11 +1,12 @@
 /**
- * Defines the animation styles: the motions a recipe names with `animationStyle` when a thing
- * opens, closes or waits.
+ * Defines the motions a recipe reads by name: how a thing enters and leaves, and the loops that
+ * run while nothing is pressed.
  *
  * @remarks
- *   Each motion states its keyframes, its pace and its curve, and turns itself off for a reader
- *   who asked for less motion. The slide reads the placement its machine stamps, so a popover
- *   slides in from the side its anchor is on without the recipe knowing which side that is.
+ *   Every motion names a keyframe, a pace from the duration tokens and a curve from the easing
+ *   tokens, so a theme moves the whole set by moving three tokens. An entering motion eases out at
+ *   the moderate pace and a leaving one eases in at the fast pace, because a thing arriving is
+ *   watched and a thing going is not. Every motion is turned off for a reader who asked for less.
  */
 
 import { type AnimationStyle, type AnimationStyles } from "#pandacss.ts";
@@ -16,9 +17,9 @@ import { type AnimationStyle, type AnimationStyles } from "#pandacss.ts";
 type Motion = Record<"value", AnimationStyle>;
 
 /**
- * Lists the sides a placement can start with against the side a panel slides in from.
+ * Lists each placement against the side the anchored element sits on.
  */
-const SLIDES: ReadonlyArray<readonly [placement: string, from: string]> = [
+const SLIDES: ReadonlyArray<readonly [placement: string, anchored: string]> = [
   ["top", "bottom"],
   ["bottom", "top"],
   ["left", "right"],
@@ -26,7 +27,7 @@ const SLIDES: ReadonlyArray<readonly [placement: string, from: string]> = [
 ];
 
 /**
- * Writes one motion: its keyframes at a pace and a curve, off under reduced motion.
+ * Writes one motion that runs once.
  */
 function motion(name: string, pace: string, curve: string): Motion {
   return {
@@ -40,9 +41,16 @@ function motion(name: string, pace: string, curve: string): Motion {
 }
 
 /**
- * Writes a slide that reads the placement its machine stamps.
- *
- * @param direction - Whether the panel slides in or out, which decides the keyframe name.
+ * Writes one motion that runs until the element goes.
+ */
+function loop(name: string, pace: string, curve: string): Motion {
+  const { value } = motion(name, pace, curve);
+
+  return { value: { ...value, animationIterationCount: "infinite" } };
+}
+
+/**
+ * Writes a slide that reads the side to move from off the placement a floating element states.
  */
 function slide(direction: "from" | "to", fade: string, pace: string, curve: string): Motion {
   const { value } = motion(`slide-${direction}-top, ${fade}`, pace, curve);
@@ -51,11 +59,9 @@ function slide(direction: "from" | "to", fade: string, pace: string, curve: stri
     value: {
       ...value,
       ...Object.fromEntries(
-        SLIDES.map(([placement, from]) => [
+        SLIDES.map(([placement, anchored]) => [
           `&[data-placement^=${placement}]`,
-          {
-            animationName: `slide-${direction}-${direction === "from" ? from : placement}, ${fade}`,
-          },
+          { animationName: `slide-${direction}-${anchored}, ${fade}` },
         ]),
       ),
       transformOrigin: "var(--transform-origin)",
@@ -64,9 +70,30 @@ function slide(direction: "from" | "to", fade: string, pace: string, curve: stri
 }
 
 /**
- * Lists the motions: an entering and a leaving form of each, and the ambient shimmer.
+ * Writes one motion the scroll position drives rather than the clock.
+ *
+ * @remarks
+ *   The timeline is the scroll of the nearest scroller or the element's own passage through the
+ *   viewport, so the motion runs forward as the reader scrolls down and back as they scroll up. A
+ *   browser without scroll-driven animations leaves the element at rest.
+ */
+function scrolled(name: string, timeline: string, more: AnimationStyle): Motion {
+  return {
+    value: {
+      _motionReduce: { animation: "none" },
+      animationName: name,
+      animationTimeline: timeline,
+      animationTimingFunction: "linear",
+      ...more,
+    },
+  };
+}
+
+/**
+ * Lists the motions: the entering and leaving pairs, the loops, and the scrolled ones.
  */
 export const animationStyles: AnimationStyles = {
+  aurora: loop("bg-drift", "ambientSlower", "in-out"),
   collapse: {
     in: motion("expand-height, fade-in", "moderate", "out"),
     out: motion("collapse-height, fade-out", "fast", "in"),
@@ -75,21 +102,47 @@ export const animationStyles: AnimationStyles = {
     in: motion("fade-in", "moderate", "out"),
     out: motion("fade-out", "fast", "in"),
   },
+  float: loop("float", "ambientSlow", "in-out"),
+  marquee: loop("marquee", "ambientSlower", "linear"),
+  meteor: {
+    value: {
+      ...loop("meteor", "ambientSlow", "linear").value,
+      animationDelay: "calc(-1 * var(--stagger, 0) * {durations.ambient})",
+    },
+  },
+  parallax: scrolled("parallax", "scroll()", {}),
+  progress: scrolled("progress", "scroll()", { transformOrigin: "left" }),
+  "pulse-glow": {
+    value: { ...loop("pulse-glow", "ambient", "in-out").value, animationDirection: "alternate" },
+  },
+  reveal: scrolled("rise", "view()", {
+    animationFillMode: "both",
+    animationRange: "entry 0% cover 30%",
+    animationTimingFunction: "out",
+  }),
+  rise: {
+    value: {
+      ...motion("rise", "slower", "out").value,
+      animationDelay: "calc(var(--stagger, 0) * {durations.faster})",
+      animationFillMode: "both",
+    },
+  },
   "scale-fade": {
     in: motion("scale-in, fade-in", "moderate", "out"),
     out: motion("scale-out, fade-out", "fast", "in"),
   },
-  shimmer: {
-    value: {
-      _motionReduce: { animation: "none" },
-      animationDuration: "ambientSlow",
-      animationIterationCount: "infinite",
-      animationName: "bg-position",
-      animationTimingFunction: "linear",
-    },
-  },
+  shimmer: loop("bg-position", "ambientSlow", "linear"),
   "slide-fade": {
     in: slide("from", "fade-in", "moderate", "out"),
     out: slide("to", "fade-out", "fast", "in"),
+  },
+  spin: loop("spin", "ambient", "linear"),
+  sweep: loop("rotate-angle", "ambientSlow", "linear"),
+  twinkle: {
+    value: {
+      ...loop("twinkle", "ambient", "in-out").value,
+      animationDelay: "calc(var(--stagger, 0) * {durations.slowest})",
+      animationDirection: "alternate",
+    },
   },
 };

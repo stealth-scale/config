@@ -3,7 +3,7 @@
  * it.
  */
 
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { ci } from "#run/ci.ts";

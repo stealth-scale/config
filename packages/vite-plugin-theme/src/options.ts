@@ -35,6 +35,30 @@ export const GENERATED = "generated";
 export const PRESET_SUBPATH = "./theme";
 
 /**
+ * Fixes the attribute the compiled stylesheet switches a theme under, on the document root or on
+ * any element for a subtree.
+ *
+ * @remarks
+ *   The compiler emits every theme under an attribute of its own naming, and the plugin rewrites it
+ *   to this one, so nothing a page sees names the compiler. The design-system package publishes the
+ *   same name for a provider to write.
+ */
+export const THEME_ATTRIBUTE = "data-theme";
+
+/**
+ * Fixes the character the compiler writes between an axis and its value, and between a property's
+ * class and its value, in a class name.
+ *
+ * @remarks
+ *   The compiler's default. Neither an axis nor a value contains an underscore, so the first one is
+ *   the boundary, and a negative value keeps its sign where a hyphen would merge into it. Nothing
+ *   a page sees carries it: the naming scheme reads it on both sides and writes a hyphen. The
+ *   design-system package publishes the same character for the names it writes itself, and the
+ *   testing kit holds the two equal.
+ */
+export const SEPARATOR = "_";
+
+/**
  * Lists the cascade layers in the order the compiler writes them, whatever they are named.
  *
  * @remarks
@@ -184,3 +208,13 @@ export function layerPattern(layers: StylesheetLayers): RegExp {
 
   return new RegExp(String.raw`@layer\s+${names.join(String.raw`\s*,\s*`)}\s*;`, "u");
 }
+
+/**
+ * Declares the cascade order under the names an application gets without stating any.
+ *
+ * @remarks
+ *   An application's stylesheet opens with this line, and it is the line the compiled rules are
+ *   appended to. A specification that drives the plugin writes it rather than a literal of its
+ *   own, so renaming a layer does not leave a specification asserting against the old names.
+ */
+export const LAYER_DECLARATION = `${layerDeclaration(resolveOptions().layers)}\n`;

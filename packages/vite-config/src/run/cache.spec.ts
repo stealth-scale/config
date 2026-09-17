@@ -2,7 +2,7 @@
  * Proves the runner caches a script as readily as a task.
  */
 
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { cache } from "#run/cache.ts";

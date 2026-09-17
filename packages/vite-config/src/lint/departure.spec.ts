@@ -2,7 +2,7 @@
  * Specifies how a departure reaches the lint block and what it carries there.
  */
 
-import { type ConfigEnv, type UserConfig } from "vite-plus";
+import { type ConfigEnv, type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { defineConfig, type Layer, owned, remove } from "@stealthscale/vite-config-core";

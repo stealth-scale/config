@@ -1,21 +1,35 @@
 import { describe, expect, it } from "vitest";
 
-import { COLOR_MODE_ATTRIBUTE, conditions } from "#preset/conditions.ts";
+import { conditions } from "#preset/conditions.ts";
 
 describe("conditions", () => {
   it("adds to the compiler's conditions rather than replacing them", () => {
     expect(Object.keys(conditions)).toStrictEqual(["extend"]);
   });
 
-  it("reads the color mode from the attribute", () => {
-    expect(COLOR_MODE_ATTRIBUTE).toBe("data-color-mode");
-    expect(conditions.extend?.["dark"]).toBe("[data-color-mode=dark] &");
+  it("reads dark from the attribute above or from the preference outside a light subtree", () => {
+    expect(conditions.extend?.["dark"]).toStrictEqual({
+      "[data-color-mode=dark] &": "@slot",
+      "@media (prefers-color-scheme: dark)": {
+        ":where(:root, :host):not([data-color-mode=light], [data-color-mode=light] *) &": "@slot",
+      },
+    });
   });
 
-  it("draws light as the complement of dark", () => {
-    expect(conditions.extend?.["light"]).toBe(
-      "&:not([data-color-mode=dark], [data-color-mode=dark] *)",
-    );
+  it("reads light from the attribute above or from the preference outside a dark subtree", () => {
+    expect(conditions.extend?.["light"]).toStrictEqual({
+      "[data-color-mode=light] &": "@slot",
+      "@media (prefers-color-scheme: light)": {
+        ":where(:root, :host):not([data-color-mode=dark], [data-color-mode=dark] *) &": "@slot",
+      },
+    });
+  });
+
+  it("anchors each preference block to the document root", () => {
+    const written = JSON.stringify([conditions.extend?.["dark"], conditions.extend?.["light"]]);
+
+    expect(written.match(/:where\(:root, :host\):not\(/gu)).toHaveLength(2);
+    expect(written).not.toContain(String.raw`"&:not(`);
   });
 
   it("holds hover inside a media query and excludes a disabled control", () => {

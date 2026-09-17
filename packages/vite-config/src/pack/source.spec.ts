@@ -1,5 +1,5 @@
 import { globSync, readFileSync } from "node:fs";
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { source } from "#pack/source.ts";

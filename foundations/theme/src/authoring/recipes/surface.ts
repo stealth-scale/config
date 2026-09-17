@@ -7,21 +7,21 @@ import type { SystemStyleObject } from "#generated/types/system.d.mts";
 /**
  * Selects how far a panel is lifted from the page, as a step of the shadow scale.
  */
-export type Level = "2xl" | "lg" | "md" | "sm" | "xl" | "xs";
+export type Elevation = "2xl" | "lg" | "md" | "sm" | "xl" | "xs";
 
 /**
  * Writes the base of a panel: the panel surface, an edge, the middle corner, and a shadow at the
- * level given.
+ * elevation given.
  *
- * @param level - How far the panel is lifted. A little unless the caller says otherwise.
+ * @param elevation - How far the panel is lifted. A little unless the caller says otherwise.
  */
-export function surface(level: Level = "sm"): SystemStyleObject {
+export function surface(elevation: Elevation = "sm"): SystemStyleObject {
   return {
     background: "bg.panel",
     borderColor: "border",
     borderRadius: "l2",
     borderWidth: "sm",
-    boxShadow: level,
+    boxShadow: elevation,
     color: "fg",
   };
 }

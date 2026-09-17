@@ -2,7 +2,7 @@
  * Checks that prose is wrapped, and wrapped the way a doc comment is.
  */
 
-import { type UserConfig } from "vite-plus";
+import { type UserConfig } from "vite";
 import { describe, expect, it } from "vitest";
 
 import { docblocks } from "#fmt/docblock.ts";

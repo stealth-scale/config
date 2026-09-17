@@ -171,7 +171,7 @@ describe("stylesheet", () => {
     });
 
     expect(written).toContain(DECLARED);
-    expect(written).toContain("c_red");
+    expect(written).toContain("c-red");
   });
 
   it("appends the compiled rules to a stylesheet whose declaration has no spaces", async () => {
@@ -181,7 +181,7 @@ describe("stylesheet", () => {
       return transformed(plugin, context, "@layer reset,base,tokens,recipes,utilities;\n", sheet);
     });
 
-    expect(written).toContain("c_red");
+    expect(written).toContain("c-red");
   });
 
   it("passes over a stylesheet without the declaration", async () => {
@@ -277,7 +277,7 @@ describe("stylesheet", () => {
       return transformed(plugin, context, DECLARED, sheet);
     });
 
-    expect(written).toContain("c_blue");
+    expect(written).toContain("c-blue");
   });
 
   it("compiles a source file that appears under the scanned globs", async () => {
@@ -291,7 +291,7 @@ describe("stylesheet", () => {
       return transformed(plugin, context, DECLARED, sheet);
     });
 
-    expect(written).toContain("c_green");
+    expect(written).toContain("c-green");
   });
 
   it("invalidates the stylesheet when a source file is deleted", async () => {
@@ -410,7 +410,7 @@ describe("stylesheet", () => {
       return transformed(plugin, context, DECLARED, sheet);
     });
 
-    expect(written).toContain("c_blue");
+    expect(written).toContain("c-blue");
   });
 
   it("leaves a watch change to the hot update under a dev server", async () => {
@@ -424,7 +424,7 @@ describe("stylesheet", () => {
       return transformed(plugin, context, DECLARED, sheet);
     });
 
-    expect(written).not.toContain("c_blue");
+    expect(written).not.toContain("c-blue");
   });
 
   it("throws when the application does not depend on the system package", async () => {

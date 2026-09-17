@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
 
+import { recipeViolations } from "@stealthscale/testing-theme";
+
+import { defineRecipe } from "#authoring/recipe.ts";
 import { frame } from "#patterns/frame.ts";
 
 describe("frame", () => {
@@ -15,5 +18,9 @@ describe("frame", () => {
 
   it("takes the ratio it was given", () => {
     expect(frame({ ratio: "square" })).toMatchObject({ aspectRatio: "square" });
+  });
+
+  it("passes the recipe checks", () => {
+    expect(recipeViolations(defineRecipe({ base: frame(), className: "x" }))).toStrictEqual([]);
   });
 });
