@@ -36,6 +36,14 @@ export function Typography(): ReactElement {
       <Heading as="h3" size="md" tone="muted">
         A heading in the middle size
       </Heading>
+      <Heading as="h3" size="3xl">
+        A hero heading
+      </Heading>
+      <Heading as="h3" size="xs" tone="muted">
+        The smallest heading
+      </Heading>
+      <Text size="xl">A paragraph in the largest body size.</Text>
+      <Text size="xs">A paragraph in the smallest body size.</Text>
       <Text>
         A paragraph in the body size, holding <Code>pnpm add</Code> as a snippet of code and{" "}
         <Kbd>Esc</Kbd> as a key a reader is asked to press.
@@ -50,6 +58,12 @@ export function Typography(): ReactElement {
         </Icon>
         <Icon aria-hidden={false} aria-label="Loading" motion="spin" size="md" viewBox="0 0 24 24">
           <path d="M12 2a10 10 0 1 0 10 10" fill="none" stroke="currentColor" strokeWidth="2" />
+        </Icon>
+        <Icon size="2xl" tone="info" viewBox="0 0 24 24">
+          <path d="M12 2 2 22h20Z" />
+        </Icon>
+        <Icon size="4xl" tone="success" viewBox="0 0 24 24">
+          <path d="M12 2 2 22h20Z" />
         </Icon>
       </p>
       <Lists />

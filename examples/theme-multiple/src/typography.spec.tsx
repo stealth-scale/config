@@ -10,11 +10,11 @@ describe("Typography", () => {
     expect(getByRole("heading", { level: 2, name: "Typography" })).toBeDefined();
   });
 
-  it("names the labelled icon and hides the other", () => {
+  it("names the labelled icon and hides the others", () => {
     const { container, getByRole } = render(<Typography />);
 
     expect(getByRole("img", { name: "Loading" })).toBeDefined();
-    expect(container.querySelectorAll("svg[aria-hidden='true']")).toHaveLength(2);
+    expect(container.querySelectorAll("svg[aria-hidden='true']")).toHaveLength(4);
   });
 
   it("draws the lists between the icons and the quotation", () => {

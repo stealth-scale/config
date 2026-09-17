@@ -1,6 +1,6 @@
 /**
  * Draws the actions package's components: a button in every look, every size and every status,
- * a glowing one, a disabled one, two icon buttons, and a pair under a provider.
+ * the hero buttons, a glowing one, a disabled one, two icon buttons, and a pair under a provider.
  *
  * @remarks
  *   Every variant is written as a literal, which is what the compiler extracts the rules for.
@@ -14,6 +14,8 @@ import { type ReactElement } from "react";
 import { Button, ButtonPropsProvider, IconButton } from "@stealthscale/component-actions";
 import { Heading, Icon } from "@stealthscale/component-typography";
 import { css } from "@stealthscale/theme";
+
+import { Heroes } from "#heroes.tsx";
 
 /**
  * Lays the section out as a column.
@@ -58,6 +60,7 @@ export function Actions(): ReactElement {
           Redo
         </Button>
       </p>
+      <Heroes />
       <p className={row}>
         <Button status="info">Info</Button>
         <Button status="success">Success</Button>
