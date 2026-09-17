@@ -251,6 +251,12 @@ catalogs:
     packageurl-js:
       specifier: ^2.0.1
       version: 2.0.1
+    postcss:
+      specifier: ^8.5.28
+      version: 8.5.28
+    postcss-selector-parser:
+      specifier: ^7.1.6
+      version: 7.1.6
     publint:
       specifier: ^0.3.24
       version: 0.3.24
@@ -1193,6 +1199,76 @@ importers:
       react-dom:
         specifier: 'catalog:'
         version: 19.3.0(react@19.3.0)
+      typescript:
+        specifier: 'catalog:'
+        version: 7.0.2
+      vite:
+        specifier: 'catalog:'
+        version: '@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1)'
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.11(@types/node@26.5.1)(@vitest/browser-playwright@4.1.11)(@vitest/browser-preview@4.1.11)(@vitest/coverage-v8@4.1.11)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(happy-dom@20.14.5)
+
+  packages/pandacss-compiler:
+    dependencies:
+      '@pandacss/compiler':
+        specifier: 'catalog:'
+        version: 2.0.0-beta.17(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)
+      '@stealthscale/pandacss-naming':
+        specifier: workspace:^
+        version: link:../pandacss-naming
+      postcss:
+        specifier: 'catalog:'
+        version: 8.5.28
+      postcss-selector-parser:
+        specifier: 'catalog:'
+        version: 7.1.6
+    devDependencies:
+      '@arethetypeswrong/core':
+        specifier: 'catalog:'
+        version: 0.18.5
+      '@pandacss/preset-base':
+        specifier: 'catalog:'
+        version: 2.0.0-beta.17
+      '@stealthscale/vite-config':
+        specifier: workspace:^
+        version: link:../vite-config
+      '@stealthscale/vite-config-typescript':
+        specifier: workspace:^
+        version: link:../vite-config-typescript
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.5.1
+      publint:
+        specifier: 'catalog:'
+        version: 0.3.24
+      typescript:
+        specifier: 'catalog:'
+        version: 7.0.2
+      vite:
+        specifier: 'catalog:'
+        version: '@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1)'
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.11(@types/node@26.5.1)(@vitest/browser-playwright@4.1.11)(@vitest/browser-preview@4.1.11)(@vitest/coverage-v8@4.1.11)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(happy-dom@20.14.5)
+
+  packages/pandacss-naming:
+    devDependencies:
+      '@arethetypeswrong/core':
+        specifier: 'catalog:'
+        version: 0.18.5
+      '@stealthscale/vite-config':
+        specifier: workspace:^
+        version: link:../vite-config
+      '@stealthscale/vite-config-typescript':
+        specifier: workspace:^
+        version: link:../vite-config-typescript
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.5.1
+      publint:
+        specifier: 'catalog:'
+        version: 0.3.24
       typescript:
         specifier: 'catalog:'
         version: 7.0.2
