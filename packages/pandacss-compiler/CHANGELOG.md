@@ -1,5 +1,12 @@
 # @stealthscale/pandacss-compiler
 
+## 0.1.1
+
+### Patch Changes
+
+- Updated dependencies [[`4d6bed5`](https://github.com/stealth-scale/config/commit/4d6bed5a3c60bb5518b7defac65cd812911e9f8c)]:
+  - @stealthscale/pandacss-naming@0.2.0
+
 ## 0.1.0
 
 ### Minor Changes

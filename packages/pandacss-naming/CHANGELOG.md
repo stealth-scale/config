@@ -1,5 +1,17 @@
 # @stealthscale/pandacss-naming
 
+## 0.2.0
+
+### Minor Changes
+
+- [#25](https://github.com/stealth-scale/config/pull/25) [`4d6bed5`](https://github.com/stealth-scale/config/commit/4d6bed5a3c60bb5518b7defac65cd812911e9f8c) Thanks [@stealth-rklopper](https://github.com/stealth-rklopper)! - pandacss-naming: write a value in lower kebab-case and drop a custom property's hyphens
+  
+  - `atomicClass` writes the value of an atomic class in lower kebab-case, so `bg_colorPalette.solid`
+    becomes `bg-color-palette-solid` and `ff_Segoe_UI` becomes `ff-segoe-ui`. A class name resolves no
+    token, so its case is free, and one case reads as one scheme.
+  - The class of a custom property drops the hyphens the property opens with, so `--stagger_0` becomes
+    `stagger-0`.
+
 ## 0.1.0
 
 ### Minor Changes
