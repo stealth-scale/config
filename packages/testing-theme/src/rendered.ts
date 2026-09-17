@@ -2,12 +2,14 @@
  * Reads what a rendered component did with its recipe.
  *
  * @remarks
- *   A bound component marks the element carrying its recipe with `data-recipe`. A slot binding
- *   marks each part of a compound component with `data-slot`, and an anatomy marks it with
- *   `data-part`, the slot's name written with hyphens. Those are the handles a specification
- *   holds, because a class list changes with the recipe. Every reader throws where the element it
+ *   A bound component marks the element carrying its recipe with `data-recipe`. A part of a
+ *   compound component carries its slot class, `card__header`, which the binding writes and the
+ *   pruning leaves, and a part an anatomy stamps carries `data-part`, the slot's name written with
+ *   hyphens. Those are the handles a specification holds. Every reader throws where the element it
  *   was asked for is absent, naming it, so a failure says which element went missing.
  */
+
+import { slotClass } from "@stealthscale/pandacss-naming";
 
 /**
  * Fixes the attribute a bound component marks the element carrying its recipe with.
@@ -18,11 +20,6 @@ const RECIPE = "data-recipe";
  * Fixes the attribute an anatomy marks each part of a compound component with.
  */
 const PART = "data-part";
-
-/**
- * Fixes the attribute a slot binding marks each part of a compound component with.
- */
-const SLOT = "data-slot";
 
 /**
  * Writes a slot's name the way an anatomy writes a part's, so `itemIndicator` finds the part
@@ -61,12 +58,15 @@ export function recipeElement(container: ParentNode, name: string): HTMLElement 
 
 /**
  * Finds the element one slot of a compound component was applied to, by the part its anatomy
- * stamps or by the slot its binding stamps.
+ * stamps or by the slot class its binding writes.
  *
- * @throws {@link Error} When nothing in the output carries that part or that slot.
+ * @remarks
+ *   The slot class opens with the recipe's class name, so the reader takes that name beside the
+ *   slot as the recipe names it and builds `card__header` from the two.
+ * @throws {@link Error} When nothing in the output carries that part or that slot class.
  */
-export function slotElement(container: ParentNode, slot: string): HTMLElement {
-  return one(container, `[${PART}="${partOf(slot)}"], [${SLOT}="${slot}"]`);
+export function slotElement(container: ParentNode, name: string, slot: string): HTMLElement {
+  return one(container, `[${PART}="${partOf(slot)}"], .${slotClass(name, slot)}`);
 }
 
 /**
@@ -87,10 +87,11 @@ export function recipeClasses(container: ParentNode, name: string): readonly str
 }
 
 /**
- * Lists every class one slot of a compound component was given, sorted.
+ * Lists every class one slot of a compound component was given, sorted, found as `slotElement`
+ * finds it.
  *
- * @throws {@link Error} When nothing in the output carries that part.
+ * @throws {@link Error} When nothing in the output carries that part or that slot class.
  */
-export function slotClasses(container: ParentNode, slot: string): readonly string[] {
-  return classesOf(slotElement(container, slot));
+export function slotClasses(container: ParentNode, name: string, slot: string): readonly string[] {
+  return classesOf(slotElement(container, name, slot));
 }

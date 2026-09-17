@@ -21,27 +21,27 @@ describe("rendered", () => {
     expect(() => recipeElement(drawn("<div></div>"), "button")).toThrow(/data-recipe="button"/u);
   });
 
-  it("finds the element one slot was applied to", () => {
-    const container = drawn('<div data-part="content" class="dialog__content"></div>');
+  it("finds the element one slot was applied to by the part its anatomy stamps", () => {
+    const container = drawn('<div data-part="content" class="dialog-content"></div>');
 
-    expect(slotElement(container, "content").className).toBe("dialog__content");
+    expect(slotElement(container, "dialog", "content").className).toBe("dialog-content");
   });
 
   it("finds a slot named in camel case by the kebab-case part its anatomy stamps", () => {
-    const container = drawn('<div data-part="item-indicator" class="menu__itemIndicator"></div>');
+    const container = drawn('<div data-part="item-indicator" class="menu-indicator"></div>');
 
-    expect(slotElement(container, "itemIndicator").className).toBe("menu__itemIndicator");
+    expect(slotElement(container, "menu", "itemIndicator").className).toBe("menu-indicator");
   });
 
-  it("finds the element one slot was applied to by the slot its binding stamps", () => {
-    const container = drawn('<header data-slot="header" class="card__header"></header>');
+  it("finds the element one slot was applied to by the slot class its binding writes", () => {
+    const container = drawn('<header class="card__header card__header--md"></header>');
 
-    expect(slotElement(container, "header").className).toBe("card__header");
+    expect(slotElement(container, "card", "header").tagName).toBe("HEADER");
   });
 
-  it("throws naming the part and the slot it could not find", () => {
-    expect(() => slotElement(drawn("<div></div>"), "content")).toThrow(
-      /data-part="content".*data-slot="content"/u,
+  it("throws naming the part and the slot class it could not find", () => {
+    expect(() => slotElement(drawn("<div></div>"), "dialog", "content")).toThrow(
+      /data-part="content".*\.dialog__content/u,
     );
   });
 
@@ -63,13 +63,11 @@ describe("rendered", () => {
   });
 
   it("lists the classes one slot was given", () => {
-    const container = drawn(
-      '<div data-part="content" class="dialog__content dialog__content--size-lg"></div>',
-    );
+    const container = drawn('<div class="dialog__content dialog__content--lg"></div>');
 
-    expect(slotClasses(container, "content")).toStrictEqual([
+    expect(slotClasses(container, "dialog", "content")).toStrictEqual([
       "dialog__content",
-      "dialog__content--size-lg",
+      "dialog__content--lg",
     ]);
   });
 });

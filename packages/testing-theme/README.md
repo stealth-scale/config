@@ -107,21 +107,21 @@ unless a theme package states its own.
 
 ### `presetViolations(preset, options)`
 
-| Check               | Reports                                                                                        |
-| ------------------- | ---------------------------------------------------------------------------------------------- |
-| `preset.registered` | A `*.recipe.ts` file under `at` the preset does not register, and a key no recipe file defines |
-| `preset.keys`       | A recipe registered under a key that is not its class name in camel case                       |
-| `preset.slots`      | A slot recipe under `recipes`, and a recipe without slots under `slotRecipes`                  |
+| Check               | Reports                                                                                                       |
+| ------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `preset.registered` | A `*.recipe.ts` or `recipe.ts` file under `at` the preset does not register, and a key no recipe file defines |
+| `preset.keys`       | A recipe registered under a key that is not its class name in camel case                                      |
+| `preset.slots`      | A slot recipe under `recipes`, and a recipe without slots under `slotRecipes`                                 |
 
 ### Readers
 
-| Export                                                                          | Reads                                                                                                                                                                        |
-| ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `recipeClass`, `variantClass`, `slotClass`, `slotVariantClass`, `compoundClass` | The classes a recipe emits, in the naming scheme of `@stealthscale/pandacss-naming`                                                                                          |
-| `axesOf`, `valuesOf`, `defaultsOf`, `slotsOf`, `scaleOf`, `byStep`              | What a recipe declares, without rendering                                                                                                                                    |
-| `recipeElement`, `slotElement`, `classesOf`, `recipeClasses`, `slotClasses`     | What a rendered component drew, by `data-recipe` on the element a recipe was bound to and on the root of a compound component, and by `data-part` or `data-slot` on one part |
-| `resolved`, `palettesOf`, `extendedRecipes`, `fontsOf`                          | What a theme states, with every reference followed                                                                                                                           |
-| `publishedRecipes`                                                              | Every recipe the presets of the component packages register, keyed as they register it, for `options.recipes`                                                                |
+| Export                                                                          | Reads                                                                                                                                                                           |
+| ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `recipeClass`, `variantClass`, `slotClass`, `slotVariantClass`, `compoundClass` | The classes a recipe emits, in the naming scheme of `@stealthscale/pandacss-naming`                                                                                             |
+| `axesOf`, `valuesOf`, `defaultsOf`, `slotsOf`, `scaleOf`, `byStep`              | What a recipe declares, without rendering                                                                                                                                       |
+| `recipeElement`, `slotElement`, `classesOf`, `recipeClasses`, `slotClasses`     | What a rendered component drew, by `data-recipe` on the element a recipe was bound to and on the root of a compound component, and by the slot class or `data-part` on one part |
+| `resolved`, `palettesOf`, `extendedRecipes`, `fontsOf`                          | What a theme states, with every reference followed                                                                                                                              |
+| `publishedRecipes`                                                              | Every recipe the presets of the component packages register, keyed as they register it, for `options.recipes`                                                                   |
 
 ## Licence
 

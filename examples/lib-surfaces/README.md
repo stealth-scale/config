@@ -42,8 +42,9 @@ names at run time:
 
 The scheme is `block__element` for a slot and `block--axis-value` for a variant, the axis kept in
 the modifier so a size of `sm` and any other axis with an `sm` never share a class. A theme
-addresses one band at one size as `.card__header--size-lg`. The binding also stamps `data-slot` on
-each part, which is the handle the theme testing kit finds a part by.
+addresses one band at one size as `.card__header--size-lg`. The binding stamps `data-recipe` on the
+root, which is the handle the theme testing kit finds the component by, and the kit finds each part
+by its slot class.
 
 ## The component
 

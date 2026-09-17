@@ -43,12 +43,18 @@ describe("Card", () => {
       </Card.Root>,
     );
 
-    expect(slotClasses(container, "root")).toStrictEqual(bandClasses("root", "md", "elevated"));
-    expect(slotClasses(container, "header")).toStrictEqual(bandClasses("header", "md", "elevated"));
-    expect(slotClasses(container, "content")).toStrictEqual(
+    expect(slotClasses(container, "card", "root")).toStrictEqual(
+      bandClasses("root", "md", "elevated"),
+    );
+    expect(slotClasses(container, "card", "header")).toStrictEqual(
+      bandClasses("header", "md", "elevated"),
+    );
+    expect(slotClasses(container, "card", "content")).toStrictEqual(
       bandClasses("content", "md", "elevated"),
     );
-    expect(slotClasses(container, "footer")).toStrictEqual(bandClasses("footer", "md", "elevated"));
+    expect(slotClasses(container, "card", "footer")).toStrictEqual(
+      bandClasses("footer", "md", "elevated"),
+    );
   });
 
   it("hands the look and the size the root was given to every band", () => {
@@ -59,8 +65,12 @@ describe("Card", () => {
       </Card.Root>,
     );
 
-    expect(slotClasses(container, "header")).toStrictEqual(bandClasses("header", "lg", "subtle"));
-    expect(slotClasses(container, "footer")).toStrictEqual(bandClasses("footer", "lg", "subtle"));
+    expect(slotClasses(container, "card", "header")).toStrictEqual(
+      bandClasses("header", "lg", "subtle"),
+    );
+    expect(slotClasses(container, "card", "footer")).toStrictEqual(
+      bandClasses("footer", "lg", "subtle"),
+    );
   });
 
   it("renders the elements each part is bound to", () => {
@@ -72,10 +82,10 @@ describe("Card", () => {
       </Card.Root>,
     );
 
-    expect(recipeElement(container, "card")).toBe(slotElement(container, "root"));
-    expect(slotElement(container, "root").tagName).toBe("ARTICLE");
-    expect(slotElement(container, "header").tagName).toBe("HEADER");
-    expect(slotElement(container, "content").tagName).toBe("DIV");
-    expect(slotElement(container, "footer").tagName).toBe("FOOTER");
+    expect(recipeElement(container, "card")).toBe(slotElement(container, "card", "root"));
+    expect(slotElement(container, "card", "root").tagName).toBe("ARTICLE");
+    expect(slotElement(container, "card", "header").tagName).toBe("HEADER");
+    expect(slotElement(container, "card", "content").tagName).toBe("DIV");
+    expect(slotElement(container, "card", "footer").tagName).toBe("FOOTER");
   });
 });
