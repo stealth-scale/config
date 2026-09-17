@@ -18,7 +18,7 @@ import {
   controlSizes,
   defineRecipe,
   interactive,
-  LOOKS,
+  liftVariants,
   lookVariants,
   statusVariants,
   touchTarget,
@@ -61,19 +61,13 @@ export const recipe = defineRecipe({
       glow: { layerStyle: "glow.md" },
       ripple: { layerStyle: "ripple" },
     },
-    elevation: {
-      floating: { _active: { boxShadow: "sm" }, _hover: { boxShadow: "xl" }, boxShadow: "lg" },
-      raised: { _active: { boxShadow: "none" }, _hover: { boxShadow: "md" }, boxShadow: "sm" },
-    },
+    elevation: liftVariants(),
     shape: {
       square: { aspectRatio: "square", paddingInline: "0" },
     },
 
-    size: controlSizes(["xs", "sm", "md", "lg", "xl", "2xl", "3xl", "4xl"]),
+    size: controlSizes(),
     status: statusVariants(),
-    variant: {
-      ...lookVariants(LOOKS),
-      glass: { layerStyle: "glass" },
-    },
+    variant: { ...lookVariants(), glass: { layerStyle: "glass" } },
   },
 });
