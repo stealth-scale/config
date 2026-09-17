@@ -40,6 +40,10 @@ export interface UseControllableStateProps<Held> {
  *   followed. The setter takes a value or a function of the current one, as React's own does, and
  *   tells `onChange` either way. Setting the value it already holds is passed over, so a caller
  *   listening for changes hears about changes.
+ *   The React Compiler is told to leave this alone. It refuses any function whose hook rules were
+ *   suppressed, and the setter below suppresses one so that a stable callback is not named as a
+ *   dependency. The hook memoises by hand instead, which a consumer without the compiler needs
+ *   anyway.
  * @typeParam Held - The value that is held.
  * @param props - The value, the default and what to tell.
  * @returns The value, and the function that sets it.
@@ -47,6 +51,8 @@ export interface UseControllableStateProps<Held> {
 export function useControllableState<Held>(
   props: UseControllableStateProps<Held>,
 ): [Held, (next: ((previous: Held) => Held) | Held) => void] {
+  "use no memo";
+
   const { defaultValue, onChange, value: stated } = props;
 
   const told = useCallbackRef(onChange);

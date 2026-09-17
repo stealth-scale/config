@@ -13,6 +13,9 @@ import { type DependencyList, useCallback, useInsertionEffect, useRef } from "re
  *   effect when the dependencies say to and never because the handler was rewritten. The ref is
  *   written in an insertion effect rather than during the render, because a render may be thrown
  *   away and a discarded one must not leave the ref holding a callback that never mounted.
+ *   The React Compiler is told to leave this alone. It refuses any function whose hook rules were
+ *   suppressed, and the suppression below is the point of the hook. Without the directive it
+ *   raises the refusal as an error and fails the build of every package that carries this.
  * @typeParam Args - The arguments the callback takes.
  * @typeParam Held - The value the callback returns.
  * @param callback - The function to call, or nothing where the caller passes none.
@@ -24,6 +27,8 @@ export function useCallbackRef<Args extends unknown[], Held>(
   callback?: (...args: Args) => Held,
   deps: DependencyList = [],
 ): (...args: Args) => Held | undefined {
+  "use no memo";
+
   const held = useRef(callback);
 
   useInsertionEffect(() => {

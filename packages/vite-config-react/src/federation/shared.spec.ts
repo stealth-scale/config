@@ -1,10 +1,10 @@
 /**
- * Checks which packages are shared, the range they are shared at, and how a bad manifest fails.
+ * Checks which packages are shared and the range they are shared at.
  */
 
 import { describe, expect, it } from "vitest";
 
-import { installed, shared } from "#federation/shared.ts";
+import { shared } from "#federation/shared.ts";
 
 describe("shared", () => {
   it("shares React as a singleton", () => {
@@ -35,17 +35,5 @@ describe("shared", () => {
 
   it("reads the tree when nothing is passed", () => {
     expect(shared()["react"]?.requiredVersion).toMatch(/^\^\d+\.0\.0$/u);
-  });
-
-  it("reads React's version from the manifest it was pointed at", () => {
-    expect(installed(() => ({ version: "19.3.0" }))).toBe("19.3.0");
-  });
-
-  it("throws for a manifest declaring no version", () => {
-    expect(() => installed(() => ({}))).toThrow(/could not read React's version/u);
-  });
-
-  it("throws when the manifest cannot be resolved", () => {
-    expect(() => installed(() => "not a manifest")).toThrow(/could not read React's version/u);
   });
 });

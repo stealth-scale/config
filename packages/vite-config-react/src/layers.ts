@@ -12,9 +12,24 @@ import * as test from "#test/index.ts";
  */
 export interface Rendering {
   /**
+   * Whether the React Compiler memoises what the package renders, and what to write the memo cache
+   * against. It runs against the installed React unless this states a target, and `false` drops it.
+   */
+  compiler?: boolean | plugin.Compiled;
+
+  /**
    * Whether the package writes documents in MDX, which adds the plugin that compiles them.
    */
   mdx?: boolean;
+}
+
+/**
+ * Reads the compiler's own layers out of what a caller stated about it.
+ */
+function compiling(stated: Rendering["compiler"]): readonly Layer[] {
+  if (stated === false) return [];
+
+  return plugin.compiler(typeof stated === "object" ? stated : {});
 }
 
 /**
@@ -32,6 +47,7 @@ export interface Rendering {
 export function layers(stated: Rendering = {}): readonly Layer[] {
   return [
     plugin.refresh(),
+    ...compiling(stated.compiler),
     test.cleanup(),
     test.document(),
     ...(stated.mdx === true ? plugin.mdx() : []),

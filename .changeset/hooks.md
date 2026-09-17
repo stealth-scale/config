@@ -29,5 +29,9 @@ hooks: add the React hooks a component reads the page with
 - `useAnnounce` says a message to a screen reader through one shared region per politeness, with a
   frame's messages joined by `speakable`.
 
+`useLiveRef`, `useCallbackRef` and `useControllableState` carry the `"use no memo"` directive. Each
+one does on purpose what the React Compiler refuses to compile, and the directive turns a refusal
+the build would stop on into a decision the source records.
+
 The package peers on React alone. The three hooks that wrap the behaviour library and the two that
 read the viewport provider are not here, so a consumer of any hook installs React and nothing else.

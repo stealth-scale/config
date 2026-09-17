@@ -47,6 +47,7 @@
   },
   "devDependencies": {
     "@arethetypeswrong/core": "catalog:",
+    "@rolldown/plugin-babel": "catalog:",
     "@stealthscale/vite-config": "workspace:^",
     "@stealthscale/vite-config-react": "workspace:^",
     "@stealthscale/vite-config-typescript": "workspace:^",
@@ -54,7 +55,9 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitest/coverage-v8": "catalog:",
+    "babel-plugin-react-compiler": "catalog:",
     "happy-dom": "catalog:",
+    "oxc-transform-react": "catalog:",
     "publint": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",

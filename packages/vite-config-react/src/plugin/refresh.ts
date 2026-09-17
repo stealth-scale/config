@@ -40,11 +40,6 @@ export interface Refreshed {
   also?: readonly RegExp[];
 
   /**
-   * Lets the React compiler memoise a component, which it does unless this is false.
-   */
-  compiler?: boolean;
-
-  /**
    * Extra paths to leave alone, added after the dependency directory.
    */
   except?: readonly RegExp[];
@@ -62,10 +57,12 @@ export interface Refreshed {
  *   The automatic runtime imports the factory itself, so no file under this transform needs React
  *   in scope. The shipped `web.json` sets the same factory for the type checker, and a caller
  *   changing `from` here has to change the tsconfig with it or the two disagree.
+ *   The plugin's own `compiler` option is left alone. It asks the plugin to resolve the compiler
+ *   from its own directory, which an isolated node_modules refuses, and setting it also turns
+ *   fast refresh off. The compiler runs as a Babel pass of its own instead.
  */
 export function options(stated: Refreshed): Options {
   return {
-    compiler: stated.compiler ?? true,
     exclude: [UNTOUCHED, ...(stated.except ?? [])],
     include: [...COMPILED, ...(stated.also ?? [])],
     jsxImportSource: stated.from ?? FACTORY,
