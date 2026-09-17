@@ -43,6 +43,12 @@ describe("Icon", () => {
     expect(recipeElement(labelled.container, "icon").getAttribute("aria-hidden")).toBe("false");
   });
 
+  it("states the img role so a label names it", () => {
+    const { container } = render(<Icon aria-hidden={false} aria-label="Warning" />);
+
+    expect(recipeElement(container, "icon").getAttribute("role")).toBe("img");
+  });
+
   it("draws the element as names", () => {
     const { container } = render(<Icon as="span" />);
 

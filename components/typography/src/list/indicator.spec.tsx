@@ -3,7 +3,7 @@ import { type ReactElement, type ReactNode } from "react";
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { violations } from "@stealthscale/testing-react";
+import { accessibilityViolations, violations } from "@stealthscale/testing-react";
 import { boundViolations, slotElement } from "@stealthscale/testing-theme";
 
 import { Indicator } from "#list/indicator.ts";
@@ -30,6 +30,18 @@ describe("Indicator", () => {
         wrapper: listed,
       }),
     ).toStrictEqual([]);
+  });
+
+  it("breaks no accessibility rule beside an entry", async () => {
+    await expect(
+      accessibilityViolations(Indicator, { props: { children: "•" }, wrapper: listed }),
+    ).resolves.toStrictEqual([]);
+  });
+
+  it("hides the mark from assistive technology", () => {
+    const { container } = render(listed(<Indicator>•</Indicator>));
+
+    expect(slotElement(container, "list", "indicator").getAttribute("aria-hidden")).toBe("true");
   });
 
   it("writes the class of every value its recipe offers", () => {

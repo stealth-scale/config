@@ -10,4 +10,6 @@ component-typography: publish the first seven components
 - Every axis the vocabulary lets a theme move on a component is an axis of its recipe: the body and
   heading roles as sizes, the foreground roles as tones, the looks, the statuses, the semantic
   scales, and the text effects, masks and motions as `effect`, `mask` and `motion`.
+- `Icon` states the `img` role, so a label a caller gives it names the graphic in every screen
+  reader. `List.Indicator` is hidden from assistive technology, as the browser's bullet is.
 - The preset under `./theme` registers all seven recipes.

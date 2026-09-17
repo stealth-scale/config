@@ -21,7 +21,8 @@ The package peers on `react` and `@stealthscale/theme`. An application lists the
 ## Text
 
 Draws a paragraph, in a size, an ink, a weight and an alignment, cut to one line where a caller
-asks, and moved or masked where a page wants it. The element is `p`.
+asks, and moved or masked where a page wants it. The element is `p`. A truncated or masked paragraph
+hides words. The full words are the caller's to keep reachable, in a `title` or in text nearby.
 
 ```tsx
 import { Text } from "@stealthscale/component-typography";
@@ -109,8 +110,9 @@ import { Kbd } from "@stealthscale/component-typography";
 ## Icon
 
 Draws the artwork a caller hands in, at a size, in an ink and with a motion, and ships no mark of
-its own. The element is `svg`, hidden from assistive technology unless a caller labels it. A mark
-that points is `mirrored`, so it flips in a right-to-left page.
+its own. The element is `svg` in the `img` role, hidden from assistive technology unless a caller
+labels it with `aria-hidden={false}` and `aria-label`. A mark that points is `mirrored`, so it flips
+in a right-to-left page.
 
 ```tsx
 import { Icon } from "@stealthscale/component-typography";
@@ -134,7 +136,8 @@ import { Icon } from "@stealthscale/component-typography";
 
 Draws a list, as `List.Root` holding `List.Item`, each with a `List.Indicator` where the caller
 draws the mark. The root is `ul`, and `as="ol"` numbers the entries. The root takes the variants and
-every entry draws them.
+every entry draws them. The indicator is hidden from assistive technology, as the browser's own
+bullet is, so a mark inside it is not read aloud before every entry.
 
 ```tsx
 import { List } from "@stealthscale/component-typography";
