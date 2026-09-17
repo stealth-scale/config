@@ -21,3 +21,7 @@ testing-theme: find a part by its slot class and a recipe file by its directory
   write. A part named by `slot` gets a value's class only where the value styles that slot, and
   `defaults` names the values a binding fixes through its default props, each of which the recipe
   lists under `staticCss` or the check reports.
+- `recipe.values` reads the part each value styles, so two axes of a slot recipe may offer one value
+  where they style different parts. A grid offering three columns on its root and a span of three on
+  its entry writes one class on the root and another on the entry. Two axes sharing a value on one
+  part are still reported.

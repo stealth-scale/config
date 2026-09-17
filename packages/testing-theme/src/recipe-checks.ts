@@ -211,6 +211,23 @@ function ownersOf(recipe: Declared): readonly string[] {
 }
 
 /**
+ * Lists the classes one value writes on: the recipe's own for a recipe that draws one element,
+ * and the slot class of each part the value styles for a slot recipe.
+ *
+ * @remarks
+ *   Two axes of a slot recipe may offer one value where they style different parts, because the
+ *   runtime writes a class per part and the two never meet on one element. A grid offering three
+ *   columns on its root and a span of three on its entry is the case.
+ */
+function stylesOf(recipe: Declared, styles: unknown): readonly string[] {
+  if (recipe.slots === undefined) return [recipe.className];
+
+  return recipe.slots
+    .filter((slot) => isRecord(styles) && isRecord(styles[slot]))
+    .map((slot) => slotClass(recipe.className, slot));
+}
+
+/**
  * Reports every value that writes the class another value or a boolean axis writes.
  *
  * @remarks
@@ -222,17 +239,23 @@ function valueViolations(recipe: Declared): readonly string[] {
   const written = new Map<string, string>();
   const found: string[] = [];
 
-  for (const [axis, values] of axesOf(recipe)) {
-    for (const value of values) {
-      const className = variantClass(recipe.className, axis, value);
+  for (const [axis, values] of Object.entries(recipe.variants ?? {})) {
+    if (!isRecord(values)) continue;
 
-      if (className === "") continue;
+    for (const [value, styles] of Object.entries(values)) {
+      for (const owner of stylesOf(recipe, styles)) {
+        const className = variantClass(owner, axis, value);
 
-      const other = written.get(className);
+        if (className === "") continue;
 
-      if (other === undefined) written.set(className, `${axis} ${value}`);
-      else
-        found.push(`${recipe.className} writes ${className} for ${axis} ${value} and for ${other}`);
+        const other = written.get(className);
+
+        if (other === undefined) written.set(className, `${axis} ${value}`);
+        else
+          found.push(
+            `${recipe.className} writes ${className} for ${axis} ${value} and for ${other}`,
+          );
+      }
     }
   }
 

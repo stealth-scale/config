@@ -50,6 +50,49 @@ describe("recipeViolations", () => {
     ]);
   });
 
+  it("passes a value two axes share where each styles a part the other does not", () => {
+    const recipe = defineSlotRecipe({
+      base: { item: INK, root: { display: "grid" } },
+      className: "grid",
+      slots: ["root", "item"],
+      variants: {
+        columns: { "3": { root: { gridTemplateColumns: "repeat(3, minmax(0, 1fr))" } } },
+        span: { "3": { item: { gridColumn: "span 3" } } },
+      },
+    });
+
+    expect(recipeViolations(recipe)).toStrictEqual([]);
+  });
+
+  it("reads no part off a slot recipe's value that is not an object", () => {
+    const recipe = {
+      base: { root: INK },
+      className: "grid",
+      slots: ["root"],
+      variants: { columns: { "3": "odd" }, gap: { "3": "odd" } },
+    };
+
+    expect(recipeViolations(recipe)).not.toContain(
+      "recipe.values: grid writes grid__root--3 for gap 3 and for columns 3",
+    );
+  });
+
+  it("reports a value two axes share on one part of a slot recipe", () => {
+    const recipe = defineSlotRecipe({
+      base: { root: { display: "grid" } },
+      className: "grid",
+      slots: ["root"],
+      variants: {
+        columns: { "3": { root: { gridTemplateColumns: "repeat(3, minmax(0, 1fr))" } } },
+        gap: { "3": { root: { gap: "gap.md" } } },
+      },
+    });
+
+    expect(recipeViolations(recipe)).toStrictEqual([
+      "recipe.values: grid writes grid__root--3 for gap 3 and for columns 3",
+    ]);
+  });
+
   it("reports a value that is also the name of a boolean axis", () => {
     const recipe = {
       base: INK,
