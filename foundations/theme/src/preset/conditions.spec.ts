@@ -11,7 +11,7 @@ describe("conditions", () => {
     expect(conditions.extend?.["dark"]).toStrictEqual({
       "[data-color-mode=dark] &": "@slot",
       "@media (prefers-color-scheme: dark)": {
-        "&:not([data-color-mode=light], [data-color-mode=light] *)": "@slot",
+        ":where(:root, :host):not([data-color-mode=light], [data-color-mode=light] *) &": "@slot",
       },
     });
   });
@@ -20,9 +20,16 @@ describe("conditions", () => {
     expect(conditions.extend?.["light"]).toStrictEqual({
       "[data-color-mode=light] &": "@slot",
       "@media (prefers-color-scheme: light)": {
-        "&:not([data-color-mode=dark], [data-color-mode=dark] *)": "@slot",
+        ":where(:root, :host):not([data-color-mode=dark], [data-color-mode=dark] *) &": "@slot",
       },
     });
+  });
+
+  it("anchors each preference block to the document root", () => {
+    const written = JSON.stringify([conditions.extend?.["dark"], conditions.extend?.["light"]]);
+
+    expect(written.match(/:where\(:root, :host\):not\(/gu)).toHaveLength(2);
+    expect(written).not.toContain(String.raw`"&:not(`);
   });
 
   it("holds hover inside a media query and excludes a disabled control", () => {

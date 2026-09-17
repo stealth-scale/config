@@ -5,13 +5,21 @@
  * @remarks
  *   The color mode is an attribute, like the theme, so a subtree can be switched on its own. Where
  *   no attribute is written the operating system's preference decides, so a page that writes
- *   nothing follows the reader's setting and a page that writes the attribute overrides it. Each
- *   mode is two blocks: the attribute on an ancestor, or the preference outside a subtree that
- *   states the other mode. The attribute block names an ancestor and not the element itself, as
- *   the compiler's theme attribute does, because the compiler writes the same selector round a
- *   token block, and a block that matched every element below the carrier would let a mode
- *   nested inside the other one be decided by stylesheet order rather than by the nearest
- *   carrier.
+ *   nothing follows the reader's setting and a page that writes the attribute overrides it.
+ *   Each mode is two blocks. The attribute block is written against an ancestor, which the
+ *   compiler expands over a theme's own selector in all three positions, so the mode and the theme
+ *   may be written on one element, on an ancestor or on a descendant. The preference block is
+ *   anchored to the document root, because the compiler replaces the nesting selector with the
+ *   theme's own and the default theme has none: a block written against the nesting selector alone
+ *   compiles to a bare negation that matches every element, which declares the default theme's
+ *   values over every switched subtree. Anchored, the preference declares them where the
+ *   unconditioned values are declared, and a switched element declares over them.
+ *   One case is not covered. A subtree switched to light inside a page drawn dark keeps the dark
+ *   values, because the unconditioned values are declared on the root alone and nothing declares
+ *   them again on the subtree. Dark inside light works, because the dark values are declared under
+ *   the attribute. Closing it means declaring every color a second time under the light attribute,
+ *   which costs about a fifth of the stylesheet for each theme, or writing every color as
+ *   `light-dark()`, which is the smaller output and the larger change.
  */
 
 import { COLOR_MODE_ATTRIBUTE } from "#attributes.ts";
@@ -28,6 +36,11 @@ const DARK = `[${COLOR_MODE_ATTRIBUTE}=dark]`;
 const LIGHT = `[${COLOR_MODE_ATTRIBUTE}=light]`;
 
 /**
+ * Anchors a block to the document root, or to the host of a shadow tree.
+ */
+const ROOT = ":where(:root, :host)";
+
+/**
  * Lists the states a control does not react in.
  */
 const DISABLED = ":disabled, [data-disabled], [aria-disabled=true]";
@@ -38,11 +51,14 @@ const DISABLED = ":disabled, [data-disabled], [aria-disabled=true]";
 type Block = Exclude<NonNullable<ExtendableConditions["extend"]>[string], string>;
 
 /**
- * Writes a mode as its two blocks: the attribute above, or the preference outside the other mode.
+ * Writes a mode as its two blocks: the attribute above, on or below the element, or the preference
+ * at the document root outside a subtree that states the other mode.
  */
 function mode(own: string, other: string, scheme: "dark" | "light"): Block {
   return {
-    [`@media (prefers-color-scheme: ${scheme})`]: { [`&:not(${other}, ${other} *)`]: "@slot" },
+    [`@media (prefers-color-scheme: ${scheme})`]: {
+      [`${ROOT}:not(${other}, ${other} *) &`]: "@slot",
+    },
     [`${own} &`]: "@slot",
   };
 }

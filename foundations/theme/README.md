@@ -104,7 +104,9 @@ element for a subtree. The element carrying an attribute switches its own tokens
 drawn from a token follows, and the rules a theme or a recipe writes for that theme or mode reach
 the elements below it, because the compiler scopes them to descendants. A component whose own rules
 must switch is put inside the element that carries the attribute. Where neither is written, the
-first theme draws the page and the reader's operating system decides the mode:
+first theme draws the page and the reader's operating system decides the mode. One case is not
+covered: a subtree switched to light inside a page drawn dark keeps the dark values, because the
+unconditioned values are declared on the root alone. Dark inside light works.
 
 ```html
 <html data-theme="fathom" data-color-mode="dark"></html>

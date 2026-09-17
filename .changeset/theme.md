@@ -51,6 +51,25 @@ theme: name every compound in its recipe and read the sizes from the tokens
   so each of these was there in dark mode alone.
 - `Application` takes `presets`, the presets an application writes for recipes of its own, which the
   build plugin installs after every package's preset and before the themes.
+- `defineTheme` refuses a compound matched on a value a class name cannot carry, so the compiler
+  never emits one that is compiled and never applied. The extension type admits a style object on an
+  axis, which nothing refused.
+- `ThemeProvider` holds the pair it hands down across a render that changes neither, so a part that
+  reads it redraws when the page switches and not when the provider's parent redraws. The published
+  package carries no compiler, so nothing else held it.
+- `compoundSelection(compound)` writes the selection a compound matches on, in the scheme the
+  compiler names it by, and returns nothing where a class name cannot carry a value.
+  `compoundClassName` writes the class over it, and a reader that wants the name asks for the
+  selection rather than taking a class apart.
+- `createSlotRecipeContext` stamps the recipe's name as `data-recipe` on the part that provides the
+  variants, so a compound component is found by the same handle as one that draws a single element.
+  The compiler's own option does nothing there, because it reads a name off the recipe a part is
+  styled with and a part is styled with the slot's styles alone.
+- The preference half of the `dark` and `light` conditions is anchored to the document root. The
+  compiler replaces the nesting selector with a theme's own and the default theme has none, so the
+  half compiled to a bare negation that matched every element: a page switched to a theme under an
+  operating system set to dark drew that theme on the element carrying the attribute and the default
+  theme's dark values on everything below it.
 - `SEPARATOR`, published from `./authoring`, is the hyphen the build plugin configures the compiler
   with between an axis and its value. `compoundClassName` writes it, so a compound reads
   `button--compound__size-lg__variant-solid` and a bound element's variant class `button--size-lg`.
