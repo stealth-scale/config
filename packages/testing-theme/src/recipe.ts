@@ -44,6 +44,11 @@ export interface Declared {
   slots?: readonly string[] | undefined;
 
   /**
+   * The values the compiler emits whether or not a JSX literal writes them.
+   */
+  staticCss?: readonly unknown[] | undefined;
+
+  /**
    * Each variant axis against the values it takes.
    */
   variants?: Readonly<Record<string, unknown>> | undefined;

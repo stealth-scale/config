@@ -119,7 +119,10 @@ the recipe's class off the element and compares them with what the recipe writes
 value picked or defaulted and the class of each compound whose selection matches. Each class the
 element lacks is reported, and so is each class it has that the recipe does not write. A part of a
 slot recipe, named by `options.slot`, gets a value's class only where the value styles that slot.
-`options.subject` finds the element where `data-recipe` and the slot class do not identify it.
+`options.defaults` names the values a binding fixes through its default props, whose classes the
+element has where nothing is picked. A fixed value is written by no JSX literal, so the check also
+reports one the recipe does not list under `staticCss`. `options.subject` finds the element where
+`data-recipe` and the slot class do not identify it.
 
 ```tsx
 import { render } from "@testing-library/react";

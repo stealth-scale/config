@@ -18,4 +18,6 @@ testing-theme: find a part by its slot class and a recipe file by its directory
   `contract.compounds` also reports a compound styling a part the recipe's compound does not.
 - `boundViolations` renders a bound component once with nothing picked and once per value of every
   axis, and reports each class the element lacks and each class it has that the recipe does not
-  write. A part named by `slot` gets a value's class only where the value styles that slot.
+  write. A part named by `slot` gets a value's class only where the value styles that slot, and
+  `defaults` names the values a binding fixes through its default props, each of which the recipe
+  lists under `staticCss` or the check reports.

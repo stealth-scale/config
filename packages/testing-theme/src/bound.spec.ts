@@ -119,6 +119,30 @@ describe("boundViolations", () => {
     ]);
   });
 
+  it("expects the class of a value the binding fixes where nothing is picked", () => {
+    const ghost: Draw<Props> = (props) => marked(buttonClasses({ variant: "ghost", ...props }));
+    const emitted = { ...button, staticCss: [{ variant: ["ghost"] }] };
+
+    expect(boundViolations(emitted, ghost, { defaults: { variant: "ghost" } })).toStrictEqual([]);
+    expect(boundViolations(button, ghost)[0]).toBe(
+      "button lacks button--solid when nothing is picked",
+    );
+  });
+
+  it("reports a fixed value that no staticCss entry emits", () => {
+    const ghost: Draw<Props> = (props) => marked(buttonClasses({ variant: "ghost", ...props }));
+    const whole = { ...button, staticCss: ["*"] };
+    const axis = { ...button, staticCss: [{ variant: "*" }] };
+    const other = { ...button, staticCss: [{ size: ["lg"] }, "odd"] };
+
+    expect(boundViolations(button, ghost, { defaults: { variant: "ghost" } })).toStrictEqual([
+      "button fixes variant ghost through a default prop, which staticCss does not list",
+    ]);
+    expect(boundViolations(whole, ghost, { defaults: { variant: "ghost" } })).toStrictEqual([]);
+    expect(boundViolations(axis, ghost, { defaults: { variant: "ghost" } })).toStrictEqual([]);
+    expect(boundViolations(other, ghost, { defaults: { variant: "ghost" } })).toHaveLength(1);
+  });
+
   it("reads the element the subject returns", () => {
     const unmarked: Draw<Props> = (props) => marked(buttonClasses(props), "other");
 

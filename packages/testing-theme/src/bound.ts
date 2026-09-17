@@ -29,6 +29,12 @@ export type Draw<Props extends object> = (props: Props) => ParentNode;
  */
 export interface BoundChecks {
   /**
+   * The values the binding fixes through its default props, which the element has where nothing
+   * is picked.
+   */
+  defaults?: Readonly<Record<string, string>> | undefined;
+
+  /**
    * The slot the element renders, for a part of a slot recipe.
    */
   slot?: string | undefined;
@@ -151,6 +157,39 @@ function expectedClasses(
 }
 
 /**
+ * Returns true when a `staticCss` entry emits the value: the whole recipe, the whole axis, or the
+ * value by name.
+ */
+function emits(entry: unknown, axis: string, value: string): boolean {
+  if (entry === "*") return true;
+  if (!isRecord(entry)) return false;
+
+  const listed = entry[axis];
+
+  return listed === "*" || (Array.isArray(listed) && listed.includes(value));
+}
+
+/**
+ * Reports each value the binding fixes that no `staticCss` entry emits.
+ *
+ * @remarks
+ *   The compiler extracts a recipe's rules from the JSX literals that write its values. A value a
+ *   binding fixes through a default prop is written by no literal, so its class is on the element
+ *   with no rule behind it unless the recipe lists it under `staticCss`.
+ */
+function unemitted(
+  recipe: Declared,
+  defaults: Readonly<Record<string, string>>,
+): readonly string[] {
+  return Object.entries(defaults)
+    .filter(([axis, value]) => !(recipe.staticCss ?? []).some((entry) => emits(entry, axis, value)))
+    .map(
+      ([axis, value]) =>
+        `${recipe.className} fixes ${axis} ${value} through a default prop, which staticCss does not list`,
+    );
+}
+
+/**
  * Reads the classes the recipe owns off the element: its own, and every one that opens with it.
  */
 function actualClasses(element: Element, owner: string): readonly string[] {
@@ -216,7 +255,8 @@ export function boundViolations<Props extends object>(
         ? recipeElement(container, recipe.className)
         : slotElement(container, recipe.className, slot));
 
-  return renders(recipe).flatMap(([picked, when]) => {
+  const fixed = options.defaults ?? {};
+  const differing = renders(recipe).flatMap(([picked, when]) => {
     // Each key is an axis the recipe offers and each value one the axis takes, which is what Props names.
     // eslint-disable-next-line typescript/no-unsafe-type-assertion -- see above
     const props = Object.fromEntries(
@@ -226,8 +266,10 @@ export function boundViolations<Props extends object>(
     return differences(
       owner,
       actualClasses(find(draw(props)), owner),
-      expectedClasses(recipe, owner, slot, picked),
+      expectedClasses(recipe, owner, slot, { ...fixed, ...picked }),
       when,
     );
   });
+
+  return [...unemitted(recipe, fixed), ...differing];
 }
