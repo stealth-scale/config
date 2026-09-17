@@ -5,7 +5,9 @@
  * @remarks
  *   A role states what the text is for. A heading role names the heading face, so a theme that
  *   sets a display face once changes every heading, and a label role is what a control's text
- *   reads, so a theme that tightens its controls restates five styles rather than every recipe.
+ *   reads, so a theme that tightens its controls restates eight styles rather than every recipe.
+ *   The label grows slower than the control above `xl`, so a hero's words stay words while its
+ *   box grows to a hero's.
  *   A role names its leading and tracking from the token scales rather than from the size table,
  *   because the leading of a heading is a decision and the leading of a size is a computation.
  */
@@ -91,7 +93,7 @@ function code(size: string): Record<"value", TextStyle> {
  */
 export const textStyles: TextStyles = {
   ...typography(),
-  body: { lg: body("lg"), md: body("md"), sm: body("sm") },
+  body: { lg: body("lg"), md: body("md"), sm: body("sm"), xl: body("xl"), xs: body("xs") },
   caption: role({ leading: "snug", size: "xs", tracking: "normal", weight: "normal" }),
   code: { md: code("md"), sm: code("sm") },
   display: {
@@ -119,10 +121,22 @@ export const textStyles: TextStyles = {
   },
   heading: {
     "2xl": heading("4xl", "bold"),
+    "3xl": heading("5xl", "bold"),
+    "4xl": heading("6xl", "bold"),
     lg: heading("2xl"),
     md: heading("xl"),
     sm: heading("lg"),
     xl: heading("3xl", "bold"),
+    xs: heading("md"),
   },
-  label: { lg: label("lg"), md: label("md"), sm: label("sm"), xl: label("xl"), xs: label("xs") },
+  label: {
+    "2xl": label("lg"),
+    "3xl": label("xl"),
+    "4xl": label("2xl"),
+    lg: label("lg"),
+    md: label("md"),
+    sm: label("sm"),
+    xl: label("xl"),
+    xs: label("xs"),
+  },
 };

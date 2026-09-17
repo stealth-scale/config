@@ -18,7 +18,7 @@ import { gaps, insets } from "#scales/geometry.ts";
 type Spacing = NonNullable<SemanticTokens["spacing"]>;
 
 /**
- * Lists the two scales, each `xs` to `xl`, and the marker gutter.
+ * Lists the two scales, each `xs` to `4xl`, and the marker gutter.
  */
 export const spacing: Spacing = {
   gap: gaps(),

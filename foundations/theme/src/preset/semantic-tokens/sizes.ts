@@ -15,7 +15,7 @@ import { controls, icons } from "#scales/geometry.ts";
 type Sizes = NonNullable<SemanticTokens["sizes"]>;
 
 /**
- * Lists the two scales, each `xs` to `xl`.
+ * Lists the two scales, each `xs` to `4xl`.
  */
 export const sizes: Sizes = {
   control: controls(),

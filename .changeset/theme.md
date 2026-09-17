@@ -13,3 +13,8 @@ theme: keep no value's class on a slot for a compound
 - The semantic spacing states `marker`, the gutter a list leaves for the browser's marker, at two
   and a half ems, which is the gutter every browser leaves by default. A recipe writes
   `paddingInlineStart: "marker"`, and a theme moves it.
+- Every geometry scale runs from `xs` to `4xl`: `control` reaches twice its base at `4xl`, `icon`
+  three times, `inset` three times and `gap` six times, so a hero's call to action, the mark beside
+  it and the room around it grow together on the same names. The `label` role follows to `4xl`,
+  growing slower than the control, the `heading` role gains `xs`, `3xl` and `4xl`, and the `body`
+  role gains `xs` and `xl`.
