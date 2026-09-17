@@ -21,6 +21,11 @@ import { only, type Rendered } from "#part.ts";
  */
 export interface ConformanceOptions {
   /**
+   * Whether to check that the component renders the element `as` names in place of its own.
+   */
+  as?: boolean | undefined;
+
+  /**
    * Whether to check that the component renders its child's element in place of its own.
    */
   asChild?: boolean | undefined;
@@ -213,11 +218,17 @@ function forwarding(
 const CHILD: ReactNode = createElement("a", { href: "#conformance" });
 
 /**
+ * The tag a component is asked to render through `as`, recognised the same way.
+ */
+const TAG = "a";
+
+/**
  * Lists the failures among the parts a caller asked about, and looks at nothing else.
  *
  * @remarks
- *   Not every component takes children or answers to asChild. A check running unasked would
- *   report a violation against a component that never offered the behaviour in the first place.
+ *   Not every component takes children, answers to `as`, or answers to `asChild`. A check running
+ *   unasked would report a violation against a component that never offered the behaviour in the
+ *   first place.
  */
 function optional(
   Component: ElementType,
@@ -235,6 +246,17 @@ function optional(
     );
 
     if (text !== "held") found.push("does not render children");
+  }
+
+  if (options.as === true) {
+    const swapped = mounted(
+      Component,
+      { ...props, as: TAG },
+      (held) => held.tagName.toUpperCase(),
+      options,
+    );
+
+    if (swapped !== "A") found.push("does not honour as");
   }
 
   if (options.asChild === true) {

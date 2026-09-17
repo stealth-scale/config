@@ -74,6 +74,7 @@ else.
 
 | Field      | Type                                    | Default     | What it turns on                                                                              |
 | ---------- | --------------------------------------- | ----------- | --------------------------------------------------------------------------------------------- |
+| `as`       | `boolean`                               | `undefined` | Renders the component with `as="a"` and expects the element back as `A`                       |
 | `asChild`  | `boolean`                               | `undefined` | Renders the component with `asChild` and an anchor child, and expects the element back as `A` |
 | `children` | `boolean`                               | `undefined` | Passes a string as `children` and expects it in the element's `textContent`                   |
 | `element`  | `string`                                | `undefined` | The tag the component is expected to render, spelled upper-case                               |
@@ -114,6 +115,7 @@ A phrase states what the component did. The order of the list is the order the c
 | `does not forward ref`                          | The ref reached no element, or reached one other than the element under check               |
 | `does not spread unknown props`                 | An attribute the component does not name never reached the element                          |
 | `does not render children`                      | `children` was given and the text did not arrive                                            |
+| `does not honour as`                            | `as` was given and the element is not the one it named                                      |
 | `does not honour asChild`                       | `asChild` was given and the element is not the child's                                      |
 
 ## Licence

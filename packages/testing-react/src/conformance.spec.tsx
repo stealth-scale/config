@@ -1,4 +1,11 @@
-import { createContext, type ReactElement, type ReactNode, type Ref, use } from "react";
+import {
+  createContext,
+  type ElementType,
+  type ReactElement,
+  type ReactNode,
+  type Ref,
+  use,
+} from "react";
 
 import { describe, expect, it } from "vitest";
 
@@ -6,6 +13,8 @@ import { violations } from "#conformance.tsx";
 import { part } from "#part.ts";
 
 interface ProbeProps {
+  as?: ElementType | undefined;
+
   asChild?: boolean | undefined;
 
   children?: ReactNode | undefined;
@@ -27,7 +36,7 @@ function without(props: ProbeProps, dropped: keyof ProbeProps): ProbeProps {
   return held;
 }
 
-function Conforming({ asChild, children, className, ref, ...rest }: ProbeProps): ReactElement {
+function Conforming({ as, asChild, children, className, ref, ...rest }: ProbeProps): ReactElement {
   if (asChild === true) {
     return (
       <a className={merged(className)} href="#conformance" {...rest}>
@@ -36,10 +45,12 @@ function Conforming({ asChild, children, className, ref, ...rest }: ProbeProps):
     );
   }
 
+  const Tag: ElementType = as ?? "div";
+
   return (
-    <div className={merged(className)} ref={ref} {...rest}>
+    <Tag className={merged(className)} ref={ref} {...rest}>
       {children}
-    </div>
+    </Tag>
   );
 }
 
@@ -79,8 +90,12 @@ function Keeping(props: ProbeProps): ReactElement {
   return <Conforming {...without(props, "asChild")} />;
 }
 
+function Fixed(props: ProbeProps): ReactElement {
+  return <Conforming {...without(props, "as")} />;
+}
+
 function Plain(props: ProbeProps): ReactElement {
-  return <Conforming {...without(without(props, "children"), "asChild")} />;
+  return <Conforming {...without(without(without(props, "children"), "asChild"), "as")} />;
 }
 
 function Requiring({ ratio, ...rest }: { ratio?: number } & ProbeProps): ReactElement {
@@ -123,7 +138,7 @@ function Thrower(): ReactElement {
 
 describe("violations", () => {
   it("returns no violation for a component that keeps the contract", () => {
-    const options = { asChild: true, children: true, element: "DIV" };
+    const options = { as: true, asChild: true, children: true, element: "DIV" };
 
     expect(violations(Conforming, options)).toStrictEqual([]);
   });
@@ -162,7 +177,11 @@ describe("violations", () => {
     expect(violations(Keeping, { asChild: true })).toStrictEqual(["does not honour asChild"]);
   });
 
-  it("checks neither children nor asChild unless asked", () => {
+  it("reports a component that keeps its own element when as was passed", () => {
+    expect(violations(Fixed, { as: true })).toStrictEqual(["does not honour as"]);
+  });
+
+  it("checks neither children nor as nor asChild unless asked", () => {
     expect(violations(Plain)).toStrictEqual([]);
   });
 
