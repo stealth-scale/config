@@ -10,6 +10,16 @@ import { type Preset, preset } from "@stealthscale/vite-config-core";
 const WRITTEN = "*.{json,jsonc,md,css,html,yml,yaml}";
 
 /**
+ * The command the staged files are handed to.
+ *
+ * @remarks
+ *   The formatter ignores a lockfile on its own, and a commit that stages `pnpm-lock.yaml` alone
+ *   hands it nothing else. Without the flag it exits with "Expected at least one target file" and
+ *   the commit is refused.
+ */
+const COMMAND = "vp fmt --no-error-on-unmatched-pattern";
+
+/**
  * Formats each staged document, stylesheet and manifest, and does nothing
  * further to it.
  *
@@ -20,7 +30,7 @@ const WRITTEN = "*.{json,jsonc,md,css,html,yml,yaml}";
  */
 export function formatted(): Preset {
   return preset({
-    config: { staged: { [WRITTEN]: "vp fmt" } },
+    config: { staged: { [WRITTEN]: COMMAND } },
     name: "staged.formatted",
   });
 }

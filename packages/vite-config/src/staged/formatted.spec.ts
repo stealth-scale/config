@@ -16,7 +16,13 @@ function staged(): Record<string, unknown> {
 
 describe("formatted", () => {
   it("formats and does no more", () => {
-    expect(Object.values(staged())).toStrictEqual(["vp fmt"]);
+    expect(Object.values(staged())).toStrictEqual(["vp fmt --no-error-on-unmatched-pattern"]);
+  });
+
+  it("tolerates a staged file the formatter ignores", () => {
+    const [command] = Object.values(staged());
+
+    expect(command).toContain("--no-error-on-unmatched-pattern");
   });
 
   it("matches what the formatter reads and the linter does not", () => {
