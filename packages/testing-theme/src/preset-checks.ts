@@ -12,6 +12,7 @@ import { existsSync } from "node:fs";
 import { type Preset } from "@stealthscale/theme/authoring";
 
 import { recipeFiles } from "#files.ts";
+import { gated } from "#gate.ts";
 import { camelCased } from "#tokens.ts";
 
 /**
@@ -128,15 +129,6 @@ const RUNNERS: ReadonlyArray<readonly [PresetCheck, Runner]> = [
 ];
 
 /**
- * Reports a skip that gives no reason.
- */
-function unreasoned(options: PresetChecks): readonly string[] {
-  return Object.entries(options.skip ?? {})
-    .filter(([, because]) => because.trim() === "")
-    .map(([check]) => `skip of ${check} gives no reason`);
-}
-
-/**
  * Runs every check the specification leaves standing over a preset.
  *
  * @returns Each violation, opening with the check that reported it, or an empty array for a
@@ -145,9 +137,8 @@ function unreasoned(options: PresetChecks): readonly string[] {
 export function presetViolations(preset: Preset, options: PresetChecks): readonly string[] {
   if (!existsSync(options.at)) return [`${preset.name} has no source directory at ${options.at}`];
 
-  const reported = RUNNERS.filter(([check]) => options.skip?.[check] === undefined).flatMap(
-    ([check, run]) => run(preset, options).map((violation) => `${check}: ${violation}`),
+  return gated(
+    RUNNERS.map(([check, run]) => [check, () => run(preset, options)] as const),
+    options,
   );
-
-  return [...unreasoned(options), ...reported];
 }

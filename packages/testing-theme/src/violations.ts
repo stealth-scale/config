@@ -11,6 +11,7 @@ import { type Preset, type Theme } from "@stealthscale/theme/authoring";
 import * as contract from "#contract.ts";
 import * as contrast from "#contrast.ts";
 import { installed } from "#fonts.ts";
+import { gated } from "#gate.ts";
 import { type Declared } from "#recipe.ts";
 
 /**
@@ -136,24 +137,14 @@ function thresholdsOf(options: ThemeChecks): contrast.Thresholds {
 }
 
 /**
- * Reports a skip that gives no reason.
- */
-function unreasoned(options: ThemeChecks): readonly string[] {
-  return Object.entries(options.skip ?? {})
-    .filter(([, because]) => because.trim() === "")
-    .map(([check]) => `skip of ${check} gives no reason`);
-}
-
-/**
  * Runs every check the specification leaves standing over a theme.
  *
  * @returns Each violation, opening with the check that reported it, or an empty array for a theme
  *   that keeps the contract.
  */
 export function violations(theme: Theme, options: ThemeChecks = {}): readonly string[] {
-  const reported = RUNNERS.filter(([check]) => options.skip?.[check] === undefined).flatMap(
-    ([check, run]) => run(theme, options).map((violation) => `${check}: ${violation}`),
+  return gated(
+    RUNNERS.map(([check, run]) => [check, () => run(theme, options)] as const),
+    options,
   );
-
-  return [...unreasoned(options), ...reported];
 }
