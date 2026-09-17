@@ -56,6 +56,8 @@ The scheme is sound under three rules, which a gate holds and this package trust
   a compound's name. `size: lg` and `radius: lg` in one recipe would both read `button--lg`.
 - A compound carries a name. The name is unique in its recipe, is not a value of any axis, and does
   not start with an axis and the separator.
+- An axis name does not contain the separator. Where one axis name prefixes another, `rename` reads
+  the longest axis that fits, so `on-off` wins over `on` for `card--on-off-true`.
 - Two different classes of one stylesheet never sanitise to one name. The stylesheet rewrite checks
   this and reports a collision.
 
@@ -71,6 +73,7 @@ has no structure to read, and a prefix is not read from a recipe's class.
 | `compoundClass(className, name)`       | `<class>--<name>`                                                                                                                                                             |
 | `atomicClass(pandaClass)`              | The class with each named condition and the property's class in kebab-case, and the value sanitised. A raw selector or at-rule condition in brackets is kept as written       |
 | `rename(pandaClass, config)`           | The class as a variant where one of `config.recipes` claims it, with `config.separator` between axis and value, and as an atomic class otherwise                              |
+| `conditionsOf(pandaClass)`             | The conditions of a class, outer to inner, as the compiler wrote them, with a raw one in its brackets                                                                         |
 | `sanitise(segment)`                    | The segment with a letter, a digit, a hyphen, `%`, `/`, `!` and the slot separator `__` kept, and each run of other characters replaced by one hyphen. A value keeps its case |
 | `kebab(name)`                          | The name with a hyphen at each boundary between a lower-case letter or a digit and a capital, in lower case                                                                   |
 

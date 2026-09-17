@@ -20,7 +20,7 @@ A build step runs codegen, rewrites the runtime it wrote, and renames the styles
 
 ```ts
 import { createNodeDriver } from "@pandacss/compiler";
-import { renameSelectors, rewriteRuntime } from "@stealthscale/pandacss-compiler";
+import { compilerConfig, renameSelectors, rewriteRuntime } from "@stealthscale/pandacss-compiler";
 
 const driver = await createNodeDriver({ configPath: "panda.config.ts", cwd: root });
 
@@ -28,16 +28,21 @@ driver.parseFiles();
 driver.codegen({ cwd: root, outdir: generated });
 rewriteRuntime(generated);
 
-const { css, diagnostics } = renameSelectors(driver.cssgen().css, {
-  recipes: [{ axes: ["loading", "size"], className: "button" }],
-  separator: "-",
-});
+const { css, diagnostics } = renameSelectors(driver.cssgen().css, compilerConfig(driver.config));
 ```
 
-`diagnostics` lists an error for each pair of classes that renamed to one name, and one warning for
-the classes kept under a raw selector or at-rule condition.
+`diagnostics` lists an error for each set of classes that renamed to one name, one warning for the
+classes whose rules were removed because no element carries them, and one warning for the classes
+kept under a raw selector or at-rule condition.
 
 ## Reference
+
+### `compilerConfig(config)`
+
+Reads what the scheme needs out of `driver.config`, the configuration the compiler received with
+every preset merged: every recipe under `theme.recipes` and `theme.slotRecipes` with its
+`className`, or its key where it names none, the keys of its `variants` as its axes, and its
+`slots`, together with `separator`, which is `_` where the configuration sets none.
 
 ### `rewriteRuntime(dir)`
 
@@ -57,14 +62,15 @@ under `js` where the compiler was configured for that. A second run changes noth
 
 ### `renameSelectors(css, config)`
 
-| Step        | Does                                                                                                                                                                                                                       |
-| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Rename      | Each class in each selector goes through `rename` of the naming package, with `config.recipes` and `config.separator`, once per class                                                                                      |
-| Remove      | A selector that needs the class of a boolean axis at `false` is removed, since no element carries it. Inside `:is()`, `:where()` or `:has()` only that entry goes. `:not()` of it matches everything and is written as `*` |
-| Prune       | A rule or a block the removal leaves empty goes with it                                                                                                                                                                    |
-| Collision   | Classes that renamed to one name are reported as `naming/collision`, an error naming each                                                                                                                                  |
-| Raw         | The classes kept under a raw selector or at-rule condition are reported once as `naming/raw-condition`, a warning listing them                                                                                             |
-| Leave alone | A keyframe step, a rule that names no class, and a layer order statement                                                                                                                                                   |
+| Step        | Does                                                                                                                                                                                                                                                                |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Rename      | Each class in each selector goes through `rename` of the naming package, with `config.recipes` and `config.separator`, once per class                                                                                                                               |
+| Remove      | A selector that needs the class of a boolean axis at `false` is removed, since no element carries it. Inside `:is()`, `:where()` or `:has()` only that entry goes. `:not()` of it is kept as written, because it matches everything at the specificity of the class |
+| Prune       | A rule or a block the removal leaves empty goes with it                                                                                                                                                                                                             |
+| Collision   | Classes that renamed to one name are reported as `naming/collision`, an error naming each                                                                                                                                                                           |
+| Unreachable | The classes whose rules were removed are reported once as `naming/unreachable`, a warning listing them, since a styled `false` branch is authored CSS that reaches no element                                                                                       |
+| Raw         | The classes kept under a raw selector or at-rule condition, at any depth, are reported once as `naming/raw-condition`, a warning listing them                                                                                                                       |
+| Leave alone | A keyframe step, a rule that names no class, and a layer order statement                                                                                                                                                                                            |
 
 The diagnostics take the compiler's own `Diagnostic` shape, so a reporter written for the compiler's
 prints them unchanged.

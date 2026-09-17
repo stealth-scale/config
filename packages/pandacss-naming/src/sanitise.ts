@@ -6,8 +6,9 @@
  *   author typed them, with a space as `_`. A stylesheet escapes each of those characters and a
  *   person reads past them. The scheme keeps a letter, a digit, a hyphen, `%`, `/` and `!`, keeps
  *   the two underscores between a recipe and its slot, and replaces every other character with one
- *   hyphen. The same function runs in the browser and on the stylesheet, so the two sides agree by
- *   construction.
+ *   hyphen. A value with two spaces in a row reaches the sanitiser as two underscores and keeps
+ *   them the same way. The same function runs in the browser and on the stylesheet, so the two
+ *   sides agree by construction, and the stylesheet rewrite reports a clash between two classes.
  */
 
 /**

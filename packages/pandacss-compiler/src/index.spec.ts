@@ -9,9 +9,9 @@ import { describe, expect, it } from "vitest";
 import { type CompilerConfig } from "@stealthscale/pandacss-naming";
 
 import * as published from "#index.ts";
-import { type Renamed, renameSelectors, rewriteRuntime } from "#index.ts";
+import { compilerConfig, type Renamed, renameSelectors, rewriteRuntime } from "#index.ts";
 
-const SURFACE = ["renameSelectors", "rewriteRuntime"];
+const SURFACE = ["compilerConfig", "renameSelectors", "rewriteRuntime"];
 
 const PACKAGE = join(import.meta.dirname, "..");
 
@@ -22,14 +22,6 @@ const BASE = join(
   "dist",
   "index.mjs",
 );
-
-const CONFIG: CompilerConfig = {
-  recipes: [
-    { axes: ["loading", "size"], className: "button" },
-    { axes: ["bleed"], className: "card", slots: ["content", "root"] },
-  ],
-  separator: "-",
-};
 
 const STYLES = {
   _child: { marginBlock: "4" },
@@ -87,6 +79,7 @@ interface Recipes {
 
 interface Outcome {
   bled: Record<string, string>;
+  config: CompilerConfig;
   exposed: string;
   plain: string;
   sheet: Renamed;
@@ -153,12 +146,14 @@ async function compiled(): Promise<Outcome> {
     driver.codegen({ cwd: dir, outdir: generated });
     rewriteRuntime(generated);
 
-    const sheet = renameSelectors(driver.cssgen().css, CONFIG);
+    const config = compilerConfig(driver.config);
+    const sheet = renameSelectors(driver.cssgen().css, config);
     const { css } = loaded(join(generated, "css", "index.mjs"), isCss);
     const { button, card } = loaded(join(generated, "recipes", "index.mjs"), isRecipes);
 
     return {
       bled: card({ bleed: true }),
+      config,
       exposed: button({ loading: true, size: "lg" }),
       plain: button({ loading: false, size: "sm" }),
       sheet,
@@ -170,8 +165,20 @@ async function compiled(): Promise<Outcome> {
 }
 
 describe("pandacss-compiler", () => {
-  it("publishes the two rewrites", () => {
+  it("publishes the two rewrites and the configuration reader", () => {
     expect(Object.keys(published).toSorted()).toStrictEqual(SURFACE.toSorted());
+  });
+
+  it("reads the recipes and the separator out of the driver's configuration", async () => {
+    const { config } = await compiled();
+
+    expect(config).toStrictEqual({
+      recipes: [
+        { axes: ["loading", "size"], className: "button" },
+        { axes: ["bleed"], className: "card", slots: ["root", "content"] },
+      ],
+      separator: "-",
+    });
   });
 
   it("writes every class the browser writes as a selector in the renamed stylesheet", async () => {
@@ -218,10 +225,16 @@ describe("pandacss-compiler", () => {
     expect(classesOf(sheet.css).has("button--loading")).toBe(true);
   });
 
-  it("reports the raw condition the page wrote and nothing else", async () => {
+  it("reports the styled false branch and the raw condition the page wrote and nothing else", async () => {
     const { sheet } = await compiled();
 
-    expect(sheet.diagnostics.map((each) => each.code)).toStrictEqual(["naming/raw-condition"]);
-    expect(sheet.diagnostics[0]?.help).toStrictEqual(["[&_>_*]:flex-sh-0"]);
+    expect(sheet.diagnostics.map((each) => each.code)).toStrictEqual([
+      "naming/unreachable",
+      "naming/raw-condition",
+    ]);
+    expect(sheet.diagnostics.map((each) => each.help)).toStrictEqual([
+      ["button--loading-false"],
+      ["[&_>_*]:flex-sh-0"],
+    ]);
   });
 });

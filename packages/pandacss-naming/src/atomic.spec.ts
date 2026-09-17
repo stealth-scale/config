@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { atomicClass } from "#atomic.ts";
+import { atomicClass, conditionsOf } from "#atomic.ts";
 
 describe("atomicClass", () => {
   it.each([
@@ -41,5 +41,16 @@ describe("atomicClass", () => {
 
   it("returns an empty string for an empty class", () => {
     expect(atomicClass("")).toBe("");
+  });
+
+  it("lists the conditions of a class outer to inner with a raw one in its brackets", () => {
+    expect(conditionsOf("md:[@media_(min-width:_40rem)]:c-green")).toStrictEqual([
+      "md",
+      "[@media_(min-width:_40rem)]",
+    ]);
+  });
+
+  it("lists no condition for a class without one", () => {
+    expect(conditionsOf("c-red")).toStrictEqual([]);
   });
 });

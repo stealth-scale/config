@@ -5,17 +5,18 @@
  * @remarks
  *   The stylesheet is parsed once per compile, each class in each selector is renamed, and the
  *   parser escapes the new name as it writes it back. A class for a boolean axis at `false` is one
- *   no element carries, so a selector that needs it is removed, `:not()` of it matches everything,
- *   and a block the removal leaves empty goes with it. Two classes that rename to one name are a
- *   collision and are reported as an error, since the rules of one would apply to the other. A
- *   class under a raw selector or at-rule condition is reported as a warning, because the scheme
- *   keeps it as written and a named condition in the preset would read better.
+ *   no element carries, so a selector that needs it is removed and reported, a block the removal
+ *   leaves empty goes with it, and `:not()` of it is kept as written, since the negation matches
+ *   everything at its own specificity. Two classes that rename to one name are a collision and are
+ *   reported as an error, since the rules of one would apply to the other. A class under a raw
+ *   selector or at-rule condition is reported as a warning, because the scheme keeps it as written
+ *   and a named condition in the preset would read better.
  */
 
 import { type AtRule, type Container, type Node, parse, type Rule } from "postcss";
 import selectorParser from "postcss-selector-parser";
 
-import { type CompilerConfig, rename } from "@stealthscale/pandacss-naming";
+import { type CompilerConfig, conditionsOf, rename } from "@stealthscale/pandacss-naming";
 
 import { type Diagnostic } from "#pandacss.ts";
 
@@ -28,7 +29,8 @@ export interface Renamed {
    */
   css: string;
   /**
-   * Each collision as an error, and the classes kept under a raw condition as one warning.
+   * Each collision as an error, then the classes whose rules were removed and the classes kept
+   * under a raw condition as one warning each.
    */
   diagnostics: readonly Diagnostic[];
 }
@@ -55,6 +57,10 @@ interface Pass {
    * The classes the compiler wrote, by the name each was renamed to.
    */
   sources: Sources;
+  /**
+   * The classes no element carries, whose rules were removed.
+   */
+  unreachable: Set<string>;
 }
 
 /**
@@ -102,6 +108,13 @@ function record(sources: Sources, renamed: string, pandaClass: string): void {
 }
 
 /**
+ * Tells whether a class sits under a raw selector or at-rule condition, at any depth.
+ */
+function isRaw(pandaClass: string): boolean {
+  return conditionsOf(pandaClass).some((condition) => condition.startsWith(RAW));
+}
+
+/**
  * Renames one class the compiler wrote, once per call, and records what it saw of it.
  */
 function renamedOf(pandaClass: string, config: CompilerConfig, pass: Pass): string {
@@ -112,26 +125,13 @@ function renamedOf(pandaClass: string, config: CompilerConfig, pass: Pass): stri
   const renamed = rename(pandaClass, config);
 
   pass.renamed.set(pandaClass, renamed);
-  if (renamed !== "") {
+  if (renamed === "") pass.unreachable.add(pandaClass);
+  else {
     record(pass.sources, renamed, pandaClass);
-    if (pandaClass.startsWith(RAW)) pass.raw.add(pandaClass);
+    if (isRaw(pandaClass)) pass.raw.add(pandaClass);
   }
 
   return renamed;
-}
-
-/**
- * Tells whether a node is the whole of its compound selector, with a combinator or nothing on
- * either side of it.
- */
-function alone(node: selectorParser.Node): boolean {
-  const before = node.prev();
-  const after = node.next();
-
-  return (
-    (before === undefined || selectorParser.isCombinator(before)) &&
-    (after === undefined || selectorParser.isCombinator(after))
-  );
 }
 
 /**
@@ -148,11 +148,12 @@ function trimStart(selector: selectorParser.Selector): void {
  *
  * @remarks
  *   The node is a class no element carries, or a pseudo-class whose argument was removed. At the
- *   top level its selector goes. Inside `:not()` the negation of nothing matches everything, so the
- *   pseudo-class goes, written as `*` where it was a compound selector on its own. Inside `:is()`,
- *   `:where()` or `:has()` the selector goes and the list stands, unless it was the last one, in
- *   which case the list never matches and the pseudo-class is removed the same way. A selector an
- *   earlier removal took away is left as it is.
+ *   top level its selector goes. Inside `:not()` nothing changes, because the negation of a class
+ *   nothing carries matches everything, and it does so at the specificity of the class, which a
+ *   rewrite to `*` would lose. Inside `:is()`, `:where()` or `:has()` the selector goes and the
+ *   list stands, unless it was the last one, in which case the list never matches and the
+ *   pseudo-class is removed the same way. A selector an earlier removal took away is left as it
+ *   is.
  */
 function drop(node: selectorParser.Node): void {
   // eslint-disable-next-line typescript/no-unsafe-type-assertion -- a class and a pseudo-class with an argument sit inside a selector
@@ -165,15 +166,10 @@ function drop(node: selectorParser.Node): void {
 
     return;
   }
+  if (list.value.toLowerCase() === NOT) return;
   if (list.length > 1) {
     selector.remove();
     trimStart(list.first);
-
-    return;
-  }
-  if (list.value.toLowerCase() === NOT) {
-    if (alone(list)) list.replaceWith(selectorParser.universal({ value: "*" }));
-    else list.remove();
 
     return;
   }
@@ -233,20 +229,16 @@ function collisions(sources: Sources): Diagnostic[] {
 }
 
 /**
- * Reports the classes kept under a raw condition as one warning, or nothing where there is none.
+ * Reports a set of classes as one warning that opens with their count, or nothing where the set
+ * is empty.
  */
-function rawConditions(raw: ReadonlySet<string>): Diagnostic[] {
-  if (raw.size === 0) return [];
+function warning(code: string, classes: ReadonlySet<string>, rest: string): Diagnostic[] {
+  if (classes.size === 0) return [];
 
-  const count = raw.size === 1 ? "1 class is" : `${String(raw.size)} classes are`;
+  const count = classes.size === 1 ? "1 class is" : `${String(classes.size)} classes are`;
 
   return [
-    {
-      code: "naming/raw-condition",
-      help: [...raw].toSorted(),
-      message: `${count} kept under a raw selector or at-rule condition. A condition named in the preset is renamed.`,
-      severity: "warning",
-    },
+    { code, help: [...classes].toSorted(), message: `${count} ${rest}`, severity: "warning" },
   ];
 }
 
@@ -255,12 +247,17 @@ function rawConditions(raw: ReadonlySet<string>): Diagnostic[] {
  *
  * @remarks
  *   A rule inside a keyframes block and a rule that names no class are left as they are.
- * @returns The stylesheet renamed, with a diagnostic for each collision and one for the classes
- *   kept under a raw condition.
+ * @returns The stylesheet renamed, with a diagnostic for each collision, one for the classes whose
+ *   rules were removed, and one for the classes kept under a raw condition.
  */
 export function renameSelectors(css: string, config: CompilerConfig): Renamed {
   const root = parse(css);
-  const pass: Pass = { raw: new Set(), renamed: new Map(), sources: new Map() };
+  const pass: Pass = {
+    raw: new Set(),
+    renamed: new Map(),
+    sources: new Map(),
+    unreachable: new Set(),
+  };
   const transform = transformer(config, pass);
 
   root.walkRules((rule) => {
@@ -273,6 +270,18 @@ export function renameSelectors(css: string, config: CompilerConfig): Renamed {
 
   return {
     css: root.toString(),
-    diagnostics: [...collisions(pass.sources), ...rawConditions(pass.raw)],
+    diagnostics: [
+      ...collisions(pass.sources),
+      ...warning(
+        "naming/unreachable",
+        pass.unreachable,
+        "styled for a boolean axis at false, which no element carries, so the rules were removed. Style the false look in base.",
+      ),
+      ...warning(
+        "naming/raw-condition",
+        pass.raw,
+        "kept under a raw selector or at-rule condition. A condition named in the preset is renamed.",
+      ),
+    ],
   };
 }

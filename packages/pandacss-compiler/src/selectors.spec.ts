@@ -48,13 +48,22 @@ describe("renameSelectors", () => {
     expect(css).toBe(".button--loading { opacity: 0.5 }");
   });
 
-  it("removes the rule for a boolean variant at false", () => {
-    const { css } = renameSelectors(
+  it("removes the rule for a boolean variant at false and reports it", () => {
+    const { css, diagnostics } = renameSelectors(
       ".button--loading-false { opacity: 1 }\n.button { color: red }",
       CONFIG,
     );
 
     expect(css).toBe(".button { color: red }");
+    expect(diagnostics).toStrictEqual([
+      {
+        code: "naming/unreachable",
+        help: ["button--loading-false"],
+        message:
+          "1 class is styled for a boolean axis at false, which no element carries, so the rules were removed. Style the false look in base.",
+        severity: "warning",
+      },
+    ]);
   });
 
   it("removes only the unreachable selector of a selector list", () => {
@@ -93,24 +102,15 @@ describe("renameSelectors", () => {
     expect(css).toBe(".button { color: red }");
   });
 
-  it("writes a negation of a class no element carries as everything", () => {
+  it("keeps a negation of a class no element carries as written", () => {
     const { css } = renameSelectors(
-      ":not(.button--loading-false) { opacity: 1 }\n:not(.button--loading-false) > .button { opacity: 1 }\n.button:not(.button--loading-false, .button--size-sm) { opacity: 1 }",
+      ".button > :not(.button--loading-false):hover { opacity: 1 }\n.button:not(.button--loading-false, .button--size-sm) { opacity: 1 }",
       CONFIG,
     );
 
     expect(css).toBe(
-      "* { opacity: 1 }\n* > .button { opacity: 1 }\n.button:not(.button--sm) { opacity: 1 }",
+      ".button > :not(.button--loading-false):hover { opacity: 1 }\n.button:not(.button--loading-false, .button--sm) { opacity: 1 }",
     );
-  });
-
-  it("removes a negation of a class no element carries from a compound selector", () => {
-    const { css } = renameSelectors(
-      ".button > :not(.button--loading-false):hover { opacity: 1 }\n.button:not(.button--loading-false) { opacity: 1 }",
-      CONFIG,
-    );
-
-    expect(css).toBe(".button > :hover { opacity: 1 }\n.button { opacity: 1 }");
   });
 
   it("leaves a selector an earlier removal took away as it is", () => {
@@ -185,6 +185,15 @@ describe("renameSelectors", () => {
         severity: "warning",
       },
     ]);
+  });
+
+  it("reports a raw condition that sits under a named one", () => {
+    const { diagnostics } = renameSelectors(
+      String.raw`@media (min-width: 48rem) { .md\:\[\&_\>_\*\]\:flex-sh-0 > * { flex-shrink: 0 } }`,
+      CONFIG,
+    );
+
+    expect(diagnostics.map((each) => each.help)).toStrictEqual([["md:[&_>_*]:flex-sh-0"]]);
   });
 
   it("reports the classes kept under a raw condition as one warning", () => {

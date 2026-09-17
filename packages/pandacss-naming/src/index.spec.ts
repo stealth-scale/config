@@ -5,6 +5,7 @@ import * as published from "#index.ts";
 const SURFACE = [
   "atomicClass",
   "compoundClass",
+  "conditionsOf",
   "kebab",
   "rename",
   "sanitise",

@@ -6,6 +6,8 @@
  *   class share their characters and only the recipes tell them apart. A class no recipe claims is
  *   an atomic class. A class under a recipe that is not one of its variants is its base class or a
  *   compound, both of which the author named, so those pass through the atomic rewrite unchanged.
+ *   Where one axis name prefixes another, the longest axis that fits is read, so `on-off` wins
+ *   over `on` for `card--on-off-true` whatever their order.
  */
 
 import { atomicClass } from "#atomic.ts";
@@ -37,7 +39,9 @@ export function rename(pandaClass: string, config: CompilerConfig): string {
     if (owner === undefined) continue;
 
     const rest = pandaClass.slice(owner.length + VARIANT.length);
-    const axis = recipe.axes.find((each) => rest.startsWith(`${each}${config.separator}`));
+    const axis = recipe.axes
+      .toSorted((one, other) => other.length - one.length)
+      .find((each) => rest.startsWith(`${each}${config.separator}`));
 
     if (axis === undefined) continue;
 

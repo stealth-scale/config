@@ -64,6 +64,15 @@ function segments(pandaClass: string): Segments {
 }
 
 /**
+ * Lists the conditions of a class, outer to inner, as the compiler wrote them.
+ *
+ * @returns Each condition, a raw one in its brackets, or an empty array for a class without one.
+ */
+export function conditionsOf(pandaClass: string): string[] {
+  return segments(pandaClass).conditions;
+}
+
+/**
  * Rewrites a condition: a raw selector or at-rule stays as written, and a named condition is
  * written in kebab-case.
  */

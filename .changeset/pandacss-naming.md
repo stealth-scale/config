@@ -14,4 +14,6 @@ pandacss-naming: write every class name in one readable scheme
   becomes `md:grid-tc-repeat-3-minmax-0-1fr`, and `layerStyle-dim.others` becomes
   `layer-style-dim-others`. A raw selector or at-rule condition is kept as written.
 - `rename(pandaClass, config)` reads a class the compiler wrote as a variant where one of
-  `config.recipes` claims it, and as an atomic class otherwise.
+  `config.recipes` claims it, reading the longest axis that fits, and as an atomic class otherwise.
+- `conditionsOf(pandaClass)` lists the conditions of a class, outer to inner, with a raw one in its
+  brackets.

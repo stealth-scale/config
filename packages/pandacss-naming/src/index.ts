@@ -5,7 +5,7 @@
  * @packageDocumentation
  */
 
-export { atomicClass } from "#atomic.ts";
+export { atomicClass, conditionsOf } from "#atomic.ts";
 export {
   type CompilerConfig,
   compoundClass,

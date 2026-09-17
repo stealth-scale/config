@@ -47,6 +47,16 @@ describe("rename", () => {
     expect(rename("button-group--size-lg", CONFIG)).toBe("button-group--lg");
   });
 
+  it.each([
+    ["on", "on-off"],
+    ["on-off", "on"],
+  ])("reads the longest axis that fits when the axes are declared as %s then %s", (...axes) => {
+    const config: CompilerConfig = { recipes: [{ axes, className: "card" }], separator: "-" };
+
+    expect(rename("card--on-off-true", config)).toBe("card--on-off");
+    expect(rename("card--on-true", config)).toBe("card--on");
+  });
+
   it("rewrites an atomic class no recipe claims", () => {
     expect(rename("md:grid-tc-repeat(3,_minmax(0,_1fr))", CONFIG)).toBe(
       "md:grid-tc-repeat-3-minmax-0-1fr",
