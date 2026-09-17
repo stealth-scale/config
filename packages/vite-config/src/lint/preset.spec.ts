@@ -76,7 +76,7 @@ describe("preset", () => {
 
   it("excuses a config file and a specification whichever entry was picked", () => {
     for (const held of [base(), node(), web()]) {
-      expect(namesOf(held)).toContain("lint.defaultExported(**/*.config.ts)");
+      expect(namesOf(held)).toContain("lint.defaultExported(**/*.config.ts, **/src/theme.ts)");
       expect(held.some((one) => one.name.includes("*.spec.ts"))).toBe(true);
     }
   });

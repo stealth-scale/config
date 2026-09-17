@@ -34,9 +34,10 @@ function asRules(held: rules.PluginRules): NonNullable<LintBlock["rules"]> {
 }
 
 /**
- * The globs whose files a tool reads through their default export.
+ * The globs whose files a tool reads through their default export: a configuration, and the
+ * preset a package publishes under `./theme`.
  */
-const DEFAULT_EXPORTED = ["**/*.config.ts"];
+const DEFAULT_EXPORTED = ["**/*.config.ts", "**/src/theme.ts"];
 
 /**
  * The globs excused from doc comments in every tier.

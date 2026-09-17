@@ -4,5 +4,5 @@
     "@stealthscale/vite-config-typescript/web.json",
     "@stealthscale/vite-config-react/web.json"
   ],
-  "include": ["src", "generated", "vite.config.ts", "vite.layers.ts"]
+  "include": ["src", "generated", "vite.config.ts"]
 }
