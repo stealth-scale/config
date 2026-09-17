@@ -45,6 +45,15 @@ describe("globalCss", () => {
     });
   });
 
+  it("reads a bare heading in the heading role of its level", () => {
+    expect(globalCss).toMatchObject({
+      h1: { textStyle: "heading.xl" },
+      h2: { textStyle: "heading.lg" },
+      h3: { textStyle: "heading.md" },
+      "h4, h5, h6": { textStyle: "heading.sm" },
+    });
+  });
+
   it("follows the dark preference with the color scheme where the page writes no light mode", () => {
     expect(globalCss["html"]).toMatchObject({
       "@media (prefers-color-scheme: dark)": {
