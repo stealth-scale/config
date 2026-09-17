@@ -5,9 +5,13 @@
  * @remarks
  *   The compiler's reset and its focus-ring utility read six custom properties, and this is where
  *   the vocabulary fills them, so a placeholder, a selection and a focus ring are drawn in the
- *   theme's colors. The color scheme follows the attribute where one is written, and the operating
- *   system's preference where none is, the same way the color mode condition does. The page
- *   scrolls smoothly to an anchor, and jumps for a reader who asked for less motion.
+ *   theme's colors.
+ *   The color scheme follows the attribute where one is written, and the operating system's
+ *   preference where none is, the same way the color mode condition does. Either attribute states
+ *   it, so a subtree switched to light inside a page drawn dark draws its form controls, its
+ *   scrollbars and its selection in light, even though the colors a theme states do not follow it
+ *   there.
+ *   The page scrolls smoothly to an anchor, and jumps for a reader who asked for less motion.
  */
 
 import { COLOR_MODE_ATTRIBUTE } from "#attributes.ts";
@@ -27,6 +31,9 @@ export const globalCss: GlobalStyleObject = {
   },
   [`[${COLOR_MODE_ATTRIBUTE}=dark]`]: {
     colorScheme: "dark",
+  },
+  [`[${COLOR_MODE_ATTRIBUTE}=light]`]: {
+    colorScheme: "light",
   },
   html: {
     "@media (prefers-color-scheme: dark)": {

@@ -27,6 +27,10 @@ describe("globalCss", () => {
     expect(globalCss["[data-color-mode=dark]"]).toStrictEqual({ colorScheme: "dark" });
   });
 
+  it("follows the light mode attribute with the color scheme", () => {
+    expect(globalCss["[data-color-mode=light]"]).toStrictEqual({ colorScheme: "light" });
+  });
+
   it("scrolls smoothly and jumps for a reader who asked for less motion", () => {
     expect(globalCss["html"]).toMatchObject({
       "@media (prefers-reduced-motion: reduce)": { scrollBehavior: "auto" },

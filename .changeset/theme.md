@@ -65,6 +65,9 @@ theme: name every compound in its recipe and read the sizes from the tokens
   variants, so a compound component is found by the same handle as one that draws a single element.
   The compiler's own option does nothing there, because it reads a name off the recipe a part is
   styled with and a part is styled with the slot's styles alone.
+- The document's color scheme is stated on the light attribute as well as the dark one, so a subtree
+  switched to light inside a page drawn dark draws its form controls, its scrollbars and its
+  selection in light. The colors a theme states still do not follow it there.
 - The preference half of the `dark` and `light` conditions is anchored to the document root. The
   compiler replaces the nesting selector with a theme's own and the default theme has none, so the
   half compiled to a bare negation that matched every element: a page switched to a theme under an
