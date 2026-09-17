@@ -108,8 +108,14 @@ export function constant(name: string): boolean {
  * @remarks
  *   The descent goes as deep as the namespaces nest and the path gains a segment at each level.
  *   A namespace found here is not listed as one, because only a top-level namespace is a block.
+ *   An object the walk has entered already is not entered again, because a React context's
+ *   provider reaches itself through its context and the walk would otherwise never end.
  */
-function within(path: string, namespace: Readonly<Record<string, unknown>>): Walked {
+function within(
+  path: string,
+  namespace: Readonly<Record<string, unknown>>,
+  seen: WeakSet<object>,
+): Walked {
   const collected: Factory[] = [];
   const violations: string[] = [];
 
@@ -119,7 +125,10 @@ function within(path: string, namespace: Readonly<Record<string, unknown>>): Wal
     if (callable(value)) collected.push({ call: value, path: at });
     else if (constant(name)) continue;
     else if (record(value)) {
-      const nested = within(at, value);
+      if (seen.has(value)) continue;
+      seen.add(value);
+
+      const nested = within(at, value, seen);
 
       collected.push(...nested.factories);
       violations.push(...nested.violations);
@@ -142,6 +151,7 @@ export function walked(module: Readonly<Record<string, unknown>>, supplied: Argu
   const collected: Factory[] = [];
   const namespaces: string[] = [];
   const violations: string[] = [];
+  const seen = new WeakSet<object>();
 
   for (const [name, value] of Object.entries(module)) {
     if (callable(value)) {
@@ -150,7 +160,9 @@ export function walked(module: Readonly<Record<string, unknown>>, supplied: Argu
       }
     } else if (constant(name)) continue;
     else if (record(value)) {
-      const nested = within(name, value);
+      seen.add(value);
+
+      const nested = within(name, value, seen);
 
       namespaces.push(name);
       collected.push(...nested.factories);
