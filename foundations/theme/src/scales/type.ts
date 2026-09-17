@@ -14,7 +14,8 @@ type Sizes = NonNullable<Tokens["fontSizes"]>;
  *
  * @remarks
  *   The display sizes climb faster than the ratio would take them, because a heading three rungs
- *   above the body reads as emphasis rather than as a heading.
+ *   above the body reads as emphasis rather than as a heading. The top two steps carry a hero,
+ *   where the words are the page and a size the paragraph could reach is not loud enough.
  */
 const STEPS: ReadonlyArray<readonly [name: string, rungs: number]> = [
   ["2xs", -3],
@@ -29,6 +30,8 @@ const STEPS: ReadonlyArray<readonly [name: string, rungs: number]> = [
   ["5xl", 8],
   ["6xl", 10],
   ["7xl", 12],
+  ["8xl", 14],
+  ["9xl", 16],
 ];
 
 /**
@@ -50,7 +53,7 @@ const TIGHTEST = 1.1;
  */
 interface Step {
   /**
-   * The step's name, `2xs` to `7xl`.
+   * The step's name, `2xs` to `9xl`.
    */
   name: string;
 

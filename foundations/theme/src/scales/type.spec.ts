@@ -3,7 +3,22 @@ import { describe, expect, it } from "vitest";
 import { fontSizes, typography } from "#scales/type.ts";
 import { tokenAt } from "#tokens.fixtures.ts";
 
-const STEPS = ["2xs", "xs", "sm", "md", "lg", "xl", "2xl", "3xl", "4xl", "5xl", "6xl", "7xl"];
+const STEPS = [
+  "2xs",
+  "xs",
+  "sm",
+  "md",
+  "lg",
+  "xl",
+  "2xl",
+  "3xl",
+  "4xl",
+  "5xl",
+  "6xl",
+  "7xl",
+  "8xl",
+  "9xl",
+];
 
 function styleOf(name: string, property: string): string {
   return String(Reflect.get(tokenAt(typography(), name) ?? {}, property));

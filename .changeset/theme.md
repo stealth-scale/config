@@ -18,3 +18,17 @@ theme: keep no value's class on a slot for a compound
   it and the room around it grow together on the same names. The `label` role follows to `4xl`,
   growing slower than the control, the `heading` role gains `xs`, `3xl` and `4xl`, and the `body`
   role gains `xs` and `xl`.
+- The type scale gains `8xl` and `9xl`, and the heading role steps over two sizes above `2xl`: `3xl`
+  reads at the `6xl` size and `4xl` at the `8xl`. A document heading and a hero heading are
+  different things, and the size between them read as neither.
+- A control reads as pressed. `interactive` squeezes the box to 98 percent, held still for a reader
+  who asked for less motion. A fill presses to the palette's `emphasized`, a solid fill to the ink
+  it hovers to, and a plain one to the palette's solid. An outline fills in as it is hovered and
+  further as it is pressed, rather than changing its line, which is the change a hover already
+  makes.
+- An outline and a surface clip their background to the padding box, so a rounded corner is drawn as
+  one antialiased curve. A fill running under the line laid a second curve over the first, and the
+  corners read heavier than the edges they joined.
+- `controlSizes` leads with one step less inset where a mark opens the control, and `touchTarget`
+  draws its area before the control's content rather than after it, which leaves the other
+  pseudo-element to a look that draws one.

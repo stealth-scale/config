@@ -7,7 +7,8 @@
  *   sets a display face once changes every heading, and a label role is what a control's text
  *   reads, so a theme that tightens its controls restates eight styles rather than every recipe.
  *   The label grows slower than the control above `xl`, so a hero's words stay words while its
- *   box grows to a hero's.
+ *   box grows to a hero's. The heading role steps over two sizes above `2xl`, because a document
+ *   heading and a hero heading are different things and a size between them reads as neither.
  *   A role names its leading and tracking from the token scales rather than from the size table,
  *   because the leading of a heading is a decision and the leading of a size is a computation.
  */
@@ -121,8 +122,8 @@ export const textStyles: TextStyles = {
   },
   heading: {
     "2xl": heading("4xl", "bold"),
-    "3xl": heading("5xl", "bold"),
-    "4xl": heading("6xl", "bold"),
+    "3xl": heading("6xl", "bold"),
+    "4xl": heading("8xl", "bold"),
     lg: heading("2xl"),
     md: heading("xl"),
     sm: heading("lg"),

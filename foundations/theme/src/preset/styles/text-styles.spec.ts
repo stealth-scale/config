@@ -63,7 +63,7 @@ describe("textStyles", () => {
 
   it("offers a heading from xs to 4xl and a body from xs to xl", () => {
     expect(Object.keys(tokenAt(textStyles, "heading") ?? {})).toHaveLength(8);
-    expect(tokenAt(textStyles, "heading.4xl")).toMatchObject({ fontSize: "6xl" });
+    expect(tokenAt(textStyles, "heading.4xl")).toMatchObject({ fontSize: "8xl" });
     expect(Object.keys(tokenAt(textStyles, "body") ?? {})).toHaveLength(5);
   });
 
