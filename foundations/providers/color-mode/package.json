@@ -1,0 +1,77 @@
+{
+  "name": "@stealthscale/provider-color-mode",
+  "version": "0.0.0",
+  "description": "Puts a colour mode in scope, remembers what a person chose, and settles the first paint before the page draws.",
+  "keywords": [
+    "color-mode",
+    "dark-mode",
+    "react"
+  ],
+  "homepage": "https://github.com/stealth-scale/config/tree/main/foundations/providers/color-mode#readme",
+  "bugs": "https://github.com/stealth-scale/config/issues",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stealth-scale/config.git",
+    "directory": "foundations/providers/color-mode"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "imports": {
+    "#*": "./src/*"
+  },
+  "exports": {
+    ".": {
+      "stealth-source": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": "./dist/index.js",
+      "./package.json": "./package.json"
+    },
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vp pack",
+    "check": "vp check",
+    "prepublishOnly": "vp pack",
+    "test": "vp test"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/core": "catalog:",
+    "@rolldown/plugin-babel": "catalog:",
+    "@stealthscale/settings": "workspace:^",
+    "@stealthscale/theme": "workspace:^",
+    "@stealthscale/vite-config": "workspace:^",
+    "@stealthscale/vite-config-react": "workspace:^",
+    "@stealthscale/vite-config-typescript": "workspace:^",
+    "@testing-library/react": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "babel-plugin-react-compiler": "catalog:",
+    "happy-dom": "catalog:",
+    "oxc-transform-react": "catalog:",
+    "publint": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "@stealthscale/settings": "workspace:^",
+    "@stealthscale/theme": "workspace:^",
+    "react": "catalog:"
+  },
+  "engines": {
+    "node": ">=26.0.0"
+  }
+}
