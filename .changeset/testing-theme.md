@@ -17,3 +17,7 @@ testing-theme: add the theme testing kit
 - `slotElement` and `slotClasses` find a part by the `data-slot` a slot binding stamps as well as by
   the `data-part` an anatomy stamps, so a compound component with no machine behind it is read the
   same way.
+- `variantClass` and `slotVariantClass` write the separator `@stealthscale/theme/authoring`
+  publishes, so `variantClass("button", "size", "lg")` returns `button--size-lg`, and the kit holds
+  the separator and the theme attribute equal between the design-system package and the build
+  plugin.

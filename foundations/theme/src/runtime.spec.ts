@@ -4,7 +4,7 @@ import * as runtime from "#runtime.ts";
 
 describe("runtime", () => {
   it("publishes the function a style object is written with", () => {
-    expect(runtime.css({ color: "fg" })).toBe("c_fg");
+    expect(runtime.css({ color: "fg" })).toBe("c-fg");
   });
 
   it("publishes the function class names are joined with", () => {

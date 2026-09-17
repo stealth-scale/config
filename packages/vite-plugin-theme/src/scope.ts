@@ -5,7 +5,7 @@
  *   A theme's token values reach the page as custom properties, which a selector redefines. Its
  *   recipe extensions and its compositions reach the page as declarations inside a rule, which no
  *   selector can touch. Nesting each under `[data-theme=<name>] &` gives the compiler a second rule
- *   to emit: `[data-theme=abyss] .button--variant_solid` carries one attribute more than the rule
+ *   to emit: `[data-theme=abyss] .button--variant-solid` carries one attribute more than the rule
  *   it extends, so it wins while the attribute is set and matches nothing while it is not. Only the
  *   declarations a theme states are emitted, so the cost follows the theme rather than the size of
  *   the recipe layer.
@@ -185,7 +185,7 @@ function isStyles(value: unknown): value is Styles {
 }
 
 /**
- * Nests styles under a selector, inside each slot where a slot name sits above them.
+ * Nests styles under a selector, inside each slot where a slot name carries them.
  *
  * @remarks
  *   A slot recipe keys its styles by slot, so the selector goes inside each slot: one wrapping the

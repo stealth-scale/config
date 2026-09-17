@@ -37,6 +37,7 @@ describe("config", () => {
       expect(written).toContain('jsxFramework: "react",');
       expect(written).toContain("forceImportExtension: true,");
       expect(written).toContain("patterns: {},");
+      expect(written).toContain('separator: "-",');
     }
   });
 

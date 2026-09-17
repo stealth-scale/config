@@ -4,10 +4,13 @@
  *
  * @remarks
  *   The names follow the compiler's scheme. A recipe emits its class name for the base rules and
- *   `<class>--<axis>_<value>` for each variant, and a slot recipe emits `<class>__<slot>` for each
+ *   the class, two hyphens, the axis, the separator and the value for each variant, and a slot
+ *   recipe emits `<class>__<slot>` for each
  *   slot with the variant classes beside it. A unit test has no compiled stylesheet, so what a
  *   component owes its recipe is that the right class reaches the right element.
  */
+
+import { SEPARATOR } from "@stealthscale/theme/authoring";
 
 /**
  * Writes the class a recipe emits its base rules under, which is its class name unchanged.
@@ -24,7 +27,7 @@ export function variantClass(
   axis: string,
   value: boolean | number | string,
 ): string {
-  return `${className}--${axis}_${String(value)}`;
+  return `${className}--${axis}${SEPARATOR}${String(value)}`;
 }
 
 /**

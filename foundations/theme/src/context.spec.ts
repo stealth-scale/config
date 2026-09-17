@@ -32,7 +32,7 @@ describe("createRecipeContext", () => {
     const Button = createRecipeContext(button).withContext("button");
     const { container } = render(createElement(Button, null, "Go"));
 
-    expect(container.firstElementChild?.className).toBe("button button--variant_solid");
+    expect(container.firstElementChild?.className).toBe("button button--variant-solid");
   });
 
   it("stamps the recipe's name on the element it binds", () => {
@@ -46,7 +46,7 @@ describe("createRecipeContext", () => {
     const Button = createRecipeContext(button).withContext("button");
     const { container } = render(createElement(Button, { variant: "ghost" }, "Go"));
 
-    expect(container.firstElementChild?.className).toBe("button button--variant_ghost");
+    expect(container.firstElementChild?.className).toBe("button button--variant-ghost");
   });
 
   it("returns the three factories a compound component is built from", () => {
@@ -65,8 +65,8 @@ describe("createRecipeContext", () => {
       createElement(Content, { size: "lg" }, createElement(Title, null, "Hello")),
     );
 
-    expect(container.firstElementChild?.className).toBe("dialog__content dialog__content--size_lg");
-    expect(container.querySelector("h2")?.className).toBe("dialog__title dialog__title--size_lg");
+    expect(container.firstElementChild?.className).toBe("dialog__content dialog__content--size-lg");
+    expect(container.querySelector("h2")?.className).toBe("dialog__title dialog__title--size-lg");
   });
 
   it("binds a recipe with no variants and no defaults", () => {
@@ -88,9 +88,9 @@ describe("createRecipeContext", () => {
     const ghost = render(createElement(Button, { variant: "ghost" }, "Go"));
 
     expect(solid.container.firstElementChild?.className).toBe(
-      "button button--variant_solid button--compound__variant_solid",
+      "button button--variant-solid button--compound__variant-solid",
     );
-    expect(ghost.container.firstElementChild?.className).toBe("button button--variant_ghost");
+    expect(ghost.container.firstElementChild?.className).toBe("button button--variant-ghost");
   });
 
   it("binds a slot recipe with no variants and no defaults", () => {
@@ -111,7 +111,7 @@ describe("createRecipeContext", () => {
     }).withProvider("div", "root");
     const { container } = render(createElement(Root, { size: "lg" }, "Body"));
 
-    expect(container.firstElementChild?.className).toBe("card__root card__root--size_lg");
+    expect(container.firstElementChild?.className).toBe("card__root card__root--size-lg");
   });
 
   it("draws the class of a slot compound on the slot it styles and on no other", () => {
@@ -129,9 +129,9 @@ describe("createRecipeContext", () => {
       createElement(Root, { size: "lg" }, createElement(Title, null, "Hello")),
     );
 
-    expect(container.firstElementChild?.className).toBe("card__root card__root--size_lg");
+    expect(container.firstElementChild?.className).toBe("card__root card__root--size-lg");
     expect(container.querySelector("h2")?.className).toBe(
-      "card__title card__title--size_lg card__title--compound__size_lg",
+      "card__title card__title--size-lg card__title--compound__size-lg",
     );
   });
 });

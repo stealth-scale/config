@@ -55,6 +55,7 @@ export {
   defineStyles,
   type Recipe,
   type RecipeProps,
+  SEPARATOR,
   type SlotCompound,
   type SlotRecipe,
 } from "#authoring/recipe.ts";

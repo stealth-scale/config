@@ -1,8 +1,11 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
 
-import { type Application, type Theme } from "@stealthscale/theme/authoring";
+import { THEME_ATTRIBUTE } from "@stealthscale/theme";
+import { type Application, SEPARATOR, type Theme } from "@stealthscale/theme/authoring";
 import {
   type Theme as Loaded,
+  THEME_ATTRIBUTE as pluginAttribute,
+  SEPARATOR as pluginSeparator,
   type Application as Stated,
   type Switchable,
 } from "@stealthscale/vite-plugin-theme";
@@ -42,6 +45,8 @@ describe("testing-theme", () => {
 
   it("agrees with the build plugin on what a theme and an application are", () => {
     expect(published.THRESHOLDS.text).toBe(7);
+    expect(SEPARATOR).toBe(pluginSeparator);
+    expect(THEME_ATTRIBUTE).toBe(pluginAttribute);
 
     expectTypeOf<Theme>().toExtend<Switchable>();
     expectTypeOf<Theme>().toExtend<Loaded>();

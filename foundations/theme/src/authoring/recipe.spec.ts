@@ -32,17 +32,17 @@ describe("defineRecipe", () => {
 
   it("names a compound from the sorted axes it matches on", () => {
     expect(named({ size: "lg", variant: "solid" })).toBe(
-      "button--compound__size_lg__variant_solid",
+      "button--compound__size-lg__variant-solid",
     );
   });
 
   it("writes the values an axis may hold joined by a bar", () => {
-    expect(named({ variant: ["ghost", "solid"] })).toBe("button--compound__variant_ghost|solid");
+    expect(named({ variant: ["ghost", "solid"] })).toBe("button--compound__variant-ghost|solid");
   });
 
   it("writes a boolean and a number the way the compiler does", () => {
-    expect(named({ disabled: true })).toBe("button--compound__disabled_true");
-    expect(named({ level: 2 })).toBe("button--compound__level_2");
+    expect(named({ disabled: true })).toBe("button--compound__disabled-true");
+    expect(named({ level: 2 })).toBe("button--compound__level-2");
   });
 
   it("keeps the styles and the selection of a named compound", () => {
@@ -53,7 +53,7 @@ describe("defineRecipe", () => {
     });
 
     expect(recipe.compoundVariants).toStrictEqual([
-      { className: "button--compound__size_lg", css: { fontWeight: "bold" }, size: "lg" },
+      { className: "button--compound__size-lg", css: { fontWeight: "bold" }, size: "lg" },
     ]);
   });
 
@@ -75,12 +75,12 @@ describe("defineRecipe", () => {
 
     expect(recipe.compoundVariants).toStrictEqual([
       {
-        className: "card__root--compound__size_lg",
+        className: "card__root--compound__size-lg",
         css: { root: { fontWeight: "bold" } },
         size: "lg",
       },
       {
-        className: "card__title--compound__size_lg",
+        className: "card__title--compound__size-lg",
         css: { title: { letterSpacing: "wide" } },
         size: "lg",
       },

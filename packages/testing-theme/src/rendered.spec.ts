@@ -56,20 +56,20 @@ describe("rendered", () => {
 
   it("lists the classes the element carrying a recipe was given", () => {
     const container = drawn(
-      '<button data-recipe="button" class="button button--variant_solid"></button>',
+      '<button data-recipe="button" class="button button--variant-solid"></button>',
     );
 
-    expect(recipeClasses(container, "button")).toStrictEqual(["button", "button--variant_solid"]);
+    expect(recipeClasses(container, "button")).toStrictEqual(["button", "button--variant-solid"]);
   });
 
   it("lists the classes one slot was given", () => {
     const container = drawn(
-      '<div data-part="content" class="dialog__content dialog__content--size_lg"></div>',
+      '<div data-part="content" class="dialog__content dialog__content--size-lg"></div>',
     );
 
     expect(slotClasses(container, "content")).toStrictEqual([
       "dialog__content",
-      "dialog__content--size_lg",
+      "dialog__content--size-lg",
     ]);
   });
 });

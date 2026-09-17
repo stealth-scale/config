@@ -17,7 +17,7 @@ describe("violations", () => {
 
     expect(violations(theme, { recipes: { button } })).toStrictEqual([
       "contract.extensions: abyss extends buton, which no package publishes",
-      "contract.compounds: abyss extends button with a compound for size_lg, which the recipe does not declare",
+      "contract.compounds: abyss extends button with a compound for size-lg, which the recipe does not declare",
     ]);
   });
 

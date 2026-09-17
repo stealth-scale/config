@@ -58,6 +58,7 @@ const SURFACE = [
   "paletteRoles",
   "palettes",
   "PALETTES",
+  "SEPARATOR",
   "radii",
   "readable",
   "reel",

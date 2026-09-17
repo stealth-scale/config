@@ -36,14 +36,14 @@ names at run time:
 
 | Element  | Classes                                                             |
 | -------- | ------------------------------------------------------------------- |
-| `Root`   | `card__root card__root--size_md card__root--variant_elevated`       |
-| `Header` | `card__header card__header--size_md card__header--variant_elevated` |
-| `Footer` | `card__footer card__footer--size_md card__footer--variant_elevated` |
+| `Root`   | `card__root card__root--size-md card__root--variant-elevated`       |
+| `Header` | `card__header card__header--size-md card__header--variant-elevated` |
+| `Footer` | `card__footer card__footer--size-md card__footer--variant-elevated` |
 
-The scheme is the compiler's and is fixed: `block__element` for a slot and `block--axis_value` for a
-variant, the axis kept in the modifier so a size of `sm` and any other axis with an `sm` never share
-a class. A theme addresses one band at one size as `.card__header--size_lg`. The binding also stamps
-`data-slot` on each part, which is the handle the theme testing kit finds a part by.
+The scheme is `block__element` for a slot and `block--axis-value` for a variant, the axis kept in
+the modifier so a size of `sm` and any other axis with an `sm` never share a class. A theme
+addresses one band at one size as `.card__header--size-lg`. The binding also stamps `data-slot` on
+each part, which is the handle the theme testing kit finds a part by.
 
 ## The component
 

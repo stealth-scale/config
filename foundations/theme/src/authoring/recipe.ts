@@ -184,6 +184,16 @@ export type RecipeProps<Bound> =
       : never;
 
 /**
+ * Fixes the character the compiler writes between an axis and its value in a class name.
+ *
+ * @remarks
+ *   The build plugin configures the compiler with the same character, so a class the runtime
+ *   writes and a selector the stylesheet carries agree. A hyphen rather than the compiler's
+ *   default underscore, so `button--size-lg` reads as one modifier.
+ */
+export const SEPARATOR = "-";
+
+/**
  * Writes one value a compound matches on the way a class name carries it.
  *
  * @remarks
@@ -207,7 +217,8 @@ function written(axis: string, value: unknown): string {
  * @remarks
  *   The scheme is the compiler's own, so a theme's compound for the same selection, which the
  *   compiler names itself, is emitted under the same class: the axes sorted, each written as
- *   `axis_value` with a list joined by `|`, the pairs joined by `__`, after `--compound__`.
+ *   the axis, the separator and the value, with a list joined by `|`, the pairs joined by `__`,
+ *   after `--compound__`.
  * @param className - The class of the recipe, or of the slot for a slot recipe.
  * @param compound - The compound, read for every key but `css` and `className`.
  * @throws {@link Error} When the compound matches an axis on a value a class name cannot carry.
@@ -216,7 +227,7 @@ export function compoundClassName(className: string, compound: object): string {
   const pairs = Object.keys(compound)
     .filter((axis) => axis !== "className" && axis !== "css")
     .toSorted()
-    .map((axis) => `${axis}_${written(axis, Reflect.get(compound, axis))}`);
+    .map((axis) => `${axis}${SEPARATOR}${written(axis, Reflect.get(compound, axis))}`);
 
   return `${className}--compound__${pairs.join("__")}`;
 }
