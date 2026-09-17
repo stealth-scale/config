@@ -9,9 +9,19 @@
  *   and every extension share, and handed to the compiler as the preset it reads.
  */
 
-import { type Preset } from "#pandacss.ts";
+import { type Preset as Compiled } from "#pandacss.ts";
 
-export type { Preset } from "#pandacss.ts";
+/**
+ * Describes a preset as this package publishes one.
+ *
+ * @remarks
+ *   An interface of its own that adds nothing to the compiler's, so a package that publishes a
+ *   preset emits a declaration naming this package. A re-exported alias is erased by the
+ *   declaration bundler, which then wrote the compiler's whole preset type into the declaration of
+ *   every component package, `csstype` included, over eleven thousand lines for one default export.
+ */
+// eslint-disable-next-line typescript/no-empty-object-type -- the shape is the compiler's; the name is what a consumer's declaration refers to
+export interface Preset extends Compiled {}
 
 /**
  * Describes a recipe as a preset registers it: what `defineRecipe` and `defineSlotRecipe` return,

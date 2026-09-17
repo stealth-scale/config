@@ -30,13 +30,13 @@
   "exports": {
     ".": {
       "stealth-source": "./src/index.ts",
-      "default": "./dist/index.js"
+      "default": "./dist/index.mjs"
     },
     "./package.json": "./package.json"
   },
   "publishConfig": {
     "exports": {
-      ".": "./dist/index.js",
+      ".": "./dist/index.mjs",
       "./package.json": "./package.json"
     },
     "access": "public"
