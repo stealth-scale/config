@@ -85,11 +85,12 @@ export interface RecipeBinding<Variants extends RecipeVariantRecord> {
   usePropsContext: () => RecipeSelection<Variants> | undefined;
 
   /**
-   * Binds an element, which then takes the recipe's variants beside its own props.
+   * Binds an element, which then takes the recipe's variants beside its own props. A default prop
+   * may name a variant, for a component that fixes one of the recipe's values.
    */
   withContext: <Tag extends ElementType>(
     Component: Tag,
-    options?: JsxFactoryOptions<ComponentProps<Tag>>,
+    options?: JsxFactoryOptions<ComponentProps<Tag> & Partial<RecipeSelection<Variants>>>,
   ) => StyledComponent<Tag, RecipeSelection<Variants>>;
 }
 

@@ -49,6 +49,15 @@ describe("createRecipeContext", () => {
     expect(container.firstElementChild?.className).toBe("button button--ghost");
   });
 
+  it("draws the class of a variant a default prop names", () => {
+    const Ghost = createRecipeContext(button).withContext("button", {
+      defaultProps: { variant: "ghost" },
+    });
+    const { container } = render(createElement(Ghost, null, "Go"));
+
+    expect(container.firstElementChild?.className).toBe("button button--ghost");
+  });
+
   it("returns the three factories a compound component is built from", () => {
     const bound = createSlotRecipeContext(dialog);
 
