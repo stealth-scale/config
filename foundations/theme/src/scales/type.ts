@@ -3,6 +3,28 @@
  */
 
 import { type TextStyles, type Tokens } from "#pandacss.ts";
+import { type Scale } from "#scales/geometry.ts";
+
+/**
+ * Selects one of the roles a component's words are read at.
+ */
+export type TextRole = "body" | "code" | "display" | "heading" | "label";
+
+/**
+ * Lists the steps each role offers, which is what a component's `size` axis reads.
+ *
+ * @remarks
+ *   A role states the steps it has here and the styles it draws them in beside its own
+ *   definition, and a specification holds the two to each other. A component reads this list
+ *   rather than restating one, so a role that gains a step reaches every component that reads it.
+ */
+export const ROLE_SIZES = {
+  body: ["xs", "sm", "md", "lg", "xl"],
+  code: ["sm", "md"],
+  display: ["sm", "md", "lg"],
+  heading: ["xs", "sm", "md", "lg", "xl", "2xl", "3xl", "4xl"],
+  label: ["xs", "sm", "md", "lg", "xl", "2xl", "3xl", "4xl"],
+} as const satisfies Record<TextRole, readonly Scale[]>;
 
 /**
  * Describes the sizes a theme states.

@@ -36,10 +36,22 @@ const LAYER_STYLES: Readonly<Record<Look, string>> = {
 /**
  * Writes the `variant` axis for the looks given, each reading its layer style.
  *
+ * @typeParam Offered - The looks the recipe offers, which is every one unless it names them.
+ */
+export function lookVariants(): Record<Look, SystemStyleObject>;
+
+/**
+ * Writes the `variant` axis for the looks a recipe names.
+ *
  * @typeParam Offered - The looks the recipe offers.
  */
 export function lookVariants<const Offered extends Look>(
   looks: readonly Offered[],
-): Record<Offered, SystemStyleObject> {
+): Record<Offered, SystemStyleObject>;
+
+/**
+ * Writes one entry per look, each reading the layer style that draws it.
+ */
+export function lookVariants(looks: readonly Look[] = LOOKS): Record<string, SystemStyleObject> {
   return recordOf(looks, (look) => ({ layerStyle: LAYER_STYLES[look] }));
 }

@@ -32,3 +32,14 @@ theme: keep no value's class on a slot for a compound
 - `controlSizes` leads with one step less inset where a mark opens the control, and `touchTarget`
   draws its area before the control's content rather than after it, which leaves the other
   pseudo-element to a look that draws one.
+- The vocabulary a recipe writes its axes from is stated once: `SCALE`, `WIDTHS`, `RATIOS`,
+  `CORNERS`, `COUNTS`, `TONES`, `WEIGHTS`, `MOTIONS`, `LIFTED`, `ALIGNMENTS`, `DISTRIBUTIONS` and
+  `ROLE_SIZES`, with a helper that writes each axis from it: `gapSizes`, `alignVariants`,
+  `justifyVariants`, `columnCounts`, `spanCounts`, `fittedColumns`, `widthSizes`, `ratioVariants`,
+  `cornerVariants`, `textSizes`, `toneVariants`, `weightVariants`, `truncate`, `motionVariants` and
+  `liftVariants`. Each takes the whole scale where a recipe names no part of it, so no recipe writes
+  a scale out and a scale that gains a step needs no edit to a recipe. `onSlot` lifts an axis onto
+  one part of a slot recipe.
+- The per-slot pruning drops a class from a slot only where no value that styles the slot writes it.
+  A grid drawing three columns and an entry spanning three write the same class on their own slots,
+  and the root lost its columns to the entry's span.

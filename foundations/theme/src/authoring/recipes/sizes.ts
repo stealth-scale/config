@@ -1,11 +1,16 @@
 /**
  * Writes the `size` axis of a recipe from the semantic scales, so a theme that moves the scales
  * moves every control.
+ *
+ * @remarks
+ *   Each helper offers the whole scale where a recipe names no steps, so a component with a use
+ *   for every step states nothing and one with a use for three states three. No recipe writes the
+ *   scale out, and a scale that gains a step reaches every component that reads it.
  */
 
 import type { SystemStyleObject } from "#generated/types/system.d.mts";
 import { recordOf } from "#record.ts";
-import { type Scale } from "#scales/geometry.ts";
+import { SCALE, type Scale } from "#scales/geometry.ts";
 
 /**
  * The inset a control leads with where a mark opens it, one step below its own.
@@ -30,11 +35,22 @@ const LEADING: Readonly<Record<Scale, Scale>> = {
  *   than a word and the same inset on both sides reads as a gap before the mark. A control that
  *   holds a mark and nothing else states its own inset, which this one does not reach, because
  *   the two rules are equally specific and a recipe's compound is written after its variants.
- * @typeParam Offered - The sizes the recipe offers.
+ */
+export function controlSizes(): Record<Scale, SystemStyleObject>;
+
+/**
+ * Writes the `size` axis of a control for the steps it names.
+ *
+ * @typeParam Offered - The steps the recipe offers.
  */
 export function controlSizes<const Offered extends Scale>(
   sizes: readonly Offered[],
-): Record<Offered, SystemStyleObject> {
+): Record<Offered, SystemStyleObject>;
+
+/**
+ * Writes one entry per step, each reading the four scales under that step's name.
+ */
+export function controlSizes(sizes: readonly Scale[] = SCALE): Record<string, SystemStyleObject> {
   return recordOf(sizes, (size) => ({
     "&:has(> svg:first-child)": { paddingInlineStart: `inset.${LEADING[size]}` },
     gap: `gap.${size}`,
@@ -46,24 +62,44 @@ export function controlSizes<const Offered extends Scale>(
 
 /**
  * Writes the `size` axis of an icon: a square box on the icon scale.
+ */
+export function iconSizes(): Record<Scale, SystemStyleObject>;
+
+/**
+ * Writes the `size` axis of an icon for the steps it names.
  *
- * @typeParam Offered - The sizes the recipe offers.
+ * @typeParam Offered - The steps the recipe offers.
  */
 export function iconSizes<const Offered extends Scale>(
   sizes: readonly Offered[],
-): Record<Offered, SystemStyleObject> {
+): Record<Offered, SystemStyleObject>;
+
+/**
+ * Writes one entry per step, each a square box on the icon scale.
+ */
+export function iconSizes(sizes: readonly Scale[] = SCALE): Record<string, SystemStyleObject> {
   return recordOf(sizes, (size) => ({ boxSize: `icon.${size}` }));
 }
 
 /**
  * Writes the `size` axis of a square control that holds one icon and no label: a box on the
  * control scale with no inset.
+ */
+export function iconOnly(): Record<Scale, SystemStyleObject>;
+
+/**
+ * Writes the `size` axis of such a control for the steps it names.
  *
- * @typeParam Offered - The sizes the recipe offers.
+ * @typeParam Offered - The steps the recipe offers.
  */
 export function iconOnly<const Offered extends Scale>(
   sizes: readonly Offered[],
-): Record<Offered, SystemStyleObject> {
+): Record<Offered, SystemStyleObject>;
+
+/**
+ * Writes one entry per step, each a box on the control scale with no inset.
+ */
+export function iconOnly(sizes: readonly Scale[] = SCALE): Record<string, SystemStyleObject> {
   return recordOf(sizes, (size) => ({ boxSize: `control.${size}`, padding: "0" }));
 }
 

@@ -78,6 +78,29 @@ describe("createRecipeContext", () => {
     expect(container.querySelector("h2")?.className).toBe("dialog__title");
   });
 
+  it("keeps a class one value writes on a slot where another value of the same name does not", () => {
+    const grid = defineSlotRecipe({
+      className: "grid",
+      defaultVariants: { columns: "1" },
+      slots: ["root", "item"],
+      variants: {
+        columns: { "1": { root: { gridTemplateColumns: "1fr" } } },
+        span: { "1": { item: { gridColumn: "span 1" } } },
+      },
+    });
+    const { withContext, withProvider } = createSlotRecipeContext(grid);
+    const Root = withProvider("div", "root");
+    const Item = withContext("div", "item");
+    const { container } = render(
+      createElement(Root, { span: "1" }, createElement(Item, null, "One")),
+    );
+
+    expect(container.firstElementChild?.className).toBe("grid__root grid__root--1");
+    expect(container.firstElementChild?.firstElementChild?.className).toBe(
+      "grid__item grid__item--1",
+    );
+  });
+
   it("stamps the recipe's name on the part that provides the variants", () => {
     const { withContext, withProvider } = createSlotRecipeContext(dialog);
     const Content = withProvider("section", "content");

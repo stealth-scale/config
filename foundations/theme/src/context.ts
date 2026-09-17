@@ -275,7 +275,10 @@ function styledSlots<Slots extends string, Variants extends SlotRecipeVariantRec
  *   The runtime hands every slot the whole variant map, so a slot carried a class for every value
  *   the caller picked whether or not the value styled it, which was fifteen dead classes on one
  *   card. A value styles a slot through the styles it names for that slot, and the class of any
- *   other value is dropped from that slot. A compound keeps no value's class, because the compiler
+ *   other value is dropped from that slot. A class another value on the same slot writes is kept,
+ *   because a class carries the value and not the axis: a grid drawing three columns and an entry
+ *   spanning three write the same class on their own slots, and dropping it from the root for the
+ *   span would drop the columns with it. A compound keeps no value's class, because the compiler
  *   emits a compound's styles under the compound's own class, which the runtime writes on the
  *   slot where the selection matches. The classes are derived here as the runtime writes them,
  *   through the naming scheme.
@@ -295,20 +298,20 @@ function pruned<Slots extends string, Variants extends SlotRecipeVariantRecord<S
   const pruning = (props?: RecipeSelection<Variants>): SlotRecord<Slots, string> => {
     const selection: Readonly<Record<string, unknown>> = runtime.getVariantProps(props);
     const kept = Object.entries(runtime(props)).map(([slot, written]) => {
-      const dead = new Set(
-        Object.entries(selection)
-          .filter(([axis, value]) => {
-            const slots = styled.get(keyOf(axis, value));
+      const alive = new Set<string>();
+      const unstyled = new Set<string>();
 
-            return slots === undefined || !slots.has(slot);
-          })
-          .map(([axis, value]) =>
-            atomicClass(
-              variantClass(`${recipe.className}__${slot}`, axis, String(value)),
-              SEPARATOR,
-            ),
-          ),
-      );
+      for (const [axis, value] of Object.entries(selection)) {
+        const name = atomicClass(
+          variantClass(`${recipe.className}__${slot}`, axis, String(value)),
+          SEPARATOR,
+        );
+
+        if (styled.get(keyOf(axis, value))?.has(slot) === true) alive.add(name);
+        else unstyled.add(name);
+      }
+
+      const dead = new Set([...unstyled].filter((each) => !alive.has(each)));
 
       return [
         slot,

@@ -16,6 +16,76 @@ import { type SemanticTokens } from "#pandacss.ts";
 export type Scale = "2xl" | "3xl" | "4xl" | "lg" | "md" | "sm" | "xl" | "xs";
 
 /**
+ * Lists the eight steps in the order they grow, which is the order a recipe offers them in and a
+ * README reads them in.
+ */
+export const SCALE: readonly Scale[] = ["xs", "sm", "md", "lg", "xl", "2xl", "3xl", "4xl"];
+
+/**
+ * Selects one of the twelve measures a page and its columns are read at.
+ */
+export type Width =
+  | "2xl"
+  | "3xl"
+  | "4xl"
+  | "5xl"
+  | "6xl"
+  | "7xl"
+  | "8xl"
+  | "lg"
+  | "md"
+  | "sm"
+  | "xl"
+  | "xs";
+
+/**
+ * Selects one of the shapes a box that holds a picture is drawn in.
+ */
+export type Ratio = "golden" | "landscape" | "portrait" | "square" | "ultrawide" | "video" | "wide";
+
+/**
+ * Lists the shapes, from the squarest to the widest.
+ */
+export const RATIOS: readonly Ratio[] = [
+  "square",
+  "landscape",
+  "portrait",
+  "golden",
+  "video",
+  "wide",
+  "ultrawide",
+];
+
+/**
+ * Selects one of the corners a box is drawn with: the three a theme draws from one value, and the
+ * one that rounds a box to its own edge.
+ */
+export type Corner = "full" | "l1" | "l2" | "l3";
+
+/**
+ * Lists the corners, from the tightest to the fully round.
+ */
+export const CORNERS: readonly Corner[] = ["l1", "l2", "l3", "full"];
+
+/**
+ * Lists the measures in the order they grow.
+ */
+export const WIDTHS: readonly Width[] = [
+  "xs",
+  "sm",
+  "md",
+  "lg",
+  "xl",
+  "2xl",
+  "3xl",
+  "4xl",
+  "5xl",
+  "6xl",
+  "7xl",
+  "8xl",
+];
+
+/**
  * Describes one scale of eight, as the compiler reads it.
  */
 type Steps = Record<Scale, Record<"value", string>>;
