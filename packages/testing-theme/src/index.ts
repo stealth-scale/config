@@ -7,6 +7,7 @@
  * @packageDocumentation
  */
 
+export { type BoundChecks, boundViolations, type Draw } from "#bound.ts";
 export { compoundClass, recipeClass, slotClass, slotVariantClass, variantClass } from "#classes.ts";
 export { THRESHOLDS, type Thresholds } from "#contrast.ts";
 export { type PresetCheck, type PresetChecks, presetViolations } from "#preset-checks.ts";

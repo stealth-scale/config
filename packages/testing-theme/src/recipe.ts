@@ -34,6 +34,11 @@ export interface Declared {
   defaultVariants?: unknown;
 
   /**
+   * The tags the compiler extracts the variants from, as names or patterns.
+   */
+  jsx?: ReadonlyArray<RegExp | string> | undefined;
+
+  /**
    * The parts the recipe styles, absent for a recipe that draws one element.
    */
   slots?: readonly string[] | undefined;

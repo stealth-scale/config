@@ -1,0 +1,245 @@
+import { describe, expect, it } from "vitest";
+
+import { defineRecipe, defineSlotRecipe } from "@stealthscale/theme/authoring";
+
+import { boundViolations, type Draw } from "#bound.ts";
+import { compoundClass, slotClass, slotVariantClass, variantClass } from "#classes.ts";
+
+type Props = Readonly<Record<string, boolean | string | undefined>>;
+
+const INK = { color: "fg" };
+
+const button = defineRecipe({
+  base: INK,
+  className: "button",
+  compoundVariants: [{ css: { fontWeight: "bold" }, name: "hero", size: "lg", variant: "solid" }],
+  defaultVariants: { size: "md", variant: "solid" },
+  variants: {
+    loading: { true: { layerStyle: "disabled" } },
+    size: { lg: { height: "control.lg" }, md: { height: "control.md" } },
+    variant: { ghost: { layerStyle: "fill.ghost" }, solid: { layerStyle: "fill.solid" } },
+  },
+});
+
+const card = defineSlotRecipe({
+  base: { root: { display: "flex" }, title: { textStyle: "heading.md" } },
+  className: "card",
+  compoundVariants: [{ css: { root: { gap: "gap.xl" } }, name: "hero", size: "lg" }],
+  defaultVariants: { size: "md" },
+  slots: ["root", "title"],
+  variants: {
+    size: {
+      lg: { root: { gap: "gap.lg" }, title: { textStyle: "heading.lg" } },
+      md: { root: { gap: "gap.md" } },
+    },
+    tone: { muted: { title: { color: "fg.muted" } } },
+  },
+});
+
+/**
+ * Returns the classes the runtime writes on the button for the props given.
+ */
+function buttonClasses(props: Props): string[] {
+  const size = String(props["size"] ?? "md");
+  const variant = String(props["variant"] ?? "solid");
+  const classes = [
+    "button",
+    variantClass("button", "size", size),
+    variantClass("button", "variant", variant),
+  ];
+
+  if (props["loading"] === true) classes.push(variantClass("button", "loading", true));
+  if (size === "lg" && variant === "solid") classes.push(compoundClass("button", "hero"));
+
+  return classes;
+}
+
+/**
+ * Renders an element with the classes given and `data-recipe` set to the recipe.
+ */
+function marked(classes: readonly string[], recipe = "button"): ParentNode {
+  const container = document.createElement("div");
+  const element = document.createElement("span");
+
+  element.dataset["recipe"] = recipe;
+  element.className = classes.join(" ");
+  container.append(element);
+
+  return container;
+}
+
+/**
+ * Renders a card root holding a title with the classes given.
+ */
+function titled(classes: readonly string[]): ParentNode {
+  const container = document.createElement("div");
+  const root = document.createElement("div");
+  const title = document.createElement("h2");
+
+  root.dataset["recipe"] = "card";
+  root.className = slotClass("card", "root");
+  title.className = classes.join(" ");
+  root.append(title);
+  container.append(root);
+
+  return container;
+}
+
+const correct: Draw<Props> = (props) => marked(buttonClasses(props));
+
+describe("boundViolations", () => {
+  it("returns an empty array when the element has every class the recipe writes", () => {
+    expect(boundViolations(button, correct)).toStrictEqual([]);
+  });
+
+  it("reports a class the element lacks when its value is picked", () => {
+    const deaf: Draw<Props> = (props) => marked(buttonClasses({ ...props, variant: undefined }));
+
+    expect(boundViolations(button, deaf)).toStrictEqual([
+      "button lacks button--ghost when variant is ghost",
+      "button has button--solid when variant is ghost, which the recipe does not write",
+    ]);
+  });
+
+  it("reports a class the element has that the recipe does not write", () => {
+    const loud: Draw<Props> = (props) => marked([...buttonClasses(props), "button--xl"]);
+
+    expect(boundViolations(button, loud)).toHaveLength(6);
+    expect(boundViolations(button, loud)[0]).toBe(
+      "button has button--xl when nothing is picked, which the recipe does not write",
+    );
+  });
+
+  it("expects the compound class when the selection matches", () => {
+    const plain: Draw<Props> = (props) =>
+      marked(buttonClasses(props).filter((each) => each !== compoundClass("button", "hero")));
+
+    expect(boundViolations(button, plain)).toStrictEqual([
+      "button lacks button--hero when size is lg",
+    ]);
+  });
+
+  it("reads the element the subject returns", () => {
+    const unmarked: Draw<Props> = (props) => marked(buttonClasses(props), "other");
+
+    expect(
+      boundViolations(button, unmarked, {
+        subject: (container) => container.querySelector(".button") ?? document.body,
+      }),
+    ).toStrictEqual([]);
+  });
+
+  it("expects a value's class on a part only when the value styles the slot", () => {
+    const title: Draw<Props> = (props) => {
+      const classes = [slotClass("card", "title")];
+
+      if (props["size"] === "lg") classes.push(slotVariantClass("card", "title", "size", "lg"));
+      if (props["tone"] === "muted")
+        classes.push(slotVariantClass("card", "title", "tone", "muted"));
+
+      return titled(classes);
+    };
+
+    expect(boundViolations(card, title, { slot: "title" })).toStrictEqual([]);
+  });
+
+  it("reports a value's class on a part when the value does not style the slot", () => {
+    const title: Draw<Props> = (props) =>
+      titled([
+        slotClass("card", "title"),
+        slotVariantClass("card", "title", "size", String(props["size"] ?? "md")),
+      ]);
+
+    expect(boundViolations(card, title, { slot: "title" })).toStrictEqual([
+      "card__title has card__title--md when nothing is picked, which the recipe does not write",
+      "card__title has card__title--md when size is md, which the recipe does not write",
+      "card__title lacks card__title--muted when tone is muted",
+      "card__title has card__title--md when tone is muted, which the recipe does not write",
+    ]);
+  });
+
+  it("expects a compound's class on the part its styles reach", () => {
+    const root: Draw<Props> = (props) => {
+      const size = String(props["size"] ?? "md");
+      const classes = [slotClass("card", "root"), slotVariantClass("card", "root", "size", size)];
+
+      if (size === "lg") classes.push(compoundClass(slotClass("card", "root"), "hero"));
+
+      return marked(classes, "card");
+    };
+
+    expect(boundViolations(card, root, { slot: "root" })).toStrictEqual([]);
+  });
+
+  it("expects no class for a compound that is not an object or has no class name", () => {
+    const raw = {
+      base: INK,
+      className: "raw",
+      compoundVariants: [null, { css: { fontWeight: "bold" }, size: "lg" }],
+      variants: { size: { lg: { height: "control.lg" } } },
+    };
+    const drawn: Draw<Props> = (props) =>
+      marked(props["size"] === "lg" ? ["raw", "raw--lg"] : ["raw"], "raw");
+
+    expect(boundViolations(raw, drawn)).toStrictEqual([]);
+  });
+
+  it("passes a boolean axis's false value as false", () => {
+    const flag = {
+      base: INK,
+      className: "flag",
+      variants: { open: { false: { display: "none" }, true: { display: "block" } } },
+    };
+    const seen: unknown[] = [];
+    const drawn: Draw<Props> = (props) => {
+      seen.push(props["open"]);
+
+      return marked(props["open"] === true ? ["flag", "flag--open"] : ["flag"], "flag");
+    };
+
+    expect(boundViolations(flag, drawn)).toStrictEqual([]);
+    expect(seen).toStrictEqual([undefined, false, true]);
+  });
+
+  it("matches a compound that lists several values on one axis", () => {
+    const wide = {
+      base: INK,
+      className: "wide",
+      compoundVariants: [
+        { className: "wide--broad", css: { fontWeight: "bold" }, size: ["lg", "md"] },
+      ],
+      variants: {
+        size: {
+          lg: { height: "control.lg" },
+          md: { height: "control.md" },
+          sm: { height: "control.sm" },
+        },
+      },
+    };
+    const drawn: Draw<Props> = (props) => {
+      const size = props["size"];
+      const classes = ["wide"];
+
+      if (typeof size === "string") classes.push(variantClass("wide", "size", size));
+      if (size === "lg" || size === "md") classes.push("wide--broad");
+
+      return marked(classes, "wide");
+    };
+
+    expect(boundViolations(wide, drawn)).toStrictEqual([]);
+  });
+
+  it("renders once when the recipe offers no axis", () => {
+    const bare = { base: INK, className: "bare" };
+    const drawn: Draw<Props> = () => marked(["bare"], "bare");
+
+    expect(boundViolations(bare, drawn)).toStrictEqual([]);
+  });
+
+  it("skips an axis whose values are not an object", () => {
+    const odd = { base: INK, className: "odd", variants: { size: "odd" } };
+    const drawn: Draw<Props> = () => marked(["odd"], "odd");
+
+    expect(boundViolations(odd, drawn)).toStrictEqual([]);
+  });
+});

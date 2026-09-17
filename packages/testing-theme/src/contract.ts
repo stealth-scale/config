@@ -1,8 +1,8 @@
 /**
  * Checks a theme against the contract a type cannot hold it to: a role stated in one mode, a
- * reference that points nowhere, an extension aimed at a recipe nobody publishes, a compound the
- * runtime never applies, an extension file the theme does not list, and a style with nothing in
- * it.
+ * reference that points nowhere, an extension aimed at a recipe nobody publishes, a variant value
+ * or a part the runtime never writes a class for, a compound the runtime never applies, an
+ * extension file the theme does not list, and a style with nothing in it.
  */
 
 import { existsSync } from "node:fs";
@@ -132,24 +132,106 @@ export function extensions(theme: Theme, recipes?: readonly string[]): readonly 
 }
 
 /**
- * Writes a compound's selection in the compiler's scheme, or undefined for an entry that is not an
- * object and for one matched on a value a class name cannot carry.
+ * Reports whether a style object states anything.
  */
-function selectionOf(compound: unknown): string | undefined {
-  return typeof compound === "object" && compound !== null
-    ? compoundSelection(compound)
-    : undefined;
+function states(held: unknown): boolean {
+  return typeof held === "object" && held !== null && Object.keys(held).length > 0;
 }
 
 /**
- * Reports a theme's compound for a selection the recipe declares no compound for, and a compound
- * matched on a value a class name cannot carry.
+ * Lists the parts a slot recipe's value or compound states styles on.
+ */
+function partsStyled(slotted: unknown): readonly string[] {
+  return typeof slotted === "object" && slotted !== null
+    ? Object.entries(slotted)
+        .filter(([, held]) => states(held))
+        .map(([slot]) => slot)
+    : [];
+}
+
+/**
+ * Lists the parts an extension's value or compound styles that the recipe's own does not, for a
+ * slot recipe, and nothing for a recipe that draws one element.
+ */
+function unstyledParts(recipe: Declared, own: unknown, extended: unknown): readonly string[] {
+  if (recipe.slots === undefined) return [];
+
+  const styledOwn = partsStyled(own);
+
+  return partsStyled(extended).filter((slot) => !styledOwn.includes(slot));
+}
+
+/**
+ * Lists each axis an extension's variants name against the values it states under it.
+ */
+function variantsOf(
+  extension: object,
+): ReadonlyArray<readonly [axis: string, values: Readonly<Record<string, unknown>>]> {
+  const held: unknown = Reflect.get(extension, "variants");
+
+  if (typeof held !== "object" || held === null) return [];
+
+  return Object.entries(held).flatMap(([axis, values]) =>
+    typeof values === "object" && values !== null
+      ? // eslint-disable-next-line typescript/no-unsafe-type-assertion -- an object is read by its keys, whatever they hold
+        [[axis, values as Readonly<Record<string, unknown>>] as const]
+      : [],
+  );
+}
+
+/**
+ * Reports a theme's variant styles the runtime never writes a class for: an axis the recipe does
+ * not offer, a value the axis does not offer, and a part the recipe's own value does not style.
+ *
+ * @remarks
+ *   The runtime writes a variant class from the component's recipe alone, and writes a part's
+ *   variant class only where the recipe styles that part under the value. A theme's styles for
+ *   any other axis, value or part compile to a rule no element carries the class for. A key the
+ *   map leaves out goes unchecked here, and the extensions check reports it.
+ */
+export function variants(
+  theme: Theme,
+  recipes: Readonly<Record<string, Declared>>,
+): readonly string[] {
+  const extend = theme.preset.theme?.extend;
+  const named = Object.entries({ ...extend?.recipes, ...extend?.slotRecipes });
+
+  return named.flatMap(([key, extension]) => {
+    const recipe = recipes[key];
+
+    if (recipe === undefined) return [];
+
+    return variantsOf(extension).flatMap(([axis, values]) => {
+      const offered: unknown = recipe.variants?.[axis];
+
+      if (typeof offered !== "object" || offered === null) {
+        return [`${theme.name} extends ${key} on ${axis}, which the recipe does not offer`];
+      }
+
+      return Object.entries(values).flatMap(([value, extended]) => {
+        if (!(value in offered)) {
+          return [`${theme.name} extends ${key} ${axis} ${value}, which the axis does not offer`];
+        }
+
+        return unstyledParts(recipe, Reflect.get(offered, value), extended).map(
+          (slot) =>
+            `${theme.name} extends ${key} ${axis} ${value} on ${slot}, which the recipe's value does not style`,
+        );
+      });
+    });
+  });
+}
+
+/**
+ * Reports a theme's compound for a selection the recipe declares no compound for, a compound
+ * matched on a value a class name cannot carry, and a compound styling a part the recipe's own
+ * compound does not.
  *
  * @remarks
  *   The runtime takes a compound's class from the component's recipe alone, so a theme's compound
- *   reaches an element only where the recipe declares the same selection. Any other compound is
- *   compiled and never applied. A key the map leaves out goes unchecked here, and the extensions
- *   check reports it.
+ *   reaches an element only where the recipe declares the same selection, and reaches a part only
+ *   where the recipe's compound styles that part. Any other compound is compiled and never
+ *   applied. A key the map leaves out goes unchecked here, and the extensions check reports it.
  */
 export function compounds(
   theme: Theme,
@@ -163,14 +245,16 @@ export function compounds(
 
     if (recipe === undefined) return [];
 
-    const declared = new Set(
-      (recipe.compoundVariants ?? []).map((compound) => selectionOf(compound)),
+    const declared = new Map(
+      (recipe.compoundVariants ?? [])
+        .filter((compound): compound is object => typeof compound === "object" && compound !== null)
+        .map((compound) => [compoundSelection(compound), compound] as const),
     );
 
     return (extension.compoundVariants ?? []).flatMap((compound) => {
       if (typeof compound !== "object" || compound === null) return [];
 
-      const selection = selectionOf(compound);
+      const selection = compoundSelection(compound);
 
       if (selection === undefined) {
         return [
@@ -178,11 +262,18 @@ export function compounds(
         ];
       }
 
-      return declared.has(selection)
-        ? []
-        : [
-            `${theme.name} extends ${key} with a compound for ${selection}, which the recipe does not declare`,
-          ];
+      const own = declared.get(selection);
+
+      if (own === undefined) {
+        return [
+          `${theme.name} extends ${key} with a compound for ${selection}, which the recipe does not declare`,
+        ];
+      }
+
+      return unstyledParts(recipe, Reflect.get(own, "css"), Reflect.get(compound, "css")).map(
+        (slot) =>
+          `${theme.name} extends ${key} with a compound for ${selection} on ${slot}, which the recipe's compound does not style`,
+      );
     });
   });
 }

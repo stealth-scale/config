@@ -1,10 +1,19 @@
 import { describe, expect, it } from "vitest";
 
 import { withScratchWorkspace } from "@stealthscale/testing";
-import { defineRecipe, defineTheme } from "@stealthscale/theme/authoring";
+import { defineRecipe, defineSlotRecipe, defineTheme } from "@stealthscale/theme/authoring";
 import foundation from "@stealthscale/theme/theme";
 
-import { compounds, extensions, listed, modes, references, roles, styles } from "#contract.ts";
+import {
+  compounds,
+  extensions,
+  listed,
+  modes,
+  references,
+  roles,
+  styles,
+  variants,
+} from "#contract.ts";
 import { foundationTheme, paletteTheme } from "#theme.fixtures.ts";
 
 const EXTENSION = "export const extension = { base: {} };\n";
@@ -13,6 +22,19 @@ const button = defineRecipe({
   className: "button",
   compoundVariants: [{ css: {}, size: "lg", variant: "solid" }],
   variants: { size: { lg: {}, sm: {} }, variant: { ghost: {}, solid: {} } },
+});
+
+const card = defineSlotRecipe({
+  base: { root: { display: "flex" } },
+  className: "card",
+  compoundVariants: [{ css: { root: { gap: "gap.lg" } }, name: "hero", size: "lg" }],
+  slots: ["root", "title", "footer"],
+  variants: {
+    size: {
+      lg: { root: { gap: "gap.lg" }, title: { textStyle: "heading.lg" } },
+      md: { root: { gap: "gap.md" } },
+    },
+  },
 });
 
 describe("contract", () => {
@@ -174,6 +196,93 @@ describe("contract", () => {
     expect(compounds(theme, { button: recipe })).toStrictEqual([
       "abyss extends button with a compound for size_lg, which the recipe does not declare",
     ]);
+  });
+
+  it("passes an extension on a value the recipe offers and a part its value styles", () => {
+    const theme = defineTheme({
+      extends: foundationTheme(),
+      name: "abyss",
+      recipes: { button: { variants: { size: { lg: { letterSpacing: "wide" } } } } },
+      slotRecipes: { card: { variants: { size: { lg: { title: { letterSpacing: "wide" } } } } } },
+    });
+
+    expect(variants(theme, { button, card })).toStrictEqual([]);
+  });
+
+  it("reports an extension on an axis the recipe does not offer", () => {
+    const theme = defineTheme({
+      extends: foundationTheme(),
+      name: "abyss",
+      recipes: { button: { variants: { tone: { loud: { letterSpacing: "wide" } } } } },
+    });
+
+    expect(variants(theme, { button })).toStrictEqual([
+      "abyss extends button on tone, which the recipe does not offer",
+    ]);
+  });
+
+  it("reports an extension on a value the axis does not offer", () => {
+    const theme = defineTheme({
+      extends: foundationTheme(),
+      name: "abyss",
+      recipes: { button: { variants: { size: { xl: { letterSpacing: "wide" } } } } },
+    });
+
+    expect(variants(theme, { button })).toStrictEqual([
+      "abyss extends button size xl, which the axis does not offer",
+    ]);
+  });
+
+  it("reports an extension on a part the recipe's value does not style", () => {
+    const theme = defineTheme({
+      extends: foundationTheme(),
+      name: "abyss",
+      slotRecipes: { card: { variants: { size: { md: { title: { letterSpacing: "wide" } } } } } },
+    });
+
+    expect(variants(theme, { card })).toStrictEqual([
+      "abyss extends card size md on title, which the recipe's value does not style",
+    ]);
+  });
+
+  it("passes over an extension whose variants are not an object and a key the map lacks", () => {
+    const theme = defineTheme({
+      extends: foundationTheme(),
+      name: "abyss",
+      recipes: { button: { base: {} }, input: { base: {} } },
+    });
+    const extend = theme.preset.theme?.extend?.recipes?.["button"];
+
+    Object.assign(extend ?? {}, { variants: { size: "odd" } });
+
+    expect(variants(theme, { button })).toStrictEqual([]);
+  });
+
+  it("reports a compound styling a part the recipe's compound does not", () => {
+    const theme = defineTheme({
+      extends: foundationTheme(),
+      name: "abyss",
+      slotRecipes: {
+        card: { compoundVariants: [{ css: { footer: { gap: "gap.lg" } }, size: "lg" }] },
+      },
+    });
+
+    expect(compounds(theme, { card })).toStrictEqual([
+      "abyss extends card with a compound for size_lg on footer, which the recipe's compound does not style",
+    ]);
+  });
+
+  it("passes over a compound without css on a slot recipe", () => {
+    const theme = defineTheme({
+      extends: foundationTheme(),
+      name: "abyss",
+      slotRecipes: { card: { base: {} } },
+    });
+    const extend = theme.preset.theme?.extend?.slotRecipes?.["card"];
+
+    Object.assign(extend ?? {}, { compoundVariants: [{ size: "lg" }] });
+
+    expect(compounds(theme, { card })).toStrictEqual([]);
   });
 
   it("reports an extension file the theme does not list", () => {
