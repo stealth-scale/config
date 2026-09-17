@@ -9,7 +9,19 @@
 
 import { definePreset } from "@stealthscale/theme/authoring";
 
+import { recipe as container } from "#container/recipe.ts";
+import { recipe as divider } from "#divider/recipe.ts";
+import { recipe as frame } from "#frame/recipe.ts";
+import { recipe as grid } from "#grid/recipe.ts";
+import { recipe as spacer } from "#spacer/recipe.ts";
+import { recipe as stack } from "#stack/recipe.ts";
+
 export default definePreset({
   name: "@stealthscale/component-layout",
-  theme: { extend: { recipes: {} } },
+  theme: {
+    extend: {
+      recipes: { container, divider, frame, spacer, stack },
+      slotRecipes: { grid },
+    },
+  },
 });
