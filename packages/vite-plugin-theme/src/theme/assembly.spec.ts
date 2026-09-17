@@ -222,7 +222,7 @@ describe("assemble", () => {
     ).toBe("0.2em");
   });
 
-  it("compiles the compound a page selects and leaves an unselected one out", async () => {
+  it("compiles the compound a page selects alone", async () => {
     const files = {
       ...APP,
       "src/button.tsx": "export const Button = (props: object) => <button {...props} />;\n",

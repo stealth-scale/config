@@ -16,7 +16,7 @@ describe("responsive", () => {
     expect(responsive({ base: 1, md: 3 }, doubled)).toStrictEqual({ base: "2", md: "6" });
   });
 
-  it("transforms every entry of an array and keeps a null", () => {
+  it("transforms every entry of an array but a null", () => {
     expect(responsive([1, null, 3], doubled)).toStrictEqual(["2", null, "6"]);
   });
 

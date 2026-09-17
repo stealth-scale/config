@@ -87,7 +87,7 @@ describe("presetViolations", () => {
     ).toStrictEqual(["@acme/actions has no source directory at /nowhere"]);
   });
 
-  it("leaves out a skipped check and reports a skip without a reason", () => {
+  it("reports a skip without a reason rather than the check it left out", () => {
     const preset = definePreset({
       name: "@acme/actions",
       theme: { extend: { recipes: { btn: { className: "button" } } } },

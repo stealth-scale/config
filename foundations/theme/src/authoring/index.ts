@@ -1,14 +1,13 @@
 /**
  * Publishes the vocabulary a recipe, a theme and an application are written in, and nothing that
- * runs in a browser.
+ * runs in a browser. Every name here is read at build time. It is separate from the package's own
+ * entry because that entry re-exports the generated runtime, and the compiler's configuration
+ * reaches this package through whatever a theme imports: a theme importing the entry would put
+ * every generated file behind the configuration, and regenerating them would read as the
+ * configuration changing. The two attributes are published here as well as on the entry, so a
+ * package that does not render, such as the testing kit, reads them without loading the provider
+ * and its React transform.
  *
- * @remarks
- *   Every name here is read at build time. Separate from the package's own entry because that
- *   entry re-exports the generated runtime, and the compiler's configuration reaches this package
- *   through whatever a theme imports. A theme importing the entry would put every generated file
- *   behind the configuration, and regenerating them would read as the configuration changing. The
- *   two attributes are published here as well as on the entry, so a package that does not render,
- *   such as the testing kit, reads them without loading the provider and its React transform.
  * @packageDocumentation
  */
 

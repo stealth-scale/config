@@ -1,12 +1,9 @@
 /**
- * Holds a theme, a recipe and a preset to the theme contract, and reads what a recipe declares
- * and what a rendered component drew.
+ * Holds a theme, a recipe and a preset to the theme contract, and reads what a recipe declares and
+ * what a rendered component drew. Each gate returns violations rather than a verdict, so one
+ * assertion reports which role, pair or file broke the contract. No reader reads a computed style,
+ * because a unit test has no compiled stylesheet.
  *
- * @remarks
- *   Each gate returns violations rather than a verdict, so one assertion reports which role, pair
- *   or file broke the contract. The readers answer the narrower questions a specification about
- *   one recipe or one rendered component asks, and none of them reads a computed style, because a
- *   unit test has no compiled stylesheet.
  * @packageDocumentation
  */
 

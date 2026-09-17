@@ -179,7 +179,7 @@ describe("scope", () => {
     ]);
   });
 
-  it("nests every leaf of a nested composition and keeps the tree", () => {
+  it("nests every leaf of a nested composition inside the tree it found them in", () => {
     const scoped = scopedPreset(
       theme("abyss", {
         layerStyles: {
@@ -207,7 +207,7 @@ describe("scope", () => {
     ]);
   });
 
-  it("nests an animation style and leaves a value that is not a style object as it is", () => {
+  it("nests an animation style but not a value that is no style object", () => {
     const scoped = scopedPreset(
       theme("abyss", {
         animationStyles: { fade: { value: { animationName: "fade-in" } }, odd: { value: "x" } },

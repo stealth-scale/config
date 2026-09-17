@@ -44,7 +44,7 @@ describe("keyframes", () => {
     expect(keyframes["bg-drift"]).toMatchObject({ "50%": { backgroundPosition: "100% 50%" } });
   });
 
-  it("rises and parallaxes and fills by a share and twinkles by opacity", () => {
+  it("moves each scrolled motion by a share of the box rather than a length", () => {
     expect(keyframes["rise"]).toStrictEqual({
       from: { opacity: "0", transform: "translateY(20%)" },
       to: { opacity: "1", transform: "none" },

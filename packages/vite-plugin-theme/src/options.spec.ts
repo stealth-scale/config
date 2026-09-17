@@ -36,7 +36,7 @@ describe("options", () => {
     expect(resolveOptions({ include: ["app/**/*.tsx"] }).include).toStrictEqual(["app/**/*.tsx"]);
   });
 
-  it("renames one layer and keeps the default name of the rest", () => {
+  it("renames one layer over the default names", () => {
     expect(resolveOptions({ layers: { reset: "acme-reset" } }).layers).toStrictEqual({
       base: "base",
       recipes: "recipes",

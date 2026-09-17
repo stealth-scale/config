@@ -49,7 +49,7 @@ describe("type", () => {
     expect(styleOf("7xl", "lineHeight")).toBe("1.1");
   });
 
-  it("tightens the tracking at display sizes and leaves body text alone", () => {
+  it("tightens the tracking at display sizes alone", () => {
     expect(styleOf("md", "letterSpacing")).toBe("0em");
     expect(styleOf("xl", "letterSpacing")).toBe("-0.01em");
     expect(styleOf("4xl", "letterSpacing")).toBe("-0.02em");

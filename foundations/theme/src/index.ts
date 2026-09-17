@@ -1,11 +1,10 @@
 /**
  * Publishes what a component imports: the generated runtime, the binding, the provider that
- * switches a page, and the two attributes it switches with.
+ * switches a page, and the two attributes it switches with. Nothing from the authoring entry is
+ * here. A recipe file imports the vocabulary from `./authoring`, and a component imports the
+ * runtime from here, so the compiler's configuration never reaches the generated runtime through a
+ * recipe.
  *
- * @remarks
- *   Nothing from the authoring entry is here. A recipe file imports the vocabulary from
- *   `./authoring`, and a component imports the runtime from here, so the compiler's
- *   configuration never reaches the generated runtime through a recipe.
  * @packageDocumentation
  */
 
