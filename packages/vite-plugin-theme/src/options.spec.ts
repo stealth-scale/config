@@ -13,8 +13,8 @@ describe("options", () => {
     expect(THEME_ATTRIBUTE).toBe("data-theme");
   });
 
-  it("separates an axis from its value with a hyphen", () => {
-    expect(SEPARATOR).toBe("-");
+  it("separates an axis from its value with the compiler's underscore", () => {
+    expect(SEPARATOR).toBe("_");
   });
 
   it("fills in every default when nothing is stated", () => {

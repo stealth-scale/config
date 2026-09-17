@@ -14,6 +14,8 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
+import { type Separator } from "@stealthscale/pandacss-naming";
+
 /**
  * The package the rewritten runtime imports the scheme from.
  */
@@ -23,6 +25,11 @@ const NAMING = "@stealthscale/pandacss-naming";
  * Lists the extensions codegen writes the runtime under, the house's first.
  */
 const EXTENSIONS = ["mjs", "js"];
+
+/**
+ * Marks where a replacement takes the separator the compiler was configured with, as a literal.
+ */
+const MARK = "<separator>";
 
 /**
  * Describes one line to find once and what to write in its place.
@@ -38,7 +45,7 @@ interface Edit {
    */
   line: string;
   /**
-   * The line to write in its place.
+   * The line to write in its place, with the separator's mark where the scheme reads it.
    */
   replacement: string;
 }
@@ -71,7 +78,7 @@ const HELPERS: Rewrite = {
     {
       anchor: /parts\.join\(":"\)/gu,
       line: 'parts.join(":")',
-      replacement: 'atomicClass(parts.join(":"))',
+      replacement: `atomicClass(parts.join(":"), ${MARK})`,
     },
     {
       anchor: /set\.add\(name\)/gu,
@@ -97,7 +104,7 @@ const RECIPES: Rewrite = {
     {
       anchor: /return classPrefix \? `\$\{classPrefix\}-\$\{next\}` : next/gu,
       line: "return classPrefix ? `${classPrefix}-${next}` : next",
-      replacement: "return atomicClass(classPrefix ? `${classPrefix}-${next}` : next)",
+      replacement: `return atomicClass(classPrefix ? \`\${classPrefix}-\${next}\` : next, ${MARK})`,
     },
   ],
   file: join("recipes", "runtime"),
@@ -112,14 +119,14 @@ function header(names: readonly string[]): string {
 }
 
 /**
- * Applies one edit to a file's text.
+ * Applies one edit to a file's text, with the separator written as a literal.
  *
  * @remarks
  *   The replacement is given as a function, so a `$` in it is written as it is rather than read
  *   as a substitution pattern.
  * @throws {@link Error} When the anchor is absent from the text or appears more than once.
  */
-function applied(file: string, text: string, edit: Edit): string {
+function applied(file: string, text: string, edit: Edit, separator: Separator): string {
   const found = text.match(edit.anchor)?.length ?? 0;
 
   if (found !== 1) {
@@ -128,14 +135,15 @@ function applied(file: string, text: string, edit: Edit): string {
     );
   }
 
-  return text.replaceAll(edit.anchor, () => edit.replacement);
+  const replacement = edit.replacement.replaceAll(MARK, JSON.stringify(separator));
+
+  return text.replaceAll(edit.anchor, () => replacement);
 }
 
 /**
  * Rewrites one file, and leaves a file the rewrite was already applied to as it is.
  */
-function rewrite(dir: string, extension: string, rewriting: Rewrite): void {
-  const file = join(dir, `${rewriting.file}.${extension}`);
+function rewrite(file: string, rewriting: Rewrite, separator: Separator): void {
   const source = readFileSync(file, "utf8");
   const opening = header(rewriting.names);
 
@@ -143,7 +151,7 @@ function rewrite(dir: string, extension: string, rewriting: Rewrite): void {
 
   writeFileSync(
     file,
-    `${opening}${rewriting.edits.reduce((text, edit) => applied(file, text, edit), source)}`,
+    `${opening}${rewriting.edits.reduce((text, edit) => applied(file, text, edit, separator), source)}`,
   );
 }
 
@@ -155,16 +163,18 @@ function rewrite(dir: string, extension: string, rewriting: Rewrite): void {
  *   for that. A second run on a rewritten runtime changes nothing.
  * @param dir - The directory codegen wrote the runtime into, holding `helpers` and
  *   `recipes/runtime`.
+ * @param separator - The separator the compiler was configured with, which the scheme reads at
+ *   run time.
  * @throws {@link Error} When the directory contains no runtime, or a template line is not found
  *   once in its file.
  */
-export function rewriteRuntime(dir: string): void {
+export function rewriteRuntime(dir: string, separator: Separator): void {
   const extension = EXTENSIONS.find((each) => existsSync(join(dir, `helpers.${each}`)));
 
   if (extension === undefined) {
     throw new Error(`${dir} contains no generated runtime: neither helpers.mjs nor helpers.js`);
   }
 
-  rewrite(dir, extension, HELPERS);
-  rewrite(dir, extension, RECIPES);
+  rewrite(join(dir, `${HELPERS.file}.${extension}`), HELPERS, separator);
+  rewrite(join(dir, `${RECIPES.file}.${extension}`), RECIPES, separator);
 }

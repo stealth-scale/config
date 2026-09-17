@@ -47,7 +47,8 @@
     "test": "vp test"
   },
   "dependencies": {
-    "@pandacss/preset-base": "catalog:"
+    "@pandacss/preset-base": "catalog:",
+    "@stealthscale/pandacss-naming": "workspace:^"
   },
   "devDependencies": {
     "@arethetypeswrong/core": "catalog:",

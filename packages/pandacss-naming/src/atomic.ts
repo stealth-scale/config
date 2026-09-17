@@ -5,11 +5,16 @@
  *   A class is the conditions, outer to inner, then the utility, joined by a colon. A named
  *   condition is written in kebab-case. A raw selector or at-rule condition, which the compiler
  *   wraps in brackets, is kept as written, because a scheme for a selector would not read better
- *   than the selector. The utility's first word is the property's class and is written in
- *   kebab-case. The rest is the value, which keeps its case because a token name is
- *   case-sensitive.
+ *   than the selector. The utility is the property's class, the compiler's separator and the
+ *   value, and it is split at the first separator on its own, since two in a row are a negative
+ *   value under `-` or a recipe's slot under `_`. The property's class is written in kebab-case,
+ *   the separator becomes a hyphen, and the value is sanitised and keeps its case, because a token
+ *   name is case-sensitive. A utility without the separator is a recipe's class, which the scheme
+ *   wrote already, and is written in kebab-case, so a slot named in camel case reads the same on
+ *   both sides.
  */
 
+import { type Separator } from "#recipe.ts";
 import { kebab, sanitise } from "#sanitise.ts";
 
 /**
@@ -23,9 +28,13 @@ const JOIN = ":";
 const OPEN = "[";
 
 /**
- * Matches the property's class at the start of a utility, up to its first hyphen.
+ * Matches the first separator on its own in a utility, for each separator the compiler accepts.
  */
-const PROPERTY = /^[^-]+/u;
+const SPLITS: Readonly<Record<Separator, RegExp>> = {
+  _: /(?<!_)_(?!_)/u,
+  "-": /(?<!-)-(?!-)/u,
+  "=": /(?<!=)=(?!=)/u,
+};
 
 /**
  * Describes a class split into its conditions and its utility.
@@ -81,18 +90,33 @@ function condition(segment: string): string {
 }
 
 /**
+ * Rewrites a utility: the property's class in kebab-case, a hyphen and the value sanitised, or a
+ * recipe's class in kebab-case where the separator is absent.
+ */
+function utility(segment: string, separator: Separator): string {
+  const at = segment.search(SPLITS[separator]);
+
+  if (at === -1) return sanitise(kebab(segment));
+
+  return `${kebab(segment.slice(0, at))}-${sanitise(segment.slice(at + 1))}`;
+}
+
+/**
  * Rewrites the class the compiler writes for one declaration, conditions included, into the
  * scheme.
  *
  * @remarks
  *   A class with nothing to replace is returned as it is, so a recipe class the scheme has already
  *   written passes through unchanged.
+ * @param pandaClass - The class as the compiler wrote it, conditions included.
+ * @param separator - The separator the compiler was configured with, between the property's
+ *   class and the value.
  */
-export function atomicClass(pandaClass: string): string {
-  const { conditions, utility } = segments(pandaClass);
+export function atomicClass(pandaClass: string, separator: Separator): string {
+  const split = segments(pandaClass);
 
   return [
-    ...conditions.map((segment) => condition(segment)),
-    sanitise(utility.replace(PROPERTY, (property) => kebab(property))),
+    ...split.conditions.map((segment) => condition(segment)),
+    utility(split.utility, separator),
   ].join(JOIN);
 }

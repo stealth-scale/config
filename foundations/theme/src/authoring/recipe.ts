@@ -188,10 +188,10 @@ export type RecipeProps<Bound> =
  *
  * @remarks
  *   The build plugin configures the compiler with the same character, so a class the runtime
- *   writes and a selector the stylesheet carries agree. A hyphen rather than the compiler's
- *   default underscore, so `button--size-lg` reads as one modifier.
+ *   writes and a selector the stylesheet carries agree. The compiler's default underscore, which
+ *   neither an axis nor a value contains, so the first one is the boundary between them.
  */
-export const SEPARATOR = "-";
+export const SEPARATOR = "_";
 
 /**
  * Fixes what the compiler writes between a class and the selection a compound matches on.

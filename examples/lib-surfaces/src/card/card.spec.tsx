@@ -13,14 +13,14 @@ import {
 import { Card } from "#index.ts";
 
 /**
- * Lists the classes one band carries in one look and one size.
+ * Lists the classes one band carries in one look and one size, sorted as the reader lists them.
  */
 function bandClasses(slot: string, size: string, variant: string): readonly string[] {
   return [
     slotClass("card", slot),
     slotVariantClass("card", slot, "size", size),
     slotVariantClass("card", slot, "variant", variant),
-  ];
+  ].toSorted();
 }
 
 describe("Card", () => {

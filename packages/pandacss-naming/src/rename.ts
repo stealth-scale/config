@@ -47,8 +47,8 @@ export function rename(pandaClass: string, config: CompilerConfig): string {
 
     const written = variantClass(owner, axis, rest.slice(axis.length + config.separator.length));
 
-    return written === "" ? "" : atomicClass(written);
+    return written === "" ? "" : atomicClass(written, config.separator);
   }
 
-  return atomicClass(pandaClass);
+  return atomicClass(pandaClass, config.separator);
 }

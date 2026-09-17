@@ -17,7 +17,7 @@ import {
 
 import { type Loading } from "@stealthscale/vite-plugin-base";
 
-import { cleaned } from "#compiler.ts";
+import { rewritten } from "#compiler.ts";
 import { reportDiagnostics } from "#diagnostics.ts";
 import { renderStylesheet } from "#fonts.ts";
 import { layerPattern, type Options, type Resolved, resolveOptions } from "#options.ts";
@@ -170,23 +170,27 @@ interface Transforming {
 }
 
 /**
- * Compiles the rules once per generation, reports what the compiler found, and returns the rules.
+ * Compiles the rules once per generation, renames every class selector into the scheme, reports
+ * what the compiler and the rename found, and returns the rules.
  *
  * @remarks
- *   Every stylesheet that declares the cascade order receives the same rules, so the compile runs
- *   once for a generation however many stylesheets ask, and the diagnostics are reported once with
- *   it. An application whose graph names no package publishing a preset beside the system package
- *   compiles a stylesheet carrying the foundation's values and no component's rules, which is a
- *   blank-looking page and a build that succeeded, so that is reported here too.
+ *   Every stylesheet that declares the cascade order receives the same rules, so the compile and
+ *   the rename run once for a generation however many stylesheets ask, and the diagnostics are
+ *   reported once with them. An application whose graph names no package publishing a preset
+ *   beside the system package compiles a stylesheet carrying the foundation's values and no
+ *   component's rules, which is a blank-looking page and a build that succeeded, so that is
+ *   reported here too.
  */
 function compiled(state: Running, assembled: Assembled, warn: Transforming["warn"]): string {
   if (state.compiled?.generation === state.generation) return state.compiled.css;
 
   const { compiler, contributors } = assembled;
   const output = compiler.driver.cssgen({ emitLayerDeclaration: false });
+  const renamed = rewritten(compiler, output.css);
 
   reportDiagnostics(compiler.driver.designSystemDiagnostics, "the design system", warn);
   reportDiagnostics(output.diagnostics, "the stylesheet", warn);
+  reportDiagnostics(renamed.diagnostics, "the class names", warn);
 
   if (contributors.length === 1) {
     warn(
@@ -196,7 +200,7 @@ function compiled(state: Running, assembled: Assembled, warn: Transforming["warn
     );
   }
 
-  state.compiled = { css: cleaned(output.css), generation: state.generation };
+  state.compiled = { css: renamed.css, generation: state.generation };
 
   return state.compiled.css;
 }

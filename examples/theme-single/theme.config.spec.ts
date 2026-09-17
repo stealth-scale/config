@@ -55,7 +55,7 @@ describe("theme.config", () => {
 
   it("compiles the button recipe the component package publishes", () => {
     expect(declared(css, ".button", "border-radius")).toBe("var(--radii-l2)");
-    expect(css).toContain(".button--variant-outline");
+    expect(css).toContain(".button--outline");
   });
 
   it("names the compiler nowhere in the stylesheet", () => {

@@ -14,7 +14,7 @@ import {
   withScratchWorkspaceAsync,
 } from "@stealthscale/testing";
 
-import { cleaned } from "#compiler.ts";
+import { rewritten } from "#compiler.ts";
 import { resolveOptions } from "#options.ts";
 import { assemble } from "#theme/assembly.ts";
 
@@ -40,7 +40,7 @@ const KIT = packageFiles(
       '  name: "@acme/kit",',
       "  theme: {",
       "    extend: {",
-      '      recipes: { button: { className: "button", jsx: ["Button"], base: { color: "brand", letterSpacing: "0em" }, variants: { size: { lg: { padding: "8px" }, md: { padding: "4px" } }, variant: { ghost: { color: "green" }, solid: { color: "red" } } }, compoundVariants: [{ className: "button--compound__size-lg__variant-solid", css: { fontWeight: "700" }, size: "lg", variant: "solid" }, { className: "button--compound__size-md__variant-ghost", css: { fontStyle: "italic" }, size: "md", variant: "ghost" }] } },',
+      '      recipes: { button: { className: "button", jsx: ["Button"], base: { color: "brand", letterSpacing: "0em" }, variants: { size: { lg: { padding: "8px" }, md: { padding: "4px" } }, variant: { ghost: { color: "green" }, solid: { color: "red" } } }, compoundVariants: [{ className: "button--compound__size_lg__variant_solid", css: { fontWeight: "700" }, size: "lg", variant: "solid" }, { className: "button--compound__size_md__variant_ghost", css: { fontStyle: "italic" }, size: "md", variant: "ghost" }] } },',
       '      slotRecipes: { dialog: { className: "dialog", slots: ["content", "backdrop"], base: { content: { padding: "4px" } } } },',
       "    },",
       "  },",
@@ -89,7 +89,7 @@ const APP: ScratchFiles = {
 async function compiled(workspace: ScratchWorkspace): Promise<string> {
   const { compiler } = await assemble({ root: workspace.root }, RESOLVED);
 
-  return cleaned(compiler.driver.cssgen({ emitLayerDeclaration: false }).css);
+  return rewritten(compiler, compiler.driver.cssgen({ emitLayerDeclaration: false }).css).css;
 }
 
 describe("assemble", () => {
@@ -188,8 +188,8 @@ describe("assemble", () => {
     };
     const css = await withScratchWorkspaceAsync(files, compiled);
 
-    expect(declared(css, ".textStyle-brand", "font-size")).toBe("12px");
-    expect(declared(css, "[data-theme=abyss] .textStyle-brand", "font-size")).toBe("14px");
+    expect(declared(css, ".text-style-brand", "font-size")).toBe("12px");
+    expect(declared(css, "[data-theme=abyss] .text-style-brand", "font-size")).toBe("14px");
   });
 
   it("scopes a variant's styles under the attribute", async () => {
@@ -197,8 +197,8 @@ describe("assemble", () => {
     const files = { ...APP, "themes/abyss.ts": theme("abyss", extend) };
     const css = await withScratchWorkspaceAsync(files, compiled);
 
-    expect(declared(css, ".button--size-lg", "padding")).toBe("8px");
-    expect(declared(css, "[data-theme=abyss] .button--size-lg", "padding")).toBe("12px");
+    expect(declared(css, ".button--lg", "padding")).toBe("8px");
+    expect(declared(css, "[data-theme=abyss] .button--lg", "padding")).toBe("12px");
   });
 
   it("compiles a compound under the class its recipe names", async () => {

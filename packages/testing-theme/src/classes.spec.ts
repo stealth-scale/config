@@ -7,16 +7,17 @@ describe("classes", () => {
     expect(recipeClass("button")).toBe("button");
   });
 
-  it("writes a variant's class from the axis and the value", () => {
-    expect(variantClass("button", "variant", "solid")).toBe("button--variant-solid");
+  it("writes a variant's class from the class name and the value", () => {
+    expect(variantClass("button", "variant", "solid")).toBe("button--solid");
   });
 
-  it("writes a boolean variant's class", () => {
-    expect(variantClass("button", "loading", true)).toBe("button--loading-true");
+  it("writes a boolean variant's class from the axis at true and nothing at false", () => {
+    expect(variantClass("button", "loading", true)).toBe("button--loading");
+    expect(variantClass("button", "loading", false)).toBe("");
   });
 
   it("writes a numeric variant's class", () => {
-    expect(variantClass("stack", "gap", 4)).toBe("stack--gap-4");
+    expect(variantClass("stack", "gap", 4)).toBe("stack--4");
   });
 
   it("writes a slot's class from the class name and the slot", () => {
@@ -24,6 +25,6 @@ describe("classes", () => {
   });
 
   it("writes a slot variant's class on the slot", () => {
-    expect(slotVariantClass("dialog", "content", "size", "lg")).toBe("dialog__content--size-lg");
+    expect(slotVariantClass("dialog", "content", "size", "lg")).toBe("dialog__content--lg");
   });
 });

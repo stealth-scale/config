@@ -29,6 +29,7 @@ const STYLES = {
   "& > *": { flexShrink: 0 },
   fontFamily: "Segoe UI, sans-serif",
   gridAutoRows: "{sizes.32}",
+  marginTop: "-4",
   md: { gridTemplateColumns: "repeat(3, minmax(0, 1fr))" },
 };
 
@@ -44,7 +45,6 @@ const PANDA = [
   '  outExtension: "mjs",',
   "  preflight: false,",
   "  presets: [base],",
-  '  separator: "-",',
   "  theme: {",
   "    extend: {",
   '      breakpoints: { md: "48rem" },',
@@ -144,9 +144,11 @@ async function compiled(): Promise<Outcome> {
 
     driver.parseFiles();
     driver.codegen({ cwd: dir, outdir: generated });
-    rewriteRuntime(generated);
 
     const config = compilerConfig(driver.config);
+
+    rewriteRuntime(generated, config.separator);
+
     const sheet = renameSelectors(driver.cssgen().css, config);
     const { css } = loaded(join(generated, "css", "index.mjs"), isCss);
     const { button, card } = loaded(join(generated, "recipes", "index.mjs"), isRecipes);
@@ -177,7 +179,7 @@ describe("pandacss-compiler", () => {
         { axes: ["loading", "size"], className: "button" },
         { axes: ["bleed"], className: "card", slots: ["root", "content"] },
       ],
-      separator: "-",
+      separator: "_",
     });
   });
 
@@ -199,7 +201,7 @@ describe("pandacss-compiler", () => {
 
     expect(tokens(styles)).toStrictEqual(
       tokens(
-        "[&_>_*]:flex-sh-0 child:my-4 focus-visible:c-red ff-Segoe-UI-sans-serif grid-ar-sizes-32 md:grid-tc-repeat-3-minmax-0-1fr",
+        "[&_>_*]:flex-sh-0 child:my-4 focus-visible:c-red ff-Segoe-UI-sans-serif grid-ar-sizes-32 md:grid-tc-repeat-3-minmax-0-1fr mt--4",
       ),
     );
   });
@@ -233,8 +235,8 @@ describe("pandacss-compiler", () => {
       "naming/raw-condition",
     ]);
     expect(sheet.diagnostics.map((each) => each.help)).toStrictEqual([
-      ["button--loading-false"],
-      ["[&_>_*]:flex-sh-0"],
+      ["button--loading_false"],
+      ["[&_>_*]:flex-sh_0"],
     ]);
   });
 });

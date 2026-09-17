@@ -73,6 +73,8 @@ theme: name every compound in its recipe and read the sizes from the tokens
   half compiled to a bare negation that matched every element: a page switched to a theme under an
   operating system set to dark drew that theme on the element carrying the attribute and the default
   theme's dark values on everything below it.
-- `SEPARATOR`, published from `./authoring`, is the hyphen the build plugin configures the compiler
-  with between an axis and its value. `compoundClassName` writes it, so a compound reads
-  `button--compound__size-lg__variant-solid` and a bound element's variant class `button--size-lg`.
+- `SEPARATOR`, published from `./authoring`, is the underscore the build plugin configures the
+  compiler with between an axis and its value. `compoundClassName` writes it, so a compound the
+  compiler names reads `button--compound__size_lg__variant_solid` before the plugin renames the
+  stylesheet and the runtime. The package depends on `@stealthscale/pandacss-naming`, which its
+  generated runtime imports, so a bound element's variant class reads `button--lg`.

@@ -46,14 +46,17 @@ export const PRESET_SUBPATH = "./theme";
 export const THEME_ATTRIBUTE = "data-theme";
 
 /**
- * Fixes the character the compiler writes between an axis and its value in a class name.
+ * Fixes the character the compiler writes between an axis and its value, and between a property's
+ * class and its value, in a class name.
  *
  * @remarks
- *   A hyphen rather than the compiler's default underscore, so `button--size-lg` reads as one
- *   modifier. The design-system package publishes the same character for the names it writes
- *   itself, and the testing kit holds the two equal.
+ *   The compiler's default. Neither an axis nor a value contains an underscore, so the first one is
+ *   the boundary, and a negative value keeps its sign where a hyphen would merge into it. Nothing
+ *   a page sees carries it: the naming scheme reads it on both sides and writes a hyphen. The
+ *   design-system package publishes the same character for the names it writes itself, and the
+ *   testing kit holds the two equal.
  */
-export const SEPARATOR = "-";
+export const SEPARATOR = "_";
 
 /**
  * Lists the cascade layers in the order the compiler writes them, whatever they are named.

@@ -26,9 +26,12 @@ const driver = await createNodeDriver({ configPath: "panda.config.ts", cwd: root
 
 driver.parseFiles();
 driver.codegen({ cwd: root, outdir: generated });
-rewriteRuntime(generated);
 
-const { css, diagnostics } = renameSelectors(driver.cssgen().css, compilerConfig(driver.config));
+const config = compilerConfig(driver.config);
+
+rewriteRuntime(generated, config.separator);
+
+const { css, diagnostics } = renameSelectors(driver.cssgen().css, config);
 ```
 
 `diagnostics` lists an error for each set of classes that renamed to one name, one warning for the
@@ -44,17 +47,18 @@ every preset merged: every recipe under `theme.recipes` and `theme.slotRecipes` 
 `className`, or its key where it names none, the keys of its `variants` as its axes, and its
 `slots`, together with `separator`, which is `_` where the configuration sets none.
 
-### `rewriteRuntime(dir)`
+### `rewriteRuntime(dir, separator)`
 
-Rewrites two files under `dir`, the directory codegen wrote the runtime into, and prepends an import
-of the naming package to each:
+Rewrites two files under `dir`, the directory codegen wrote the runtime into, prepends an import of
+the naming package to each, and writes `separator`, the one the compiler was configured with, as a
+literal where the scheme reads it:
 
-| File              | Line                                                     | Rewritten as                                                          |
-| ----------------- | -------------------------------------------------------- | --------------------------------------------------------------------- |
-| `helpers`         | `parts.join(":")`                                        | `atomicClass(parts.join(":"))`                                        |
-| `helpers`         | `set.add(name)`                                          | `if (name !== "") set.add(name)`                                      |
-| `recipes/runtime` | `` `${className}--${prop}-${withoutSpace(value)}` ``     | `variantClass(className, prop, value)`                                |
-| `recipes/runtime` | ``return classPrefix ? `${classPrefix}-${next}` : next`` | ``return atomicClass(classPrefix ? `${classPrefix}-${next}` : next)`` |
+| File              | Line                                                     | Rewritten as                                                               |
+| ----------------- | -------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `helpers`         | `parts.join(":")`                                        | `atomicClass(parts.join(":"), "_")`                                        |
+| `helpers`         | `set.add(name)`                                          | `if (name !== "") set.add(name)`                                           |
+| `recipes/runtime` | `` `${className}--${prop}_${withoutSpace(value)}` ``     | `variantClass(className, prop, value)`                                     |
+| `recipes/runtime` | ``return classPrefix ? `${classPrefix}-${next}` : next`` | ``return atomicClass(classPrefix ? `${classPrefix}-${next}` : next, "_")`` |
 
 Each line is matched once, as `@pandacss/compiler` 2.0.0-beta.17 writes it. A compiler release that
 moves a line throws here, which is the version pin. The files are read under the `mjs` extension, or

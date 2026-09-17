@@ -27,6 +27,15 @@ const SLOT = "__";
 const RUN = /-*(?:[^\p{L}\p{N}%/!-]+-*)+/gu;
 
 /**
+ * Matches a run of replaced characters at the start of a value, with the hyphens after it.
+ *
+ * @remarks
+ *   Dropped rather than replaced, so a token reference `{sizes.32}` reads `sizes-32`. A hyphen at
+ *   the start is kept, so a negative value keeps its sign.
+ */
+const LEADING = /^(?:[^\p{L}\p{N}%/!-]+-*)+/u;
+
+/**
  * Matches the hyphen a run leaves at the end of a segment, before an importance mark.
  */
 const TRAILING = /-+(?=!*$)/u;
@@ -44,11 +53,12 @@ export function kebab(name: string): string {
 }
 
 /**
- * Replaces every character of a segment that a stylesheet would escape, and collapses each run of
- * them into one hyphen.
+ * Replaces every character of a segment that a stylesheet would escape, collapses each run of
+ * them into one hyphen, and drops a run at the start.
  */
 export function sanitise(segment: string): string {
   return segment
+    .replace(LEADING, "")
     .split(SLOT)
     .map((part) => part.replaceAll(RUN, "-"))
     .join(SLOT)

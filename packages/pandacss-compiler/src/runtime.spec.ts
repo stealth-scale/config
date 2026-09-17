@@ -3,6 +3,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
+import { type Separator } from "@stealthscale/pandacss-naming";
+
 import { rewriteRuntime } from "#runtime.ts";
 
 const HELPERS = [
@@ -34,15 +36,23 @@ interface Rewritten {
   runtime: string;
 }
 
-function rewritten(files: Files, extension = "mjs", twice = false): Rewritten {
+interface Run {
+  extension?: string;
+  separator?: Separator;
+  twice?: boolean;
+}
+
+function rewritten(files: Files, run: Run = {}): Rewritten {
   const dir = mkdtempSync(join(tmpdir(), "pandacss-compiler-"));
+  const extension = run.extension ?? "mjs";
+  const separator = run.separator ?? "_";
 
   try {
     mkdirSync(join(dir, "recipes"));
     writeFileSync(join(dir, `helpers.${extension}`), files.helpers);
     writeFileSync(join(dir, "recipes", `runtime.${extension}`), files.runtime);
-    rewriteRuntime(dir);
-    if (twice) rewriteRuntime(dir);
+    rewriteRuntime(dir, separator);
+    if (run.twice === true) rewriteRuntime(dir, separator);
 
     return {
       helpers: readFileSync(join(dir, `helpers.${extension}`), "utf8"),
@@ -54,10 +64,22 @@ function rewritten(files: Files, extension = "mjs", twice = false): Rewritten {
 }
 
 describe("rewriteRuntime", () => {
-  it("passes the joined atomic class through the scheme", () => {
+  it("passes the joined atomic class through the scheme with the separator", () => {
     const { helpers } = rewritten({ helpers: HELPERS, runtime: RUNTIME });
 
-    expect(helpers).toContain('atomicClass(parts.join(":"))');
+    expect(helpers).toContain('atomicClass(parts.join(":"), "_")');
+  });
+
+  it("writes the separator the compiler was configured with", () => {
+    const { helpers, runtime } = rewritten(
+      { helpers: HELPERS, runtime: RUNTIME },
+      { separator: "-" },
+    );
+
+    expect(helpers).toContain('atomicClass(parts.join(":"), "-")');
+    expect(runtime).toContain(
+      'return atomicClass(classPrefix ? `${classPrefix}-${next}` : next, "-")',
+    );
   });
 
   it("drops an empty class instead of adding it", () => {
@@ -84,7 +106,9 @@ describe("rewriteRuntime", () => {
   it("writes a compound class through the scheme", () => {
     const { runtime } = rewritten({ helpers: HELPERS, runtime: RUNTIME });
 
-    expect(runtime).toContain("return atomicClass(classPrefix ? `${classPrefix}-${next}` : next)");
+    expect(runtime).toContain(
+      'return atomicClass(classPrefix ? `${classPrefix}-${next}` : next, "_")',
+    );
   });
 
   it("imports what each file uses from the scheme at its top", () => {
@@ -105,7 +129,7 @@ describe("rewriteRuntime", () => {
 
     try {
       expect(() => {
-        rewriteRuntime(dir);
+        rewriteRuntime(dir, "_");
       }).toThrow(/contains no generated runtime: neither helpers\.mjs nor helpers\.js$/u);
     } finally {
       rmSync(dir, { force: true, recursive: true });
@@ -114,15 +138,15 @@ describe("rewriteRuntime", () => {
 
   it("leaves a rewritten runtime as it is on a second run", () => {
     const once = rewritten({ helpers: HELPERS, runtime: RUNTIME });
-    const twice = rewritten({ helpers: HELPERS, runtime: RUNTIME }, "mjs", true);
+    const twice = rewritten({ helpers: HELPERS, runtime: RUNTIME }, { twice: true });
 
     expect(twice).toStrictEqual(once);
   });
 
   it("reads the runtime under the js extension when there is no mjs", () => {
-    const { helpers } = rewritten({ helpers: HELPERS, runtime: RUNTIME }, "js");
+    const { helpers } = rewritten({ helpers: HELPERS, runtime: RUNTIME }, { extension: "js" });
 
-    expect(helpers).toContain('atomicClass(parts.join(":"))');
+    expect(helpers).toContain('atomicClass(parts.join(":"), "_")');
   });
 
   it("throws when a template line is absent", () => {

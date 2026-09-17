@@ -74,21 +74,19 @@ describe("theme.config", () => {
 
   it("compiles the button recipe the component package publishes", () => {
     expect(declared(css, ".button", "border-radius")).toBe("var(--radii-l2)");
-    expect(css).toContain(".button--variant-ghost");
+    expect(css).toContain(".button--ghost");
   });
 
   it("compiles the card slot recipe the surfaces package publishes with one class per slot", () => {
     expect(declared(css, ".card__root", "border-radius")).toBe("var(--radii-l2)");
-    expect(declared(css, ".card__root--variant-subtle", "background")).toBe(
-      "var(--colors-bg-subtle)",
-    );
-    expect(declared(css, ".card__header--size-lg", "font-size")).toBeDefined();
+    expect(declared(css, ".card__root--subtle", "background")).toBe("var(--colors-bg-subtle)");
+    expect(declared(css, ".card__header--lg", "font-size")).toBeDefined();
     expect(css).toContain(".card__footer");
   });
 
   it("compiles forge's card extension under its attribute alone on the band it names", () => {
     expect(declared(css, "[data-theme=forge] .card__header", "text-transform")).toBe("uppercase");
-    expect(declared(css, "[data-theme=forge] .card__root--variant-elevated", "box-shadow")).toBe(
+    expect(declared(css, "[data-theme=forge] .card__root--elevated", "box-shadow")).toBe(
       "var(--shadows-xl)",
     );
     expect(declared(css, ".card__header", "text-transform")).toBeUndefined();

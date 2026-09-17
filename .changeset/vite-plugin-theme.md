@@ -12,6 +12,11 @@ vite-plugin-theme: declare the class a compound's styles are emitted under
 - `theme.stylesheet()` installs the presets an application states under `presets` in
   `theme.config.ts`, after every package's preset and before the themes, so a theme extends a recipe
   written in the application as it extends one a package published.
-- Both rendered configurations set the compiler's `separator` to a hyphen, so a variant reads
-  `button--size-lg` and a compound `button--compound__size-lg__variant-solid`. `SEPARATOR` and
+- Both rendered configurations set the compiler's `separator` to its default underscore, and the
+  plugin rewrites what the compiler writes into the naming scheme of `@stealthscale/pandacss-naming`
+  through `@stealthscale/pandacss-compiler`: `generateRuntime` rewrites the generated runtime before
+  it syncs it, and the stylesheet plugin renames every class selector after it compiles. A variant
+  reads `button--lg`, a boolean axis `card__content--bleed` and nothing at `false`, a slot
+  `card__root`, and an atomic class `grid-ar-sizes-32` or `md:grid-tc-repeat-3-minmax-0-1fr`. What
+  the rename found is reported as a third stage, `the class names`. `SEPARATOR` and
   `THEME_ATTRIBUTE` are exported, so a package that writes the same names can hold itself to them.

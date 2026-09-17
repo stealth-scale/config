@@ -26,6 +26,12 @@ describe("sanitise", () => {
     expect(sanitise("w-calc(1px)!")).toBe("w-calc-1px!");
   });
 
+  it("drops a run at the start of a value and keeps a leading minus", () => {
+    expect(sanitise("{sizes.32}")).toBe("sizes-32");
+    expect(sanitise("_x")).toBe("x");
+    expect(sanitise("-4")).toBe("-4");
+  });
+
   it("keeps the case of a value", () => {
     expect(sanitise("ff-Inter_Tight")).toBe("ff-Inter-Tight");
   });

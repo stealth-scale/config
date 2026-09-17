@@ -130,7 +130,7 @@ describe("contract", () => {
     });
 
     expect(compounds(theme, { button })).toStrictEqual([
-      "abyss extends button with a compound for size-sm__variant-solid, which the recipe does not declare",
+      "abyss extends button with a compound for size_sm__variant_solid, which the recipe does not declare",
     ]);
   });
 
@@ -172,7 +172,7 @@ describe("contract", () => {
     const recipe = { ...button, compoundVariants: [{ css: {}, size: { bad: true } }] };
 
     expect(compounds(theme, { button: recipe })).toStrictEqual([
-      "abyss extends button with a compound for size-lg, which the recipe does not declare",
+      "abyss extends button with a compound for size_lg, which the recipe does not declare",
     ]);
   });
 

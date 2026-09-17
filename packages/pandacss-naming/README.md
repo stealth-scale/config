@@ -6,12 +6,17 @@ the compiled stylesheet, where the selectors are renamed, so the two sides agree
 
 | Kind                      | The compiler writes                               | The scheme writes                                |
 | ------------------------- | ------------------------------------------------- | ------------------------------------------------ |
-| Variant on a string axis  | `button--size-lg`                                 | `button--lg`                                     |
-| Variant on a boolean axis | `card__content--bleed-true`, `…--bleed-false`     | `card__content--bleed`, and no class for `false` |
+| Variant on a string axis  | `button--size_lg`                                 | `button--lg`                                     |
+| Variant on a boolean axis | `card__content--bleed_true`, `…--bleed_false`     | `card__content--bleed`, and no class for `false` |
 | Slot                      | `card__root`                                      | `card__root`                                     |
-| Compound                  | `button--compound__size-lg__variant-solid`        | `button--expose`, the name the author gave it    |
-| Atomic                    | `grid-ar-{sizes.32}`, `md:grid-tc-repeat(3,_1fr)` | `grid-ar-sizes-32`, `md:grid-tc-repeat-3-1fr`    |
-| Condition                 | `focusVisible:c-red`, `[&_>_*]:c-red`             | `focus-visible:c-red`, `[&_>_*]:c-red`           |
+| Compound                  | `button--compound__size_lg__variant_solid`        | `button--expose`, the name the author gave it    |
+| Atomic                    | `grid-ar_{sizes.32}`, `md:grid-tc_repeat(3,_1fr)` | `grid-ar-sizes-32`, `md:grid-tc-repeat-3-1fr`    |
+| Negative value            | `m_-4`                                            | `m--4`                                           |
+| Condition                 | `focusVisible:c_red`, `[&_>_*]:c_red`             | `focus-visible:c-red`, `[&_>_*]:c-red`           |
+
+The compiler's separator, `_` by default, sits between an axis and its value and between a
+property's class and its value. The scheme reads it on both sides and writes a hyphen, and it takes
+the separator the compiler was configured with, `_`, `-` or `=`.
 
 ## Install
 
@@ -40,12 +45,12 @@ import { type CompilerConfig, rename } from "@stealthscale/pandacss-naming";
 
 const config: CompilerConfig = {
   recipes: [{ axes: ["loading", "size"], className: "button" }],
-  separator: "-",
+  separator: "_",
 };
 
-rename("button--size-lg", config); // "button--lg"
-rename("button--loading-false", config); // ""
-rename("md:grid-tc-repeat(3,_minmax(0,_1fr))", config); // "md:grid-tc-repeat-3-minmax-0-1fr"
+rename("button--size_lg", config); // "button--lg"
+rename("button--loading_false", config); // ""
+rename("md:grid-tc_repeat(3,_minmax(0,_1fr))", config); // "md:grid-tc-repeat-3-minmax-0-1fr"
 ```
 
 ## The rules
@@ -57,7 +62,7 @@ The scheme is sound under three rules, which a gate holds and this package trust
 - A compound carries a name. The name is unique in its recipe, is not a value of any axis, and does
   not start with an axis and the separator.
 - An axis name does not contain the separator. Where one axis name prefixes another, `rename` reads
-  the longest axis that fits, so `on-off` wins over `on` for `card--on-off-true`.
+  the longest axis that fits, so `on-off` wins over `on` for `card--on-off_true`.
 - Two different classes of one stylesheet never sanitise to one name. The stylesheet rewrite checks
   this and reports a collision.
 
@@ -66,16 +71,16 @@ has no structure to read, and a prefix is not read from a recipe's class.
 
 ## Reference
 
-| Export                                 | Returns                                                                                                                                                                       |
-| -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `variantClass(className, axis, value)` | `<class>--<value>` for a string or a number, `<class>--<axis>` for `true`, and an empty string for `false`                                                                    |
-| `slotClass(className, slot)`           | `<class>__<slot>`                                                                                                                                                             |
-| `compoundClass(className, name)`       | `<class>--<name>`                                                                                                                                                             |
-| `atomicClass(pandaClass)`              | The class with each named condition and the property's class in kebab-case, and the value sanitised. A raw selector or at-rule condition in brackets is kept as written       |
-| `rename(pandaClass, config)`           | The class as a variant where one of `config.recipes` claims it, with `config.separator` between axis and value, and as an atomic class otherwise                              |
-| `conditionsOf(pandaClass)`             | The conditions of a class, outer to inner, as the compiler wrote them, with a raw one in its brackets                                                                         |
-| `sanitise(segment)`                    | The segment with a letter, a digit, a hyphen, `%`, `/`, `!` and the slot separator `__` kept, and each run of other characters replaced by one hyphen. A value keeps its case |
-| `kebab(name)`                          | The name with a hyphen at each boundary between a lower-case letter or a digit and a capital, in lower case                                                                   |
+| Export                                 | Returns                                                                                                                                                                                                    |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `variantClass(className, axis, value)` | `<class>--<value>` for a string or a number, `<class>--<axis>` for `true`, and an empty string for `false`                                                                                                 |
+| `slotClass(className, slot)`           | `<class>__<slot>`                                                                                                                                                                                          |
+| `compoundClass(className, name)`       | `<class>--<name>`                                                                                                                                                                                          |
+| `atomicClass(pandaClass, separator)`   | The class with each named condition and the property's class in kebab-case, the separator written as a hyphen, and the value sanitised. A raw selector or at-rule condition in brackets is kept as written |
+| `rename(pandaClass, config)`           | The class as a variant where one of `config.recipes` claims it, with `config.separator` between axis and value, and as an atomic class otherwise                                                           |
+| `conditionsOf(pandaClass)`             | The conditions of a class, outer to inner, as the compiler wrote them, with a raw one in its brackets                                                                                                      |
+| `sanitise(segment)`                    | The segment with a letter, a digit, a hyphen, `%`, `/`, `!` and the slot separator `__` kept, each run of other characters replaced by one hyphen, and a run at the start dropped. A value keeps its case  |
+| `kebab(name)`                          | The name with a hyphen at each boundary between a lower-case letter or a digit and a capital, in lower case                                                                                                |
 
 ## Licence
 

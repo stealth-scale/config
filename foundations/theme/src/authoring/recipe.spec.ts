@@ -33,17 +33,17 @@ describe("defineRecipe", () => {
 
   it("names a compound from the sorted axes it matches on", () => {
     expect(named({ size: "lg", variant: "solid" })).toBe(
-      "button--compound__size-lg__variant-solid",
+      "button--compound__size_lg__variant_solid",
     );
   });
 
   it("writes the values an axis may hold joined by a bar", () => {
-    expect(named({ variant: ["ghost", "solid"] })).toBe("button--compound__variant-ghost|solid");
+    expect(named({ variant: ["ghost", "solid"] })).toBe("button--compound__variant_ghost|solid");
   });
 
   it("writes a boolean and a number the way the compiler does", () => {
-    expect(named({ disabled: true })).toBe("button--compound__disabled-true");
-    expect(named({ level: 2 })).toBe("button--compound__level-2");
+    expect(named({ disabled: true })).toBe("button--compound__disabled_true");
+    expect(named({ level: 2 })).toBe("button--compound__level_2");
   });
 
   it("keeps the styles and the selection of a named compound", () => {
@@ -54,7 +54,7 @@ describe("defineRecipe", () => {
     });
 
     expect(recipe.compoundVariants).toStrictEqual([
-      { className: "button--compound__size-lg", css: { fontWeight: "bold" }, size: "lg" },
+      { className: "button--compound__size_lg", css: { fontWeight: "bold" }, size: "lg" },
     ]);
   });
 
@@ -66,9 +66,9 @@ describe("defineRecipe", () => {
 
   it("writes the selection a compound matches on without a class before it", () => {
     expect(compoundSelection({ css: {}, size: "lg", variant: "solid" })).toBe(
-      "size-lg__variant-solid",
+      "size_lg__variant_solid",
     );
-    expect(compoundSelection({ css: {}, size: ["lg", "md"] })).toBe("size-lg|md");
+    expect(compoundSelection({ css: {}, size: ["lg", "md"] })).toBe("size_lg|md");
   });
 
   it("returns nothing for a selection a class name cannot carry", () => {
@@ -88,12 +88,12 @@ describe("defineRecipe", () => {
 
     expect(recipe.compoundVariants).toStrictEqual([
       {
-        className: "card__root--compound__size-lg",
+        className: "card__root--compound__size_lg",
         css: { root: { fontWeight: "bold" } },
         size: "lg",
       },
       {
-        className: "card__title--compound__size-lg",
+        className: "card__title--compound__size_lg",
         css: { title: { letterSpacing: "wide" } },
         size: "lg",
       },

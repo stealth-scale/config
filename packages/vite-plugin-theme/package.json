@@ -52,7 +52,8 @@
   "dependencies": {
     "@pandacss/compiler": "catalog:",
     "@pandacss/preset-base": "catalog:",
-    "@pandacss/types": "catalog:"
+    "@pandacss/types": "catalog:",
+    "@stealthscale/pandacss-compiler": "workspace:^"
   },
   "devDependencies": {
     "@arethetypeswrong/core": "catalog:",
