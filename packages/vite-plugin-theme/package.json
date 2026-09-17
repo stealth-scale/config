@@ -1,6 +1,6 @@
 {
   "name": "@stealthscale/vite-plugin-theme",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Generates the styling runtime of a design system and compiles the stylesheet of an application.",
   "keywords": [
     "css",

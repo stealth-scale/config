@@ -1,5 +1,21 @@
 # @stealthscale/vite-config-react
 
+## 0.7.0
+
+### Minor Changes
+
+- [#21](https://github.com/stealth-scale/config/pull/21) [`e1e1b2b`](https://github.com/stealth-scale/config/commit/e1e1b2b00019a0d46e0fd6be453dccd8757ef601) Thanks [@stealth-rklopper](https://github.com/stealth-rklopper)! - Compile MDX documents into components. `layers({ mdx: true })` adds `plugin.mdx()`, which puts
+  `@mdx-js/rollup` ahead of every other plugin and gives the packer the same plugin under
+  `pack.plugins`. The plugin compiles `.mdx` only, so a markdown file imported with `?raw` stays a
+  string. `./mdx` publishes the declaration file a package references from its `globals.d.ts`: it
+  declares the `*.mdx` module and types the elements a document renders against React's JSX.
+  `@mdx-js/rollup` and `@types/mdx` are optional peers.
+
+### Patch Changes
+
+- Updated dependencies [[`739ba79`](https://github.com/stealth-scale/config/commit/739ba795e2ce4de0260c026c281fd6142ae28bc5)]:
+  - @stealthscale/vite-config@0.6.0
+
 ## 0.6.1
 
 ### Patch Changes

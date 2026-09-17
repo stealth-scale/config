@@ -1,0 +1,57 @@
+# @stealthscale/testing-theme
+
+## 0.1.0
+
+### Minor Changes
+
+- [#21](https://github.com/stealth-scale/config/pull/21) [`ce44d1e`](https://github.com/stealth-scale/config/commit/ce44d1e0c12bff1b597f0fd86e38fcf0abaeda0c) Thanks [@stealth-rklopper](https://github.com/stealth-rklopper)! - testing-theme: add the theme testing kit
+  
+  - `violations(theme, options)` checks a theme against the contract and the contrast table: every
+    role and every mode, every reference, every extension and its compounds, every text pair at 7:1
+    and every line and ring at 3:1.
+  - `recipeViolations(recipe, options)` reports a color a theme cannot move, a token or a condition
+    the preset does not define, a length in px, rem or pt, a color mode, a slot the anatomy does not
+    stamp, and `fg.subtle` as a text color.
+  - `presetViolations(preset, options)` reports a recipe file the preset does not register, a key that
+    is not the class name in camel case, and a slot recipe under the wrong section.
+  - The readers list the classes a recipe emits, read what a recipe declares, read what a rendered
+    component drew, and resolve a theme's colors through every reference.
+  - `slotElement` and `slotClasses` find a part by the `data-slot` a slot binding stamps as well as by
+    the `data-part` an anatomy stamps, so a compound component with no machine behind it is read the
+    same way.
+  - `recipe.tokens` reads a token named by one word, so `l9` and `stiky` are reported where the dotted
+    form alone was. Nine of the categories a theme states are keyed by one word. A CSS-wide keyword
+    and a size a box takes from its content are passed over.
+  - `recipe.lengths` leaves out what the compiler resolves, so `token(spacing.4, 4px)` is no longer
+    read as a hard-coded length.
+  - The walk reads a key as a property where the compiler resolves one of that name, so a value under
+    a range breakpoint such as `smDown` is checked against the property above it. A written list of
+    six breakpoint names had left every derived form unchecked.
+  - `recipeFiles` finds a recipe whose export carries a type, and one whose definition is written on
+    the next line, and reads whether it is slotted from the call. One spelling was recognised, and a
+    file written any other way was reported as backed by no file.
+  - `contract.modes` reports a color whose value states no mode the kit knows, an empty object or a
+    pair of keys misspelt, which every check passed over.
+  - `contract.compounds` reports rather than throws where the component's own recipe carries a
+    compound matched on a value a class name cannot carry.
+  - `fonts.installed` resolves a font package from the directory the specification names and reports
+    nothing without one, as the listing check does. It resolved from the working directory, so the
+    answer depended on where the run was started.
+  - `publishedRecipes(...presets)` maps every recipe the component packages register to its key, for
+    `options.recipes`. A theme specification that passed a list of names left the compound check out,
+    because the check needs the recipes themselves.
+  - `variantClass`, `slotClass`, `slotVariantClass` and `compoundClass` write the naming scheme
+    through `@stealthscale/pandacss-naming`, so `variantClass("button", "size", "lg")` returns
+    `button--lg`, `variantClass("button", "loading", true)` returns `button--loading` and
+    `compoundClass("button", "hero")` returns `button--hero`, and the kit holds the separator and the
+    theme attribute equal between the design-system package and the build plugin.
+  - `recipe.values` reports a value that writes the class another value writes across the recipe's
+    axes, or that a boolean axis writes at `true`, since the scheme writes a variant's class from the
+    value alone. `recipe.compounds` reports a compound without a name, two compounds under one name,
+    and a name that writes the class of a variant.
+
+### Patch Changes
+
+- Updated dependencies [[`ef9c601`](https://github.com/stealth-scale/config/commit/ef9c601e8224b34d545be51eced2a47354fc2e16), [`459eb8c`](https://github.com/stealth-scale/config/commit/459eb8cdeb48bea844b906098740c941aec22278)]:
+  - @stealthscale/pandacss-naming@0.1.0
+  - @stealthscale/theme@0.1.1

@@ -1,5 +1,27 @@
 # @stealthscale/vite-config
 
+## 0.6.0
+
+### Minor Changes
+
+- [#21](https://github.com/stealth-scale/config/pull/21) [`739ba79`](https://github.com/stealth-scale/config/commit/739ba795e2ce4de0260c026c281fd6142ae28bc5) Thanks [@stealth-rklopper](https://github.com/stealth-rklopper)! - vite-config: refuse an import of the toolchain
+  
+  - `no-restricted-imports` reports `vite-plus` and every `vite-plus/*` subpath in the style rules,
+    with the ADR-0006 message to import `vite` or `vitest` instead.
+  - `staged.formatted` runs `vp fmt --no-error-on-unmatched-pattern`, so a commit that stages a file
+    the formatter ignores, such as `pnpm-lock.yaml`, is no longer refused.
+  - `test.coverage` keeps the development server from watching `**/coverage/**`, so a test run beside
+    a running server no longer reloads every page.
+  - Every lint tier excuses `**/src/theme.ts` from `no-default-export` beside `**/*.config.ts`. A
+    package publishes its preset under `./theme` through a default export, which the build plugin
+    reads, so the file needs no departure of its own.
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @stealthscale/vite-config-core@0.3.0
+  - @stealthscale/vite-plugin-sbom@0.3.1
+
 ## 0.5.0
 
 ### Minor Changes

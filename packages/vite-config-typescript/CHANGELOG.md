@@ -1,5 +1,14 @@
 # @stealthscale/vite-config-typescript
 
+## 0.3.0
+
+### Minor Changes
+
+- [#21](https://github.com/stealth-scale/config/pull/21) [`8ab4fc7`](https://github.com/stealth-scale/config/commit/8ab4fc75851c942cb4d849865fc55e1f1c97cc72) Thanks [@stealth-rklopper](https://github.com/stealth-rklopper)! - vite-config-typescript: compile the theme statement beside the configuration
+  
+  - `base.json` includes `theme.config.ts` and `theme.config.spec.ts`, so an application that states
+    its themes writes no `include` of its own.
+
 ## 0.2.0
 
 ### Minor Changes
