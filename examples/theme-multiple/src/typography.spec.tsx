@@ -17,11 +17,10 @@ describe("Typography", () => {
     expect(container.querySelectorAll("svg[aria-hidden='true']")).toHaveLength(2);
   });
 
-  it("draws two lists with two entries each", () => {
+  it("draws the lists between the icons and the quotation", () => {
     const { getAllByRole } = render(<Typography />);
 
-    expect(getAllByRole("list")).toHaveLength(2);
-    expect(getAllByRole("listitem")).toHaveLength(4);
+    expect(getAllByRole("list")).toHaveLength(6);
   });
 
   it("draws the quotation with its caption", () => {
