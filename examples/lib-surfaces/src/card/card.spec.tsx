@@ -14,13 +14,19 @@ import { Card } from "#index.ts";
 
 /**
  * Lists the classes one band carries in one look and one size, sorted as the reader lists them.
+ * The root takes the size and the look, the header the size, and the other bands neither, because
+ * the recipe styles them through no variant.
  */
 function bandClasses(slot: string, size: string, variant: string): readonly string[] {
-  return [
-    slotClass("card", slot),
-    slotVariantClass("card", slot, "size", size),
-    slotVariantClass("card", slot, "variant", variant),
-  ].toSorted();
+  const styled: Readonly<Record<string, readonly string[]>> = {
+    header: [slotVariantClass("card", slot, "size", size)],
+    root: [
+      slotVariantClass("card", slot, "size", size),
+      slotVariantClass("card", slot, "variant", variant),
+    ],
+  };
+
+  return [slotClass("card", slot), ...(styled[slot] ?? [])].toSorted();
 }
 
 describe("Card", () => {

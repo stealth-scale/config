@@ -15,7 +15,9 @@
 
 import { type ElementType, type JSX, type Provider } from "react";
 
-import { type Recipe, type SlotCompound, type SlotRecipe } from "#authoring/recipe.ts";
+import { atomicClass, variantClass } from "@stealthscale/pandacss-naming";
+
+import { type Recipe, SEPARATOR, type SlotCompound, type SlotRecipe } from "#authoring/recipe.ts";
 import { toVariantMap } from "#generated/helpers.mjs";
 import {
   createRecipeContext as bindRecipe,
@@ -38,6 +40,7 @@ import type {
   RecipeConfigVariantMap,
   RecipeSelection,
   RecipeVariantRecord,
+  SlotRecipeRuntimeFn,
   SlotRecipeVariantRecord,
   SlotRecord,
 } from "#generated/types/recipe.d.mts";
@@ -226,6 +229,135 @@ function toSlotRuntimeConfig<Slots extends string, Variants extends SlotRecipeVa
 }
 
 /**
+ * Lists the keys of a compound that are not axes.
+ */
+const UNMATCHED = new Set(["className", "classNames", "css", "name"]);
+
+/**
+ * Writes the key one value of one axis is read under.
+ */
+function keyOf(axis: string, value: unknown): string {
+  return `${axis}=${String(value)}`;
+}
+
+/**
+ * Records the slots each value of each axis styles, keyed by axis and value.
+ */
+type Styled = Map<string, Set<string>>;
+
+/**
+ * Records that one value of one axis styles one slot.
+ */
+function styles(styled: Styled, axis: string, value: unknown, slot: string): void {
+  const slots = styled.get(keyOf(axis, value)) ?? new Set<string>();
+
+  slots.add(slot);
+  styled.set(keyOf(axis, value), slots);
+}
+
+/**
+ * Records the slots each variant value styles through its own styles.
+ */
+function styledByVariants<Slots extends string, Variants extends SlotRecipeVariantRecord<Slots>>(
+  recipe: SlotRecipe<Slots, Variants>,
+  styled: Styled,
+): void {
+  for (const [axis, values] of Object.entries(recipe.variants ?? {})) {
+    for (const [value, slotStyles] of Object.entries(values)) {
+      for (const slot of Object.keys(slotStyles)) styles(styled, axis, value, slot);
+    }
+  }
+}
+
+/**
+ * Records the slots each value styles through a compound matched on it.
+ */
+function styledByCompounds<Slots extends string, Variants extends SlotRecipeVariantRecord<Slots>>(
+  recipe: SlotRecipe<Slots, Variants>,
+  styled: Styled,
+): void {
+  for (const compound of recipe.compoundVariants ?? []) {
+    for (const [axis, selected] of Object.entries(compound)) {
+      if (UNMATCHED.has(axis)) continue;
+      for (const value of Array.isArray(selected) ? selected : [selected]) {
+        for (const slot of Object.keys(compound.css)) styles(styled, axis, value, slot);
+      }
+    }
+  }
+}
+
+/**
+ * Lists, for each value of each axis, the slots the value styles: through its own styles, or
+ * through a compound matched on it.
+ */
+function styledSlots<Slots extends string, Variants extends SlotRecipeVariantRecord<Slots>>(
+  recipe: SlotRecipe<Slots, Variants>,
+): ReadonlyMap<string, ReadonlySet<string>> {
+  const styled: Styled = new Map();
+
+  styledByVariants(recipe, styled);
+  styledByCompounds(recipe, styled);
+
+  return styled;
+}
+
+/**
+ * Keeps, on each slot, the variant classes of the values that style the slot, and drops the rest.
+ *
+ * @remarks
+ *   The runtime hands every slot the whole variant map, so a slot carried a class for every value
+ *   the caller picked whether or not the value styled it, which was fifteen dead classes on one
+ *   card. A value styles a slot through its own styles or through a compound matched on it, and
+ *   the class of any other value is dropped from that slot. The classes are derived here as the
+ *   runtime writes them, through the naming scheme.
+ * @typeParam Slots - Every part the recipe styles.
+ * @typeParam Variants - Each axis it offers, against the values it takes.
+ */
+function pruned<Slots extends string, Variants extends SlotRecipeVariantRecord<Slots>>(
+  recipe: SlotRecipe<Slots, Variants>,
+  runtime: SlotRecipeRuntimeFn<Slots, RecipeSelection<Variants>, RecipeConfigVariantMap<Variants>>,
+): SlotRecipeRuntimeFn<Slots, RecipeSelection<Variants>, RecipeConfigVariantMap<Variants>> {
+  const styled = styledSlots(recipe);
+
+  /**
+   * Draws every slot's classes as the runtime does, then drops the variant classes of the values
+   * that do not style each slot.
+   */
+  const pruning = (props?: RecipeSelection<Variants>): SlotRecord<Slots, string> => {
+    const selection: Readonly<Record<string, unknown>> = runtime.getVariantProps(props);
+    const kept = Object.entries(runtime(props)).map(([slot, written]) => {
+      const dead = new Set(
+        Object.entries(selection)
+          .filter(([axis, value]) => {
+            const slots = styled.get(keyOf(axis, value));
+
+            return slots === undefined || !slots.has(slot);
+          })
+          .map(([axis, value]) =>
+            atomicClass(
+              variantClass(`${recipe.className}__${slot}`, axis, String(value)),
+              SEPARATOR,
+            ),
+          ),
+      );
+
+      return [
+        slot,
+        String(written)
+          .split(" ")
+          .filter((each) => !dead.has(each))
+          .join(" "),
+      ];
+    });
+
+    // eslint-disable-next-line typescript/no-unsafe-type-assertion -- the entries are the slots the runtime wrote, keyed as it keyed them
+    return Object.fromEntries(kept) as SlotRecord<Slots, string>;
+  };
+
+  return Object.assign(pruning, runtime);
+}
+
+/**
  * Binds a recipe that draws one element and returns the element factory and the provider that
  * sets variants from above.
  *
@@ -280,7 +412,9 @@ export function createSlotRecipeContext<
   const Slots extends string,
   const Variants extends SlotRecipeVariantRecord<Slots>,
 >(recipe: SlotRecipe<Slots, Variants>): SlotRecipeBinding<Slots, Variants> {
-  const generated: unknown = bindSlots(createSlotRecipe(toSlotRuntimeConfig(recipe)));
+  const generated: unknown = bindSlots(
+    pruned(recipe, createSlotRecipe(toSlotRuntimeConfig(recipe))),
+  );
 
   // eslint-disable-next-line typescript/no-unsafe-type-assertion -- as above, and the slot a part is bound to is one of the recipe's, which the generated type resolves through a conditional the checker cannot settle for a generic recipe
   const bound = generated as SlotRecipeBinding<Slots, Variants>;

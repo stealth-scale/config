@@ -201,7 +201,7 @@ describe("pandacss-compiler", () => {
 
     expect(tokens(styles)).toStrictEqual(
       tokens(
-        "[&_>_*]:flex-sh-0 child:my-4 focus-visible:c-red ff-Segoe-UI-sans-serif grid-ar-sizes-32 md:grid-tc-repeat-3-minmax-0-1fr mt--4",
+        "[&_>_*]:flex-sh-0 child:my-4 focus-visible:c-red ff-segoe-ui-sans-serif grid-ar-sizes-32 md:grid-tc-repeat-3-minmax-0-1fr mt--4",
       ),
     );
   });
