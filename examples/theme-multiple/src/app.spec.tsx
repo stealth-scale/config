@@ -45,6 +45,14 @@ describe("App", () => {
     expect(document.documentElement.dataset["colorMode"]).toBe("dark");
   });
 
+  it("names the color mode in the badge beside the switch", () => {
+    const { getByRole, getByText } = render(<App />);
+
+    fireEvent.click(getByRole("button", { name: "Dark mode" }));
+
+    expect(getByText("dark").className).toContain(variantClass("badge", "variant", "subtle"));
+  });
+
   it("switches the color mode back from the same button", () => {
     const { getByRole } = render(<App />);
 

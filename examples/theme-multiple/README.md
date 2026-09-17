@@ -24,7 +24,7 @@ mode, and reads the attributes back off the document root.
 ## The statement
 
 ```ts
-export default { themes: [fathom, folio, forge, abyss] } satisfies Application;
+export default { presets: [own], themes: [fathom, folio, forge, abyss] } satisfies Application;
 ```
 
 The first theme is the default. Each of the four is compiled under `[data-theme=<name>]` as well, so
@@ -32,32 +32,38 @@ a subtree can wear any of them. Abyss is derived from Fathom, and the compiler c
 so Fathom's values and Abyss's own both compile under Abyss's attribute. One panel wears Forge while
 the page wears whatever the reader picked.
 
+`own` is the preset of the application's own recipes, `src/theme.ts`, written and checked exactly as
+a component package writes and checks its `./theme`. It registers the badge under
+`src/badge/badge.recipe.ts`, which has no package for the build plugin to find it in. The plugin
+installs it after every package's preset and before the themes, and Abyss extends the badge by its
+key alone, every label in capitals, without knowing where the recipe is written.
+
 ## The page
 
 `src/app.tsx` keeps the theme and the color mode in state and hands both to `ThemeProvider` from
-`@stealthscale/theme`, which writes them onto the document root. The buttons are written with
-literal variants, which is what the compiler extracts the rules for. The page's own layout and the
-two panels are written with `css` from the same package, reading the semantic surfaces, spacing and
-text styles a recipe reads, so every theme moves the page as it moves the buttons. Below the Forge
-panel, four cards from `@stealthscale/example-lib-surfaces` show a slot recipe at work: the default,
-a small one in outline, a large subtle one, and one wearing Forge, whose header the theme's card
-extension sets in capitals. Each is `Card.Root` holding `Card.Header`, `Card.Content` and
-`Card.Footer`, with the look and the size stated on the root alone and every band drawn in them. The
-candy panel is dressed in a moving border swept by `sweep`, a heading in `text.shine` moved by
-`shimmer`, a glowing button, a breathing one, a rippling one, and a marquee that fades at both edges
-and rises into view as the page scrolls. Two sections below it show the rest. The looks are a
-heading in `text.gradient`, a card of `glass` over a drifting aurora, the three glows and the three
-blurs on chips, a paragraph under `mask.bottom`, a grid under `mask.radial`, and a tile under
-`backdrop.spotlight` whose handler writes the pointer's position into the two custom properties the
-look reads. The motions are a bar along the top of the viewport that `progress` fills with the
-scroll, a chip under `float`, a ring under `spin`, three dots under `twinkle`, a `meteor` across a
-dark sky, stripes under `parallax` behind a pane, and a list under `rise` that runs again from a
-button by mounting under a new key. All of it is drawn in whichever palette the theme points at, and
-all of it holds still under `prefers-reduced-motion`. Below them a bento of five tiles, two of them
-spanning, each on a backdrop of its own, dims the others while one is hovered. The switches stick to
-the top of the page while the rest scrolls past. `src/main.tsx` imports
-`@stealthscale/theme/styles.css` before the application, and the build plugin appends the compiled
-rules to it.
+`@stealthscale/theme`, which writes them onto the document root, and names the mode in a badge, the
+application's own component. The buttons are written with literal variants, which is what the
+compiler extracts the rules for. The page's own layout and the two panels are written with `css`
+from the same package, reading the semantic surfaces, spacing and text styles a recipe reads, so
+every theme moves the page as it moves the buttons. Below the Forge panel, four cards from
+`@stealthscale/example-lib-surfaces` show a slot recipe at work: the default, a small one in
+outline, a large subtle one, and one wearing Forge, whose header the theme's card extension sets in
+capitals. Each is `Card.Root` holding `Card.Header`, `Card.Content` and `Card.Footer`, with the look
+and the size stated on the root alone and every band drawn in them. The candy panel is dressed in a
+moving border swept by `sweep`, a heading in `text.shine` moved by `shimmer`, a glowing button, a
+breathing one, a rippling one, and a marquee that fades at both edges and rises into view as the
+page scrolls. Two sections below it show the rest. The looks are a heading in `text.gradient`, a
+card of `glass` over a drifting aurora, the three glows and the three blurs on chips, a paragraph
+under `mask.bottom`, a grid under `mask.radial`, and a tile under `backdrop.spotlight` whose handler
+writes the pointer's position into the two custom properties the look reads. The motions are a bar
+along the top of the viewport that `progress` fills with the scroll, a chip under `float`, a ring
+under `spin`, three dots under `twinkle`, a `meteor` across a dark sky, stripes under `parallax`
+behind a pane, and a list under `rise` that runs again from a button by mounting under a new key.
+All of it is drawn in whichever palette the theme points at, and all of it holds still under
+`prefers-reduced-motion`. Below them a bento of five tiles, two of them spanning, each on a backdrop
+of its own, dims the others while one is hovered. The switches stick to the top of the page while
+the rest scrolls past. `src/main.tsx` imports `@stealthscale/theme/styles.css` before the
+application, and the build plugin appends the compiled rules to it.
 
 ## The configuration
 

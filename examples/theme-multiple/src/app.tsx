@@ -1,7 +1,7 @@
 /**
- * Draws the page: the controls that switch the theme and the color mode of the document, a row
- * of buttons in every look, a panel wearing a theme of its own, four cards, the candy panel, the
- * looks, the motions and a bento.
+ * Draws the page: the controls that switch the theme and the color mode of the document with a
+ * badge naming the mode, a row of buttons in every look, a panel wearing a theme of its own, four
+ * cards, the candy panel, the looks, the motions and a bento.
  *
  * @remarks
  *   The provider writes the two attributes onto the document root, so the whole page switches at
@@ -15,6 +15,7 @@ import { type ChangeEvent, type ReactElement, useState } from "react";
 import { Button } from "@stealthscale/example-lib-actions";
 import { type ColorMode, css, ThemeProvider } from "@stealthscale/theme";
 
+import { Badge } from "#badge/badge.ts";
 import { Bento } from "#bento.tsx";
 import { Candy } from "#candy.tsx";
 import { Cards } from "#cards.tsx";
@@ -125,6 +126,7 @@ export function App(): ReactElement {
           >
             {mode === "light" ? "Dark mode" : "Light mode"}
           </Button>
+          <Badge>{mode}</Badge>
         </p>
         <p className={row}>
           <Button>Solid</Button>

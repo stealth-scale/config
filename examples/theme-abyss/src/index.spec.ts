@@ -9,7 +9,11 @@ import { abyss } from "#index.ts";
 describe("abyss", () => {
   it("keeps the theme contract and clears every contrast pair in both modes", () => {
     expect(
-      violations(abyss, { at: import.meta.dirname, base: foundation, recipes: ["button"] }),
+      violations(abyss, {
+        at: import.meta.dirname,
+        base: foundation,
+        recipes: ["badge", "button"],
+      }),
     ).toStrictEqual([]);
   });
 
@@ -36,7 +40,7 @@ describe("abyss", () => {
     expect(abyss.variant.semanticTokens?.["radii"]).toMatchObject({ l3: { value: "0.5rem" } });
   });
 
-  it("extends the button and nothing else", () => {
-    expect(extendedRecipes(abyss)).toStrictEqual(["button"]);
+  it("extends the badge and the button and nothing else", () => {
+    expect(extendedRecipes(abyss)).toStrictEqual(["badge", "button"]);
   });
 });

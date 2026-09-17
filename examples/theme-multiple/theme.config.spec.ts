@@ -47,6 +47,18 @@ describe("theme.config", () => {
     ]);
   });
 
+  it("states the preset of the application's own recipes", () => {
+    expect(statement.presets?.map((each) => each.name)).toStrictEqual([
+      "@stealthscale/example-theme-multiple",
+    ]);
+  });
+
+  it("compiles the badge the application registers and abyss's extension of it", () => {
+    expect(declared(".badge", "border-radius")).toBe("var(--radii-l1)");
+    expect(declared("[data-theme=abyss] .badge", "text-transform")).toBe("uppercase");
+    expect(declared(".badge", "text-transform")).toBeUndefined();
+  });
+
   it("compiles the default theme's page color where no attribute is set", () => {
     expect(declared(":where(:root, :host)", "--colors-bg")).toBe("oklch(96.0% 0.0160 195.0)");
   });
@@ -69,19 +81,19 @@ describe("theme.config", () => {
 
   it("compiles the button recipe the component package publishes", () => {
     expect(declared(".button", "border-radius")).toBe("var(--radii-l2)");
-    expect(css).toContain(".button--variant_ghost");
+    expect(css).toContain(".button--variant-ghost");
   });
 
   it("compiles the card slot recipe the surfaces package publishes with one class per slot", () => {
     expect(declared(".card__root", "border-radius")).toBe("var(--radii-l2)");
-    expect(declared(".card__root--variant_subtle", "background")).toBe("var(--colors-bg-subtle)");
-    expect(declared(".card__header--size_lg", "font-size")).toBeDefined();
+    expect(declared(".card__root--variant-subtle", "background")).toBe("var(--colors-bg-subtle)");
+    expect(declared(".card__header--size-lg", "font-size")).toBeDefined();
     expect(css).toContain(".card__footer");
   });
 
   it("compiles forge's card extension under its attribute alone on the band it names", () => {
     expect(declared("[data-theme=forge] .card__header", "text-transform")).toBe("uppercase");
-    expect(declared("[data-theme=forge] .card__root--variant_elevated", "box-shadow")).toBe(
+    expect(declared("[data-theme=forge] .card__root--variant-elevated", "box-shadow")).toBe(
       "var(--shadows-xl)",
     );
     expect(declared(".card__header", "text-transform")).toBeUndefined();
