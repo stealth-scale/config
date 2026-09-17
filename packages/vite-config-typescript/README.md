@@ -81,11 +81,13 @@ it.
 
 ## What gets compiled
 
-`include` covers `${configDir}/src`, `${configDir}/vite.config.ts` and
-`${configDir}/vite.layers.ts`. `${configDir}` resolves against the `tsconfig.json` that does the
-extending rather than against the file it extends, and that is what lets one list serve every
-package. A relative path in its place would point at this package rather than at yours. A package
-whose layout differs writes its own `include`, which replaces the inherited list.
+`include` covers `${configDir}/src`, `${configDir}/vite.config.ts`, `${configDir}/vite.layers.ts`,
+and the theme statement an application writes beside its configuration,
+`${configDir}/theme.config.ts` with `${configDir}/theme.config.spec.ts`. `${configDir}` resolves
+against the `tsconfig.json` that does the extending rather than against the file it extends, and
+that is what lets one list serve every package. A relative path in its place would point at this
+package rather than at yours. A package whose layout differs writes its own `include`, which
+replaces the inherited list.
 
 ## Licence
 
