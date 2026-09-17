@@ -1,0 +1,81 @@
+name: Bug report
+description: Report behaviour a package does not keep to.
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Report a vulnerability through a private advisory rather than here.
+
+  - type: dropdown
+    id: package
+    attributes:
+      label: Package
+      description: The package the behaviour belongs to.
+      options:
+        - "@stealthscale/theme"
+        - "@stealthscale/vite-config"
+        - "@stealthscale/vite-config-core"
+        - "@stealthscale/vite-config-css"
+        - "@stealthscale/vite-config-plain"
+        - "@stealthscale/vite-config-react"
+        - "@stealthscale/vite-config-theme"
+        - "@stealthscale/vite-config-typescript"
+        - "@stealthscale/vite-plugin-base"
+        - "@stealthscale/vite-plugin-sbom"
+        - "@stealthscale/vite-plugin-theme"
+        - "@stealthscale/pandacss-naming"
+        - "@stealthscale/pandacss-compiler"
+        - "@stealthscale/testing"
+        - "@stealthscale/testing-config"
+        - "@stealthscale/testing-react"
+        - "@stealthscale/testing-theme"
+        - More than one, or not sure
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: The version installed, from the lockfile rather than the range.
+      placeholder: 1.4.0
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+      description: The behaviour the documentation or the types led you to expect.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened
+      description: What the package did instead. Paste the error whole rather than a summary of it.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: How to reproduce it
+      description: >
+        The smallest configuration, recipe or call that shows it, and the command you ran. A link to
+        a repository beats a description of one.
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: The output of `node --version`, `pnpm --version` and your operating system.
+      render: shell
+    validations:
+      required: false
