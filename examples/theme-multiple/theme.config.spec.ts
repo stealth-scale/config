@@ -72,6 +72,21 @@ describe("theme.config", () => {
     expect(css).toContain(".button--variant_ghost");
   });
 
+  it("compiles the card slot recipe the surfaces package publishes with one class per slot", () => {
+    expect(declared(".card__root", "border-radius")).toBe("var(--radii-l2)");
+    expect(declared(".card__root--variant_subtle", "background")).toBe("var(--colors-bg-subtle)");
+    expect(declared(".card__header--size_lg", "font-size")).toBeDefined();
+    expect(css).toContain(".card__footer");
+  });
+
+  it("compiles forge's card extension under its attribute alone on the band it names", () => {
+    expect(declared("[data-theme=forge] .card__header", "text-transform")).toBe("uppercase");
+    expect(declared("[data-theme=forge] .card__root--variant_elevated", "box-shadow")).toBe(
+      "var(--shadows-xl)",
+    );
+    expect(declared(".card__header", "text-transform")).toBeUndefined();
+  });
+
   it("compiles each theme's button extension under its attribute alone", () => {
     expect(declared("[data-theme=forge] .button", "text-transform")).toBe("uppercase");
     expect(declared("[data-theme=abyss] .button", "letter-spacing")).toBe(

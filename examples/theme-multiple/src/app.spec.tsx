@@ -82,6 +82,13 @@ describe("App", () => {
     expect(getByRole("heading", { name: "Eye candy" })).toBeDefined();
   });
 
+  it("draws the cards between the forge panel and the candy", () => {
+    const { getAllByRole, getByRole } = render(<App />);
+
+    expect(getByRole("heading", { name: "Cards" })).toBeDefined();
+    expect(getAllByRole("article")).toHaveLength(4);
+  });
+
   it("draws the looks, the motions and the bento below the candy", () => {
     const { getByRole } = render(<App />);
 

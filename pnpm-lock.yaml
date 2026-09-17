@@ -773,6 +773,54 @@ importers:
         specifier: 'catalog:'
         version: 4.1.11(@types/node@26.5.1)(@vitest/browser-playwright@4.1.11)(@vitest/browser-preview@4.1.11)(@vitest/coverage-v8@4.1.11)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(happy-dom@20.14.5)
 
+  examples/lib-surfaces:
+    devDependencies:
+      '@stealthscale/theme':
+        specifier: workspace:^
+        version: link:../../foundations/theme
+      '@stealthscale/vite-config':
+        specifier: workspace:^
+        version: link:../../packages/vite-config
+      '@stealthscale/vite-config-react':
+        specifier: workspace:^
+        version: link:../../packages/vite-config-react
+      '@stealthscale/vite-config-theme':
+        specifier: workspace:^
+        version: link:../../packages/vite-config-theme
+      '@stealthscale/vite-config-typescript':
+        specifier: workspace:^
+        version: link:../../packages/vite-config-typescript
+      '@stealthscale/vite-plugin-theme':
+        specifier: workspace:^
+        version: link:../../packages/vite-plugin-theme
+      '@testing-library/react':
+        specifier: 'catalog:'
+        version: 16.3.3(@testing-library/dom@10.4.1)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.3.0
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 19.3.0(@types/react@19.3.0)
+      happy-dom:
+        specifier: 'catalog:'
+        version: 20.14.5
+      oxc-transform-react:
+        specifier: 'catalog:'
+        version: 0.149.0
+      react:
+        specifier: 'catalog:'
+        version: 19.3.0
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.3.0(react@19.3.0)
+      typescript:
+        specifier: 'catalog:'
+        version: 7.0.2
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.11(@types/node@26.5.1)(@vitest/browser-playwright@4.1.11)(@vitest/browser-preview@4.1.11)(@vitest/coverage-v8@4.1.11)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(happy-dom@20.14.5)
+
   examples/lib-tokens:
     devDependencies:
       '@stealthscale/vite-config':
@@ -962,6 +1010,9 @@ importers:
       '@stealthscale/example-lib-actions':
         specifier: workspace:^
         version: link:../lib-actions
+      '@stealthscale/example-lib-surfaces':
+        specifier: workspace:^
+        version: link:../lib-surfaces
       '@stealthscale/example-theme-abyss':
         specifier: workspace:^
         version: link:../theme-abyss

@@ -1,7 +1,7 @@
 /**
  * Draws the page: the controls that switch the theme and the color mode of the document, a row
- * of buttons in every look, a panel wearing a theme of its own, the candy panel, the looks, the
- * motions and a bento.
+ * of buttons in every look, a panel wearing a theme of its own, four cards, the candy panel, the
+ * looks, the motions and a bento.
  *
  * @remarks
  *   The provider writes the two attributes onto the document root, so the whole page switches at
@@ -17,6 +17,7 @@ import { type ColorMode, css, ThemeProvider } from "@stealthscale/theme";
 
 import { Bento } from "#bento.tsx";
 import { Candy } from "#candy.tsx";
+import { Cards } from "#cards.tsx";
 import { Looks } from "#looks.tsx";
 import { Motions } from "#motions.tsx";
 
@@ -140,6 +141,7 @@ export function App(): ReactElement {
             <Button variant="subtle">Subtle in forge</Button>
           </p>
         </section>
+        <Cards />
         <Candy />
         <Looks />
         <Motions />

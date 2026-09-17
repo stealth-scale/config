@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@stealthscale/example-lib-actions": "workspace:^",
+    "@stealthscale/example-lib-surfaces": "workspace:^",
     "@stealthscale/example-theme-abyss": "workspace:^",
     "@stealthscale/example-theme-fathom": "workspace:^",
     "@stealthscale/example-theme-folio": "workspace:^",
