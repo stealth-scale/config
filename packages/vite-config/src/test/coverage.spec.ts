@@ -77,4 +77,10 @@ describe("coverage", () => {
     expect(excluded).toContain("**/src/bin/**");
     expect(excluded).toContain("**/*.worker.{ts,tsx}");
   });
+
+  it("keeps the development server from watching the reports it writes", () => {
+    expect((coverage().config as UserConfig).server?.watch?.ignored).toStrictEqual([
+      "**/coverage/**",
+    ]);
+  });
 });
