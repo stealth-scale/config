@@ -1,7 +1,8 @@
 /**
  * Draws the motions that loop or read the scroll: a bar along the top of the viewport that fills
  * as the page is read, a floating chip, a spinning ring, three twinkling dots, a shower of meteors
- * across a starry sky, stripes that drift with the scroll, and the list that rises in turn.
+ * across a sky of twinkling stars, stripes that drift with the scroll, and the list that rises in
+ * turn.
  *
  * @remarks
  *   Every motion is the foundation's, named by `animationStyle`, and every one holds still under
@@ -111,6 +112,23 @@ const sky = css({
 });
 
 /**
+ * Draws a second field of stars over the sky's own, offset so its stars fall between them, which
+ * twinkles.
+ *
+ * @remarks
+ *   The motion animates the opacity of whatever carries it, so the field that twinkles needs an
+ *   element of its own: on the sky it would blink the whole tile. The sky's own field holds still
+ *   under it, so the sky never goes dark and only some of its stars move.
+ */
+const twinkling = css({
+  animationStyle: "twinkle",
+  backgroundPosition: "{sizes.20} {sizes.10}",
+  inset: "0",
+  layerStyle: "backdrop.stars",
+  position: "absolute",
+});
+
+/**
  * Draws a streak of the inverted ink that crosses the sky and fades. The sky is the other mode's
  * page, so the palette's solid, drawn for this mode's surfaces, would sit in it unseen.
  *
@@ -181,6 +199,7 @@ export function Motions(): ReactElement {
       </p>
       <div className={sky}>
         A shower of meteors across the sky
+        <span aria-hidden className={twinkling} />
         {METEORS.map(([name, place]) => (
           <span aria-hidden className={cx(streak, place)} key={name} />
         ))}

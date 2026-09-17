@@ -20,10 +20,13 @@ describe("Motions", () => {
     expect(new Set(dots.map((each) => each.className)).size).toBe(3);
   });
 
-  it("crosses the sky with five streaks, each at its own place in the stagger", () => {
+  it("lays a twinkling field of stars under five streaks, each at its own place", () => {
     const { getByText } = render(<Motions />);
-    const streaks = [...getByText("A shower of meteors across the sky").querySelectorAll("span")];
+    const [field, ...streaks] = [
+      ...getByText("A shower of meteors across the sky").querySelectorAll("span"),
+    ];
 
+    expect(field?.className).not.toBe("");
     expect(streaks).toHaveLength(5);
     expect(new Set(streaks.map((each) => each.className)).size).toBe(5);
   });
