@@ -1,8 +1,9 @@
 # @stealthscale/scale
 
-`@stealthscale/scale` is the stealthscale monorepo. The packages here configure, check, test and
-release every other stealthscale package, and the foundation here is the design system they are
-drawn from. The providers, the SDKs and the remaining plugins move in from their own repositories.
+`@stealthscale/scale` holds the building blocks a stealthscale application is built from. Today that
+is the design system every interface is drawn from, the configuration tiers every package is built
+and released through, and the testing kits both are held to. The component libraries and the
+platform SDK move in next, from their own repositories.
 
 ## What is here
 
@@ -60,12 +61,11 @@ configures. `import.meta.dirname` names the directory from there and nothing els
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
 | [`theme`](foundations/theme) | Publishes the foundation every recipe is written against, the runtime every component binds with, and the vocabulary a theme is written in |
 
-A recipe is written against the foundation's vocabulary. It holds no compiler code, so a component
-imports it in a browser and a configuration imports it in node alike. Filling the contract takes two
-calls, and a theme moves whatever it wants from there. The build plugin compiles one stylesheet from
-every preset and theme in the dependency graph, and scopes each theme under `data-theme`. It renames
-every class into the naming scheme, so `button--lg` reaches the page rather than the compiler's own
-name.
+A recipe is written against the foundation's vocabulary alone, so a component reads it in a browser
+and a configuration reads it in node alike. Filling the contract takes two calls, and a theme moves
+whatever it wants from there. The build plugin compiles one stylesheet from every preset and theme
+in the dependency graph, and scopes each theme under `data-theme`. It renames every class into the
+naming scheme, so `button--lg` reaches the page rather than the compiler's own name.
 
 ## The tiers
 
