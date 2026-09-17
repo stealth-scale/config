@@ -5,7 +5,8 @@
  * @remarks
  *   Each stop is a semantic color, so a theme that moves a palette moves every gradient drawn in
  *   it, and both modes come with the colors. The shine is an overlay of white, which reads on a
- *   fill of any hue.
+ *   fill of any hue. The aurora drifts through the muted fills rather than the subtle ones,
+ *   because a subtle fill sits two points of lightness from a light page.
  */
 
 import { type SemanticTokens } from "#pandacss.ts";
@@ -21,7 +22,7 @@ type Gradients = NonNullable<SemanticTokens["gradients"]>;
 export const gradients: Gradients = {
   aurora: {
     value:
-      "linear-gradient(120deg, {colors.primary.subtle} 0%, {colors.accent.subtle} 35%, {colors.secondary.subtle} 70%, {colors.primary.subtle} 100%)",
+      "linear-gradient(120deg, {colors.primary.muted} 0%, {colors.accent.muted} 35%, {colors.secondary.muted} 70%, {colors.primary.muted} 100%)",
   },
   brand: { value: "linear-gradient(to right, {colors.primary.solid}, {colors.accent.solid})" },
   shine: {

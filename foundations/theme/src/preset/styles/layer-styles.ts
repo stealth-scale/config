@@ -13,7 +13,10 @@
  *   recipe names beside them. The ripple is the one look that moves on its own, through a
  *   transition a press interrupts and a release lets run. A backdrop is a background image, so a
  *   recipe that pairs one with a fill writes `backgroundColor`, because the `background` shorthand
- *   resets the image.
+ *   resets the image. A textured backdrop is drawn in the line color and the emphasized surface,
+ *   which the contrast checks hold apart from every surface in both modes. The subtle line and
+ *   the subtle surface meet on a light page, and a texture drawn in them was there in dark mode
+ *   alone.
  */
 
 import { type LayerStyle, type LayerStyles } from "#pandacss.ts";
@@ -34,12 +37,18 @@ const SOLID = "var(--colors-color-palette-solid)";
 const INK = "var(--colors-color-palette-fg)";
 
 /**
+ * Fixes the palette's emphasized fill as a custom property, for a band that reads on the ink in
+ * light mode, where the solid is as dark as the ink.
+ */
+const EMPHASIZED = "var(--colors-color-palette-emphasized)";
+
+/**
  * Fixes a tile of fractal noise as an inline image, for a backdrop with grain.
  *
  * @remarks
  *   A data URI rather than a file, so a theme package ships no asset and a stylesheet carries the
- *   grain itself. The rect is drawn at forty percent so the grain sits over a surface rather than
- *   replacing it.
+ *   grain itself. The rect is drawn at forty percent so the grain is laid over a surface rather
+ *   than in place of it.
  */
 const NOISE =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E\")";
@@ -109,21 +118,21 @@ export const layerStyles: LayerStyles = {
     checker: {
       value: {
         backgroundImage:
-          "conic-gradient({colors.bg.subtle} 25%, transparent 0 50%, {colors.bg.subtle} 0 75%, transparent 0)",
+          "conic-gradient({colors.bg.emphasized} 25%, transparent 0 50%, {colors.bg.emphasized} 0 75%, transparent 0)",
         backgroundSize: "{sizes.8} {sizes.8}",
       },
     },
     dots: {
       value: {
         backgroundImage:
-          "radial-gradient({colors.border} {borderWidths.xs}, transparent {borderWidths.xs})",
+          "radial-gradient({colors.border} {borderWidths.sm}, transparent {borderWidths.sm})",
         backgroundSize: "{sizes.4} {sizes.4}",
       },
     },
     grid: {
       value: {
         backgroundImage:
-          "linear-gradient(to right, {colors.border.subtle} {borderWidths.xs}, transparent {borderWidths.xs}), linear-gradient(to bottom, {colors.border.subtle} {borderWidths.xs}, transparent {borderWidths.xs})",
+          "linear-gradient(to right, {colors.border} {borderWidths.xs}, transparent {borderWidths.xs}), linear-gradient(to bottom, {colors.border} {borderWidths.xs}, transparent {borderWidths.xs})",
         backgroundSize: "{sizes.8} {sizes.8}",
       },
     },
@@ -138,7 +147,7 @@ export const layerStyles: LayerStyles = {
     stripes: {
       value: {
         backgroundImage:
-          "repeating-linear-gradient(135deg, {colors.border.subtle} 0 {borderWidths.xs}, transparent {borderWidths.xs} {sizes.4})",
+          "repeating-linear-gradient(135deg, {colors.border} 0 {borderWidths.xs}, transparent {borderWidths.xs} {sizes.4})",
       },
     },
     vignette: {
@@ -261,7 +270,8 @@ export const layerStyles: LayerStyles = {
     gradient: gradientText(`${SOLID}, var(--colors-accent-solid)`),
     shine: {
       value: {
-        ...gradientText(`${INK}, ${SOLID}, ${INK}`).value,
+        ...gradientText(`${INK}, ${EMPHASIZED}, ${INK}`).value,
+        _dark: { backgroundImage: `linear-gradient(to right, ${INK}, ${SOLID}, ${INK})` },
         backgroundSize: "200% auto",
       },
     },

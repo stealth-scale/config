@@ -214,26 +214,26 @@ A recipe picks a look with `layerStyle` and a motion with `animationStyle`. The 
 virtual palette, so each draws in whichever palette the recipe points at, and the motions are turned
 off for a reader who asked for less.
 
-| Look                                            | Draws                                                                               |
-| ----------------------------------------------- | ----------------------------------------------------------------------------------- |
-| `fill.{solid,subtle,muted,surface,ghost,plain}` | A control's fill with its hover                                                     |
-| `outline.{solid,subtle}`                        | A control's edge with its hover                                                     |
-| `indicator.{top,bottom,start,end}`              | A bar along one edge                                                                |
-| `disabled`                                      | The disabled cursor and opacity                                                     |
-| `glow.{sm,md,lg}`                               | A shadow in the palette's solid at half strength                                    |
-| `border.moving`                                 | A conic sweep of the palette's solid round the panel surface, moved by `sweep`      |
-| `glass`                                         | The panel surface at seventy percent behind a blur, solid where transparency is off |
-| `text.gradient`                                 | Text from the palette's solid to the accent's                                       |
-| `text.shine`                                    | Text in the palette's ink with a band of its solid, moved by `shimmer`              |
-| `backdrop.{dots,grid,stripes,checker}`          | A field of dots, a grid, diagonal stripes or a checkerboard in the quiet colors     |
-| `backdrop.noise`                                | A tile of fractal noise over the surface, carried inline                            |
-| `backdrop.vignette`                             | A darkening towards the edges                                                       |
-| `backdrop.spotlight`                            | A radial pool of the palette's muted fill at `--spotlight-x` and `--spotlight-y`    |
-| `backdrop.aurora`                               | The aurora gradient, moved by `aurora`                                              |
-| `blur.{sm,md,lg}`                               | A blur of the element by a step of the blur scale                                   |
-| `dim.others`                                    | The siblings of a hovered child blurred and muted                                   |
-| `mask.{bottom,edges,radial}`                    | The element faded out at the bottom, at both sides, or towards its edges            |
-| `ripple`                                        | A circle of the ink that grows and fades from the centre on release                 |
+| Look                                            | Draws                                                                                                       |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `fill.{solid,subtle,muted,surface,ghost,plain}` | A control's fill with its hover                                                                             |
+| `outline.{solid,subtle}`                        | A control's edge with its hover                                                                             |
+| `indicator.{top,bottom,start,end}`              | A bar along one edge                                                                                        |
+| `disabled`                                      | The disabled cursor and opacity                                                                             |
+| `glow.{sm,md,lg}`                               | A shadow in the palette's solid at half strength                                                            |
+| `border.moving`                                 | A conic sweep of the palette's solid round the panel surface, moved by `sweep`                              |
+| `glass`                                         | The panel surface at seventy percent behind a blur, solid where transparency is off                         |
+| `text.gradient`                                 | Text from the palette's solid to the accent's                                                               |
+| `text.shine`                                    | Text in the palette's ink with a band of its emphasized fill, of its solid in dark mode, moved by `shimmer` |
+| `backdrop.{dots,grid,stripes,checker}`          | A field of dots, a grid or diagonal stripes in the line color, or a checkerboard in the emphasized surface  |
+| `backdrop.noise`                                | A tile of fractal noise over the surface, carried inline                                                    |
+| `backdrop.vignette`                             | A darkening towards the edges                                                                               |
+| `backdrop.spotlight`                            | A radial pool of the palette's muted fill at `--spotlight-x` and `--spotlight-y`                            |
+| `backdrop.aurora`                               | The aurora gradient, moved by `aurora`                                                                      |
+| `blur.{sm,md,lg}`                               | A blur of the element by a step of the blur scale                                                           |
+| `dim.others`                                    | The siblings of a hovered child blurred and muted                                                           |
+| `mask.{bottom,edges,radial}`                    | The element faded out at the bottom, at both sides, or towards its edges                                    |
+| `ripple`                                        | A circle of the ink that grows and fades from the centre on release                                         |
 
 | Motion                                         | Runs                                                                            |
 | ---------------------------------------------- | ------------------------------------------------------------------------------- |

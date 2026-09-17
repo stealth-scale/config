@@ -100,9 +100,11 @@ describe("layerStyles", () => {
   it("draws the patterned backdrops from the lines and the fills", () => {
     expect(tokenAt(layerStyles, "backdrop.stripes")).toStrictEqual({
       backgroundImage:
-        "repeating-linear-gradient(135deg, {colors.border.subtle} 0 {borderWidths.xs}, transparent {borderWidths.xs} {sizes.4})",
+        "repeating-linear-gradient(135deg, {colors.border} 0 {borderWidths.xs}, transparent {borderWidths.xs} {sizes.4})",
     });
-    expect(tokenAt(layerStyles, "backdrop.checker")).toMatchObject({
+    expect(tokenAt(layerStyles, "backdrop.checker")).toStrictEqual({
+      backgroundImage:
+        "conic-gradient({colors.bg.emphasized} 25%, transparent 0 50%, {colors.bg.emphasized} 0 75%, transparent 0)",
       backgroundSize: "{sizes.8} {sizes.8}",
     });
     expect(tokenAt(layerStyles, "backdrop.vignette")).toStrictEqual({
@@ -208,8 +210,12 @@ describe("layerStyles", () => {
       color: "transparent",
     });
     expect(tokenAt(layerStyles, "text.shine")).toMatchObject({
+      _dark: {
+        backgroundImage:
+          "linear-gradient(to right, var(--colors-color-palette-fg), var(--colors-color-palette-solid), var(--colors-color-palette-fg))",
+      },
       backgroundImage:
-        "linear-gradient(to right, var(--colors-color-palette-fg), var(--colors-color-palette-solid), var(--colors-color-palette-fg))",
+        "linear-gradient(to right, var(--colors-color-palette-fg), var(--colors-color-palette-emphasized), var(--colors-color-palette-fg))",
       backgroundSize: "200% auto",
     });
   });
@@ -217,7 +223,7 @@ describe("layerStyles", () => {
   it("draws the backdrops from the lines and the gradients", () => {
     expect(tokenAt(layerStyles, "backdrop.dots")).toStrictEqual({
       backgroundImage:
-        "radial-gradient({colors.border} {borderWidths.xs}, transparent {borderWidths.xs})",
+        "radial-gradient({colors.border} {borderWidths.sm}, transparent {borderWidths.sm})",
       backgroundSize: "{sizes.4} {sizes.4}",
     });
     expect(tokenAt(layerStyles, "backdrop.aurora")).toStrictEqual({

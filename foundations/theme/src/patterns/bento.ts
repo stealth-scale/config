@@ -7,7 +7,8 @@
  *   wide cell pushes the next one down. Every row takes the same minimum height, so a cell that
  *   spans two rows is exactly twice a cell that spans one. A cell states its span with
  *   `bentoCell`, per breakpoint where it wants to, so a tile that is wide on a desk is one
- *   column on a phone.
+ *   column on a phone. The row height is written as a token reference in braces, because the
+ *   compiler binds no scale to `gridAutoRows` and reads a bare number as pixels.
  */
 
 import type { ConditionalValue } from "#generated/types/system.d.mts";
@@ -29,7 +30,8 @@ export interface BentoProps {
   gap?: SystemProperties["gap"];
 
   /**
-   * The least height of one row, as a size token. A cell spanning two rows is twice it.
+   * The least height of one row, as a size token in braces such as `{sizes.40}`. A cell spanning
+   * two rows is twice it. Eight rem when nothing is stated.
    */
   rowHeight?: SystemProperties["gridAutoRows"];
 }
@@ -55,9 +57,9 @@ export interface BentoCellProps {
 const COLUMNS = 3;
 
 /**
- * Fixes the least height of a row when nothing is stated, as a size token.
+ * Fixes the least height of a row when nothing is stated: eight rem, by reference to the sizes.
  */
-const ROW = "40";
+const ROW = "{sizes.32}";
 
 /**
  * Writes a span of a number of tracks.

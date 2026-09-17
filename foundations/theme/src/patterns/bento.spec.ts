@@ -11,7 +11,7 @@ describe("bento", () => {
       display: "grid",
       gap: "gap.md",
       gridAutoFlow: "dense",
-      gridAutoRows: "40",
+      gridAutoRows: "{sizes.32}",
       gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
     });
   });
@@ -23,9 +23,9 @@ describe("bento", () => {
   });
 
   it("takes the gap and the row height it was given", () => {
-    expect(bento({ gap: "gap.sm", rowHeight: "32" })).toMatchObject({
+    expect(bento({ gap: "gap.sm", rowHeight: "{sizes.40}" })).toMatchObject({
       gap: "gap.sm",
-      gridAutoRows: "32",
+      gridAutoRows: "{sizes.40}",
     });
   });
 

@@ -41,4 +41,9 @@ theme: name every compound in its recipe and read the sizes from the tokens
   by the scroll position. The `sticky` pattern joins the patterns, and the page scrolls smoothly
   unless the reader asked for less motion.
 - `bento(props)` and `bentoCell(props)` draw a dense grid of tiles that span columns and rows, each
-  count responsive.
+  count responsive. A row defaults to `{sizes.32}`, written as a token reference because the
+  compiler binds no scale to `gridAutoRows`.
+- The textured backdrops draw in the line color and the emphasized surface, the aurora drifts
+  through the muted fills, and `text.shine` bands the emphasized fill in light mode and the solid in
+  dark mode. The subtle line and the subtle surface are two points of lightness from a light page,
+  so each of these was there in dark mode alone.

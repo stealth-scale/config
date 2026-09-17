@@ -19,9 +19,9 @@ describe("gradients", () => {
     expect(tokenAt(gradients, "shine")).toMatch(/^linear-gradient\(105deg, transparent 40%/u);
   });
 
-  it("drifts the aurora through the three quiet fills and back to the first", () => {
+  it("drifts the aurora through the three muted fills and back to the first", () => {
     expect(tokenAt(gradients, "aurora")).toMatch(
-      /^linear-gradient\(120deg, \{colors\.primary\.subtle\} 0%, .*\{colors\.primary\.subtle\} 100%\)$/u,
+      /^linear-gradient\(120deg, \{colors\.primary\.muted\} 0%, .*\{colors\.primary\.muted\} 100%\)$/u,
     );
   });
 });
