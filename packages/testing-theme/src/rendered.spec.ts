@@ -33,8 +33,16 @@ describe("rendered", () => {
     expect(slotElement(container, "itemIndicator").className).toBe("menu__itemIndicator");
   });
 
-  it("throws naming the part it could not find", () => {
-    expect(() => slotElement(drawn("<div></div>"), "content")).toThrow(/data-part="content"/u);
+  it("finds the element one slot was applied to by the slot its binding stamps", () => {
+    const container = drawn('<header data-slot="header" class="card__header"></header>');
+
+    expect(slotElement(container, "header").className).toBe("card__header");
+  });
+
+  it("throws naming the part and the slot it could not find", () => {
+    expect(() => slotElement(drawn("<div></div>"), "content")).toThrow(
+      /data-part="content".*data-slot="content"/u,
+    );
   });
 
   it("lists every class an element carries sorted", () => {

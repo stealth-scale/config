@@ -2,11 +2,11 @@
  * Reads what a rendered component did with its recipe.
  *
  * @remarks
- *   A bound component marks the element carrying its recipe with `data-recipe`, and an anatomy
- *   marks each part of a compound component with `data-part`. Those are the handles a
- *   specification holds, because a class list changes with the recipe. Every reader throws where
- *   the element it was asked for is absent, naming it, so a failure says which element went
- *   missing.
+ *   A bound component marks the element carrying its recipe with `data-recipe`. A slot binding
+ *   marks each part of a compound component with `data-slot`, and an anatomy marks it with
+ *   `data-part`, the slot's name written with hyphens. Those are the handles a specification
+ *   holds, because a class list changes with the recipe. Every reader throws where the element it
+ *   was asked for is absent, naming it, so a failure says which element went missing.
  */
 
 /**
@@ -18,6 +18,11 @@ const RECIPE = "data-recipe";
  * Fixes the attribute an anatomy marks each part of a compound component with.
  */
 const PART = "data-part";
+
+/**
+ * Fixes the attribute a slot binding marks each part of a compound component with.
+ */
+const SLOT = "data-slot";
 
 /**
  * Writes a slot's name the way an anatomy writes a part's, so `itemIndicator` finds the part
@@ -32,12 +37,11 @@ function partOf(slot: string): string {
 }
 
 /**
- * Finds one element by an attribute and its value.
+ * Finds one element by a selector.
  *
- * @throws {@link Error} When nothing in the output carries the attribute with that value.
+ * @throws {@link Error} When nothing in the output matches the selector.
  */
-function one(container: ParentNode, attribute: string, value: string): HTMLElement {
-  const selector = `[${attribute}="${value}"]`;
+function one(container: ParentNode, selector: string): HTMLElement {
   const found = container.querySelector<HTMLElement>(selector);
 
   if (found === null) throw new Error(`Nothing in the rendered output carries ${selector}.`);
@@ -52,17 +56,17 @@ function one(container: ParentNode, attribute: string, value: string): HTMLEleme
  * @throws {@link Error} When nothing in the output carries that recipe.
  */
 export function recipeElement(container: ParentNode, name: string): HTMLElement {
-  return one(container, RECIPE, name);
+  return one(container, `[${RECIPE}="${name}"]`);
 }
 
 /**
  * Finds the element one slot of a compound component was applied to, by the part its anatomy
- * stamps.
+ * stamps or by the slot its binding stamps.
  *
- * @throws {@link Error} When nothing in the output carries that part.
+ * @throws {@link Error} When nothing in the output carries that part or that slot.
  */
 export function slotElement(container: ParentNode, slot: string): HTMLElement {
-  return one(container, PART, partOf(slot));
+  return one(container, `[${PART}="${partOf(slot)}"], [${SLOT}="${slot}"]`);
 }
 
 /**
