@@ -1,5 +1,11 @@
 # @stealthscale/scale
 
+[![ci](https://github.com/stealth-scale/config/actions/workflows/ci.yml/badge.svg)](https://github.com/stealth-scale/config/actions/workflows/ci.yml)
+[![release](https://github.com/stealth-scale/config/actions/workflows/release.yml/badge.svg)](https://github.com/stealth-scale/config/actions/workflows/release.yml)
+[![npm](https://img.shields.io/npm/v/@stealthscale/theme?label=%40stealthscale%2Ftheme)](https://www.npmjs.com/package/@stealthscale/theme)
+[![node](https://img.shields.io/node/v/@stealthscale/theme)](https://nodejs.org)
+[![license](https://img.shields.io/github/license/stealth-scale/config)](LICENSE)
+
 `@stealthscale/scale` holds the building blocks a stealthscale application is built from. Today that
 is the design system every interface is drawn from, the configuration tiers every package is built
 and released through, and the testing kits both are held to. The component libraries and the
