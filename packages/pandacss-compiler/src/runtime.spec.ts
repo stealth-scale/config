@@ -26,18 +26,36 @@ const RUNTIME = [
   "",
 ].join("\n");
 
+const SLOTS = [
+  '"use client";',
+  "        children: createElement(StyledComponent, {",
+  "          ...resolvedProps,",
+  "          'data-slot': slot,",
+  "          ref,",
+  "        }),",
+  "      return createElement(StyledComponent, {",
+  "        ...resolvedProps,",
+  "        'data-slot': slot,",
+  "        ref,",
+  "      })",
+  "",
+].join("\n");
+
 interface Files {
   helpers: string;
   runtime: string;
+  slots?: string;
 }
 
 interface Rewritten {
   helpers: string;
   runtime: string;
+  slots: string;
 }
 
 interface Run {
   extension?: string;
+  jsx?: boolean;
   separator?: Separator;
   twice?: boolean;
 }
@@ -46,17 +64,23 @@ function rewritten(files: Files, run: Run = {}): Rewritten {
   const dir = mkdtempSync(join(tmpdir(), "pandacss-compiler-"));
   const extension = run.extension ?? "mjs";
   const separator = run.separator ?? "_";
+  const slots = join(dir, "jsx", `create-slot-recipe-context.${extension}`);
 
   try {
     mkdirSync(join(dir, "recipes"));
     writeFileSync(join(dir, `helpers.${extension}`), files.helpers);
     writeFileSync(join(dir, "recipes", `runtime.${extension}`), files.runtime);
+    if (run.jsx !== false) {
+      mkdirSync(join(dir, "jsx"));
+      writeFileSync(slots, files.slots ?? SLOTS);
+    }
     rewriteRuntime(dir, separator);
     if (run.twice === true) rewriteRuntime(dir, separator);
 
     return {
       helpers: readFileSync(join(dir, `helpers.${extension}`), "utf8"),
       runtime: readFileSync(join(dir, "recipes", `runtime.${extension}`), "utf8"),
+      slots: run.jsx === false ? "" : readFileSync(slots, "utf8"),
     };
   } finally {
     rmSync(dir, { force: true, recursive: true });
@@ -111,6 +135,14 @@ describe("rewriteRuntime", () => {
     );
   });
 
+  it("drops the slot attribute from the provider and from the part", () => {
+    const { slots } = rewritten({ helpers: HELPERS, runtime: RUNTIME });
+
+    expect(slots).not.toContain("data-slot");
+    expect(slots).toContain("          ...resolvedProps,\n          ref,");
+    expect(slots).toContain("        ...resolvedProps,\n        ref,");
+  });
+
   it("imports what each file uses from the scheme at its top", () => {
     const { helpers, runtime } = rewritten({ helpers: HELPERS, runtime: RUNTIME });
 
@@ -122,6 +154,21 @@ describe("rewriteRuntime", () => {
         'import { atomicClass, variantClass } from "@stealthscale/pandacss-naming";\n',
       ),
     ).toBe(true);
+  });
+
+  it("marks a file that imports nothing with a comment after its directive", () => {
+    const { slots } = rewritten({ helpers: HELPERS, runtime: RUNTIME });
+
+    expect(
+      slots.startsWith('"use client";\n// rewritten by @stealthscale/pandacss-compiler\n'),
+    ).toBe(true);
+  });
+
+  it("leaves a runtime with no jsx directory as it is beyond the two files it holds", () => {
+    const { helpers, slots } = rewritten({ helpers: HELPERS, runtime: RUNTIME }, { jsx: false });
+
+    expect(helpers).toContain('atomicClass(parts.join(":"), "_")');
+    expect(slots).toBe("");
   });
 
   it("throws when the directory contains no runtime", () => {
@@ -158,6 +205,14 @@ describe("rewriteRuntime", () => {
   it("throws when a template line appears twice", () => {
     expect(() => rewritten({ helpers: HELPERS, runtime: `${RUNTIME}${RUNTIME}` })).toThrow(
       /runtime\.mjs contains .* 2 times where the rewrite needs it once/u,
+    );
+  });
+
+  it("throws when the slot attribute line appears once where the rewrite needs it twice", () => {
+    const slots = SLOTS.replace("          'data-slot': slot,\n", "");
+
+    expect(() => rewritten({ helpers: HELPERS, runtime: RUNTIME, slots })).toThrow(
+      /create-slot-recipe-context\.mjs contains 'data-slot': slot, 1 times where the rewrite needs it 2 times/u,
     );
   });
 });

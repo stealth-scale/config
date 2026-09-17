@@ -370,9 +370,9 @@ function stamped<Props>(
  * @remarks
  *   The part that provides the variants carries the recipe's name as `data-recipe`, so a compound
  *   component is found by the same handle as one that draws a single element. Every part carries
- *   its own slot as `data-slot`, which the generated factories write. The compiler's own
- *   `dataAttr` option does nothing here, because it reads a name off the recipe a part is styled
- *   with and a part is styled with the slot's styles alone.
+ *   its slot class, `card__header`, which the generated factories write and which names the
+ *   recipe and the slot. The compiler's own `dataAttr` option does nothing here, because it reads
+ *   a name off the recipe a part is styled with and a part is styled with the slot's styles alone.
  * @typeParam Slots - Every part the recipe styles.
  * @typeParam Variants - Each axis it offers, against the values it takes.
  */

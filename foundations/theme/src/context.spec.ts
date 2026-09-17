@@ -76,9 +76,19 @@ describe("createRecipeContext", () => {
     const { container } = render(createElement(Content, null, createElement(Title, null, "Hello")));
 
     expect(container.querySelector("section")?.dataset["recipe"]).toBe("dialog");
-    expect(container.querySelector("section")?.dataset["slot"]).toBe("content");
     expect(container.querySelector("h2")?.dataset["recipe"]).toBeUndefined();
-    expect(container.querySelector("h2")?.dataset["slot"]).toBe("title");
+  });
+
+  it("writes each part's slot class and no slot attribute", () => {
+    const { withContext, withProvider } = createSlotRecipeContext(dialog);
+    const Content = withProvider("section", "content");
+    const Title = withContext("h2", "title");
+    const { container } = render(createElement(Content, null, createElement(Title, null, "Hello")));
+
+    expect(container.querySelector("section")?.classList).toContain("dialog__content");
+    expect(container.querySelector("section")?.dataset["slot"]).toBeUndefined();
+    expect(container.querySelector("h2")?.classList).toContain("dialog__title");
+    expect(container.querySelector("h2")?.dataset["slot"]).toBeUndefined();
   });
 
   it("stamps the recipe's name on a root provider that draws no slot of its own", () => {
