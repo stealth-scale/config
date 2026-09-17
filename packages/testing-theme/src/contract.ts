@@ -18,6 +18,7 @@ import {
   type Theme,
 } from "@stealthscale/theme/authoring";
 
+import { COMPOSITIONS } from "#categories.ts";
 import { extensionFiles } from "#files.ts";
 import { type Declared } from "#recipe.ts";
 import { colorsOf, extendedRecipes, palettesOf, resolved, type Resolving } from "#theme.ts";
@@ -36,11 +37,6 @@ const FAMILIES: ReadonlyArray<readonly [family: string, members: readonly string
  * Lists the two keys an extension may never name.
  */
 const OWNED = ["className", "slots"];
-
-/**
- * Lists the three kinds of composition a theme states.
- */
-const COMPOSITIONS = ["animationStyles", "layerStyles", "textStyles"] as const;
 
 /**
  * Reports a palette that leaves one of the twelve roles out, and a family that leaves one of its

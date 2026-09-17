@@ -32,6 +32,9 @@ testing-theme: add the theme testing kit
   pair of keys misspelt, which every check passed over.
 - `contract.compounds` reports rather than throws where the component's own recipe carries a
   compound matched on a value a class name cannot carry.
+- `fonts.installed` resolves a font package from the directory the specification names and reports
+  nothing without one, as the listing check does. It resolved from the working directory, so the
+  answer depended on where the run was started.
 - `publishedRecipes(...presets)` maps every recipe the component packages register to its key, for
   `options.recipes`. A theme specification that passed a list of names left the compound check out,
   because the check needs the recipes themselves.

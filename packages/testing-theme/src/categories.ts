@@ -17,10 +17,15 @@ import foundation from "@stealthscale/theme/theme";
 import { leaves } from "#tokens.ts";
 
 /**
+ * Lists the three kinds of composition a theme states, each of which a recipe reads by name alone.
+ */
+export const COMPOSITIONS = ["animationStyles", "layerStyles", "textStyles"] as const;
+
+/**
  * Maps the properties the compiler resolves itself, which no utility declares, to the categories
  * they read: the three compositions and the virtual palette.
  */
-const COMPOSITIONS: Readonly<Record<string, string>> = {
+const RESOLVED: Readonly<Record<string, string>> = {
   animationStyle: "animationStyles",
   colorPalette: "colors",
   layerStyle: "layerStyles",
@@ -110,8 +115,8 @@ function namesOf(property: string, utility: Utility): readonly string[] {
  * Reads the base preset's utilities into the two lookups.
  */
 function read(): Vocabulary {
-  const categories = new Map<string, string>(Object.entries(COMPOSITIONS));
-  const properties = new Set<string>(Object.keys(COMPOSITIONS));
+  const categories = new Map<string, string>(Object.entries(RESOLVED));
+  const properties = new Set<string>(Object.keys(RESOLVED));
 
   for (const [property, utility] of Object.entries({ ...base.utilities })) {
     const names = namesOf(property, { ...utility });

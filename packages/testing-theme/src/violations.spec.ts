@@ -60,10 +60,22 @@ describe("violations", () => {
     ).toStrictEqual(["skip of name.attribute gives no reason"]);
   });
 
-  it("reports a font package that does not resolve", () => {
+  it("reports a font package that does not resolve from the directory given", () => {
     expect(
-      violations({ ...paletteTheme(), fonts: ["@nope/face"] }, { base: foundation })[0],
+      violations(
+        { ...paletteTheme(), fonts: ["@nope/face"] },
+        {
+          at: import.meta.dirname,
+          base: foundation,
+        },
+      )[0],
     ).toContain("fonts.installed: audited names @nope/face");
+  });
+
+  it("checks the font packages only when a source directory is given", () => {
+    expect(
+      violations({ ...paletteTheme(), fonts: ["@nope/face"] }, { base: foundation }),
+    ).toStrictEqual([]);
   });
 
   it("checks the extension files only when a source directory is given", () => {

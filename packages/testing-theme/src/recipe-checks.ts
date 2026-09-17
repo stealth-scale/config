@@ -12,7 +12,7 @@
 import { HUES, PALETTES, type Preset, ROLES } from "@stealthscale/theme/authoring";
 import foundation from "@stealthscale/theme/theme";
 
-import { conditionNames, semanticColorPaths, tokenPaths } from "#categories.ts";
+import { COMPOSITIONS, conditionNames, semanticColorPaths, tokenPaths } from "#categories.ts";
 import { gated } from "#gate.ts";
 import { type Declared } from "#recipe.ts";
 import { walked, type Walked, type Written } from "#walk.ts";
@@ -137,11 +137,6 @@ const KEYWORDS = new Set([
 const TOKEN_CALL = /token\(([a-zA-Z]+)\.([^,)]+)/u;
 
 /**
- * Lists the three categories a value reads by name alone, so every value has to exist.
- */
-const COMPOSITIONS = new Set(["animationStyles", "layerStyles", "textStyles"]);
-
-/**
  * Fixes the virtual palette a recipe reads roles through.
  */
 const VIRTUAL = "colorPalette";
@@ -222,7 +217,9 @@ function tokenFault(category: string, value: string, preset: Preset): string | u
       : `names ${value}, which is not a ${String(called)} token`;
   }
 
-  if (!TOKEN.test(value) && !COMPOSITIONS.has(category)) return undefined;
+  const composed = COMPOSITIONS.some((kind) => kind === category);
+
+  if (!TOKEN.test(value) && !composed) return undefined;
   if (KEYWORDS.has(bare(value))) return undefined;
 
   return tokenPaths(category, preset).has(bare(value))

@@ -12,6 +12,7 @@
 import { type Mode, type Preset, type Theme } from "@stealthscale/theme/authoring";
 
 import { type Declared } from "#recipe.ts";
+import { nodeAt } from "#tokens.ts";
 
 /**
  * Describes the preset a theme is layered on, for the scales a reference names and the theme does
@@ -42,13 +43,7 @@ function at(value: unknown, name: string): unknown {
  * group.
  */
 function walked(block: unknown, path: readonly string[]): unknown {
-  let node = block;
-
-  for (const name of path) {
-    if (node === undefined) return undefined;
-
-    node = at(node, name);
-  }
+  const node = nodeAt(block, path.join("."));
 
   return node === undefined ? undefined : (at(node, ITSELF) ?? node);
 }

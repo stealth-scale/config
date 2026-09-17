@@ -77,7 +77,7 @@ expect(recipeClasses(container, "button")).toContain(variantClass("button", "var
 | `contrast.text`       | A text pair below 7:1: every ink on every surface, and each palette's `contrast` on its solids and its inks on its fills           |
 | `contrast.boundary`   | A boundary pair below 3:1: the emphasized line and the subtle ink on every surface, and each palette's solid and lines on the page |
 | `contrast.focus`      | A palette's `focusRing` below 3:1 on any surface                                                                                   |
-| `fonts.installed`     | A font package the theme names that does not resolve from `at`                                                                     |
+| `fonts.installed`     | A font package the theme names that does not resolve from `at`, and nothing where `at` is not given                                |
 
 `options.recipes` lists the recipe keys the workspace publishes, or maps each key to its recipe,
 which adds the compound check. `publishedRecipes(...presets)` builds that map out of the presets the

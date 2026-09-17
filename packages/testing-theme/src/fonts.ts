@@ -31,10 +31,16 @@ function resolves(name: string, from: string): boolean {
 }
 
 /**
- * Reports a font package the theme names that does not resolve from a directory, which is the
- * theme package's own directory or the working directory where none is given.
+ * Reports a font package the theme names that does not resolve from the theme package's own
+ * directory.
+ *
+ * @remarks
+ *   Nothing is reported where no directory is given, as the listing check does. Resolving from the
+ *   working directory instead would answer differently depending on where the run was started.
  */
-export function installed(theme: Theme, at: string = process.cwd()): readonly string[] {
+export function installed(theme: Theme, at?: string): readonly string[] {
+  if (at === undefined) return [];
+
   return theme.fonts
     .filter((name) => !resolves(name, at))
     .map((name) => `${theme.name} names ${name}, which does not resolve from ${at}`);
