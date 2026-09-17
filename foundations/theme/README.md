@@ -84,7 +84,9 @@ export const abyss = defineTheme({
 ```
 
 An application lists its themes in `theme.config.ts`. The first is the default, and every one of
-them switches under `data-theme`:
+them switches under `data-theme`. A recipe written in the application rather than in a package is
+registered there too, through a preset the application states under `presets`, and a theme extends
+it by its key as it extends any other:
 
 ```ts
 import { type Application } from "@stealthscale/theme/authoring";
@@ -92,7 +94,9 @@ import { type Application } from "@stealthscale/theme/authoring";
 import { abyss } from "@acme/theme-abyss";
 import { fathom } from "@acme/theme-fathom";
 
-export default { themes: [fathom, abyss] } satisfies Application;
+import own from "./src/theme.ts";
+
+export default { presets: [own], themes: [fathom, abyss] } satisfies Application;
 ```
 
 A page switches its theme and its color mode with two attributes, on the document root or on any

@@ -47,3 +47,8 @@ theme: name every compound in its recipe and read the sizes from the tokens
   through the muted fills, and `text.shine` bands the emphasized fill in light mode and the solid in
   dark mode. The subtle line and the subtle surface are two points of lightness from a light page,
   so each of these was there in dark mode alone.
+- `Application` takes `presets`, the presets an application writes for recipes of its own, which the
+  build plugin installs after every package's preset and before the themes.
+- `SEPARATOR`, published from `./authoring`, is the hyphen the build plugin configures the compiler
+  with between an axis and its value. `compoundClassName` writes it, so a compound reads
+  `button--compound__size-lg__variant-solid` and a bound element's variant class `button--size-lg`.
