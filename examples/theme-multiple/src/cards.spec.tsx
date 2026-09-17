@@ -29,7 +29,8 @@ describe("Cards", () => {
     expect(outline?.querySelector("header")?.className).toContain(
       slotVariantClass("card", "header", "size", "sm"),
     );
-    expect(subtle?.querySelector("footer")?.className).toContain(
+    expect(subtle?.className).toContain(slotVariantClass("card", "root", "variant", "subtle"));
+    expect(subtle?.querySelector("footer")?.className).not.toContain(
       slotVariantClass("card", "footer", "variant", "subtle"),
     );
   });

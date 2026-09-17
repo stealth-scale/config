@@ -8,10 +8,11 @@
  *   than the selector. The utility is the property's class, the compiler's separator and the
  *   value, and it is split at the first separator on its own, since two in a row are a negative
  *   value under `-` or a recipe's slot under `_`. The property's class is written in kebab-case,
- *   the separator becomes a hyphen, and the value is sanitised and keeps its case, because a token
- *   name is case-sensitive. A utility without the separator is a recipe's class, which the scheme
- *   wrote already, and is written in kebab-case, so a slot named in camel case reads the same on
- *   both sides.
+ *   without the hyphens a custom property opens with, the separator becomes a hyphen, and the
+ *   value is sanitised and written in lower kebab-case. A class name resolves no token, so its
+ *   case is free, and one case reads as one scheme. A utility without the separator is a recipe's
+ *   class, which the scheme wrote already, and is written in kebab-case, so a slot named in camel
+ *   case reads the same on both sides.
  */
 
 import { type Separator } from "#recipe.ts";
@@ -35,6 +36,12 @@ const SPLITS: Readonly<Record<Separator, RegExp>> = {
   "-": /(?<!-)-(?!-)/u,
   "=": /(?<!=)=(?!=)/u,
 };
+
+/**
+ * Matches the hyphens a custom property's class opens with, which the compiler keeps from the
+ * property's name.
+ */
+const DASHES = /^-+/u;
 
 /**
  * Describes a class split into its conditions and its utility.
@@ -90,15 +97,17 @@ function condition(segment: string): string {
 }
 
 /**
- * Rewrites a utility: the property's class in kebab-case, a hyphen and the value sanitised, or a
- * recipe's class in kebab-case where the separator is absent.
+ * Rewrites a utility: the property's class in kebab-case, a hyphen and the value sanitised and in
+ * lower kebab-case, or a recipe's class in kebab-case where the separator is absent.
  */
 function utility(segment: string, separator: Separator): string {
   const at = segment.search(SPLITS[separator]);
 
   if (at === -1) return sanitise(kebab(segment));
 
-  return `${kebab(segment.slice(0, at))}-${sanitise(segment.slice(at + 1))}`;
+  const property = kebab(segment.slice(0, at)).replace(DASHES, "");
+
+  return `${property}-${kebab(sanitise(segment.slice(at + 1)))}`;
 }
 
 /**

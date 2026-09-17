@@ -11,6 +11,8 @@ the compiled stylesheet, where the selectors are renamed, so the two sides agree
 | Slot                      | `card__root`                                      | `card__root`                                     |
 | Compound                  | `button--compound__size_lg__variant_solid`        | `button--expose`, the name the author gave it    |
 | Atomic                    | `grid-ar_{sizes.32}`, `md:grid-tc_repeat(3,_1fr)` | `grid-ar-sizes-32`, `md:grid-tc-repeat-3-1fr`    |
+| Value with a capital      | `bg_colorPalette.solid`, `ff_Segoe_UI`            | `bg-color-palette-solid`, `ff-segoe-ui`          |
+| Custom property           | `--stagger_0`                                     | `stagger-0`                                      |
 | Negative value            | `m_-4`                                            | `m--4`                                           |
 | Condition                 | `focusVisible:c_red`, `[&_>_*]:c_red`             | `focus-visible:c-red`, `[&_>_*]:c-red`           |
 
@@ -71,16 +73,16 @@ has no structure to read, and a prefix is not read from a recipe's class.
 
 ## Reference
 
-| Export                                 | Returns                                                                                                                                                                                                    |
-| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `variantClass(className, axis, value)` | `<class>--<value>` for a string or a number, `<class>--<axis>` for `true`, and an empty string for `false`                                                                                                 |
-| `slotClass(className, slot)`           | `<class>__<slot>`                                                                                                                                                                                          |
-| `compoundClass(className, name)`       | `<class>--<name>`                                                                                                                                                                                          |
-| `atomicClass(pandaClass, separator)`   | The class with each named condition and the property's class in kebab-case, the separator written as a hyphen, and the value sanitised. A raw selector or at-rule condition in brackets is kept as written |
-| `rename(pandaClass, config)`           | The class as a variant where one of `config.recipes` claims it, with `config.separator` between axis and value, and as an atomic class otherwise                                                           |
-| `conditionsOf(pandaClass)`             | The conditions of a class, outer to inner, as the compiler wrote them, with a raw one in its brackets                                                                                                      |
-| `sanitise(segment)`                    | The segment with a letter, a digit, a hyphen, `%`, `/`, `!` and the slot separator `__` kept, each run of other characters replaced by one hyphen, and a run at the start dropped. A value keeps its case  |
-| `kebab(name)`                          | The name with a hyphen at each boundary between a lower-case letter or a digit and a capital, in lower case                                                                                                |
+| Export                                 | Returns                                                                                                                                                                                                                                                                              |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `variantClass(className, axis, value)` | `<class>--<value>` for a string or a number, `<class>--<axis>` for `true`, and an empty string for `false`                                                                                                                                                                           |
+| `slotClass(className, slot)`           | `<class>__<slot>`                                                                                                                                                                                                                                                                    |
+| `compoundClass(className, name)`       | `<class>--<name>`                                                                                                                                                                                                                                                                    |
+| `atomicClass(pandaClass, separator)`   | The class with each named condition and the property's class in kebab-case, without the hyphens a custom property opens with, the separator written as a hyphen, and the value sanitised and in lower kebab-case. A raw selector or at-rule condition in brackets is kept as written |
+| `rename(pandaClass, config)`           | The class as a variant where one of `config.recipes` claims it, with `config.separator` between axis and value, and as an atomic class otherwise                                                                                                                                     |
+| `conditionsOf(pandaClass)`             | The conditions of a class, outer to inner, as the compiler wrote them, with a raw one in its brackets                                                                                                                                                                                |
+| `sanitise(segment)`                    | The segment with a letter, a digit, a hyphen, `%`, `/`, `!` and the slot separator `__` kept, each run of other characters replaced by one hyphen, and a run at the start dropped. The case is kept, and `atomicClass` lowers it                                                     |
+| `kebab(name)`                          | The name with a hyphen at each boundary between a lower-case letter or a digit and a capital, in lower case                                                                                                                                                                          |
 
 ## Licence
 

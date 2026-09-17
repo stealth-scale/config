@@ -144,7 +144,7 @@ describe("assemble", () => {
     expect(declared(css, "[data-theme=abyss]", "--colors-brand")).toBe("#222");
   });
 
-  it("restates the foundation's token values under every theme's attribute", async () => {
+  it("restates the foundation's value under a theme for a token another theme states", async () => {
     const files = {
       ...APP,
       "themes/abyss.ts": theme(
@@ -306,15 +306,14 @@ describe("assemble", () => {
     expect(declared(css, "[data-theme=abyss] .button", "letter-spacing")).toBe("0.3em");
   });
 
-  it("stops scoping a theme's rules once it extends nothing and keeps its token block", async () => {
+  it("stops scoping a theme that no longer extends anything", async () => {
     const files = {
       ...APP,
       "themes/abyss.ts": 'export const abyss = { fonts: [], name: "abyss", variant: {} };\n',
     };
     const css = await withScratchWorkspaceAsync(files, compiled);
 
-    expect(css).not.toContain("[data-theme=abyss] .button");
-    expect(declared(css, "[data-theme=abyss]", "--colors-brand")).toBe("#111");
+    expect(css).not.toContain("data-theme=abyss");
   });
 
   it("lists every file the configuration was built from as watched", async () => {

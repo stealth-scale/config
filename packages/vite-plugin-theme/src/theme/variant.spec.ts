@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { type Preset } from "#pandacss.ts";
-import { completed } from "#theme/variant.ts";
+import { type Preset, type ThemeVariant } from "#pandacss.ts";
+import { completed, stated } from "#theme/variant.ts";
 
 const FOUNDATION: Preset = {
   name: "@acme/design",
@@ -19,62 +19,67 @@ const FOUNDATION: Preset = {
   },
 };
 
-describe("completed", () => {
-  it("restates every token category the variant leaves out", () => {
-    const variant = completed({ tokens: { radii: { l1: { value: "8px" } } } }, FOUNDATION);
+const FOLIO: ThemeVariant = { tokens: { fonts: { body: { value: "Georgia" } } } };
 
-    expect(variant.tokens?.fonts).toStrictEqual({
-      body: { value: "sans-serif" },
-      heading: { value: "serif" },
+const FORGE: ThemeVariant = { tokens: { radii: { l1: { value: "8px" } } } };
+
+describe("completed", () => {
+  it("lists every token any variant states as one shape", () => {
+    expect(stated([FOLIO, FORGE, {}])).toStrictEqual({
+      tokens: { fonts: { body: { value: "Georgia" } }, radii: { l1: { value: "8px" } } },
     });
-    expect(variant.tokens?.colors).toStrictEqual({
-      gray: { 100: { value: "#eee" }, 900: { value: "#111" } },
+  });
+
+  it("fills a token another theme states with the foundation's value", () => {
+    const shape = stated([FOLIO, FORGE]);
+
+    expect(completed(FORGE, FOUNDATION, shape).tokens).toStrictEqual({
+      fonts: { body: { value: "sans-serif" } },
+      radii: { l1: { value: "8px" } },
     });
-    expect(variant.semanticTokens?.colors).toStrictEqual({
-      bg: { value: { _dark: "{colors.gray.900}", base: "{colors.gray.100}" } },
+    expect(completed(FOLIO, FOUNDATION, shape).tokens).toStrictEqual({
+      fonts: { body: { value: "Georgia" } },
+      radii: { l1: { value: "4px" } },
     });
+  });
+
+  it("leaves a token no theme states out", () => {
+    const variant = completed(FORGE, FOUNDATION, stated([FORGE]));
+
+    expect(variant).toStrictEqual({ tokens: { radii: { l1: { value: "8px" } } } });
+    expect(variant.tokens?.colors).toBeUndefined();
   });
 
   it("keeps the variant's token over the foundation's with every mode it states", () => {
-    const variant = completed(
-      { semanticTokens: { colors: { bg: { value: "{colors.gray.100}" } } } },
-      FOUNDATION,
-    );
+    const own: ThemeVariant = {
+      semanticTokens: { colors: { bg: { value: "{colors.gray.100}" } } },
+    };
 
-    expect(variant.semanticTokens?.colors).toStrictEqual({ bg: { value: "{colors.gray.100}" } });
+    expect(completed(own, FOUNDATION, stated([own])).semanticTokens).toStrictEqual({
+      colors: { bg: { value: "{colors.gray.100}" } },
+    });
   });
 
-  it("fills a group the variant states in part", () => {
-    const variant = completed({ tokens: { fonts: { body: { value: "Inter" } } } }, FOUNDATION);
+  it("fills only the token of a group that another theme states", () => {
+    const other: ThemeVariant = { tokens: { fonts: { heading: { value: "Inter" } } } };
 
-    expect(variant.tokens?.fonts).toStrictEqual({
-      body: { value: "Inter" },
+    expect(completed(FOLIO, FOUNDATION, stated([FOLIO, other])).tokens?.fonts).toStrictEqual({
+      body: { value: "Georgia" },
       heading: { value: "serif" },
     });
   });
 
-  it("keeps a token the foundation does not define", () => {
-    const variant = completed({ tokens: { fonts: { mono: { value: "monospace" } } } }, FOUNDATION);
+  it("leaves a token the foundation does not define to the theme that states it", () => {
+    const other: ThemeVariant = { tokens: { fonts: { mono: { value: "monospace" } } } };
 
-    expect(variant.tokens?.fonts).toStrictEqual({
-      body: { value: "sans-serif" },
-      heading: { value: "serif" },
-      mono: { value: "monospace" },
+    expect(completed(FORGE, FOUNDATION, stated([FORGE, other])).tokens).toStrictEqual({
+      radii: { l1: { value: "8px" } },
     });
-  });
-
-  it("states no category that neither the variant nor the foundation states", () => {
-    const variant = completed({}, { name: "@acme/bare" });
-
-    expect(variant).toStrictEqual({});
   });
 
   it("returns the variant as it is where the foundation extends nothing", () => {
-    const variant = completed(
-      { tokens: { radii: { l1: { value: "8px" } } } },
-      { name: "@acme/bare", theme: {} },
-    );
-
-    expect(variant).toStrictEqual({ tokens: { radii: { l1: { value: "8px" } } } });
+    expect(
+      completed(FORGE, { name: "@acme/bare", theme: {} }, stated([FOLIO, FORGE])),
+    ).toStrictEqual(FORGE);
   });
 });

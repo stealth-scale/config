@@ -16,6 +16,10 @@
  *   scrollbars and its selection in light, even though the colors a theme states do not follow it
  *   there.
  *   The page scrolls smoothly to an anchor, and jumps for a reader who asked for less motion.
+ *   The compiler's reset strips the size and the weight off every heading, so a heading with no
+ *   text style of its own read as body text. A bare heading reads in the heading role of its
+ *   level, in the proportions the browser's own defaults keep, and a text style on the element
+ *   still overrides it, because the utilities layer follows the base layer.
  */
 
 import { COLOR_MODE_ATTRIBUTE, THEME_ATTRIBUTE } from "#attributes.ts";
@@ -36,6 +40,10 @@ export const globalCss: GlobalStyleObject = {
   [`[${COLOR_MODE_ATTRIBUTE}=light]`]: {
     colorScheme: "light",
   },
+  h1: { textStyle: "heading.xl" },
+  h2: { textStyle: "heading.lg" },
+  h3: { textStyle: "heading.md" },
+  "h4, h5, h6": { textStyle: "heading.sm" },
   html: {
     "@media (prefers-color-scheme: dark)": {
       [`&:not([${COLOR_MODE_ATTRIBUTE}=light])`]: { colorScheme: "dark" },

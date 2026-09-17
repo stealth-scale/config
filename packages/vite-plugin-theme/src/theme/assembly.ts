@@ -32,7 +32,7 @@ import {
   type Statement,
   type Theme,
 } from "#statement.ts";
-import { completed } from "#theme/variant.ts";
+import { completed, stated } from "#theme/variant.ts";
 
 /**
  * Fixes the file the rendered configuration is written to, under the cache directory.
@@ -143,9 +143,10 @@ function defaultPreset(first: Theme): object {
  *   themes, so a theme extends a recipe the application wrote as it extends one a package
  *   published. The first theme's values and preset are installed unscoped, which is what makes it
  *   the theme that applies while no attribute is set, and every theme's preset is installed scoped,
- *   the first included. Every theme's variant is completed with the foundation's tokens before it
- *   is installed, so a subtree switched to a theme is drawn from that theme alone rather than from
- *   the theme around it. The manifests are watched beside the statement and the presets, because a
+ *   the first included. Every theme's variant is completed with the foundation's value for each
+ *   token another theme states before it is installed, so a subtree switched to a theme is drawn
+ *   from that theme alone rather than from the theme around it. The manifests are watched beside
+ *   the statement and the presets, because a
  *   package added to a manifest is a package whose own files nothing is watching yet, so the change
  *   that introduces it is the only notice there is.
  * @throws {@link Error} When the application does not depend on the system package, or the
@@ -170,6 +171,7 @@ export async function assemble(
   const [first] = themes;
   const configPath = join(root, CACHE, CONFIG);
   const published = [...rest.map((each) => each.preset), ...own];
+  const shape = stated(themes.map((each) => each.variant));
 
   writeIfChanged(
     configPath,
@@ -187,7 +189,7 @@ export async function assemble(
       staticCss: staticCssOf(statement.application),
       system: resolved.systemPackage,
       themes: Object.fromEntries(
-        themes.map((each) => [each.name, completed(each.variant, foundation.preset)]),
+        themes.map((each) => [each.name, completed(each.variant, foundation.preset, shape)]),
       ),
     }),
   );
