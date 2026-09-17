@@ -21,7 +21,7 @@ import { type Switchable } from "#scope.ts";
  * Describes a theme as the package that defines one exports it.
  *
  * @remarks
- *   Declared here rather than imported. The package that owns this type ships browser code, and
+ *   Declared here rather than imported. The package this type belongs to ships browser code, and
  *   such a package may not depend on build tooling, so the two agree structurally.
  */
 export interface Theme extends Switchable {
@@ -40,6 +40,12 @@ export interface Theme extends Switchable {
  * Describes what an application states about styling.
  */
 export interface Application {
+  /**
+   * The presets the application writes for recipes of its own, installed after every package's
+   * preset and before the themes.
+   */
+  presets?: readonly object[] | undefined;
+
   /**
    * The recipes to compile outright, for a page that picks variants while it runs.
    */

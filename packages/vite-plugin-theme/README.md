@@ -41,8 +41,10 @@ export default { static: "*", themes: [fathom, abyss] };
 
 The first theme is the default: its values and its extensions apply while no attribute is set. Every
 theme is compiled under `[data-theme=<name>]` as well, the first included, so a subtree can wear any
-theme. The application imports the stylesheet through the system package's `styles.css` subpath, and
-the plugin appends the compiled rules to whichever stylesheet declares the cascade order.
+theme. A recipe written in the application itself is registered through a preset the statement
+carries under `presets`, installed after every package's preset and before the themes. The
+application imports the stylesheet through the system package's `styles.css` subpath, and the plugin
+appends the compiled rules to whichever stylesheet declares the cascade order.
 
 ## Options
 
@@ -66,16 +68,16 @@ to `node_modules/.theme/`.
 | `theme.runtime`    | `(options?: RuntimeOptions) => Plugin` | `stealth:theme.runtime`, which generates the runtime of the system package  |
 | `theme.stylesheet` | `(options?: Options) => Plugin`        | `stealth:theme.stylesheet`, which compiles the stylesheet of an application |
 
-| Type               | What it describes                                                                                       |
-| ------------------ | ------------------------------------------------------------------------------------------------------- |
-| `Application`      | What an application states: `themes`, the first being the default, and an optional `static`             |
-| `Theme`            | A theme as a theme package exports it: `name`, `variant`, an optional `preset` and `fonts`              |
-| `Options`          | The three options above                                                                                 |
-| `RuntimeOptions`   | The `layers` option alone                                                                               |
-| `Switchable`       | A theme read for its `name` and its `preset`                                                            |
-| `SwitchablePreset` | A preset read for its `name`, its `presets` and the extensions under `theme.extend`                     |
-| `Extension`        | What a theme changes about one recipe: `base`, `variants` and `compoundVariants`                        |
-| `Extensions`       | A theme's extensions, under `recipes`, `slotRecipes`, `textStyles`, `layerStyles` and `animationStyles` |
+| Type               | What it describes                                                                                                 |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| `Application`      | What an application states: `themes`, the first being the default, an optional `presets` and an optional `static` |
+| `Theme`            | A theme as a theme package exports it: `name`, `variant`, an optional `preset` and `fonts`                        |
+| `Options`          | The three options above                                                                                           |
+| `RuntimeOptions`   | The `layers` option alone                                                                                         |
+| `Switchable`       | A theme read for its `name` and its `preset`                                                                      |
+| `SwitchablePreset` | A preset read for its `name`, its `presets` and the extensions under `theme.extend`                               |
+| `Extension`        | What a theme changes about one recipe: `base`, `variants` and `compoundVariants`                                  |
+| `Extensions`       | A theme's extensions, under `recipes`, `slotRecipes`, `textStyles`, `layerStyles` and `animationStyles`           |
 
 ## The compilation
 

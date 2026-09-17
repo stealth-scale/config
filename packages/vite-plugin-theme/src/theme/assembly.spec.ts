@@ -39,7 +39,7 @@ const KIT = packageFiles(
       '  name: "@acme/kit",',
       "  theme: {",
       "    extend: {",
-      '      recipes: { button: { className: "button", jsx: ["Button"], base: { color: "brand", letterSpacing: "0em" }, variants: { size: { lg: { padding: "8px" }, md: { padding: "4px" } }, variant: { ghost: { color: "green" }, solid: { color: "red" } } }, compoundVariants: [{ className: "button--compound__size_lg__variant_solid", css: { fontWeight: "700" }, size: "lg", variant: "solid" }, { className: "button--compound__size_md__variant_ghost", css: { fontStyle: "italic" }, size: "md", variant: "ghost" }] } },',
+      '      recipes: { button: { className: "button", jsx: ["Button"], base: { color: "brand", letterSpacing: "0em" }, variants: { size: { lg: { padding: "8px" }, md: { padding: "4px" } }, variant: { ghost: { color: "green" }, solid: { color: "red" } } }, compoundVariants: [{ className: "button--compound__size-lg__variant-solid", css: { fontWeight: "700" }, size: "lg", variant: "solid" }, { className: "button--compound__size-md__variant-ghost", css: { fontStyle: "italic" }, size: "md", variant: "ghost" }] } },',
       '      slotRecipes: { dialog: { className: "dialog", slots: ["content", "backdrop"], base: { content: { padding: "4px" } } } },',
       "    },",
       "  },",
@@ -112,6 +112,30 @@ describe("assemble", () => {
     expect(declared(css, "[data-theme=fathom] .button", "letter-spacing")).toBe("0.01em");
   });
 
+  it("installs the presets the application states after the packages and before the themes", async () => {
+    const files: ScratchFiles = {
+      ...APP,
+      "theme.config.ts": [
+        'import { abyss } from "./themes/abyss.ts";',
+        'import { fathom } from "./themes/fathom.ts";',
+        "",
+        'const own = { name: "@acme/app", theme: { extend: { recipes: { badge: { className: "badge", jsx: ["Badge"], base: { letterSpacing: "0.02em" } } } } } };',
+        "",
+        'export default { presets: [own], static: "*", themes: [fathom, abyss] };',
+        "",
+      ].join("\n"),
+      "themes/abyss.ts": theme(
+        "abyss",
+        'recipes: { badge: { base: { letterSpacing: "0.09em" } }, button: { base: { letterSpacing: "0.06em" } } }',
+      ),
+    };
+    const css = await withScratchWorkspaceAsync(files, compiled);
+
+    expect(declared(css, ".badge", "letter-spacing")).toBe("0.02em");
+    expect(declared(css, "[data-theme=abyss] .badge", "letter-spacing")).toBe("0.09em");
+    expect(declared(css, "[data-theme=abyss] .button", "letter-spacing")).toBe("0.06em");
+  });
+
   it("draws a theme's token values under its attribute", async () => {
     const files = {
       ...APP,
@@ -170,8 +194,8 @@ describe("assemble", () => {
     };
     const css = await withScratchWorkspaceAsync(files, compiled);
 
-    expect(declared(css, ".textStyle_brand", "font-size")).toBe("12px");
-    expect(declared(css, "[data-theme=abyss] .textStyle_brand", "font-size")).toBe("14px");
+    expect(declared(css, ".textStyle-brand", "font-size")).toBe("12px");
+    expect(declared(css, "[data-theme=abyss] .textStyle-brand", "font-size")).toBe("14px");
   });
 
   it("scopes a variant's styles under the attribute", async () => {
@@ -179,14 +203,14 @@ describe("assemble", () => {
     const files = { ...APP, "themes/abyss.ts": theme("abyss", extend) };
     const css = await withScratchWorkspaceAsync(files, compiled);
 
-    expect(declared(css, ".button--size_lg", "padding")).toBe("8px");
-    expect(declared(css, "[data-theme=abyss] .button--size_lg", "padding")).toBe("12px");
+    expect(declared(css, ".button--size-lg", "padding")).toBe("8px");
+    expect(declared(css, "[data-theme=abyss] .button--size-lg", "padding")).toBe("12px");
   });
 
   it("compiles a compound under the class its recipe names", async () => {
     const css = await withScratchWorkspaceAsync(APP, compiled);
 
-    expect(declared(css, ".button--compound__size_lg__variant_solid", "font-weight")).toBe("700");
+    expect(declared(css, ".button--compound__size-lg__variant-solid", "font-weight")).toBe("700");
   });
 
   it("compiles a theme's compound for the same selection under the same class", async () => {
@@ -198,7 +222,7 @@ describe("assemble", () => {
     expect(
       declared(
         css,
-        "[data-theme=abyss] .button--compound__size_lg__variant_solid",
+        "[data-theme=abyss] .button--compound__size-lg__variant-solid",
         "letter-spacing",
       ),
     ).toBe("0.2em");
@@ -224,8 +248,8 @@ describe("assemble", () => {
     };
     const css = await withScratchWorkspaceAsync(files, compiled);
 
-    expect(declared(css, ".button--compound__size_lg__variant_solid", "font-weight")).toBe("700");
-    expect(css).not.toContain("size_md__variant_ghost");
+    expect(declared(css, ".button--compound__size-lg__variant-solid", "font-weight")).toBe("700");
+    expect(css).not.toContain("size-md__variant-ghost");
   });
 
   it("scopes a slot recipe's styles inside the slot", async () => {

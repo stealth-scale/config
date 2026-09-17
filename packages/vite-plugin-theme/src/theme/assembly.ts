@@ -138,11 +138,13 @@ function defaultPreset(first: Theme): object {
  * compiler and scans everything the application draws with.
  *
  * @remarks
- *   The first theme's values and preset are installed unscoped, which is what makes it the theme
- *   that applies while no attribute is set, and every theme's preset is installed scoped, the first
- *   included. The manifests are watched beside the statement and the presets, because a package
- *   added to a manifest is a package whose own files nothing is watching yet, so the change that
- *   introduces it is the only notice there is.
+ *   The presets the application states are installed after every package's preset and before the
+ *   themes, so a theme extends a recipe the application wrote as it extends one a package
+ *   published. The first theme's values and preset are installed unscoped, which is what makes it
+ *   the theme that applies while no attribute is set, and every theme's preset is installed
+ *   scoped, the first included. The manifests are watched beside the statement and the presets,
+ *   because a package added to a manifest is a package whose own files nothing is watching yet, so
+ *   the change that introduces it is the only notice there is.
  * @throws {@link Error} When the application does not depend on the system package, or the
  *   statement or a preset cannot be loaded.
  */
@@ -161,7 +163,7 @@ export async function assemble(
     throw new Error(`${root} does not depend on ${resolved.systemPackage}`);
   }
 
-  const { themes } = statement.application;
+  const { presets: own = [], themes } = statement.application;
   const [first] = themes;
   const configPath = join(root, CACHE, CONFIG);
 
@@ -174,6 +176,7 @@ export async function assemble(
       layers: resolved.layers,
       presets: [
         ...rest.map((each) => each.preset),
+        ...own,
         defaultPreset(first),
         ...(first.preset === undefined ? [] : [first.preset]),
         ...scopedPresets(themes),
