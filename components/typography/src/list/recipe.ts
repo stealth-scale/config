@@ -3,12 +3,15 @@
  * with each entry's mark aligned to its lines, entering with a motion where a page wants one.
  *
  * @remarks
- *   Every value is a semantic gap, a semantic inset, a foreground role or an animation style, so
+ *   Every value is a semantic gap, the marker gutter, a foreground role or an animation style, so
  *   a theme moves all of them. The root takes the variants and every part draws its slot in them.
- *   The marker look restores the browser's markers, which the compiler's reset removes, and the
- *   plain look leaves each entry a row so an indicator of the caller's own sits beside the text.
+ *   The marker look restores the browser's markers, which the compiler's reset removes, and lays
+ *   the entries in from the gutter the foundation states for a marker, and the plain look leaves
+ *   each entry a row so an indicator of the caller's own sits beside the text.
  *   Which element the root draws is the whole of the difference between a bulleted and a numbered
- *   list, and a caller chooses it with `as`.
+ *   list, and a caller chooses it with `as`. A marker picks the glyph or the numbering the browser
+ *   draws, and is set on the entry rather than the root, because the marker look restores the
+ *   root's list style with the shorthand and a type on the root would lose to it.
  */
 
 import { defineSlotRecipe } from "@stealthscale/theme/authoring";
@@ -45,6 +48,19 @@ export const recipe = defineSlotRecipe({
       xl: { root: { gap: "gap.xl" } },
       xs: { root: { gap: "gap.xs" } },
     },
+    marker: {
+      circle: { item: { listStyleType: "circle" } },
+      dash: { item: { listStyleType: '"– "' } },
+      decimal: { item: { listStyleType: "decimal" } },
+      disc: { item: { listStyleType: "disc" } },
+      "leading-zero": { item: { listStyleType: "decimal-leading-zero" } },
+      "lower-alpha": { item: { listStyleType: "lower-alpha" } },
+      "lower-greek": { item: { listStyleType: "lower-greek" } },
+      "lower-roman": { item: { listStyleType: "lower-roman" } },
+      square: { item: { listStyleType: "square" } },
+      "upper-alpha": { item: { listStyleType: "upper-alpha" } },
+      "upper-roman": { item: { listStyleType: "upper-roman" } },
+    },
     motion: {
       reveal: { item: { animationStyle: "reveal" } },
       rise: { item: { animationStyle: "rise" } },
@@ -52,7 +68,7 @@ export const recipe = defineSlotRecipe({
     variant: {
       marker: {
         item: { _marker: { color: "fg.muted" } },
-        root: { listStyle: "revert", paddingInlineStart: "inset.lg" },
+        root: { listStyle: "revert", paddingInlineStart: "marker" },
       },
       plain: {
         item: { alignItems: "flex-start", display: "inline-flex" },

@@ -154,12 +154,13 @@ import { List } from "@stealthscale/component-typography";
 </List.Root>;
 ```
 
-| Axis      | Values                       | Default  | Styles                |
-| --------- | ---------------------------- | -------- | --------------------- |
-| `variant` | `marker`, `plain`            | `marker` | the root and the item |
-| `gap`     | `xs`, `sm`, `md`, `lg`, `xl` | `md`     | the root              |
-| `align`   | `start`, `center`, `end`     | inherit  | the item              |
-| `motion`  | `rise`, `reveal`             | none     | the item              |
+| Axis      | Values                                                                                                                                   | Default       | Styles                |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------- | --------------------- |
+| `variant` | `marker`, `plain`                                                                                                                        | `marker`      | the root and the item |
+| `gap`     | `xs`, `sm`, `md`, `lg`, `xl`                                                                                                             | `md`          | the root              |
+| `align`   | `start`, `center`, `end`                                                                                                                 | inherit       | the item              |
+| `marker`  | `disc`, `circle`, `square`, `dash`, `decimal`, `leading-zero`, `lower-roman`, `upper-roman`, `lower-alpha`, `upper-alpha`, `lower-greek` | the element's | the item              |
+| `motion`  | `rise`, `reveal`                                                                                                                         | none          | the item              |
 
 ## Blockquote
 

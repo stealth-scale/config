@@ -22,8 +22,24 @@ describe("recipe", () => {
     expect(recipe.slots).toStrictEqual(["root", "item", "indicator"]);
   });
 
-  it("offers an alignment axis and a gap axis and a motion axis and a look axis", () => {
-    expect(axesOf(recipe)).toStrictEqual(["align", "gap", "motion", "variant"]);
+  it("offers the five axes a list takes", () => {
+    expect(axesOf(recipe)).toStrictEqual(["align", "gap", "marker", "motion", "variant"]);
+  });
+
+  it("offers the eleven markers the browser draws", () => {
+    expect(valuesOf(recipe, "marker")).toStrictEqual([
+      "circle",
+      "dash",
+      "decimal",
+      "disc",
+      "leading-zero",
+      "lower-alpha",
+      "lower-greek",
+      "lower-roman",
+      "square",
+      "upper-alpha",
+      "upper-roman",
+    ]);
   });
 
   it("draws the browser's markers at the middle gap when nothing is asked for", () => {
