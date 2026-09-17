@@ -1,10 +1,14 @@
 import { describe, expect, it } from "vitest";
 
-import { globalCss } from "#preset/global-css.ts";
+import { globalCss, SWITCHED } from "#preset/global-css.ts";
 
 describe("globalCss", () => {
-  it("fills the six properties the reset and the focus ring read", () => {
-    expect(globalCss[":root"]).toStrictEqual({
+  it("selects the root and every element that switches a theme or a mode", () => {
+    expect(SWITCHED).toBe(":root, [data-theme], [data-color-mode]");
+  });
+
+  it("fills the six properties the reset and the focus ring read on every switched element", () => {
+    expect(globalCss[SWITCHED]).toMatchObject({
       "--global-color-border": "colors.border",
       "--global-color-focus-ring": "colors.border.focus",
       "--global-color-placeholder": "colors.fg.muted",
@@ -14,13 +18,16 @@ describe("globalCss", () => {
     });
   });
 
-  it("draws the page in its own ink and surface with the neutral palette", () => {
-    expect(globalCss["html"]).toMatchObject({
-      background: "bg",
+  it("declares the ink and the palette and the font again on every switched element", () => {
+    expect(globalCss[SWITCHED]).toMatchObject({
       color: "fg",
       colorPalette: "neutral",
-      colorScheme: "light",
+      fontFamily: "body",
     });
+  });
+
+  it("draws the page on its own surface in the light scheme", () => {
+    expect(globalCss["html"]).toMatchObject({ background: "bg", colorScheme: "light" });
   });
 
   it("follows the dark mode attribute with the color scheme", () => {

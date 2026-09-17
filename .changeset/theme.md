@@ -97,6 +97,10 @@ theme: name every compound in its recipe and read the sizes from the tokens
   slot compound `card__root--hero`. The name is removed once the class is written, because the
   compiler and the runtime read every other key as an axis. A compound without a name keeps the
   compiler's own class, which the testing kit reports.
+- The global styles declare the six properties the reset reads, the ink, the palette and the font on
+  every element that switches a theme or a color mode, beside the root. A property set on the root
+  is inherited as its computed value, so a subtree switched to another theme kept the root's font
+  and ink while its own tokens said otherwise.
 - The ripple grows from the point of the press, which a component writes as `--ripple-x` and
   `--ripple-y` and which falls at the centre where it writes none, and it fades at full size over
   the release rather than shrinking back. It was a rounded rectangle cut to the control's outline.

@@ -25,3 +25,7 @@ vite-plugin-theme: declare the class a compound's styles are emitted under
   `[data-theme=forge] .button--hero`. A compound over a slot recipe is split per slot it styles, as
   the recipe's own was. `publishedCompounds(presets)` reads the classes, and `scopedPresets` takes
   them.
+- Every theme's variant is completed with the foundation's tokens and semantic tokens before it is
+  installed, so a subtree switched to a theme is drawn from that theme and the foundation alone. A
+  theme that stated no font took the font of the theme around it, because a custom property inherits
+  and the compiler emits only what a variant states.

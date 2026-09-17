@@ -63,6 +63,11 @@ describe("theme.config", () => {
     expect(declared(css, "[data-theme=abyss]", "--colors-bg")).toBe("oklch(93.0% 0.0200 195.0)");
   });
 
+  it("restates the foundation's font under a theme that states none of its own", () => {
+    expect(declared(css, "[data-theme=forge]", "--fonts-body")).toContain("ui-sans-serif");
+    expect(declared(css, "[data-theme=folio]", "--fonts-body")).toContain("Georgia");
+  });
+
   it("compiles the derived theme with its parent's values under its own attribute", () => {
     expect(declared(css, "[data-theme=abyss]", "--colors-teal-700")).toBe(
       declared(css, "[data-theme=fathom]", "--colors-teal-700"),

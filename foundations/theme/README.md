@@ -102,11 +102,13 @@ export default { presets: [own], themes: [fathom, abyss] } satisfies Application
 A page switches its theme and its color mode with two attributes, on the document root or on any
 element for a subtree. The element carrying an attribute switches its own tokens, so everything
 drawn from a token follows, and the rules a theme or a recipe writes for that theme or mode reach
-the elements below it, because the compiler scopes them to descendants. A component whose own rules
-must switch is put inside the element that carries the attribute. Where neither is written, the
-first theme draws the page and the reader's operating system decides the mode. One case is not
-covered: a subtree switched to light inside a page drawn dark keeps the dark values, because the
-unconditioned values are declared on the root alone. Dark inside light works.
+the elements below it, because the compiler scopes them to descendants. A subtree switched to a
+theme is drawn from that theme and the foundation alone: every token the theme leaves unstated takes
+the foundation's value there, not the value of the theme around it. A component whose own rules must
+switch is put inside the element that carries the attribute. Where neither is written, the first
+theme draws the page and the reader's operating system decides the mode. A subtree switched to light
+inside a page drawn dark keeps the dark values, because the unconditioned values are declared on the
+root alone. Dark inside light works.
 
 ```html
 <html data-theme="fathom" data-color-mode="dark"></html>
