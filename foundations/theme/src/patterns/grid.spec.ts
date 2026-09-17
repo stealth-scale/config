@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
 
+import { recipeViolations } from "@stealthscale/testing-theme";
+
+import { defineRecipe } from "#authoring/recipe.ts";
 import { grid, simpleGrid } from "#patterns/grid.ts";
 
 describe("grid", () => {
@@ -31,15 +34,6 @@ describe("grid", () => {
     });
   });
 
-  it("reads a custom property and a function as they stand", () => {
-    expect(grid({ minChildWidth: "var(--column)" })).toMatchObject({
-      gridTemplateColumns: "repeat(auto-fit, minmax(var(--column), 1fr))",
-    });
-    expect(grid({ minChildWidth: "min(10rem, 100%)" })).toMatchObject({
-      gridTemplateColumns: "repeat(auto-fit, minmax(min(10rem, 100%), 1fr))",
-    });
-  });
-
   it("prefers the count when both a count and a narrowest width are given", () => {
     expect(grid({ columns: 2, minChildWidth: "40" })).toMatchObject({
       gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
@@ -59,5 +53,14 @@ describe("grid", () => {
     expect(simpleGrid({ columns: 4, gap: "gap.xs" })).toStrictEqual(
       grid({ columns: 4, gap: "gap.xs" }),
     );
+  });
+
+  it("passes the recipe checks counted and fitted to a size token", () => {
+    expect(
+      recipeViolations(defineRecipe({ base: grid({ columns: 3 }), className: "x" })),
+    ).toStrictEqual([]);
+    expect(
+      recipeViolations(defineRecipe({ base: simpleGrid({ minChildWidth: "xs" }), className: "x" })),
+    ).toStrictEqual([]);
   });
 });

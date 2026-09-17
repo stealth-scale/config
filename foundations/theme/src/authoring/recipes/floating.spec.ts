@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
 
+import { recipeViolations } from "@stealthscale/testing-theme";
+
+import { defineRecipe } from "#authoring/recipe.ts";
 import { floating, overlay } from "#authoring/recipes/floating.ts";
 
 describe("floating", () => {
@@ -33,5 +36,10 @@ describe("floating", () => {
       _closed: { animationStyle: "fade.out" },
       _open: { animationStyle: "fade.in" },
     });
+  });
+
+  it("passes the recipe checks for a popover and for a backdrop", () => {
+    expect(recipeViolations(defineRecipe({ base: floating(), className: "x" }))).toStrictEqual([]);
+    expect(recipeViolations(defineRecipe({ base: overlay(), className: "x" }))).toStrictEqual([]);
   });
 });

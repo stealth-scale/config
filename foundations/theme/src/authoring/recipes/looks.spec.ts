@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
 
+import { recipeViolations } from "@stealthscale/testing-theme";
+
+import { defineRecipe } from "#authoring/recipe.ts";
 import { LOOKS, lookVariants } from "#authoring/recipes/looks.ts";
 
 describe("lookVariants", () => {
@@ -23,5 +26,11 @@ describe("lookVariants", () => {
       subtle: { layerStyle: "fill.subtle" },
       surface: { layerStyle: "fill.surface" },
     });
+  });
+
+  it("reads a layer style the foundation defines for every look", () => {
+    const recipe = defineRecipe({ className: "x", variants: { variant: lookVariants(LOOKS) } });
+
+    expect(recipeViolations(recipe)).toStrictEqual([]);
   });
 });

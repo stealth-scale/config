@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
 
+import { recipeViolations } from "@stealthscale/testing-theme";
+
+import { defineRecipe } from "#authoring/recipe.ts";
 import { interactive, link } from "#authoring/recipes/interactive.ts";
 
 describe("interactive", () => {
@@ -34,5 +37,12 @@ describe("interactive", () => {
 
   it("keeps the link ink once visited", () => {
     expect(link()).toMatchObject({ _visited: { color: "fg.link" } });
+  });
+
+  it("passes the recipe checks for a control and for a link", () => {
+    expect(recipeViolations(defineRecipe({ base: interactive(), className: "x" }))).toStrictEqual(
+      [],
+    );
+    expect(recipeViolations(defineRecipe({ base: link(), className: "x" }))).toStrictEqual([]);
   });
 });

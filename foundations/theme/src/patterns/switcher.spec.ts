@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
 
+import { recipeViolations } from "@stealthscale/testing-theme";
+
+import { defineRecipe } from "#authoring/recipe.ts";
 import { switcher } from "#patterns/switcher.ts";
 
 describe("switcher", () => {
@@ -28,5 +31,9 @@ describe("switcher", () => {
         },
       },
     });
+  });
+
+  it("passes the recipe checks at its default threshold", () => {
+    expect(recipeViolations(defineRecipe({ base: switcher(), className: "x" }))).toStrictEqual([]);
   });
 });

@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
 
+import { recipeViolations } from "@stealthscale/testing-theme";
+
+import { defineRecipe } from "#authoring/recipe.ts";
 import { reel } from "#patterns/reel.ts";
 
 describe("reel", () => {
@@ -19,5 +22,11 @@ describe("reel", () => {
       "& > *": { flexBasis: "xs" },
       gap: "gap.sm",
     });
+  });
+
+  it("passes the recipe checks", () => {
+    expect(
+      recipeViolations(defineRecipe({ base: reel({ itemWidth: "xs" }), className: "x" })),
+    ).toStrictEqual([]);
   });
 });

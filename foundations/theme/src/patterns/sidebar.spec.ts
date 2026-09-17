@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
 
+import { recipeViolations } from "@stealthscale/testing-theme";
+
+import { defineRecipe } from "#authoring/recipe.ts";
 import { sidebar } from "#patterns/sidebar.ts";
 
 describe("sidebar", () => {
@@ -31,5 +34,12 @@ describe("sidebar", () => {
     expect(sidebar({ contentMin: { base: 100, md: 50 } })).toMatchObject({
       "& > :last-child": { minInlineSize: { base: "100%", md: "50%" } },
     });
+  });
+
+  it("passes the recipe checks on either side", () => {
+    expect(recipeViolations(defineRecipe({ base: sidebar(), className: "x" }))).toStrictEqual([]);
+    expect(
+      recipeViolations(defineRecipe({ base: sidebar({ side: "end" }), className: "x" })),
+    ).toStrictEqual([]);
   });
 });
