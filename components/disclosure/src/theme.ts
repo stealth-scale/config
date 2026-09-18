@@ -10,11 +10,12 @@
 import { definePreset } from "@stealthscale/theme/authoring";
 
 import { recipe as collapsible } from "#collapsible/recipe.ts";
+import { recipe as menu } from "#menu/recipe.ts";
 import { recipe as popover } from "#popover/recipe.ts";
 import { recipe as tabs } from "#tabs/recipe.ts";
 import { recipe as tooltip } from "#tooltip/recipe.ts";
 
 export default definePreset({
   name: "@stealthscale/component-disclosure",
-  theme: { extend: { slotRecipes: { collapsible, popover, tabs, tooltip } } },
+  theme: { extend: { slotRecipes: { collapsible, menu, popover, tabs, tooltip } } },
 });

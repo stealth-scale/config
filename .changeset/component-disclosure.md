@@ -60,6 +60,36 @@ component-disclosure: publish the collapsible
 - `Popover.Anchor` positions the panel against something other than the control that opens it, such
   as a whole row.
 
+- `Menu` opens a list of things a reader chooses from, composed as `Menu.Root` holding the control
+  and the panel of rows, with sixteen parts between them. Three looks draw the panel, one size steps
+  the rows and the panel together, and a third axis decides how the row the reader is on is marked.
+- `highlight` offers `tint`, `fill` and `bar`. The bar draws a line down the leading edge as well as
+  tinting the row, so a reader who cannot separate the two colours still sees the mark.
+- `inset` leaves every row the gutter a mark is drawn in, for a menu whose rows lead with an icon. A
+  row that carries a mark is inset whatever the axis says, so a list of options does not step
+  sideways as the marks appear. The gutter is measured from the room at the panel's edge, the mark
+  and the gap beside it, and the size axis writes it as a custom property.
+- The panel enters from the side the machine placed it on rather than always from the top, and it is
+  capped at the height the machine measured so a menu opened near the edge of a window scrolls
+  inside itself. A scroll inside it does not reach the page.
+- `Menu.OptionItem` draws a tick a reader turns on and off, or one of a set, in the same slot as a
+  plain row. The mark beside it is hidden from a screen reader, because the row already reports its
+  state through `aria-checked`.
+- A row states what it is for with `tone`, which is a typed prop rather than an axis, because a slot
+  recipe resolves its variants once at the root and a menu draws one row in a different ink from the
+  rest. The row hands its value down, so `Menu.ItemText` and `Menu.ItemIndicator` take no props.
+- A `Menu.Root` written inside the panel of another is a submenu. It finds the menu above it and
+  registers the two machines with each other, so a pointer moving from the row into the submenu
+  leaves it open and the arrow keys open and close it. It draws itself in the variants that menu was
+  given unless it picks its own. `Menu.TriggerItem` is both a row of the menu above and the control
+  of the menu below, and it throws where the menu it belongs to opens from no other menu.
+- `Menu.ContextTrigger` opens the menu at the point the pointer is at rather than beside a control,
+  and answers a long press as well as a right-click.
+- The panel states no width, so it is as wide as its widest row. A caller who wants the control's
+  width asks the machine for it.
+- Every specification of the package renders through the testing kit's settling render, so the suite
+  reports none of the 140 updates outside an act scope it reported before.
+
 The package is the first to take runtime dependencies. It installs the machine, the React adapter
 and the types the adapter's own signatures reach, all pinned together through the workspace catalog,
 because the machines share a core and a core at two versions breaks them.

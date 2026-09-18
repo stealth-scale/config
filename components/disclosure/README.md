@@ -300,6 +300,130 @@ package peers on no other component package.
 The default element for the control is `button`, because a tooltip attached to something a browser
 does not focus is a tooltip a keyboard never sees. Pass `as` for a control you have already built.
 
+## Menu
+
+Opens a list of things a reader chooses from, composed as `Menu.Root` holding the control and the
+panel of rows.
+
+```tsx
+import { Menu } from "@stealthscale/component-disclosure";
+
+<Menu.Root>
+  <Menu.Trigger>
+    Actions
+    <Menu.Indicator>
+      <ChevronIcon />
+    </Menu.Indicator>
+  </Menu.Trigger>
+  <Menu.Positioner>
+    <Menu.Content>
+      <Menu.Item value="rename">Rename</Menu.Item>
+      <Menu.Item value="duplicate">Duplicate</Menu.Item>
+      <Menu.Separator />
+      <Menu.Item tone="critical" value="delete">
+        Delete
+      </Menu.Item>
+    </Menu.Content>
+  </Menu.Positioner>
+</Menu.Root>;
+```
+
+| Axis        | Values                         | Default   |
+| ----------- | ------------------------------ | --------- |
+| `variant`   | `surface`, `elevated`, `glass` | `surface` |
+| `size`      | `sm`, `md`, `lg`               | `md`      |
+| `highlight` | `tint`, `fill`, `bar`          | `tint`    |
+| `inset`     | `true`                         | unset     |
+
+`highlight` decides how the row the reader is on is marked. `tint` and `fill` change the row's
+background. `bar` draws a line down the leading edge as well, which a reader who cannot separate the
+two colours still sees.
+
+`inset` leaves every row the gutter a mark is drawn in, for a menu whose rows lead with an icon. A
+row that carries a mark is inset whatever the axis says, so a list of options does not step sideways
+as the marks appear.
+
+The panel states no width of its own, so it is as wide as its widest row. Ask the machine for the
+control's width instead with `positioning: { sameWidth: true }`.
+
+### Rows that carry a choice
+
+`Menu.OptionItem` draws a tick a reader turns on and off, or one of a set. The caller states both
+the kind and whether it is on. The machine reports a change and the caller decides what it means.
+That is how one radio set clears the rest.
+
+```tsx
+<Menu.OptionItem checked={dense} onCheckedChange={setDense} type="checkbox" value="dense">
+  <Menu.ItemIndicator>
+    <CheckIcon />
+  </Menu.ItemIndicator>
+  <Menu.ItemText>Compact rows</Menu.ItemText>
+</Menu.OptionItem>
+```
+
+The row hands its value down. `Menu.ItemText` and `Menu.ItemIndicator` take no props of their own.
+Group rows with `Menu.ItemGroup` and `Menu.ItemGroupLabel`. The two share one `value`.
+
+### Submenus
+
+Write a `Menu.Root` inside the panel of another. The inner root finds the menu above it and joins
+the two machines. It draws itself in the variants that menu was given, unless it picks its own.
+
+```tsx
+<Menu.Content>
+  <Menu.Item value="new">New</Menu.Item>
+  <Menu.Root>
+    <Menu.TriggerItem>Share</Menu.TriggerItem>
+    <Menu.Positioner>
+      <Menu.Content>
+        <Menu.Item value="email">Email</Menu.Item>
+      </Menu.Content>
+    </Menu.Positioner>
+  </Menu.Root>
+</Menu.Content>
+```
+
+`Menu.TriggerItem` is both a row of the menu above and the control of the menu below. It opens when
+a pointer rests on it or the arrow towards the submenu is pressed, and it throws where the menu it
+belongs to opens from no other menu.
+
+### Right-click menus
+
+`Menu.ContextTrigger` opens the menu at the point the pointer is at rather than beside a control. It
+answers a long press as well as a right-click, and it stops the browser drawing its own menu over
+ours. Use it in place of `Menu.Trigger`.
+
+### The machine's settings
+
+| Setting                                 | What it does                                           |
+| --------------------------------------- | ------------------------------------------------------ |
+| `open`, `defaultOpen`                   | Drives it from outside, or opens it to begin with      |
+| `onOpenChange`                          | Hears each time the rows open or shut                  |
+| `onSelect`                              | Hears which row the reader chose                       |
+| `highlightedValue`, `onHighlightChange` | Drives the row the reader is on, or hears it change    |
+| `closeOnSelect`                         | Whether choosing a row shuts the menu                  |
+| `typeahead`, `loopFocus`                | Whether typing jumps to a row, and whether arrows wrap |
+| `navigate`                              | Follows a row drawn as a link through a router         |
+| `positioning`                           | Which side it opens on, and how far from the control   |
+| `triggerValue`, `onTriggerValueChange`  | Tracks which of several controls opened it             |
+| `anchorPoint`                           | Opens it at a point rather than beside a control       |
+| `id`                                    | Names the machine, which builds its ARIA references    |
+
+### The accessibility the machine writes
+
+- **The panel is a menu.** It carries the menu role, and the control says whether it is open and
+  which panel it opens.
+- **The focus stays on the panel.** The machine moves a highlight over the rows and points a screen
+  reader at it with `aria-activedescendant`, which is what the menu pattern asks for.
+- **Every row answers the keyboard.** The arrows move the highlight. The arrow towards a submenu
+  opens it and the arrow back closes it. Typing jumps to a row by its words, and Escape shuts the
+  menu and returns focus to the control.
+- **A row that carries a choice reports it.** The checkbox and radio menu item roles carry
+  `aria-checked`, and the mark beside them is hidden so it is not read out twice.
+
+Nothing here portals. Wrap `Menu.Positioner` in the portal you want where the panel is clipped or
+stacked wrongly.
+
 ## Licence
 
 MIT. See [LICENSE](LICENSE).
