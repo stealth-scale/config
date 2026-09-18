@@ -22,18 +22,27 @@ export interface SignupFormProps {
 }
 
 /**
- * Draws the signup form by hand, over a form built from its schema.
+ * Draws the signup form from its schema.
  *
  * @remarks
  *   The schema goes in the dynamic slot with the page's engine, so the VAT format and the
  *   matching keyword apply. The username asks the accounts service on blur, debounced, through
- *   the library's own field validator, and the library skips that request while the schema
- *   refuses the field. The rule across the password and the username is a form validator in the
- *   submit slot. The VAT field is drawn by `form.Fields`, which draws it where the schema
- *   resolved against the values has it.
+ *   the library's own field validator, given by path, and the library skips that request while
+ *   the schema refuses the field. The rule across the password and the username is a form
+ *   validator in the submit slot. The VAT field is drawn where the schema resolved against the
+ *   values declares it.
  */
 export function SignupForm({ onDone }: SignupFormProps): ReactElement {
   const form = useSchemaForm<Signup>({
+    fieldOptions: {
+      username: {
+        validators: {
+          onBlurAsync: async ({ signal, value }) =>
+            (await isTaken(value, signal)) ? { keyword: "taken" } : undefined,
+          onBlurAsyncDebounceMs: 50,
+        },
+      },
+    },
     onSubmit: ({ value }) => {
       onDone(value);
     },
@@ -44,20 +53,7 @@ export function SignupForm({ onDone }: SignupFormProps): ReactElement {
   return (
     <form.AppForm>
       <form.Form>
-        <form.AppField name="kind">{(field) => <field.Select />}</form.AppField>
-        <form.Fields of={["vat"]} />
-        <form.AppField
-          name="username"
-          validators={{
-            onBlurAsync: async ({ signal, value }) =>
-              (await isTaken(value, signal)) ? { keyword: "taken" } : undefined,
-            onBlurAsyncDebounceMs: 50,
-          }}
-        >
-          {(field) => <field.Text />}
-        </form.AppField>
-        <form.AppField name="password">{(field) => <field.Text />}</form.AppField>
-        <form.AppField name="confirm">{(field) => <field.Text />}</form.AppField>
+        <form.Fields />
         <form.Submit />
       </form.Form>
     </form.AppForm>

@@ -42,7 +42,8 @@ export interface Signup {
  *   `confirm` writes `x-matches: "password"`, a keyword the engine registers. `vat` exists only
  *   where `kind` is `business`, so the conditional declares it, requires it and gives it its
  *   format, and the form draws it for a business alone. The two passwords state
- *   `format: "password"`, which draws a password box and keeps them out of any draft.
+ *   `format: "password"`, which draws a password box and keeps them out of any draft. The root's
+ *   `x-form` names the form and lists the fields in the order they are drawn.
  */
 export const signup: Schema = {
   allOf: [
@@ -63,5 +64,5 @@ export const signup: Schema = {
   },
   required: ["confirm", "kind", "password", "username"],
   type: "object",
-  "x-form": { id: "signup" },
+  "x-form": { id: "signup", of: ["kind", "vat", "username", "password", "confirm"] },
 };

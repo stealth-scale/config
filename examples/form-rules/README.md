@@ -24,13 +24,14 @@ password holding the name, and a form that passes.
 
 ## The form
 
-`src/signup-form.tsx` builds the form with `useSchemaForm` and draws four of its five fields by hand
-with `form.AppField`, because the username's rule is a field validator and a field validator is
-written on the field. The form validator goes in the hook's `validators`, in the submit slot.
+`src/signup-form.tsx` builds the form with `useSchemaForm` and draws it with `form.Fields`. The
+username's rule is the library's own field validator, given by path in `fieldOptions` and typed over
+the username's value, and the foundation writes it onto the field it draws. The form validator goes
+in `validators`, in the submit slot.
 
-Each field component reads the schema of its property, so `field.Select` draws the choices the
-schema's `enum` lists and `field.Text` draws a password box where the property states
-`format: "password"`. The page states neither.
+Each field component reads the schema of its property, so the select draws the choices the schema's
+`enum` lists and the text box draws a password box where the property states `format: "password"`.
+The page states neither.
 
 ## The engine
 
@@ -43,10 +44,10 @@ A refusal from a registered keyword reads its words under the keyword's name, so
 
 ## The field drawn on a condition
 
-The schema requires `vat` only where `kind` is `business`. `<form.Fields of={["vat"]} />` draws that
-one member where the schema resolved against the values has it, and marks it required as the
-resolved schema does. Validation needs none of that: the whole schema is in the dynamic slot, and
-the engine evaluates the conditional against the whole value.
+The schema declares `vat` only where `kind` is `business`. `form.Fields` draws the member where the
+schema resolved against the values has it, and marks it required as the resolved schema does.
+Validation needs none of that: the whole schema is in the dynamic slot, and the engine evaluates the
+conditional against the whole value.
 
 ## The rule that needs a request
 
