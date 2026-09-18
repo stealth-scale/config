@@ -5,3 +5,5 @@
  *
  * @packageDocumentation
  */
+
+export * from "#badge/index.ts";

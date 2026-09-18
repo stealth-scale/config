@@ -9,7 +9,9 @@
 
 import { definePreset } from "@stealthscale/theme/authoring";
 
+import { recipe as badge } from "#badge/recipe.ts";
+
 export default definePreset({
   name: "@stealthscale/component-data",
-  theme: { extend: { recipes: {} } },
+  theme: { extend: { recipes: { badge } } },
 });
