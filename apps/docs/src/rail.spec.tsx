@@ -67,6 +67,13 @@ describe("Rail", () => {
     expect(onChoose).toHaveBeenCalledWith("data/badge");
   });
 
+  it("words a group the pages left unnamed", () => {
+    const loose: readonly Group[] = [{ name: "", pages: [entry("data/badge", "Badge")] }];
+    const { getByText } = render(<Rail chosen="" groups={loose} onChoose={noop} />);
+
+    expect(getByText("Other")).toBeDefined();
+  });
+
   it("draws a navigation landmark", () => {
     const { getByRole } = render(<Rail chosen="" groups={GROUPS} onChoose={noop} />);
 

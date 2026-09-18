@@ -11,11 +11,11 @@ import { createRoot } from "react-dom/client";
 
 import "@stealthscale/theme/styles.css";
 
-import { Catalogue } from "#catalogue.tsx";
+import { App } from "#app.tsx";
 
 /**
  * Selects the element this application renders into, and is null when the page has none.
  */
 const root = document.querySelector("#root");
 
-if (root !== null) createRoot(root).render(<Catalogue />);
+if (root !== null) createRoot(root).render(<App />);

@@ -8,6 +8,7 @@ import { pages } from "virtual:specimen-index";
 
 import { Container, Stack } from "@stealthscale/component-layout";
 import { Text } from "@stealthscale/component-typography";
+import { useTranslation } from "@stealthscale/provider-i18n";
 
 import { grouped } from "#grouped.ts";
 import { Page } from "#page.tsx";
@@ -34,12 +35,13 @@ export interface CatalogueProps {
 export function Catalogue({ listed = pages }: CatalogueProps): ReactElement {
   const [chosen, setChosen] = useState(listed[0]?.id ?? "");
   const entry = listed.find((page) => page.id === chosen);
+  const { t } = useTranslation("docs");
 
   return (
     <Container size="full">
       <Stack align="flex-start" direction="row" gap="2xl">
         <Rail chosen={chosen} groups={grouped(listed)} onChoose={setChosen} />
-        {entry === undefined ? <Text tone="muted">No page is open.</Text> : <Page entry={entry} />}
+        {entry === undefined ? <Text tone="muted">{t("empty")}</Text> : <Page entry={entry} />}
       </Stack>
     </Container>
   );

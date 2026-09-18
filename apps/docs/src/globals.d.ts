@@ -8,4 +8,5 @@
  */
 
 /// <reference types="@stealthscale/vite-config/globals" />
+/// <reference types="@stealthscale/vite-plugin-i18n/client" />
 /// <reference types="@stealthscale/vite-plugin-specimen/client" />

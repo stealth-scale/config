@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { grouped, UNGROUPED } from "#grouped.ts";
+import { grouped } from "#grouped.ts";
 import { type Indexed } from "#types.ts";
 
 function entry(id: string, group: string): Indexed {
@@ -29,22 +29,22 @@ describe("grouped", () => {
     expect(held[0]?.pages.map((one) => one.id)).toStrictEqual(["b", "a"]);
   });
 
-  it("lists a page that declares no group under the ungrouped heading", () => {
+  it("collects a page that declares no group under an empty name", () => {
     const held = grouped([entry("a", "")]);
 
-    expect(held.map((one) => one.name)).toStrictEqual([UNGROUPED]);
+    expect(held.map((one) => one.name)).toStrictEqual([""]);
   });
 
-  it("lists the ungrouped heading after every named group", () => {
+  it("lists the empty name after every group the pages declare", () => {
     const held = grouped([entry("a", ""), entry("b", "Zebra"), entry("c", "Actions")]);
 
-    expect(held.map((one) => one.name)).toStrictEqual(["Actions", "Zebra", UNGROUPED]);
+    expect(held.map((one) => one.name)).toStrictEqual(["Actions", "Zebra", ""]);
   });
 
-  it("keeps the ungrouped heading last when it was found after a named group", () => {
+  it("keeps the empty name last when it was found after a declared group", () => {
     const held = grouped([entry("b", "Zebra"), entry("a", "")]);
 
-    expect(held.map((one) => one.name)).toStrictEqual(["Zebra", UNGROUPED]);
+    expect(held.map((one) => one.name)).toStrictEqual(["Zebra", ""]);
   });
 
   it("returns nothing for an index that found no page", () => {

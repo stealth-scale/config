@@ -12,6 +12,7 @@ dist
 dist-ssr
 coverage
 generated
+*.gen.d.ts
 .stylelintcache
 *.local
 

@@ -496,6 +496,12 @@ importers:
       '@stealthscale/component-typography':
         specifier: workspace:^
         version: link:../../components/typography
+      '@stealthscale/provider-i18n':
+        specifier: workspace:^
+        version: link:../../foundations/providers/i18n
+      '@stealthscale/provider-locale':
+        specifier: workspace:^
+        version: link:../../foundations/providers/locale
       '@stealthscale/specimen':
         specifier: workspace:^
         version: link:../../components/specimen
@@ -539,6 +545,9 @@ importers:
       '@stealthscale/vite-config':
         specifier: workspace:^
         version: link:../../packages/vite-config
+      '@stealthscale/vite-config-i18n':
+        specifier: workspace:^
+        version: link:../../packages/vite-config-i18n
       '@stealthscale/vite-config-react':
         specifier: workspace:^
         version: link:../../packages/vite-config-react
@@ -551,6 +560,9 @@ importers:
       '@stealthscale/vite-config-typescript':
         specifier: workspace:^
         version: link:../../packages/vite-config-typescript
+      '@stealthscale/vite-plugin-i18n':
+        specifier: workspace:^
+        version: link:../../packages/vite-plugin-i18n
       '@stealthscale/vite-plugin-specimen':
         specifier: workspace:^
         version: link:../../packages/vite-plugin-specimen

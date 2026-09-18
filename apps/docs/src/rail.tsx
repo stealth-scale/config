@@ -7,6 +7,7 @@ import { type ReactElement } from "react";
 import { Button } from "@stealthscale/component-actions";
 import { Stack } from "@stealthscale/component-layout";
 import { Text } from "@stealthscale/component-typography";
+import { useTranslation } from "@stealthscale/provider-i18n";
 
 import { type Group } from "#grouped.ts";
 
@@ -38,12 +39,14 @@ export interface RailProps {
  *   nothing yet. The element changes with the router, and the rail's shape does not.
  */
 export function Rail({ chosen, groups, onChoose }: RailProps): ReactElement {
+  const { t } = useTranslation("docs");
+
   return (
-    <Stack as="nav" gap="lg">
+    <Stack aria-label={t("rail.label")} as="nav" gap="lg">
       {groups.map((group) => (
         <Stack gap="xs" key={group.name}>
           <Text size="xs" tone="muted" weight="medium">
-            {group.name}
+            {group.name === "" ? t("rail.ungrouped") : group.name}
           </Text>
           {group.pages.map((page) => (
             <Button

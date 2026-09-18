@@ -23,6 +23,27 @@ first time that component reaches the browser.
 The index is read at module scope and is fixed for the life of the page. The selection is state
 rather than an address, so a reader cannot yet link to a page.
 
+## The words
+
+Every word the catalogue writes itself is a key under the `docs` namespace, in
+`locales/en/docs.json`. Nothing in `src` holds a sentence a reader sees.
+
+```
+locales/en/docs.json     the words this application owns
+src/i18n.gen.d.ts        written by the plugin, each key typed as the string it is
+```
+
+`LocaleProvider` settles which locale to read in and writes `lang` and `dir` onto the document root,
+so a right-to-left locale turns the page without a component asking for it. `I18nProvider` takes the
+locale it settled on and hands the catalogues below.
+
+The plugin walks this application's dependencies and reads every
+`locales/<language>/<namespace>.json` it finds, deepest package first and the application last. A
+word a component package declares is therefore overridden by a word of the same key here, which is
+how a catalogue renames something the library called one thing.
+
+A specimen's own words belong to the package that holds it, not here. No package declares one yet.
+
 ## Still missing
 
 The three virtual modules are the contract, and this reads one of them. `virtual:specimen-fragments`
