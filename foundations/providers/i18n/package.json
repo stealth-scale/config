@@ -1,6 +1,6 @@
 {
   "name": "@stealthscale/provider-i18n",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Puts the words an application is read in into scope, in the locale it is given.",
   "keywords": [
     "i18n",

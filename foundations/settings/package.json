@@ -1,6 +1,6 @@
 {
   "name": "@stealthscale/settings",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Remembers one named setting a person made, per application, held to the values it is allowed to take and kept where the reader chooses.",
   "keywords": [
     "cookies",

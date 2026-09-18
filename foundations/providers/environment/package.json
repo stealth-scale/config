@@ -1,6 +1,6 @@
 {
   "name": "@stealthscale/provider-environment",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Names the document a subtree lives in, which a portal attaches to and a measurement is taken against.",
   "keywords": [
     "iframe",
