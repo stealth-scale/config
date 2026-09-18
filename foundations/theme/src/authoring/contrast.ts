@@ -12,7 +12,7 @@
 /**
  * Describes a color in linear sRGB, each channel running from 0 to 1.
  */
-interface Linear {
+export interface Linear {
   /**
    * The blue channel.
    */
@@ -140,17 +140,78 @@ function fromSrgb(color: string): Linear | undefined {
 }
 
 /**
+ * Describes a color in OKLab: a lightness and two opponent axes.
+ */
+export interface Oklab {
+  /**
+   * The green to red axis.
+   */
+  a: number;
+
+  /**
+   * The blue to yellow axis.
+   */
+  b: number;
+
+  /**
+   * The lightness, 0 for black and 1 for white.
+   */
+  l: number;
+}
+
+/**
+ * Reads a color into linear sRGB, unclamped.
+ *
+ * @param color - The color as CSS writes it: OKLCH, hex or `rgb()`.
+ * @returns The three channels, or undefined where the color cannot be read.
+ */
+export function linear(color: string): Linear | undefined {
+  return fromOklch(color) ?? fromSrgb(color);
+}
+
+/**
+ * Reads a color into OKLab, the space every ramp here is drawn in.
+ *
+ * @remarks
+ *   A difference between two colors is the distance between their OKLab points, and a
+ *   difference in lightness alone is the difference between their `l` values. The matrices are
+ *   Björn Ottosson's.
+ * @returns The three coordinates, or undefined where the color cannot be read.
+ */
+export function oklab(color: string): Oklab | undefined {
+  const read = linear(color);
+
+  if (read === undefined) return undefined;
+
+  const long = Math.cbrt(
+    0.412_221_470_8 * read.red + 0.536_332_536_3 * read.green + 0.051_445_992_9 * read.blue,
+  );
+  const medium = Math.cbrt(
+    0.211_903_498_2 * read.red + 0.680_699_545_1 * read.green + 0.107_396_956_6 * read.blue,
+  );
+  const short = Math.cbrt(
+    0.088_302_461_9 * read.red + 0.281_718_837_6 * read.green + 0.629_978_700_5 * read.blue,
+  );
+
+  return {
+    a: 1.977_998_495_1 * long - 2.428_592_205 * medium + 0.450_593_709_9 * short,
+    b: 0.025_904_037_1 * long + 0.782_771_766_2 * medium - 0.808_675_766 * short,
+    l: 0.210_454_255_3 * long + 0.793_617_785 * medium - 0.004_072_046_8 * short,
+  };
+}
+
+/**
  * Measures relative luminance as WCAG defines it.
  *
  * @param color - The color as CSS writes it: OKLCH, hex or `rgb()`.
  * @returns The luminance, 0 for black and 1 for white, or `NaN` where the color cannot be read.
  */
 export function luminance(color: string): number {
-  const linear = fromOklch(color) ?? fromSrgb(color);
+  const read = linear(color);
 
-  if (linear === undefined) return Number.NaN;
+  if (read === undefined) return Number.NaN;
 
-  return 0.2126 * linear.red + 0.7152 * linear.green + 0.0722 * linear.blue;
+  return 0.2126 * read.red + 0.7152 * read.green + 0.0722 * read.blue;
 }
 
 /**

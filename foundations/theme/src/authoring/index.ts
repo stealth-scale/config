@@ -39,7 +39,16 @@ export {
   type ThemeColors,
   type ThemeTokens,
 } from "#authoring/contract.ts";
-export { contrast, type Level, luminance, readable } from "#authoring/contrast.ts";
+export {
+  contrast,
+  type Level,
+  linear,
+  type Linear,
+  luminance,
+  oklab,
+  type Oklab,
+  readable,
+} from "#authoring/contrast.ts";
 export { type RecipeExtension, type SlotRecipeExtension } from "#authoring/extension.ts";
 export { deepMerge } from "#authoring/merge.ts";
 export {

@@ -14,3 +14,5 @@ theme: add role tables for a ramp keyed by its own steps
 - `ramp(keys, values)` keys a transcribed ramp by its own step names, and
   `stepped(ramp, light, dark, darkRamp)` writes one color as a reference into a step in each mode.
 - `contrast()` and `luminance()` read an OKLCH color whose hue is `none`.
+- `linear(color)` converts a color to linear sRGB and `oklab(color)` to OKLab, unclamped, for a
+  check that measures a distance rather than a ratio.
