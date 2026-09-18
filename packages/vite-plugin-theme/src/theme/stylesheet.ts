@@ -111,11 +111,15 @@ function bare(id: string): string {
  *
  * @remarks
  *   An assembly is a new generation, so rules compiled from the one before are compiled again.
+ *   Under a dev server the source directory of every workspace package the compiler scans is
+ *   handed to the watcher, because the server watches its own root alone and a file added to a
+ *   package beside the application would otherwise reach the compiler only when it restarts.
  */
 async function ready(state: Running, resolved: Resolved): Promise<Assembled> {
   if (state.assembled === undefined) {
     state.assembled = await assemble(state.loading, resolved, state.server);
     state.generation += 1;
+    state.server?.watcher.add([...state.assembled.roots]);
   }
 
   return state.assembled;

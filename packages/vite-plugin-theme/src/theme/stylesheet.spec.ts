@@ -1,4 +1,4 @@
-import { rmSync } from "node:fs";
+import { mkdirSync, rmSync, symlinkSync } from "node:fs";
 import { type ViteDevServer } from "vite";
 import { describe, expect, it } from "vitest";
 
@@ -65,6 +65,41 @@ const APP: ScratchFiles = {
   "src/page.tsx": page("red"),
   "theme.config.ts": statement(),
 };
+
+const LINKED: ScratchFiles = {
+  ...DESIGN,
+  ...packageFiles(
+    "packages/kit",
+    { exports: { ".": "./index.js", "./theme": "./theme.js" }, name: "@acme/kit", type: "module" },
+    { "index.js": "export {};\n", "theme.js": 'export default { name: "@acme/kit" };\n' },
+  ),
+  "package.json": manifest({
+    dependencies: { "@acme/design": "*", "@acme/kit": "*" },
+    name: "@acme/app",
+    type: "module",
+  }),
+  "src/page.tsx": page("red"),
+  "theme.config.ts": statement(),
+};
+
+function linked(workspace: ScratchWorkspace): void {
+  mkdirSync(workspace.path("node_modules/@acme"), { recursive: true });
+  symlinkSync(workspace.path("packages/kit"), workspace.path("node_modules/@acme/kit"), "dir");
+}
+
+async function serving(plugin: ReturnType<typeof stylesheet>, watched: string[]): Promise<void> {
+  const server = {
+    environments: { ssr: {} },
+    watcher: {
+      add(paths: readonly string[]): void {
+        watched.push(...paths);
+      },
+    },
+  } as unknown as ViteDevServer;
+  const hook = plugin.configureServer as (server: ViteDevServer) => unknown;
+
+  await hook(server);
+}
 
 interface Compiled {
   readonly context: ReturnType<typeof hookContext>;
@@ -140,10 +175,8 @@ describe("stylesheet", () => {
   it("compiles through an environment of its own when the server's runner is absent", async () => {
     const found = await withScratchWorkspaceAsync(APP, async (workspace) => {
       const plugin = stylesheet(OPTIONS);
-      const server = { environments: { ssr: {} } } as unknown as ViteDevServer;
-      const serving = plugin.configureServer as (server: ViteDevServer) => unknown;
 
-      await serving(server);
+      await serving(plugin, []);
       await configured(plugin, { ...RESOLVED, root: workspace.root });
       await started(plugin, hookContext());
 
@@ -151,6 +184,37 @@ describe("stylesheet", () => {
     });
 
     expect(found).toBe(`${DECLARED}\n`);
+  });
+
+  it("hands the source directory of every workspace package to the server's watcher", async () => {
+    const added = await withScratchWorkspaceAsync(LINKED, async (workspace) => {
+      const plugin = stylesheet(OPTIONS);
+      const watched: string[] = [];
+
+      linked(workspace);
+      await serving(plugin, watched);
+      await configured(plugin, { ...RESOLVED, root: workspace.root });
+      await started(plugin, hookContext());
+
+      return watched.map((at) => at.slice(workspace.root.length + 1));
+    });
+
+    expect(added).toStrictEqual(["packages/kit/src"]);
+  });
+
+  it("hands nothing to the watcher when the graph holds no workspace package", async () => {
+    const added = await withScratchWorkspaceAsync(APP, async (workspace) => {
+      const plugin = stylesheet(OPTIONS);
+      const watched: string[] = [];
+
+      await serving(plugin, watched);
+      await configured(plugin, { ...RESOLVED, root: workspace.root });
+      await started(plugin, hookContext());
+
+      return watched;
+    });
+
+    expect(added).toStrictEqual([]);
   });
 
   it("writes nothing into the application but the rendered configuration", async () => {

@@ -9,7 +9,7 @@
  *   every manifest on it, and both readers here take the result.
  */
 
-import { relative, resolve, sep } from "node:path";
+import { join, relative, resolve, sep } from "node:path";
 
 import { type Dependency } from "@stealthscale/vite-plugin-base";
 
@@ -19,6 +19,11 @@ import { PRESET_SUBPATH } from "#options.ts";
  * Marks a directory that belongs to an installed package rather than to the workspace.
  */
 const VENDOR = `${sep}node_modules${sep}`;
+
+/**
+ * Fixes the directory a workspace package keeps its source in.
+ */
+const SOURCE = "src";
 
 /**
  * Describes a package contributing a preset to an application.
@@ -71,8 +76,7 @@ export function contributors(
 }
 
 /**
- * Lists a glob for the source of every workspace package on the graph, relative to the
- * application, sorted.
+ * Lists the source directory of every workspace package on the graph, absolute, sorted.
  *
  * @remarks
  *   A style prop is resolved when the stylesheet is compiled, so a prop the compiler never read is
@@ -80,12 +84,25 @@ export function contributors(
  *   with, so their source is scanned beside the application's own. An installed package is left
  *   out: what ships in one is compiled JavaScript whose props were resolved before it was
  *   published.
+ * @param graph - The application's dependency graph.
+ */
+export function workspaceRoots(graph: readonly Dependency[]): readonly string[] {
+  return graph
+    .map((one) => resolve(one.at))
+    .filter((at) => !at.includes(VENDOR))
+    .map((at) => join(at, SOURCE))
+    .toSorted();
+}
+
+/**
+ * Lists a glob for the source of every workspace package on the graph, relative to the
+ * application, sorted.
+ *
  * @param root - The application's directory, which the globs are written relative to.
  * @param graph - The application's dependency graph.
  */
 export function workspaceSources(root: string, graph: readonly Dependency[]): readonly string[] {
-  return graph
-    .filter((one) => !resolve(one.at).includes(VENDOR))
-    .map((one) => `${relative(root, one.at)}/src/**/*.{ts,tsx}`.replaceAll(sep, "/"))
-    .toSorted();
+  return workspaceRoots(graph).map((at) =>
+    `${relative(root, at)}/**/*.{ts,tsx}`.replaceAll(sep, "/"),
+  );
 }

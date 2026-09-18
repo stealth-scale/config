@@ -31,7 +31,7 @@ export interface Application {
 
   /**
    * The themes the page can wear. The first is the default, and every one of them switches under
-   * its attribute.
+   * its attribute. An application that states none draws the foundation alone.
    */
-  themes: readonly [Theme, ...Theme[]];
+  themes?: readonly Theme[] | undefined;
 }

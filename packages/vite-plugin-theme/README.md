@@ -41,10 +41,11 @@ export default { static: "*", themes: [fathom, abyss] };
 
 The first theme is the default: its values and its extensions apply while no attribute is set. Every
 theme is compiled under `[data-theme=<name>]` as well, the first included, so a subtree can take any
-theme. A recipe written in the application itself is registered through a preset the statement
-carries under `presets`, installed after every package's preset and before the themes. The
-application imports the stylesheet through the system package's `styles.css` subpath, and the plugin
-appends the compiled rules to whichever stylesheet declares the cascade order.
+theme. An application that states no theme draws the foundation alone. A recipe written in the
+application itself is registered through a preset the statement carries under `presets`, installed
+after every package's preset and before the themes. The application imports the stylesheet through
+the system package's `styles.css` subpath, and the plugin appends the compiled rules to whichever
+stylesheet declares the cascade order.
 
 ## Options
 
@@ -110,6 +111,10 @@ reads it from disk itself. Anything else is left to Vite. Under a dev server, ev
 rules were appended to is invalidated on either, so the next request retransforms it. Under a build
 that watches, the same changes reach the plugin through `watchChange`, and the rebuild compiles from
 the changed compiler.
+
+A dev server watches its own root and the files a plugin names. The source directory of every
+workspace package the compiler scans is handed to the watcher as well, so a file added to a package
+beside the application reaches the compiler without a restart.
 
 ## Diagnostics
 

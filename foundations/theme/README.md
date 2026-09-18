@@ -99,6 +99,8 @@ import own from "./src/theme.ts";
 export default { presets: [own], themes: [fathom, abyss] } satisfies Application;
 ```
 
+An application that states no theme draws the foundation alone.
+
 A page switches its theme and its color mode with two attributes, on the document root or on any
 element for a subtree. Five rules decide what a switch covers:
 

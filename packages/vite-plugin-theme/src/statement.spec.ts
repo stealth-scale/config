@@ -48,7 +48,7 @@ describe("statement", () => {
 
         return {
           first: files[0]?.slice(workspace.root.length + 1),
-          name: application.themes[0].name,
+          name: application.themes?.[0]?.name,
         };
       }),
     );
@@ -181,5 +181,9 @@ describe("statement", () => {
     };
 
     expect(fontPackages(application)).toStrictEqual(["@f/one", "@f/two"]);
+  });
+
+  it("collects no font package where the application states no theme", () => {
+    expect(fontPackages({})).toStrictEqual([]);
   });
 });

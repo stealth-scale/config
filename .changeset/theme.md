@@ -16,3 +16,4 @@ theme: add role tables for a ramp keyed by its own steps
 - `contrast()` and `luminance()` read an OKLCH color whose hue is `none`.
 - `linear(color)` converts a color to linear sRGB and `oklab(color)` to OKLab, unclamped, for a
   check that measures a distance rather than a ratio.
+- `Application.themes` is optional. An application that states no theme draws the foundation alone.
