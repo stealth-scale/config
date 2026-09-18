@@ -1,16 +1,12 @@
 /**
- * Draws the checkout form over the shared options, with the fields drawn from the presentation
- * over the schema resolved against the values in hand.
+ * Draws the checkout form, generated from the presentation its schema carries.
  */
 
 import { type ReactElement } from "react";
 
-import { useAppForm } from "@stealthscale/example-form-fields";
-import { useFormEnvironment, useSelector } from "@stealthscale/provider-form";
+import { useSchemaForm } from "@stealthscale/example-form-fields";
 
-import { Fields } from "#fields.tsx";
-import { checkoutOptions } from "#options.ts";
-import { checkout, presentation } from "#schema.ts";
+import { checkout } from "#schema.ts";
 
 /**
  * Describes what the checkout form is given.
@@ -26,25 +22,23 @@ export interface CheckoutFormProps {
  * Draws the checkout form.
  *
  * @remarks
- *   The schema is resolved against the values on every change, at a fifth of a millisecond, and
- *   the fields draw a member only where the resolved schema has it.
+ *   The schema is resolved against the values on every change, and the fields draw a member only
+ *   where the resolved schema has it. A generated form has no type of its own, so the values are
+ *   a record of unknown values.
  */
 export function CheckoutForm({ onDone }: CheckoutFormProps): ReactElement {
-  const { engine } = useFormEnvironment();
-  const form = useAppForm({
-    ...checkoutOptions,
+  const form = useSchemaForm({
     onSubmit: ({ value }) => {
       onDone(value);
     },
+    schema: checkout,
   });
-  const values = useSelector(form.store, (state) => state.values);
-  const resolved = engine.resolve(checkout, values);
 
   return (
     <form.AppForm>
       <form.Form>
-        <Fields form={form} presentation={presentation} resolved={resolved} />
-        <form.Submit>Place order</form.Submit>
+        <form.Fields />
+        <form.Submit />
       </form.Form>
     </form.AppForm>
   );

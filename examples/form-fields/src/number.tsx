@@ -5,17 +5,12 @@
 import { type ReactElement } from "react";
 
 import { useBoundField } from "#field-like.ts";
-import { Frame } from "#frame.tsx";
+import { type FieldProps, Frame } from "#frame.tsx";
 
 /**
  * Describes what a number field is given.
  */
-export interface NumberFieldProps {
-  /**
-   * The words of the label, where the catalogue has none and the path written out is wrong.
-   */
-  readonly label?: string | undefined;
-}
+export type NumberFieldProps = FieldProps;
 
 /**
  * Draws a number box in a frame, bound to the number field in scope.
@@ -24,11 +19,11 @@ export interface NumberFieldProps {
  *   An emptied box writes zero, so the value stays a number and the schema's `minimum` is what
  *   refuses it.
  */
-export function NumberField({ label }: NumberFieldProps): ReactElement {
+export function NumberField({ label, required }: NumberFieldProps): ReactElement {
   const field = useBoundField<number>();
 
   return (
-    <Frame label={label}>
+    <Frame label={label} required={required}>
       {(control) => (
         <input
           {...control}

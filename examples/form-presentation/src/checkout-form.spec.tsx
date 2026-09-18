@@ -1,28 +1,13 @@
-import { type ReactElement } from "react";
-
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-
-import { FormNameContext } from "@stealthscale/example-form-fields";
 
 import { CheckoutForm } from "#checkout-form.tsx";
 
 const done = vi.fn<(value: unknown) => void>();
 
-/**
- * Draws the form under its identifier, with no words beyond the schema's own.
- */
-function Page(): ReactElement {
-  return (
-    <FormNameContext value="checkout">
-      <CheckoutForm onDone={done} />
-    </FormNameContext>
-  );
-}
-
 describe("CheckoutForm", () => {
   it("draws the VAT number for a business alone", () => {
-    const { getByLabelText, queryByLabelText } = render(<Page />);
+    const { getByLabelText, queryByLabelText } = render(<CheckoutForm onDone={done} />);
 
     expect(queryByLabelText("Vat")).toBeNull();
 
@@ -32,9 +17,9 @@ describe("CheckoutForm", () => {
   });
 
   it("refuses an order missing what the schema requires", async () => {
-    const { getAllByRole, getByRole } = render(<Page />);
+    const { getAllByRole, getByRole } = render(<CheckoutForm onDone={done} />);
 
-    fireEvent.click(getByRole("button", { name: "Place order" }));
+    fireEvent.click(getByRole("button", { name: "Submit" }));
 
     await waitFor(() => {
       expect(getAllByRole("alert").length).toBeGreaterThan(3);

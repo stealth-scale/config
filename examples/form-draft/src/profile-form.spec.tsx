@@ -3,7 +3,6 @@ import { type ReactElement } from "react";
 import { act, fireEvent, render, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import { FormNameContext } from "@stealthscale/example-form-fields";
 import { draftKey, FormProvider, schemaHash, writeDraft } from "@stealthscale/provider-form";
 import { memoryStore, type SettingStore } from "@stealthscale/settings";
 
@@ -23,9 +22,7 @@ const saved = vi.fn<(profile: Profile) => void>();
 function Page({ store }: { readonly store: SettingStore }): ReactElement {
   return (
     <FormProvider translate={words}>
-      <FormNameContext value="profile">
-        <ProfileForm onSaved={saved} record={RECORD} store={store} />
-      </FormNameContext>
+      <ProfileForm onSaved={saved} record={RECORD} store={store} />
     </FormProvider>
   );
 }
@@ -87,6 +84,19 @@ describe("ProfileForm", () => {
       values: { bio: "", email: "roy@example.com", name: "Roy Klopper" },
     });
     vi.useRealTimers();
+  });
+
+  it("keeps a person on the first step while a field of it is refused", async () => {
+    const store = memoryStore();
+    const { getByLabelText, getByRole } = render(<Page store={store} />);
+
+    fireEvent.change(getByLabelText("Name"), { target: { value: "R" } });
+    fireEvent.click(getByRole("button", { name: "Next" }));
+
+    await waitFor(() => {
+      expect(getByRole("alert").textContent).toBe("Enter at least two characters");
+    });
+    expect(getByRole("heading", { level: 2 }).textContent).toBe("Who you are");
   });
 
   it("writes the step at once when the first step is left", async () => {

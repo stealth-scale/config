@@ -17,6 +17,14 @@ The development server answers on port 4930. `vp test` renders the page into a h
 reads the fieldsets and the controls back, switches the kind to a business, adds and removes a line,
 and submits a filled order.
 
+## The form
+
+`src/checkout-form.tsx` builds the form with `useSchemaForm` and draws it with `form.Fields`. The
+foundation walks the members and draws a group as a fieldset or a layout. A repeat group is drawn
+once per item, with the library's `pushFieldValue` and `removeFieldValue` behind the buttons, and
+`lines[].amount` is bound to `lines[0].amount` for the first item. The foundation subscribes to the
+resolved schema by its hash. A keystroke re-renders the field that received it and no other member.
+
 ## The schema
 
 `src/schema.ts` writes the presentation beside the data.
@@ -24,35 +32,25 @@ and submits a filled order.
 - `x-form` at the root states the identifier and the members: a `who` fieldset, a `billing` fieldset
   with a three-column grid inside it, a `line` fieldset with `repeat: "lines"`, and the lone `notes`
   field.
-- `x-control` on `email` and `notes` names the renderer. `x-span` on `billing.city` takes two of the
-  three columns. `x-options` on `lines[].amount` hands the renderer a currency.
+- `x-control` on `notes` names the renderer. `x-span` on `billing.city` takes two of the three
+  columns. `x-options` on `lines[].amount` hands the renderer a currency.
 - `vat` exists only under the condition that `kind` is `business`. It is listed in the `who`
-  fieldset, and the fields skip it while the resolved schema lacks it. When it appears, the field
-  starts from the property's own default, because the values built from the schema never had it.
-- `reference` is a property no member names. `unplaced` reports it, and the page lists it.
+  fieldset. The fields skip it while the resolved schema lacks it. When it appears, the field starts
+  from the property's own default, because the values built from the schema never had it.
+- No member names `reference`. `unplaced` reports it, and the page lists it.
 
-`presentationOf` reads all of that into a `Presentation`. `validatePresentation` checks every member
-against the paths the engine lists, at module load, so a typo throws before the page renders.
-`catalogue` lists every identifier the form reads with the schema's own English, and the page draws
-that list as a table.
+`presentationOf` reads all that into a `Presentation`. `validatePresentation` checks every member
+against the paths the engine lists, so a typo throws before the page renders. `catalogue` lists
+every identifier the form reads with the schema's own English. The page draws that list as a table.
 
 ## The renderers
 
-`src/renderers.tsx` registers six renderers with a rank each. A string is a text box at the rank of
-a type. An email format is an email box at the rank of a format. An `enum` is a select at the rank
-of a constraint, and so is a number with a currency in its options. A field naming a control takes
-that renderer at the highest rank. `rendererFor` picks the highest, and the later registration on a
-tie.
+`@stealthscale/example-form-fields` registers a text box for a string, a number box for a number, a
+checkbox for a boolean and a select for an `enum`. `src/renderers.ts` adds two the page needs: a
+number with a currency in its options, at the rank of a constraint, and a multi-line box a field
+names by `control`, at the highest rank. `FormProvider` puts them after the library's own, and
+`rendererFor` picks the highest rank, and the later registration on a tie.
 
 A renderer is a field component. It reads its field through the contexts, as every component of
 `@stealthscale/example-form-fields` does, and it is handed the field's presentation, whether the
 resolved schema requires it, and the property's schema.
-
-## The fields
-
-`src/fields.tsx` is the twenty lines the design calls `<Fields>`, written for this one form with the
-library's own `withForm`. It walks the members, draws a group as a fieldset or a layout, draws a
-repeat group once per item with the library's `pushFieldValue` and `removeFieldValue` behind the
-buttons, and binds `lines[].amount` to `lines[0].amount` for the first item. It reads the whole
-values from the form's store to count the lines, which re-renders it on every change. The component
-package's own fields subscribe to the resolved schema's hash instead.

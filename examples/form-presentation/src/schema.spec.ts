@@ -15,7 +15,6 @@ describe("presentation", () => {
   it("reads each field's settings from the property's keywords", () => {
     expect(presentation.fields).toStrictEqual({
       "billing.city": { span: 2 },
-      email: { control: "email" },
       "lines[].amount": { options: { currency: "EUR" } },
       notes: { control: "textarea" },
     });

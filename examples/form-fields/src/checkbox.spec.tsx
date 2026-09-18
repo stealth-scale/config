@@ -3,7 +3,15 @@ import { type ReactElement } from "react";
 import { fireEvent, render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { useAppForm } from "#hook.ts";
+import { type Schema } from "@stealthscale/provider-form";
+
+import { useAppForm, useSchemaForm } from "#hook.ts";
+
+const terms: Schema = {
+  properties: { consent: { title: "I have read the terms", type: "boolean" } },
+  required: ["consent"],
+  type: "object",
+};
 
 /**
  * Binds a checkbox to a consent that has to be given.
@@ -19,6 +27,19 @@ function Harness(): ReactElement {
       >
         {(field) => <field.Checkbox label="I agree" />}
       </form.AppField>
+    </form.AppForm>
+  );
+}
+
+/**
+ * Binds a checkbox to the consent of a form built from the schema.
+ */
+function Described(): ReactElement {
+  const form = useSchemaForm({ schema: terms });
+
+  return (
+    <form.AppForm>
+      <form.AppField name="consent">{(field) => <field.Checkbox />}</form.AppField>
     </form.AppForm>
   );
 }
@@ -42,5 +63,11 @@ describe("CheckboxField", () => {
 
     expect(getByRole("alert").textContent).toBe("required");
     expect(getByLabelText("I agree").getAttribute("aria-invalid")).toBe("true");
+  });
+
+  it("reads the schema's title and whether it requires the box", () => {
+    const { getByLabelText } = render(<Described />);
+
+    expect(getByLabelText("I have read the terms").getAttribute("aria-required")).toBe("true");
   });
 });

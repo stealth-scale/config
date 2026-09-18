@@ -10,6 +10,7 @@ import { translateFrom } from "@stealthscale/provider-form";
  */
 export const words = translateFrom({
   "errors.minLength": "Enter at least {{minLength}} characters",
+  "signup.actions.submit": "Sign up",
   "signup.errors.confirm.x-matches": "The passwords differ",
   "signup.errors.kind.enum": "Choose one",
   "signup.errors.password.containsUsername": "Do not put your name in your password",

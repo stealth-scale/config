@@ -8,6 +8,7 @@ import { translateFrom } from "@stealthscale/provider-form";
  * The words the form reads. Every other word falls back to the path written out.
  */
 export const words = translateFrom({
+  "profile.actions.submit": "Save",
   "profile.errors.email.format": "Enter an address like name@example.com",
   "profile.errors.email.minLength": "Enter your email address",
   "profile.errors.name.minLength": "Enter at least two characters",

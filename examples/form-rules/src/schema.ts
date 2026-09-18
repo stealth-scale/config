@@ -30,18 +30,19 @@ export interface Signup {
   readonly username: string;
 
   /**
-   * The VAT number, which a business states and an individual leaves empty.
+   * The VAT number, which a business states and an individual does not have.
    */
-  readonly vat: string;
+  readonly vat?: string | undefined;
 }
 
 /**
  * The schema the signup form is generated from.
  *
  * @remarks
- *   `confirm` writes `x-matches: "password"`, a keyword the engine registers. `vat` is a plain
- *   string at the root and a VAT number only where `kind` is `business`, so the conditional both
- *   requires it and gives it its format, and an individual's empty value passes.
+ *   `confirm` writes `x-matches: "password"`, a keyword the engine registers. `vat` exists only
+ *   where `kind` is `business`, so the conditional declares it, requires it and gives it its
+ *   format, and the form draws it for a business alone. The two passwords state
+ *   `format: "password"`, which draws a password box and keeps them out of any draft.
  */
 export const signup: Schema = {
   allOf: [
@@ -55,12 +56,12 @@ export const signup: Schema = {
     },
   ],
   properties: {
-    confirm: { type: "string", "x-matches": "password" },
+    confirm: { format: "password", type: "string", "x-matches": "password" },
     kind: { enum: ["business", "individual"], type: "string" },
-    password: { minLength: 8, type: "string" },
+    password: { format: "password", minLength: 8, type: "string" },
     username: { minLength: 3, pattern: "^[a-z0-9]+$", type: "string" },
-    vat: { type: "string" },
   },
   required: ["confirm", "kind", "password", "username"],
   type: "object",
+  "x-form": { id: "signup" },
 };

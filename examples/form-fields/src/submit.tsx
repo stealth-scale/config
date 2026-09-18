@@ -4,14 +4,15 @@
 
 import { type ReactElement, type ReactNode } from "react";
 
-import { useFormContext } from "@stealthscale/provider-form";
+import { useFormContext, useWords } from "@stealthscale/provider-form";
 
 /**
  * Describes what a submit button is given.
  */
 export interface SubmitProps {
   /**
-   * The words on the button. "Submit" where the caller states none.
+   * The words on the button. The catalogue's words under `<id>.actions.submit`, or "Submit",
+   * where the caller states none.
    */
   readonly children?: ReactNode | undefined;
 }
@@ -23,14 +24,15 @@ export interface SubmitProps {
  *   The button stays enabled while the form is invalid, because the library moves focus to the
  *   first refused field on a submit attempt, and a disabled button would never let that happen.
  */
-export function Submit({ children = "Submit" }: SubmitProps): ReactElement {
+export function Submit({ children }: SubmitProps): ReactElement {
   const form = useFormContext();
+  const words = useWords();
 
   return (
     <form.Subscribe selector={(state) => state.isSubmitting}>
       {(isSubmitting) => (
         <button disabled={isSubmitting} type="submit">
-          {children}
+          {children ?? words.action("submit", "Submit")}
         </button>
       )}
     </form.Subscribe>

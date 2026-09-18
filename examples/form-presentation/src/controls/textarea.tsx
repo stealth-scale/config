@@ -7,16 +7,14 @@ import { type ReactElement } from "react";
 import { Frame, useBoundField } from "@stealthscale/example-form-fields";
 import { type RendererProps } from "@stealthscale/provider-form";
 
-import { titleOf } from "#controls/schema.ts";
-
 /**
  * Draws a multi-line text box in a frame, bound to the string field in scope.
  */
-export function Textarea({ schema }: RendererProps): ReactElement {
+export function Textarea({ required }: RendererProps): ReactElement {
   const field = useBoundField<string>();
 
   return (
-    <Frame label={titleOf(schema)}>
+    <Frame required={required}>
       {(control) => (
         <textarea
           {...control}

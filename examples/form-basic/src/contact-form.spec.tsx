@@ -3,24 +3,21 @@ import { type ReactElement } from "react";
 import { fireEvent, render, type RenderResult, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import { FormNameContext } from "@stealthscale/example-form-fields";
-import { FormProvider } from "@stealthscale/provider-form";
+import { FormProvider, translateFrom } from "@stealthscale/provider-form";
 
 import { ContactForm } from "#contact-form.tsx";
 import { type Contact } from "#schema.ts";
-import { translator } from "#words.ts";
+import { catalogues } from "#words.ts";
 
 const sent = vi.fn<(value: Contact) => void>();
 
 /**
- * Draws the form under the English catalogue and the form's identifier.
+ * Draws the form under the English catalogue.
  */
 function Page(): ReactElement {
   return (
-    <FormProvider translate={translator("en")}>
-      <FormNameContext value="contact">
-        <ContactForm onSent={sent} />
-      </FormNameContext>
+    <FormProvider translate={translateFrom(catalogues.en)}>
+      <ContactForm onSent={sent} />
     </FormProvider>
   );
 }
@@ -36,9 +33,12 @@ function fill({ getByLabelText }: RenderResult): void {
 }
 
 describe("ContactForm", () => {
-  it("starts with no choice made and the box unticked", () => {
-    const { getByLabelText } = render(<Page />);
+  it("draws the two fieldsets the schema states with no choice made", () => {
+    const { getAllByRole, getByLabelText } = render(<Page />);
 
+    expect(
+      getAllByRole("group").map((group) => group.querySelector("legend")?.textContent),
+    ).toStrictEqual(["Who you are", "What you need"]);
     expect(getByLabelText("Topic")).toHaveProperty("value", "");
     expect(getByLabelText("I agree to be contacted")).toHaveProperty("checked", false);
   });

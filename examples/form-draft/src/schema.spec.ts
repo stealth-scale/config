@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { defaultsOf, sensitivePaths } from "@stealthscale/provider-form";
+import { defaultsOf, members, presentationOf, sensitivePaths } from "@stealthscale/provider-form";
 
-import { profile, STEPS } from "#schema.ts";
+import { profile } from "#schema.ts";
 
 describe("profile", () => {
   it("starts from the saved values written over the schema's defaults", () => {
@@ -19,7 +19,7 @@ describe("profile", () => {
   });
 
   it("draws every property in one of the two steps", () => {
-    expect([...STEPS.who, ...STEPS.about].toSorted()).toStrictEqual(
+    expect(members(presentationOf(profile)).toSorted()).toStrictEqual(
       Object.keys(profile["properties"] as object).toSorted(),
     );
   });

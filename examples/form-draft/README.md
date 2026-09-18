@@ -15,39 +15,50 @@ The development server answers on port 4920. Type into the form, refresh the pag
 opens where you left it. `vp test` renders the page over a memory store, plants a draft, reads the
 step and the values back, advances the debounce, and reads what the store holds.
 
-## The record and the draft
+## The form
 
-`src/records.ts` stands in for the database. The form is handed the saved profile, and the draft is
-keyed by the record's identifier, `profile.p-1`, so a draft of one profile never opens over another.
+`src/profile-form.tsx` is one call and one element:
 
-```ts
-const draft = useDraft<ProfileValues>({ app: "docs", id: `profile.${record.id}`, schema: profile });
-const form = useAppForm({
-  defaultValues: defaultsOf<ProfileValues>(profile, draft.restored?.values ?? saved),
-  listeners: {
-    onChange: ({ formApi }) => draft.write(formApi.state.values),
-    onChangeDebounceMs: 300,
-  },
+```tsx
+const form = useSchemaForm<ProfileValues>({
+  draft: { app: "docs", id: `profile.${id}`, store },
+  onSubmit: ({ value }) => save(value),
+  schema: profile,
+  values: saved,
 });
+
+return (
+  <form.AppForm>
+    <form.Form>
+      <form.Fields />
+    </form.Form>
+  </form.AppForm>
+);
 ```
 
-The draft's values win over the record where there is a draft, because they are the person's unsaved
-edits. Both are written over the schema's defaults by `defaultsOf`, which fills in the password the
-draft left out, so every control starts controlled. A record that changes on the server while a
-draft is open is not detected here. An application that needs that puts the record's version into
-the draft's identifier, and a draft of the old version is then never found.
+## The record and the draft
 
-The library's own change listener writes the draft, debounced by `onChangeDebounceMs`. Leaving a
-step writes the step at once through `draft.write(values, step)`, and the form opens on
-`draft.restored.step`. A submit saves the record and calls `draft.clear()`.
+`src/records.ts` replaces the database in this example. The form receives the saved profile as
+`values`. The draft is keyed by the record's identifier, `profile.p-1`, so a draft of one profile
+never opens over another. The form's own identifier stays `profile`. Its words are read under that.
+
+Where there is a draft, its values take precedence over the record, because they are the person's
+unsaved edits. Both are written over the schema's defaults. The defaults fill in the password the
+draft left out, so every control starts controlled. This example does not detect a record that
+changes on the server while a draft is open. An application that needs that puts the record's
+version into the draft's identifier. A draft of the old version is then never found.
+
+The hook writes the draft through the library's own change listener, debounced by 300 ms, and
+forgets it once the submit handler returns. Leaving a step writes the step at once, and the form
+opens on the step the draft was left on.
 
 ## The steps
 
-Each step is a component built with the library's own `withForm` over the options `src/options.ts`
-states once, so the form and both steps share one type and a step draws `form.AppField` over the
-form the page owns.
+The schema's `x-form` lists the two steps of a wizard. `form.Fields` draws the step a person is on
+through the `Step` layout of `@stealthscale/example-form-fields`, which draws the way back, the way
+forward and, on the last step, the submit.
 
 Leaving the first step marks its fields touched, calls `validateField` once with the cause `submit`,
 which runs every form-level validator, and reads the errors of that step's fields alone. A refused
 field keeps the person on the step and takes focus. The second step's fields are not touched until
-it is reached, so the page shows no error of theirs before then.
+it is reached, so the page does not show an error of theirs before then.

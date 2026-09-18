@@ -5,16 +5,17 @@
 
 import { type ReactElement, useState } from "react";
 
-import { FormNameContext } from "@stealthscale/example-form-fields";
 import { catalogue, FormProvider, translateFrom } from "@stealthscale/provider-form";
 
 import { CheckoutForm } from "#checkout-form.tsx";
+import { renderers } from "#renderers.ts";
 import { checkout, presentation, unplacedFields } from "#schema.ts";
 
 /**
  * The words the form reads. Every other word falls back to the schema's title or the path.
  */
 const words = translateFrom({
+  "checkout.actions.submit": "Place order",
   "checkout.fields.billing.country.options.BE": "Belgium",
   "checkout.fields.billing.country.options.NL": "Netherlands",
   "checkout.fields.kind.options.business": "A business",
@@ -33,23 +34,26 @@ const messages = catalogue(checkout, presentation);
 
 /**
  * Draws the page, the report of unplaced fields, and the catalogue.
+ *
+ * @remarks
+ *   The provider registers the page's two renderers after the field library's own, so a field
+ *   naming `textarea` or carrying a currency is drawn by them and every other field by the
+ *   defaults.
  */
 export function App(): ReactElement {
   const [done, setDone] = useState<unknown>();
 
   return (
-    <FormProvider translate={words}>
+    <FormProvider renderers={renderers} translate={words}>
       <main>
         <h1>Checkout</h1>
-        <FormNameContext value={presentation.id}>
-          {done === undefined ? (
-            <CheckoutForm onDone={setDone} />
-          ) : (
-            <output>
-              <pre>{JSON.stringify(done, null, 2)}</pre>
-            </output>
-          )}
-        </FormNameContext>
+        {done === undefined ? (
+          <CheckoutForm onDone={setDone} />
+        ) : (
+          <output>
+            <pre>{JSON.stringify(done, null, 2)}</pre>
+          </output>
+        )}
         <aside>
           <h2>Fields nobody placed</h2>
           <ul>

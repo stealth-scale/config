@@ -1,6 +1,6 @@
 /**
- * States what the profile form edits, as a JSON Schema document, the type the page reads its
- * values under, and the two steps the form is drawn in.
+ * States what the profile form edits and the two steps it is drawn in, as a JSON Schema
+ * document, and the type the page reads its values under.
  */
 
 import { type Schema } from "@stealthscale/provider-form";
@@ -36,7 +36,8 @@ export interface ProfileValues {
  *
  * @remarks
  *   `newPassword` states `format: "password"`, which the draft reads as a value it never keeps.
- *   `x-persist: false` on any property does the same for a value that is not a password.
+ *   `x-persist: false` on any property does the same for a value that is not a password. The
+ *   root's `x-form` names the form `profile` and lists the two steps of the wizard.
  */
 export const profile: Schema = {
   properties: {
@@ -47,17 +48,14 @@ export const profile: Schema = {
   },
   required: ["email", "name"],
   type: "object",
-};
-
-/**
- * The two steps the form is drawn in, by name.
- */
-export type Step = "about" | "who";
-
-/**
- * The fields each step draws, in order.
- */
-export const STEPS: Readonly<Record<Step, ReadonlyArray<keyof ProfileValues>>> = {
-  about: ["bio", "newPassword"],
-  who: ["name", "email"],
+  "x-form": {
+    id: "profile",
+    steps: {
+      kind: "wizard",
+      of: [
+        { name: "who", of: ["name", "email"] },
+        { name: "about", of: ["bio", "newPassword"] },
+      ],
+    },
+  },
 };

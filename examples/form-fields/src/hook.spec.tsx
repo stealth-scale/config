@@ -3,7 +3,20 @@ import { type ReactElement } from "react";
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { useAppForm, withFieldGroup, withForm } from "#hook.ts";
+import { type Schema } from "@stealthscale/provider-form";
+
+import { useAppForm, useSchemaForm, withFieldGroup, withForm } from "#hook.ts";
+
+const contact: Schema = {
+  properties: {
+    consent: { type: "boolean" },
+    email: { format: "email", type: "string" },
+    name: { type: "string" },
+    topic: { enum: ["sales", "support"], type: "string" },
+  },
+  type: "object",
+  "x-form": { id: "contact", of: [{ legend: true, name: "who", of: ["name", "email"] }, "topic"] },
+};
 
 /**
  * Draws one field of each kind and the two form components.
@@ -26,6 +39,22 @@ function Harness(): ReactElement {
   );
 }
 
+/**
+ * Builds the contact form from its schema and draws it from its presentation.
+ */
+function Generated(): ReactElement {
+  const form = useSchemaForm({ schema: contact });
+
+  return (
+    <form.AppForm>
+      <form.Form>
+        <form.Fields />
+        <form.Submit />
+      </form.Form>
+    </form.AppForm>
+  );
+}
+
 describe("useAppForm", () => {
   it("binds the four field components and the two form components", () => {
     const { getByLabelText, getByRole } = render(<Harness />);
@@ -35,6 +64,17 @@ describe("useAppForm", () => {
     expect(getByLabelText("Kind").tagName).toBe("SELECT");
     expect(getByLabelText("Consent").getAttribute("type")).toBe("checkbox");
     expect(getByRole("button").textContent).toBe("Submit");
+  });
+});
+
+describe("useSchemaForm", () => {
+  it("draws the form from its schema through the renderers and the layouts", () => {
+    const { getByLabelText, getByText } = render(<Generated />);
+
+    expect(getByText("Who").tagName).toBe("LEGEND");
+    expect(getByLabelText("Name").getAttribute("type")).toBe("text");
+    expect(getByLabelText("Email").getAttribute("type")).toBe("email");
+    expect(getByLabelText("Topic").tagName).toBe("SELECT");
   });
 });
 
@@ -73,13 +113,13 @@ function GroupOwner(): ReactElement {
 }
 
 describe("withForm", () => {
-  it("answers a component that draws a form handed to it", () => {
+  it("returns a component that draws a form handed to it", () => {
     expect(render(<SectionOwner />).getByLabelText("Name")).toHaveProperty("value", "Roy");
   });
 });
 
 describe("withFieldGroup", () => {
-  it("answers a component that draws a group of fields at a prefix", () => {
+  it("returns a component that draws a group of fields at a prefix", () => {
     expect(render(<GroupOwner />).getByLabelText("City")).toHaveProperty("value", "Delft");
   });
 });

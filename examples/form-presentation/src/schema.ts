@@ -20,7 +20,8 @@ import {
  *   the schema declares only under a condition, `vat` under `then`, is listed with the others and
  *   drawn where the resolved schema has it. A property no member names, `reference`, is reported
  *   rather than drawn. Per-field keywords name a control, a span in a grid, and the options a
- *   renderer reads.
+ *   renderer reads. The email box needs no keyword, because the field library draws a string
+ *   with `format: "email"` as one.
  */
 export const checkout: Schema = {
   allOf: [
@@ -41,7 +42,7 @@ export const checkout: Schema = {
       required: ["city", "country", "line1", "postcode"],
       type: "object",
     },
-    email: { format: "email", minLength: 1, type: "string", "x-control": "email" },
+    email: { format: "email", minLength: 1, type: "string" },
     kind: { enum: ["business", "individual"], type: "string" },
     lines: {
       items: {

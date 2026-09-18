@@ -4,7 +4,6 @@
 
 import { type ReactElement, useState } from "react";
 
-import { FormNameContext } from "@stealthscale/example-form-fields";
 import { FormProvider } from "@stealthscale/provider-form";
 import { localStore, type SettingStore } from "@stealthscale/settings";
 
@@ -39,15 +38,13 @@ export function App({ id = "p-1", store = localStore() }: AppProps): ReactElemen
     <FormProvider translate={words}>
       <main>
         <h1>Profile</h1>
-        <FormNameContext value="profile">
-          {record === undefined ? (
-            <p role="alert">There is no profile to edit</p>
-          ) : saved === undefined ? (
-            <ProfileForm onSaved={setSaved} record={record} store={store} />
-          ) : (
-            <output>Saved {saved.name}</output>
-          )}
-        </FormNameContext>
+        {record === undefined ? (
+          <p role="alert">There is no profile to edit</p>
+        ) : saved === undefined ? (
+          <ProfileForm onSaved={setSaved} record={record} store={store} />
+        ) : (
+          <output>Saved {saved.name}</output>
+        )}
       </main>
     </FormProvider>
   );

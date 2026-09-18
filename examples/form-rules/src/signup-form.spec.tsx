@@ -3,7 +3,6 @@ import { type ReactElement } from "react";
 import { fireEvent, render, type RenderResult, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import { FormNameContext } from "@stealthscale/example-form-fields";
 import { FormProvider } from "@stealthscale/provider-form";
 
 import { engine } from "#engine.ts";
@@ -14,14 +13,12 @@ import { words } from "#words.ts";
 const done = vi.fn<(value: Signup) => void>();
 
 /**
- * Draws the form under the page's engine, its words and its identifier.
+ * Draws the form under the page's engine and its words.
  */
 function Page(): ReactElement {
   return (
     <FormProvider engine={engine} translate={words}>
-      <FormNameContext value="signup">
-        <SignupForm onDone={done} />
-      </FormNameContext>
+      <SignupForm onDone={done} />
     </FormProvider>
   );
 }
@@ -44,6 +41,18 @@ function submit({ getByRole }: RenderResult): void {
 }
 
 describe("SignupForm", () => {
+  it("reads the choices and the kinds of box from the schema", () => {
+    const { getAllByRole, getByLabelText } = render(<Page />);
+
+    expect(getAllByRole("option").map((option) => option.textContent)).toStrictEqual([
+      "Choose",
+      "A business",
+      "An individual",
+    ]);
+    expect(getByLabelText("Password").getAttribute("type")).toBe("password");
+    expect(getByLabelText("Password again").getAttribute("type")).toBe("password");
+  });
+
   it("draws the VAT field for a business alone", () => {
     const page = render(<Page />);
 
@@ -52,6 +61,7 @@ describe("SignupForm", () => {
     fireEvent.change(page.getByLabelText("Account"), { target: { value: "business" } });
 
     expect(page.getByLabelText("VAT number").getAttribute("name")).toBe("vat");
+    expect(page.getByLabelText("VAT number").getAttribute("aria-required")).toBe("true");
   });
 
   it("refuses a VAT number the registered format does not accept", async () => {
@@ -115,7 +125,6 @@ describe("SignupForm", () => {
         kind: "individual",
         password: "hunter22hunter",
         username: "ann",
-        vat: "",
       });
     });
   });

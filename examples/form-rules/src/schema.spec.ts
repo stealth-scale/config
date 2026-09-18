@@ -10,27 +10,25 @@ const filled: Signup = {
   kind: "individual",
   password: "hunter22hunter",
   username: "roy",
-  vat: "",
 };
 
 describe("signup", () => {
-  it("starts every control from an empty value", () => {
+  it("starts every control from an empty value with no VAT number", () => {
     expect(defaultsOf<Signup>(signup, undefined, engine)).toStrictEqual({
       confirm: "",
       kind: "",
       password: "",
       username: "",
-      vat: "",
     });
   });
 
-  it("lets an individual leave the VAT number empty", () => {
+  it("accepts an individual without a VAT number", () => {
     expect(engine.validate(signup, filled)).toStrictEqual([]);
   });
 
   it("requires a VAT number in its format from a business", () => {
     expect(engine.validate(signup, { ...filled, kind: "business" })).toStrictEqual([
-      expect.objectContaining({ keyword: "minLength", path: ["vat"] }),
+      expect.objectContaining({ keyword: "required", path: ["vat"] }),
     ]);
     expect(
       engine.validate(signup, { ...filled, kind: "business", vat: "NL123456789B01" }),
@@ -40,8 +38,8 @@ describe("signup", () => {
     ]);
   });
 
-  it("requires the VAT number in the resolved schema for a business alone", () => {
-    expect(engine.resolve(signup, { kind: "business" })["required"]).toContain("vat");
-    expect(engine.resolve(signup, { kind: "individual" })["required"]).not.toContain("vat");
+  it("declares the VAT number in the resolved schema for a business alone", () => {
+    expect(engine.resolve(signup, { kind: "business" })["properties"]).toHaveProperty("vat");
+    expect(engine.resolve(signup, { kind: "individual" })["properties"]).not.toHaveProperty("vat");
   });
 });

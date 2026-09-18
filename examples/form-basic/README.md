@@ -1,9 +1,9 @@
 # @stealthscale/example-form-basic
 
-`@stealthscale/example-form-basic` renders a contact form from one JSON Schema document. The
-schema's defaults are the values the form starts from, the schema itself is the validator in the
-form's dynamic slot, and every word on the page comes from a catalogue in the language a person
-picks. The form states no label, no message and no rule of its own.
+`@stealthscale/example-form-basic` renders a contact form from one JSON Schema document. The schema
+states the data, its `x-form` keyword states the two fieldsets the form is drawn in, and every word
+on the page comes from a catalogue in the language a person picks. The form itself is the schema and
+a submit handler.
 
 ## Run it
 
@@ -16,17 +16,39 @@ The development server answers on port 4900. `vp test` renders the page into a h
 submits the empty form, reads the refusals back in English, switches to Dutch, and submits a filled
 form.
 
+## The form
+
+`src/contact-form.tsx` is the whole form:
+
+```tsx
+const form = useSchemaForm<Contact>({ onSubmit: ({ value }) => onSent(value), schema: contact });
+
+return (
+  <form.AppForm>
+    <form.Form>
+      <form.Fields />
+      <form.Submit />
+    </form.Form>
+  </form.AppForm>
+);
+```
+
+`useSchemaForm` starts from the schema's defaults, puts the schema in the form's dynamic slot so it
+validates on submit and then on every change, and moves focus to the first refused field on a
+submit. `form.Fields` draws the members the schema's `x-form` states through the renderers of
+`@stealthscale/example-form-fields`. `form.Submit` reads its words from the catalogue.
+
 ## The schema
 
 `src/schema.ts` states five properties. A string a person has to fill in states `minLength: 1`,
 because `required` in JSON Schema asks only that the property exist and every control starts from an
 empty string. The consent is `const: true`, so an unticked box refuses under the keyword `const`.
+The root's `x-form` names the form `contact` and lists two fieldsets, `who` and `what`.
 
 ## The words
 
 `src/words.ts` keeps one catalogue per language, keyed the way `@stealthscale/provider-form` derives
-identifiers. The form's identifier is `contact`, set once around the form with `FormNameContext`, so
-a field at `email` reads:
+identifiers. The form's identifier is `contact`. A field at `email` reads:
 
 | What                                | Key                                                       |
 | ----------------------------------- | --------------------------------------------------------- |
@@ -34,18 +56,13 @@ a field at `email` reads:
 | Its help text                       | `contact.fields.email.description`                        |
 | A refusal under `minLength`         | `contact.errors.email.minLength`, then `errors.minLength` |
 | The legend of the fieldset it is in | `contact.groups.who.legend`                               |
+| The submit button                   | `contact.actions.submit`                                  |
 
-A form in another package reads its words under its own identifier, so one catalogue holds every
-form of an application without a clash. The English `errors.format` entry has no `contact` twin, so
-the email format refusal reads the shared words, which is what a product-wide message is.
+A form in another package reads its words under its own identifier. One catalogue therefore holds
+every form of an application without a clash. The English `errors.format` entry has no `contact`
+twin. The email format refusal reads the shared words instead, which is what a product-wide message
+is.
 
-`translator(language)` builds a function with i18next's shape: a key or a list of keys, a
+`translateFrom(catalogue)` builds a translator with i18next's signature: a key or a list of keys, a
 `defaultValue`, and the values a message interpolates with `{{name}}`. An application over i18next
-hands `FormProvider` its `t` instead, and nothing on the page changes.
-
-## The form
-
-`src/app.tsx` builds the form with `useAppForm` from `@stealthscale/example-form-fields`, spreads
-`formDefaults` for the submit-then-live validation and the focus on a refused submit, starts from
-`defaultsOf(contact)`, and puts `standardOf(contact)` in the `onDynamic` slot. The form library maps
-each issue onto its field, and the field's frame reads the keyword off the issue to find the words.
+gives `FormProvider` its `t` instead. Nothing on the page changes.

@@ -1,6 +1,6 @@
 /**
- * States what the contact form collects, as a JSON Schema document, and the type the page reads
- * its values under.
+ * States what the contact form collects and how it is drawn, as one JSON Schema document, and
+ * the type the page reads its values under.
  */
 
 import { type Schema } from "@stealthscale/provider-form";
@@ -41,7 +41,8 @@ export interface Contact {
  * @remarks
  *   A string a person has to fill in states `minLength: 1`, because JSON Schema's `required`
  *   asks only that the property exist and every control starts from an empty string. The consent
- *   is `const: true`, so an unticked box refuses under the keyword `const`.
+ *   is `const: true`, so an unticked box refuses under the keyword `const`. The root's `x-form`
+ *   states the identifier every word is read under and the two fieldsets the form is drawn in.
  */
 export const contact: Schema = {
   properties: {
@@ -53,4 +54,11 @@ export const contact: Schema = {
   },
   required: ["consent", "email", "name", "topic"],
   type: "object",
+  "x-form": {
+    id: "contact",
+    of: [
+      { legend: true, name: "who", of: ["name", "email"] },
+      { legend: true, name: "what", of: ["topic", "message", "consent"] },
+    ],
+  },
 };

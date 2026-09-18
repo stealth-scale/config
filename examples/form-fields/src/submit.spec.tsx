@@ -3,6 +3,8 @@ import { type ReactElement, type ReactNode } from "react";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
+import { FormProvider, translateFrom } from "@stealthscale/provider-form";
+
 import { useAppForm } from "#hook.ts";
 
 /**
@@ -32,6 +34,17 @@ describe("Submit", () => {
     rerender(<Harness>Send</Harness>);
 
     expect(getByRole("button").textContent).toBe("Send");
+  });
+
+  it("reads the catalogue's words for the form's submit action", () => {
+    const words = translateFrom({ "form.actions.submit": "Place order" });
+    const { getByRole } = render(
+      <FormProvider translate={words}>
+        <Harness />
+      </FormProvider>,
+    );
+
+    expect(getByRole("button").textContent).toBe("Place order");
   });
 
   it("is disabled while the form is submitting", async () => {

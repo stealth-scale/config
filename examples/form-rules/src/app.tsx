@@ -5,7 +5,6 @@
 
 import { type ReactElement, useState } from "react";
 
-import { FormNameContext } from "@stealthscale/example-form-fields";
 import { FormProvider } from "@stealthscale/provider-form";
 
 import { engine } from "#engine.ts";
@@ -23,13 +22,11 @@ export function App(): ReactElement {
     <FormProvider engine={engine} translate={words}>
       <main>
         <h1>Sign up</h1>
-        <FormNameContext value="signup">
-          {done === undefined ? (
-            <SignupForm onDone={setDone} />
-          ) : (
-            <output>Welcome, {done.username}</output>
-          )}
-        </FormNameContext>
+        {done === undefined ? (
+          <SignupForm onDone={setDone} />
+        ) : (
+          <output>Welcome, {done.username}</output>
+        )}
       </main>
     </FormProvider>
   );

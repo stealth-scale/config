@@ -3,21 +3,58 @@ import { type ReactElement } from "react";
 import { fireEvent, render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { FormProvider, translateFrom } from "@stealthscale/provider-form";
+import { FormProvider, type Schema, translateFrom } from "@stealthscale/provider-form";
 
-import { useAppForm } from "#hook.ts";
+import { useAppForm, useSchemaForm } from "#hook.ts";
+
+const signup: Schema = {
+  properties: { kind: { enum: ["business", "individual"], type: "string" } },
+  type: "object",
+};
+
+const KINDS = ["business", "individual"];
 
 /**
- * Binds a select to a kind that is a business or an individual.
+ * Binds a select to a kind that is a business or an individual, or to a kind with the options
+ * given.
  */
-function Harness(): ReactElement {
+function Harness({
+  options = KINDS,
+}: {
+  readonly options?: readonly string[] | undefined;
+}): ReactElement {
   const form = useAppForm({ defaultValues: { kind: "" } });
 
   return (
     <form.AppForm>
-      <form.AppField name="kind">
-        {(field) => <field.Select options={["business", "individual"]} />}
-      </form.AppField>
+      <form.AppField name="kind">{(field) => <field.Select options={options} />}</form.AppField>
+    </form.AppForm>
+  );
+}
+
+/**
+ * Binds a select to a kind of a form built from the library's own options, with no options
+ * stated.
+ */
+function Bare(): ReactElement {
+  const form = useAppForm({ defaultValues: { kind: "" } });
+
+  return (
+    <form.AppForm>
+      <form.AppField name="kind">{(field) => <field.Select />}</form.AppField>
+    </form.AppForm>
+  );
+}
+
+/**
+ * Binds a select to the kind of a form built from the schema, with no options stated.
+ */
+function Described(): ReactElement {
+  const form = useSchemaForm({ schema: signup });
+
+  return (
+    <form.AppForm>
+      <form.AppField name="kind">{(field) => <field.Select />}</form.AppField>
     </form.AppForm>
   );
 }
@@ -25,6 +62,22 @@ function Harness(): ReactElement {
 describe("SelectField", () => {
   it("draws an empty choice and then every option", () => {
     const { getAllByRole } = render(<Harness />);
+
+    expect(getAllByRole("option").map((option) => option.textContent)).toStrictEqual([
+      "Choose",
+      "business",
+      "individual",
+    ]);
+  });
+
+  it("draws the empty choice alone where neither the caller nor a schema states any", () => {
+    const { getAllByRole } = render(<Bare />);
+
+    expect(getAllByRole("option").map((option) => option.textContent)).toStrictEqual(["Choose"]);
+  });
+
+  it("reads the choices from the schema's enum where none are stated", () => {
+    const { getAllByRole } = render(<Described />);
 
     expect(getAllByRole("option").map((option) => option.textContent)).toStrictEqual([
       "Choose",
