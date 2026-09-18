@@ -1,7 +1,7 @@
-import { type ReactNode } from "react";
+import { type ReactElement, type ReactNode } from "react";
 
-import { act, renderHook, type RenderHookResult } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { act, render, renderHook, type RenderHookResult, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 
 import { useViewport, type ViewportContextValue } from "#context.ts";
 import { ViewportProvider, type ViewportProviderProps } from "#provider.tsx";
@@ -20,13 +20,56 @@ function under(stated: ViewportProviderProps): RenderHookResult<ViewportContextV
   });
 }
 
+/**
+ * Shows the width the subtree is laid out for.
+ */
+function Reader(): ReactElement {
+  return <output>{String(useViewport().width)}</output>;
+}
+
+/**
+ * Owns the width and hands it to the provider, as a catalogue with a toolbar above the preview
+ * does.
+ */
+function Owner({ width }: { readonly width: number }): ReactElement {
+  return (
+    <ViewportProvider width={width}>
+      <Reader />
+    </ViewportProvider>
+  );
+}
+
 describe("ViewportProvider", () => {
   it("leaves the window to decide until a width is stated", () => {
     expect(under({}).result.current.width).toBeUndefined();
   });
 
   it("lays the subtree out for the width it starts at", () => {
+    expect(under({ defaultWidth: 390 }).result.current.width).toBe(390);
+  });
+
+  it("lays the subtree out for the width its owner states", () => {
     expect(under({ width: 390 }).result.current.width).toBe(390);
+  });
+
+  it("follows the width its owner moves", () => {
+    const { rerender } = render(<Owner width={390} />);
+
+    rerender(<Owner width={1280} />);
+
+    expect(screen.getByRole("status").textContent).toBe("1280");
+  });
+
+  it("tells its owner the width its setter is given and leaves the owner to move it", () => {
+    const onWidthChange = vi.fn<(width: number | undefined) => void>();
+    const { result } = under({ onWidthChange, width: 390 });
+
+    act(() => {
+      result.current.setWidth(768);
+    });
+
+    expect(onWidthChange).toHaveBeenCalledWith(768);
+    expect(result.current.width).toBe(390);
   });
 
   it("offers the design system's own breakpoints where no sizes are named", () => {
@@ -48,7 +91,7 @@ describe("ViewportProvider", () => {
   });
 
   it("gives the window back when its setter is given nothing", () => {
-    const { result } = under({ width: 390 });
+    const { result } = under({ defaultWidth: 390 });
 
     act(() => {
       result.current.setWidth(undefined);

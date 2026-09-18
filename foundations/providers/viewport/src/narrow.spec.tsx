@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { useNarrow } from "#narrow.ts";
 import { ViewportProvider } from "#provider.tsx";
+import { type Breakpoint } from "#size.ts";
 
 /**
  * The width under which the hook calls an element narrow, in every case here.
@@ -95,7 +96,7 @@ function measuring(width: number): Measured {
 function under(
   ref: RefObject<HTMLElement | null>,
   viewport: number,
-  below?: string,
+  below?: Breakpoint,
 ): RenderHookResult<boolean, unknown> {
   return renderHook(() => useNarrow(ref, THRESHOLD, below), {
     wrapper: ({ children }: { children?: ReactNode }) => (
@@ -144,6 +145,47 @@ describe("useNarrow", () => {
     observing();
 
     expect(under(createRef<HTMLElement>(), 320).result.current).toBe(true);
+  });
+
+  it("measures an element that arrives after the first layout", () => {
+    observing();
+
+    const ref = createRef<HTMLElement>();
+    const { rerender, result } = under(ref, 4000);
+
+    ref.current = measuring(400).ref.current;
+    rerender();
+
+    expect(result.current).toBe(true);
+  });
+
+  it("keeps watching one element across renders that change nothing", () => {
+    const observers = observing();
+    const { rerender } = under(measuring(900).ref, 320);
+
+    rerender();
+    rerender();
+
+    expect(observers.stopped()).toBe(0);
+  });
+
+  it("measures again against a width the caller moves", () => {
+    observing();
+
+    const { ref } = measuring(700);
+    const { rerender, result } = renderHook(
+      ({ width }: { width: number }) => useNarrow(ref, width),
+      {
+        initialProps: { width: 600 },
+        wrapper: ({ children }: { children?: ReactNode }) => (
+          <ViewportProvider width={4000}>{children}</ViewportProvider>
+        ),
+      },
+    );
+
+    rerender({ width: 800 });
+
+    expect(result.current).toBe(true);
   });
 
   it("calls a wide viewport wide while the ref holds nothing", () => {

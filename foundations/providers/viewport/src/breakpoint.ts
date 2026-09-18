@@ -5,7 +5,7 @@
 import { useMediaQuery } from "@stealthscale/hooks";
 
 import { useViewport } from "#context.ts";
-import { BASE_SIZE, type Size } from "#size.ts";
+import { BASE_SIZE, type Breakpoint, type Size } from "#size.ts";
 
 /**
  * Describes what {@link useBreakpoint} takes.
@@ -15,13 +15,13 @@ export interface UseBreakpointOptions {
    * Which breakpoints count. Only these are matched, and the widest matching one is answered.
    * Naming none answers the fallback.
    */
-  breakpoints?: readonly string[] | undefined;
+  breakpoints?: readonly Breakpoint[] | undefined;
 
   /**
    * The answer where no breakpoint named starts under the width, and on the first render where the
    * window is waited for. `base` where this is absent.
    */
-  fallback?: string | undefined;
+  fallback?: Breakpoint | undefined;
 
   /**
    * Finds the window to ask, for a tree drawn in another document. The page's own where this is
@@ -47,10 +47,11 @@ export type UseBreakpointValueOptions = Omit<UseBreakpointOptions, "breakpoints"
  *
  * @remarks
  *   A list carries a gap where a breakpoint states nothing, which is why its member type admits
- *   null.
+ *   null. A key is a breakpoint the vocabulary states, so a misspelt one is refused where it is
+ *   written.
  * @typeParam Value - The value stated for each breakpoint.
  */
-export type Responsive<Value> = Array<null | Value> | Partial<Record<string, Value>>;
+export type Responsive<Value> = Array<null | Value> | Partial<Record<Breakpoint, Value>>;
 
 /**
  * Lists the breakpoints asked for, narrowest first.
@@ -94,21 +95,22 @@ function keyed<Value>(
  * @remarks
  *   The stated width where a provider states one, and the window's otherwise. The window is asked
  *   the way the styling engine asks it, one `min-width` query per breakpoint, so a component and
- *   its stylesheet switch at the same pixel.
+ *   its stylesheet switch at the same pixel. Where a provider states the width, the window is
+ *   asked nothing, so no listener is kept for an answer nothing reads.
  * @param options - Which breakpoints count and how to ask the window.
  * @returns The breakpoint's name.
  */
 export function useBreakpoint({
   breakpoints = [],
-  fallback = BASE_SIZE.name,
+  fallback = "base",
   getWindow,
   ssr,
-}: UseBreakpointOptions = {}): string {
+}: UseBreakpointOptions = {}): Breakpoint {
   const { sizes, width } = useViewport();
   const asked = askedOf(sizes, breakpoints);
   const until = asked.findIndex(({ name }) => name === fallback);
   const matching = useMediaQuery(
-    asked.map(({ min }) => `(min-width: ${String(min)}px)`),
+    width === undefined ? asked.map(({ min }) => `(min-width: ${String(min)}px)`) : [],
     {
       fallback: asked.map((_, index) => index <= until),
       ssr,
@@ -118,7 +120,7 @@ export function useBreakpoint({
   const matched = width === undefined ? matching : asked.map(({ min }) => min <= width);
   const at = asked[matched.lastIndexOf(true)];
 
-  return at?.name ?? fallback;
+  return breakpoints.find((name) => name === at?.name) ?? fallback;
 }
 
 /**
@@ -141,7 +143,11 @@ export function useBreakpointValue<Value>(
     value,
     [BASE_SIZE, ...sizes].map(({ name }) => name),
   );
-  const at = useBreakpoint({ ...options, breakpoints: Object.keys(table) });
+  // The table is keyed by the breakpoints the value named or the vocabulary lists, which are the
+  // breakpoints a hook may ask for, and a value keyed by text needs its keys read back as those.
+  // eslint-disable-next-line typescript/no-unsafe-type-assertion -- see above
+  const named = Object.keys(table) as Breakpoint[];
+  const at = useBreakpoint({ ...options, breakpoints: named });
 
   return table[at];
 }

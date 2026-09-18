@@ -19,8 +19,17 @@ provider-viewport: add the provider that lays a subtree out for a stated width
   for its own width. Until the element is measured the answer comes from the viewport, so a phone
   never lays out wide first.
 - `sizesOf` reads the widths the design system's breakpoints start at, from the compiled vocabulary
-  rather than from a theme. `pixelsOf` converts a length against the sixteen pixels the styling
-  engine compiled its queries with.
+  rather than from a theme, and builds the list once. `pixelsOf` converts a length against the
+  sixteen pixels the styling engine compiled its queries with.
+- `ViewportProvider` takes `width` as the caller's, `defaultWidth` as its own, and `onWidthChange`
+  to tell the caller what the setter was given, the way every controllable component here takes a
+  value. A width the caller moves reaches the subtree on the next render.
+- A breakpoint name is a `Breakpoint`, which is `base` or one the vocabulary states, in
+  `useBreakpoint`, `useBreakpointValue`, `useNarrow` and `Responsive`. A misspelt name is refused
+  where it is written.
+- `useNarrow` measures an element that arrives after the first layout, and measures again against a
+  width the caller moves.
+- `useBreakpoint` asks the window nothing where a provider states the width.
 
-The breakpoint hooks come from the platform's hook package. They read the viewport, so they belong
-beside it rather than in a package that peers on React alone.
+The breakpoint hooks come from the hook package of the library we are porting from. They read the
+viewport, so they belong beside it rather than in a package that peers on React alone.

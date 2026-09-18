@@ -2,14 +2,30 @@
  * Measures an element against a width, rather than measuring the window.
  */
 
-import { type RefObject, useLayoutEffect, useState } from "react";
+import { type RefObject, useLayoutEffect, useRef, useState } from "react";
 
 import { useBreakpoint } from "#breakpoint.ts";
+import { type Breakpoint } from "#size.ts";
 
 /**
  * The breakpoint under which the viewport counts as narrow before an element has been measured.
  */
-const BELOW = "md";
+const BELOW: Breakpoint = "md";
+
+/**
+ * Describes what the hook is watching: the element, and the width it is measured against.
+ */
+interface Watched {
+  /**
+   * The element being measured.
+   */
+  readonly element: HTMLElement;
+
+  /**
+   * The width it is measured against.
+   */
+  readonly width: number;
+}
 
 /**
  * Reads whether an element is narrower than a width.
@@ -19,6 +35,11 @@ const BELOW = "md";
  *   beside an open sidebar answers for its own width rather than the window's. Before it is
  *   measured, and while the ref holds nothing, the answer comes from the viewport: narrow under the
  *   breakpoint given, which is what a phone is, so a phone never lays out wide first.
+ *   The wiring effect names no dependencies, because a ref changing is not a render and nothing
+ *   else would notice an element that arrives after the first layout. It rewires only when the
+ *   element or the width differs from what it is already watching, so running on every render
+ *   costs one comparison. The teardown is held in a ref and run by a second effect, because the
+ *   wiring effect returning it would stop watching on every render.
  * @param ref - The element to measure, which may hold nothing yet.
  * @param width - The width in pixels under which the element counts as narrow.
  * @param below - The breakpoint under which the viewport counts as narrow before the element is
@@ -28,16 +49,24 @@ const BELOW = "md";
 export function useNarrow(
   ref: RefObject<HTMLElement | null>,
   width: number,
-  below = BELOW,
+  below: Breakpoint = BELOW,
 ): boolean {
   const at = useBreakpoint({ breakpoints: [below] });
   const guessed = at !== below;
   const [measured, setMeasured] = useState<boolean | undefined>();
+  const watched = useRef<null | Watched>(null);
+  const unwire = useRef<(() => void) | null>(null);
 
-  useLayoutEffect((): (() => void) | undefined => {
+  useLayoutEffect(() => {
     const element = ref.current;
 
-    if (element === null) return undefined;
+    if (element === watched.current?.element && width === watched.current.width) return;
+
+    unwire.current?.();
+    unwire.current = null;
+    watched.current = element === null ? null : { element, width };
+
+    if (element === null) return;
 
     const observer = new ResizeObserver(() => {
       setMeasured(element.getBoundingClientRect().width < width);
@@ -45,10 +74,17 @@ export function useNarrow(
 
     observer.observe(element);
 
-    return (): void => {
+    unwire.current = (): void => {
       observer.disconnect();
     };
-  }, [ref, width]);
+  });
+
+  useLayoutEffect(() => {
+    return (): void => {
+      unwire.current?.();
+      unwire.current = null;
+    };
+  }, []);
 
   return measured ?? guessed;
 }

@@ -20,6 +20,15 @@ const UNIT = /[a-z]+$/u;
 const BASE = "base";
 
 /**
+ * A breakpoint a hook may ask for, which is `base` or one the design system's vocabulary states.
+ *
+ * @remarks
+ *   Typed from the vocabulary rather than as text, so a breakpoint misspelt in a component is
+ *   refused where it is written rather than answered with nothing.
+ */
+export type Breakpoint = BreakpointToken | typeof BASE;
+
+/**
  * Describes one width a subtree can be laid out for, named after the breakpoint that starts there.
  */
 export interface Size {
@@ -59,18 +68,26 @@ export function pixelsOf(length: null | string | undefined): number {
 }
 
 /**
+ * The sizes read from the vocabulary, built on first use.
+ */
+let known: readonly Size[] | undefined;
+
+/**
  * Reads the widths the design system's breakpoints start at.
  *
  * @remarks
  *   Read from the compiled vocabulary rather than from a theme, because a breakpoint is physics. A
  *   theme that moved one would move it for every component written against the foundation, so the
- *   compiler's own preset states them and a theme leaves them alone.
+ *   compiler's own preset states them and a theme leaves them alone. The list is built once,
+ *   because the vocabulary does not change while a page runs and a hook reads it on every render.
  *   `base` is left out. It starts at nothing and has no token, and every reader here puts it back
  *   itself. What this answers is the widths a page can be previewed at.
  * @returns One size per breakpoint above `base`, narrowest first.
  */
-export function sizesOf(): Size[] {
-  return breakpointKeys
+export function sizesOf(): readonly Size[] {
+  known ??= breakpointKeys
     .filter((name): name is BreakpointToken => name !== BASE)
     .map((name) => ({ min: pixelsOf(token(`breakpoints.${name}`)), name }));
+
+  return known;
 }

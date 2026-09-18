@@ -2,7 +2,7 @@ import { type ReactElement, type ReactNode } from "react";
 import { renderToString } from "react-dom/server";
 
 import { renderHook } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import {
   type Responsive,
@@ -11,8 +11,9 @@ import {
   useBreakpointValue,
 } from "#breakpoint.ts";
 import { ViewportProvider } from "#provider.tsx";
+import { type Breakpoint } from "#size.ts";
 
-const EVERY = ["base", "sm", "md", "lg", "xl", "2xl"];
+const EVERY: readonly Breakpoint[] = ["base", "sm", "md", "lg", "xl", "2xl"];
 
 /**
  * Answers a window whose every query matches at or under the width a case names.
@@ -102,6 +103,16 @@ describe("useBreakpoint", () => {
 
   it("prefers the stated width over the window", () => {
     expect(at(320, { getWindow: windowAt(4000), ssr: false })).toBe("base");
+  });
+
+  it("asks the window nothing where a provider states the width", () => {
+    const asked = vi.fn<(query: string) => MediaQueryList>();
+
+    // eslint-disable-next-line typescript/no-unsafe-type-assertion -- the hook reads matchMedia alone off the window it is given
+    const getWindow = (): typeof window => ({ matchMedia: asked }) as unknown as typeof window;
+
+    expect(at(800, { getWindow, ssr: false })).toBe("md");
+    expect(asked).not.toHaveBeenCalled();
   });
 });
 

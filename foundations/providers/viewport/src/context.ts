@@ -39,6 +39,25 @@ function unstated(): void {
 }
 
 /**
+ * The value a reader outside every provider reads, built on first use.
+ */
+let fallback: undefined | ViewportContextValue;
+
+/**
+ * Returns what a reader outside every provider reads: the window deciding, and the design
+ * system's own sizes.
+ *
+ * @remarks
+ *   One object, however many readers and renders, so a reader outside a provider reads the same
+ *   value each render and nothing built from it is rebuilt.
+ */
+function windowed(): ViewportContextValue {
+  fallback ??= { setWidth: unstated, sizes: sizesOf(), width: undefined };
+
+  return fallback;
+}
+
+/**
  * Reads the width the subtree is laid out for, the widths on offer, and how to change it.
  *
  * @remarks
@@ -49,7 +68,5 @@ function unstated(): void {
  * @returns The width, the sizes on offer, and how to change it.
  */
 export function useViewport(): ViewportContextValue {
-  const stated = useContext(ViewportContext);
-
-  return stated ?? { setWidth: unstated, sizes: sizesOf(), width: undefined };
+  return useContext(ViewportContext) ?? windowed();
 }

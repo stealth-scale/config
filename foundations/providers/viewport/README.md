@@ -23,13 +23,13 @@ Wrap the subtree and state the width in pixels.
 ```tsx
 import { ViewportProvider } from "@stealthscale/provider-viewport";
 
-<ViewportProvider width={390}>
+<ViewportProvider defaultWidth={390}>
   <Page />
 </ViewportProvider>;
 ```
 
-Omit `width` to leave the window in charge until something states one. `useViewport` reads the
-width, the widths on offer, and the setter a toolbar drives.
+Omit `defaultWidth` to leave the window in charge until something states one. `useViewport` reads
+the width, the widths on offer, and the setter a toolbar drives.
 
 ```tsx
 import { useViewport } from "@stealthscale/provider-viewport";
@@ -45,10 +45,24 @@ export function SizeToolbar() {
 }
 ```
 
+A toolbar drawn above the provider keeps the width in its own state instead. Pass `width` and set it
+from `onWidthChange`, the way every controllable component here takes a value. The subtree reads the
+new width on the next render, and the setter calls `onWidthChange` rather than moving the width
+itself.
+
+```tsx
+const [width, setWidth] = useState<number | undefined>(390);
+
+<ViewportProvider onWidthChange={setWidth} width={width}>
+  <Page />
+</ViewportProvider>;
+```
+
 ## Reading the breakpoint
 
 `useBreakpoint` answers the widest breakpoint that starts at or under the width. Name the ones that
-count, because only those are matched.
+count, because only those are matched. A name is a `Breakpoint`, which is `base` or one the design
+system's vocabulary states, so a misspelt one is refused where it is written.
 
 ```ts
 const at = useBreakpoint({ breakpoints: ["base", "md", "lg"] });
@@ -82,10 +96,10 @@ const ref = useRef<HTMLElement>(null);
 const narrow = useNarrow(ref, 600);
 ```
 
-The element is measured once it is laid out and again whenever its size changes. Before it is
-measured, and while the ref holds nothing, the answer comes from the viewport: narrow under `md`,
-which is what a phone is, so a phone never lays out wide first. Pass a third argument to guess under
-a different breakpoint.
+The element is measured once it is laid out and again whenever its size changes, and an element that
+arrives after the first layout is measured when it arrives. Before it is measured, and while the ref
+holds nothing, the answer comes from the viewport: narrow under `md`, which is what a phone is, so a
+phone never lays out wide first. Pass a third argument to guess under a different breakpoint.
 
 ## Reference
 
@@ -93,16 +107,17 @@ a different breakpoint.
 | -------------------- | ------------------------------------------------------------------- |
 | `ViewportProvider`   | `(props: ViewportProviderProps) => ReactElement`                    |
 | `useViewport`        | `() => ViewportContextValue`                                        |
-| `useBreakpoint`      | `(options?: UseBreakpointOptions) => string`                        |
+| `useBreakpoint`      | `(options?: UseBreakpointOptions) => Breakpoint`                    |
 | `useBreakpointValue` | `<Value>(value: Responsive<Value>, options?) => undefined \| Value` |
-| `useNarrow`          | `(ref, width: number, below?: string) => boolean`                   |
-| `sizesOf`            | `() => Size[]`                                                      |
+| `useNarrow`          | `(ref, width: number, below?: Breakpoint) => boolean`               |
+| `sizesOf`            | `() => readonly Size[]`                                             |
 | `pixelsOf`           | `(length: null \| string \| undefined) => number`                   |
 | `BASE_SIZE`          | `Size`                                                              |
 
 `sizesOf` reads the widths the design system's breakpoints start at, narrowest first, and leaves
-`base` out because it starts at nothing and has no token. A provider offers these unless it is given
-its own `sizes`.
+`base` out because it starts at nothing and has no token. The list is built once, because the
+vocabulary does not change while a page runs. A provider offers these unless it is given its own
+`sizes`.
 
 `pixelsOf` reads a length the way the styling engine writes one. The engine keeps its breakpoints in
 rem and compiled its queries against a root font size of sixteen pixels, so that is the number used
