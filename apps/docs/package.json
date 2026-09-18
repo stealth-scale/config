@@ -18,8 +18,8 @@
     "@stealthscale/component-actions": "workspace:^",
     "@stealthscale/component-layout": "workspace:^",
     "@stealthscale/component-typography": "workspace:^",
-    "@stealthscale/provider-i18n": "workspace:^",
-    "@stealthscale/provider-locale": "workspace:^",
+    "@stealthscale/provider-router": "workspace:^",
+    "@stealthscale/provider-shell": "workspace:^",
     "@stealthscale/specimen": "workspace:^",
     "@stealthscale/theme": "workspace:^",
     "@stealthscale/theme-asphalt": "workspace:^",
@@ -35,6 +35,7 @@
   },
   "devDependencies": {
     "@rolldown/plugin-babel": "catalog:",
+    "@stealthscale/testing-router": "workspace:^",
     "@stealthscale/vite-config": "workspace:^",
     "@stealthscale/vite-config-i18n": "workspace:^",
     "@stealthscale/vite-config-react": "workspace:^",

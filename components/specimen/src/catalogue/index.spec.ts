@@ -6,11 +6,17 @@ describe("index", () => {
   it("names everything the catalogue publishes and nothing beside it", () => {
     expect(Object.keys(barrel).toSorted()).toStrictEqual([
       "Catalogue",
+      "FRAME",
+      "NAMED",
       "Page",
       "Rail",
+      "declarations",
       "declared",
+      "entryOf",
       "grouped",
+      "layouts",
       "parted",
+      "routeId",
     ]);
   });
 });

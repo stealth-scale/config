@@ -17,29 +17,63 @@ catalogue and resolves through the workspace root.
 
 ## The catalogue
 
-An application hands `Catalogue` the pages the plugin indexed, under the providers it decides.
+The package publishes routes and a frame, and builds no router. An application compiles them beneath
+one of its own routes.
 
-```tsx
-import { I18nProvider, LocaleProvider } from "@stealthscale/provider-locale";
-import { Catalogue } from "@stealthscale/specimen";
-import { catalogues } from "virtual:i18n";
+```ts
+import { compileRoutes } from "@stealthscale/provider-router";
+import { declarations, layouts } from "@stealthscale/specimen";
 import { pages } from "virtual:specimen-index";
 
-<LocaleProvider app="docs" locales={["en"]}>
-  <I18nProvider catalogues={catalogues}>
-    <Catalogue listed={pages} />
-  </I18nProvider>
-</LocaleProvider>;
+const under = createRoute({ getParentRoute: () => root, path: "/pages" });
+const compiled = [...declarations(pages), ...whateverElseYouWrote()];
+
+under.addChildren([...compileRoutes(compiled, { layouts: layouts(compiled), parent: under })]);
 ```
+
+`declarations` gives one route per page, addressed by the identifier the page declares and carrying
+no leading slash. Every page hangs beneath whatever parent it is compiled under, so mounting that
+parent at `/docs` serves the button at `/docs/actions/button`. The prefix stays with the
+application.
 
 The pages are passed in rather than imported, so this package draws a catalogue without the build
 plugin in its own graph and a specification renders one without a build at all.
 
-`Rail` lists every page under the group it declares, with pages that declare none collected under an
-empty name and listed last. `Page` loads a page's module and draws its scenes, which is the first
-time that component reaches the browser.
+## The rail
 
-`grouped`, `declared` and `parted` are the shaping behind those. `parted` splits what a page's parts
+`Rail` reads declarations, not the index. Anything compiled into the catalogue that carries an entry
+is listed, so a page an application wrote itself appears beside a page the plugin found.
+
+```ts
+const overview: RouteDeclaration = {
+  component: Overview,
+  id: "docs.theming.overview",
+  layout: [FRAME],
+  navigation: { group: "Theming", label: "Overview" },
+  path: "theming/overview",
+};
+```
+
+`Entry` is that shape and `entryOf` reads it, because the router types `navigation` as `unknown` and
+a declaration the catalogue did not write could carry anything under that name. A declaration
+carrying no entry is left out, which is what a page in no rail looks like.
+
+`grouped` sorts those into the tree the rail draws: groups by name, pages by the words their entry
+carries, and pages naming no group under a heading of their own, last. `routeId` names a page for a
+link, turning slashes into dots: `specimen.actions.button`.
+
+## The frame
+
+`Catalogue` is the simple frame, a rail beside the page, and `layouts` hands it to `compileRoutes`
+under `FRAME`. A pathless route draws it, so it adds no segment to any address and the rail is
+rendered once above every page.
+
+An application wanting a top bar, a search or a switcher writes its own frame, passes it under
+`FRAME` instead of calling `layouts`, and places `Rail` wherever it likes inside it. Nothing else in
+this package reaches `Catalogue`.
+
+`Page` loads a page's module and draws its scenes, which is the first time that component reaches
+the browser. `declared` and `parted` are the shaping behind it. `parted` splits what a page's parts
 accept into the variants a theme moves and the options a caller sets, each row carrying the members
 of every named type it refers to, with the dropped counts beside them.
 

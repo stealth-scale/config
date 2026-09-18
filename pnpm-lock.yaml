@@ -496,12 +496,12 @@ importers:
       '@stealthscale/component-typography':
         specifier: workspace:^
         version: link:../../components/typography
-      '@stealthscale/provider-i18n':
+      '@stealthscale/provider-router':
         specifier: workspace:^
-        version: link:../../foundations/providers/i18n
-      '@stealthscale/provider-locale':
+        version: link:../../foundations/providers/router
+      '@stealthscale/provider-shell':
         specifier: workspace:^
-        version: link:../../foundations/providers/locale
+        version: link:../../foundations/providers/shell
       '@stealthscale/specimen':
         specifier: workspace:^
         version: link:../../components/specimen
@@ -542,6 +542,9 @@ importers:
       '@rolldown/plugin-babel':
         specifier: 'catalog:'
         version: 0.2.4(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@7.29.7)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(rolldown@1.2.7)
+      '@stealthscale/testing-router':
+        specifier: workspace:^
+        version: link:../../packages/testing-router
       '@stealthscale/vite-config':
         specifier: workspace:^
         version: link:../../packages/vite-config
@@ -1374,6 +1377,9 @@ importers:
       '@stealthscale/provider-i18n':
         specifier: workspace:^
         version: link:../../foundations/providers/i18n
+      '@stealthscale/provider-router':
+        specifier: workspace:^
+        version: link:../../foundations/providers/router
       '@stealthscale/vite-plugin-specimen':
         specifier: workspace:^
         version: link:../../packages/vite-plugin-specimen
@@ -1390,6 +1396,9 @@ importers:
       '@stealthscale/component-typography':
         specifier: workspace:^
         version: link:../typography
+      '@stealthscale/testing-router':
+        specifier: workspace:^
+        version: link:../../packages/testing-router
       '@stealthscale/vite-config':
         specifier: workspace:^
         version: link:../../packages/vite-config

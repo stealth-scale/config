@@ -16,18 +16,28 @@ it.
 
 ## What is here
 
-Four files and a manifest. The application settles the locale, loads the catalogues, hands the pages
-the plugin indexed to `Catalogue`, and states which themes the page can wear.
+Five files and a manifest. The application settles the locale, loads the catalogues, compiles the
+pages the plugin indexed into routes, and states which themes the page can wear.
 
 ```
-src/app.tsx          the providers, and the pages handed to the kit
+src/app.tsx          the providers and the router
+src/routes.tsx       the tree the indexed pages are compiled into
 src/main.tsx         the mount
 theme.config.ts      the twelve themes, and static: "*"
 vite.config.ts       the layers
 ```
 
-Everything drawn below `Catalogue` belongs to `@stealthscale/specimen`. A rail, a page and the
-shaping behind them live there, so a consumer installs a catalogue rather than writing one.
+Everything drawn below belongs to `@stealthscale/specimen`, which defines the rail, the page, the
+frame around them and the route declarations. A consumer installs a catalogue rather than writing
+one.
+
+The pages are mounted under `/pages`, and the site root redirects to the first page the index found.
+That path is this application's choice: `declarations` carries no leading slash, so moving the mount
+moves every address with it.
+
+`src/routes.tsx` concatenates before it compiles. Today that list is the indexed pages alone, and a
+theming page or a written page this application adds goes in beside them, carrying a `navigation`
+entry so the rail lists it under its own heading.
 
 ## The host's own decisions
 

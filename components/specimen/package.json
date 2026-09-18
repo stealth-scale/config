@@ -51,6 +51,7 @@
     "@rolldown/plugin-babel": "catalog:",
     "@stealthscale/component-layout": "workspace:^",
     "@stealthscale/component-typography": "workspace:^",
+    "@stealthscale/testing-router": "workspace:^",
     "@stealthscale/vite-config": "workspace:^",
     "@stealthscale/vite-config-i18n": "workspace:^",
     "@stealthscale/vite-config-react": "workspace:^",
@@ -72,6 +73,7 @@
     "@stealthscale/component-layout": "workspace:^",
     "@stealthscale/component-typography": "workspace:^",
     "@stealthscale/provider-i18n": "workspace:^",
+    "@stealthscale/provider-router": "workspace:^",
     "@stealthscale/vite-plugin-specimen": "workspace:^",
     "react": "catalog:"
   },

@@ -1,65 +1,51 @@
 /**
- * Lists every page the index found, under the group each one declares.
+ * Lists every route compiled into the catalogue that carries an entry.
  */
 
 import { type ReactElement } from "react";
 
-import { Button } from "@stealthscale/component-actions";
 import { Stack } from "@stealthscale/component-layout";
 import { Text } from "@stealthscale/component-typography";
 import { useTranslation } from "@stealthscale/provider-i18n";
+import { type RouteDeclaration, RouteLink } from "@stealthscale/provider-router";
 
-import { type Group } from "#catalogue/grouped.ts";
+import { grouped } from "#catalogue/grouped.ts";
 
 /**
  * Describes what the rail takes.
  */
 export interface RailProps {
   /**
-   * The identifier of the page on screen.
+   * Every route compiled into the catalogue, whatever declared them.
+   *
+   * @remarks
+   *   Declarations rather than the index, so a page an application wrote is listed beside a page
+   *   the plugin found. The rail reads each one's entry and leaves out whatever carries none.
    */
-  chosen: string;
-
-  /**
-   * The groups, in the order they are listed.
-   */
-  groups: readonly Group[];
-
-  /**
-   * Opens a page.
-   */
-  onChoose: (id: string) => void;
+  declarations: readonly RouteDeclaration[];
 }
 
 /**
- * Draws one heading per group and one button per page.
+ * Draws one heading per group and one link per page.
  *
  * @remarks
- *   A button rather than a link, because the catalogue keeps its selection in state and routes
- *   nothing yet. The element changes with the router, and the rail's shape does not.
+ *   A link rather than a button, so a page has an address a reader sends to somebody else. The
+ *   router marks the open one, which is what `aria-current` is read off.
  */
-export function Rail({ chosen, groups, onChoose }: RailProps): ReactElement {
+export function Rail({ declarations }: RailProps): ReactElement {
   const { t } = useTranslation("specimen");
 
   return (
     <Stack aria-label={t("rail.label")} as="nav" gap="lg">
-      {groups.map((group) => (
+      {grouped(declarations).map((group) => (
         <Stack gap="xs" key={group.name}>
           <Text size="xs" tone="muted" weight="medium">
             {group.name === "" ? t("rail.ungrouped") : group.name}
           </Text>
           {group.pages.map((page) => (
-            <Button
-              aria-current={page.id === chosen ? "page" : undefined}
-              key={page.id}
-              onClick={() => {
-                onChoose(page.id);
-              }}
-              size="sm"
-              variant={page.id === chosen ? "subtle" : "plain"}
-            >
-              {page.title}
-            </Button>
+            <RouteLink activeProps={{ "aria-current": "page" }} key={page.id} to={page.id}>
+              {page.entry.label}
+            </RouteLink>
           ))}
         </Stack>
       ))}

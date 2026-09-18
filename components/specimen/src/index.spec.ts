@@ -6,14 +6,20 @@ describe("index", () => {
   it("names everything a specimen is written with and nothing beside it", () => {
     expect(Object.keys(barrel).toSorted()).toStrictEqual([
       "Catalogue",
+      "FRAME",
       "Matrix",
+      "NAMED",
       "Page",
       "Rail",
       "captionOf",
+      "declarations",
       "declared",
+      "entryOf",
       "grouped",
+      "layouts",
       "nameOf",
       "parted",
+      "routeId",
       "scene",
       "specimen",
     ]);

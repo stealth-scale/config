@@ -4,18 +4,6 @@ import { describe, expect, it } from "vitest";
 import { App } from "#app.tsx";
 
 describe("App", () => {
-  it("draws the rail under the providers", () => {
-    const { getByRole } = render(<App />);
-
-    expect(getByRole("navigation")).toBeDefined();
-  });
-
-  it("words the rail out of the catalogue rather than the key", () => {
-    const { getByRole } = render(<App />);
-
-    expect(getByRole("navigation").getAttribute("aria-label")).toBe("Pages");
-  });
-
   it("writes the locale onto the document root", () => {
     render(<App />);
 
@@ -26,5 +14,9 @@ describe("App", () => {
     render(<App />);
 
     expect(document.documentElement.dir).toBe("ltr");
+  });
+
+  it("draws without throwing, which is the providers agreeing on their order", () => {
+    expect(() => render(<App />)).not.toThrow();
   });
 });

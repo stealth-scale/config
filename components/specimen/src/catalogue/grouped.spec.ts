@@ -1,53 +1,92 @@
 import { describe, expect, it } from "vitest";
 
 import { grouped } from "#catalogue/grouped.ts";
-import { type Indexed } from "#catalogue/types.ts";
+import { written } from "#catalogue/mounted.fixtures.ts";
 
-function entry(id: string, group: string): Indexed {
-  return {
-    about: "",
-    group,
-    id,
-    load: () => Promise.resolve({}),
-    package: "",
-    path: `src/${id}.specimen.tsx`,
-    source: () => Promise.resolve({ default: "" }),
-    title: id,
-  };
+function nothing(): null {
+  return null;
 }
 
 describe("grouped", () => {
-  it("returns one entry per group the pages declare", () => {
-    const held = grouped([entry("a", "Data"), entry("b", "Actions"), entry("c", "Data")]);
+  it("returns one entry per group the declarations name", () => {
+    const held = grouped([written("a", "Data", "A"), written("b", "Actions", "B")]);
 
     expect(held.map((one) => one.name)).toStrictEqual(["Actions", "Data"]);
   });
 
-  it("keeps the pages of a group in the order the index gave them", () => {
-    const held = grouped([entry("b", "Data"), entry("a", "Data")]);
+  it("sorts the groups by name", () => {
+    const held = grouped([written("a", "Zebra", "A"), written("b", "Actions", "B")]);
 
-    expect(held[0]?.pages.map((one) => one.id)).toStrictEqual(["b", "a"]);
+    expect(held.map((one) => one.name)).toStrictEqual(["Actions", "Zebra"]);
   });
 
-  it("collects a page that declares no group under an empty name", () => {
-    const held = grouped([entry("a", "")]);
+  it("sorts the pages of a group by the words the rail writes", () => {
+    const held = grouped([written("a", "Data", "Zebra"), written("b", "Data", "Badge")]);
 
-    expect(held.map((one) => one.name)).toStrictEqual([""]);
+    expect(held[0]?.pages.map((one) => one.entry.label)).toStrictEqual(["Badge", "Zebra"]);
   });
 
-  it("lists the empty name after every group the pages declare", () => {
-    const held = grouped([entry("a", ""), entry("b", "Zebra"), entry("c", "Actions")]);
-
-    expect(held.map((one) => one.name)).toStrictEqual(["Actions", "Zebra", ""]);
+  it("collects a page that names no group under an empty name", () => {
+    expect(grouped([written("a", "", "A")]).map((one) => one.name)).toStrictEqual([""]);
   });
 
-  it("keeps the empty name last when it was found after a declared group", () => {
-    const held = grouped([entry("b", "Zebra"), entry("a", "")]);
+  it("lists the empty name after every group the declarations name", () => {
+    const held = grouped([written("a", "", "A"), written("b", "Zebra", "B")]);
 
     expect(held.map((one) => one.name)).toStrictEqual(["Zebra", ""]);
   });
 
-  it("returns nothing for an index that found no page", () => {
+  it("keeps the empty name last when it was found first", () => {
+    const held = grouped([written("a", "", "A"), written("b", "Actions", "B")]);
+
+    expect(held.map((one) => one.name)).toStrictEqual(["Actions", ""]);
+  });
+
+  it("keeps the empty name last when it was found between two others", () => {
+    const held = grouped([
+      written("a", "Zebra", "A"),
+      written("b", "", "B"),
+      written("c", "Actions", "C"),
+    ]);
+
+    expect(held.map((one) => one.name)).toStrictEqual(["Actions", "Zebra", ""]);
+  });
+
+  it("names the route each page opens", () => {
+    expect(grouped([written("docs.overview", "Theming", "Overview")])[0]?.pages).toStrictEqual([
+      { entry: { group: "Theming", label: "Overview" }, id: "docs.overview" },
+    ]);
+  });
+
+  it("leaves out a declaration that carries no entry", () => {
+    expect(grouped([{ component: nothing, id: "a", path: "a" }])).toStrictEqual([]);
+  });
+
+  it("leaves out a declaration whose entry states no words", () => {
+    const wrong = { component: nothing, id: "a", navigation: { group: "Data" }, path: "a" };
+
+    expect(grouped([wrong])).toStrictEqual([]);
+  });
+
+  it("leaves out a declaration whose entry is not an object", () => {
+    const wrong = { component: nothing, id: "a", navigation: "Data", path: "a" };
+
+    expect(grouped([wrong])).toStrictEqual([]);
+  });
+
+  it("leaves out a declaration whose entry is null", () => {
+    const wrong = { component: nothing, id: "a", navigation: null, path: "a" };
+
+    expect(grouped([wrong])).toStrictEqual([]);
+  });
+
+  it("collects a page whose group is not a string under an empty name", () => {
+    const odd = { component: nothing, id: "a", navigation: { group: 1, label: "A" }, path: "a" };
+
+    expect(grouped([odd]).map((one) => one.name)).toStrictEqual([""]);
+  });
+
+  it("returns nothing for a catalogue compiled from no declaration", () => {
     expect(grouped([])).toStrictEqual([]);
   });
 });

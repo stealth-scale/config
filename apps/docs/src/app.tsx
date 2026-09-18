@@ -1,5 +1,5 @@
 /**
- * Puts the locale and its catalogues in scope, and draws the catalogue under them.
+ * Puts everything the catalogue reads in scope, and routes the pages under them.
  */
 
 import { type ReactElement } from "react";
@@ -7,12 +7,14 @@ import { type ReactElement } from "react";
 import { catalogues } from "virtual:i18n";
 import { pages } from "virtual:specimen-index";
 
-import { I18nProvider, LocaleProvider } from "@stealthscale/provider-locale";
-import { Catalogue } from "@stealthscale/specimen";
+import { RouterProvider } from "@stealthscale/provider-router";
+import { Shell } from "@stealthscale/provider-shell";
+
+import { routed } from "#routes.tsx";
 
 /**
- * The application the locale choice is remembered under, so another application on this origin
- * keeps its own.
+ * The application every setting a reader makes is remembered under, so another application on this
+ * origin keeps its own.
  */
 const APP = "docs";
 
@@ -22,19 +24,23 @@ const APP = "docs";
 const LOCALES: readonly [string, ...string[]] = ["en"];
 
 /**
- * Draws the catalogue in the locale a reader chose.
+ * The router over the pages this build indexed, built once for the life of the page.
+ */
+const ROUTER = routed(pages);
+
+/**
+ * Draws the catalogue with the colour mode, theme, locale, viewport and shortcuts in scope.
  *
  * @remarks
- *   The application is the host. It settles the locale, loads the catalogues, and hands the pages
- *   the plugin indexed to the kit. Everything drawn below here belongs to `@stealthscale/specimen`,
- *   whose words this application can override by declaring the same key under `specimen`.
+ *   One provider rather than seven, because the order they nest in is knowledge the shell already
+ *   holds. The chrome reads all of it: a theme switcher moves `Themed`, a colour-mode toggle moves
+ *   `ColorModeProvider` and a width switcher moves `ViewportProvider`, none of which this file
+ *   states again.
  */
 export function App(): ReactElement {
   return (
-    <LocaleProvider app={APP} locales={LOCALES}>
-      <I18nProvider catalogues={catalogues}>
-        <Catalogue listed={pages} />
-      </I18nProvider>
-    </LocaleProvider>
+    <Shell app={APP} catalogues={catalogues} locales={LOCALES}>
+      <RouterProvider router={ROUTER} />
+    </Shell>
   );
 }
