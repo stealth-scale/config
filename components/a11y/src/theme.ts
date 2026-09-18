@@ -9,7 +9,11 @@
 
 import { definePreset } from "@stealthscale/theme/authoring";
 
+import { recipe as rovingFocus } from "#roving-focus/recipe.ts";
+import { recipe as skipNav } from "#skip-nav/recipe.ts";
+import { recipe as visuallyHidden } from "#visually-hidden/recipe.ts";
+
 export default definePreset({
   name: "@stealthscale/component-a11y",
-  theme: { extend: { recipes: {} } },
+  theme: { extend: { recipes: { visuallyHidden }, slotRecipes: { rovingFocus, skipNav } } },
 });
