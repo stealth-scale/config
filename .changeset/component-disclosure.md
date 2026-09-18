@@ -34,6 +34,23 @@ component-disclosure: publish the collapsible
   strip moves to what was just chosen.
 - The bar marking the control in force is positioned from measurements the machine takes, so the
   recipe states its thickness and its colour and never its place.
+- `Tooltip` shows a short label beside whatever a pointer rests on, composed as `Tooltip.Root`
+  holding a control and the box it opens. Two looks draw the box and one size sets its room and how
+  loud its words are.
+- The machine names no root, a tooltip being a control and a box that floats beside it rather than a
+  thing that frames the two. The root draws an element anyway, with `display: contents` so it takes
+  part in no layout, because the two are siblings and a slot recipe hands its variants down from
+  above them both.
+- The box states its surface once as a custom property and the point reads it from there, so the two
+  are never filled in different colours whichever look is picked.
+- Nothing portals. A page whose tooltip is clipped or stacked wrongly wraps the positioner in the
+  portal it wants, which keeps that choice with the page and this package off every other component
+  package.
+- Focus opens the box only where the focus came from a keyboard, so clicking a control leaves no
+  tooltip hanging over the page.
+- `stated` drops the settings a caller left unset before they reach a machine. A machine takes the
+  settings it defaults without `undefined` while its own splitter hands every setting over carrying
+  it, and which settings default is different for each machine.
 
 The package is the first to take runtime dependencies. It installs the machine, the React adapter
 and the types the adapter's own signatures reach, all pinned together through the workspace catalog,

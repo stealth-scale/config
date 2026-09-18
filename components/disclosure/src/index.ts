@@ -8,3 +8,4 @@
 
 export * as Collapsible from "#collapsible/index.ts";
 export * as Tabs from "#tabs/index.ts";
+export * as Tooltip from "#tooltip/index.ts";

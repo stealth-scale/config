@@ -17,6 +17,8 @@ import { normalizeProps, useMachine } from "@zag-js/react";
 
 import { createRequiredContext } from "@stealthscale/hooks";
 
+import { stated } from "#stated.ts";
+
 /**
  * Describes what the machine answers: a prop getter per part, beside its state and its methods.
  *
@@ -47,7 +49,7 @@ export function useCollapsibleMachine(options: CollapsibleOptions): CollapsibleA
   const generated = useId();
 
   return collapsible.connect(
-    useMachine(collapsible.machine, { ...options, id: options.id ?? generated }),
+    useMachine(collapsible.machine, { ...stated(options), id: options.id ?? generated }),
     normalizeProps,
   );
 }

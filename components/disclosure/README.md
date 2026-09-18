@@ -149,6 +149,85 @@ The bar that marks the control in force is positioned from measurements the mach
 recipe states its thickness and its colour and never its place. It is hidden until there is
 something to measure, which keeps it from appearing at the start of the strip on the first render.
 
+## Tooltip
+
+Shows a short label beside whatever a pointer rests on, composed as `Tooltip.Root` holding a control
+and the box it opens.
+
+```tsx
+import { Tooltip } from "@stealthscale/component-disclosure";
+
+<Tooltip.Root>
+  <Tooltip.Trigger as={IconButton} aria-label="Save">
+    <SaveIcon />
+  </Tooltip.Trigger>
+  <Tooltip.Positioner>
+    <Tooltip.Content>
+      <Tooltip.Arrow>
+        <Tooltip.ArrowTip />
+      </Tooltip.Arrow>
+      Saves without closing
+    </Tooltip.Content>
+  </Tooltip.Positioner>
+</Tooltip.Root>;
+```
+
+| Axis      | Values                                            | Default    |
+| --------- | ------------------------------------------------- | ---------- |
+| `variant` | `inverted`, `surface`                             | `inverted` |
+| `size`    | `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`, `4xl` | `md`       |
+
+The root draws an element, which the machine has no part for, because the control and the box are
+siblings and the recipe hands its variants down from above them both. It is drawn with
+`display: contents`, so it takes part in no layout and a tooltip attached to a control inside a row
+leaves that row as it was.
+
+The box states its surface once as a custom property and the point reads it from there, so the two
+are never filled in different colours whichever look is picked.
+
+### The machine's settings
+
+| Setting                                                                | What it does                                         |
+| ---------------------------------------------------------------------- | ---------------------------------------------------- |
+| `open`, `defaultOpen`                                                  | Drives it from outside, or opens it to begin with    |
+| `onOpenChange`                                                         | Hears each time the box opens or shuts               |
+| `openDelay`, `closeDelay`                                              | How long a pointer rests before it opens, and after  |
+| `disabled`                                                             | Stops it opening at all                              |
+| `interactive`                                                          | Keeps it open while a pointer is inside the box      |
+| `closeOnClick`, `closeOnEscape`, `closeOnScroll`, `closeOnPointerDown` | What shuts it                                        |
+| `positioning`                                                          | Which side it opens on, and how far from the control |
+| `id`                                                                   | Names the machine, which builds its ARIA references  |
+
+`interactive` is the one to reach for where the box holds a link. It is off by default, because a
+tooltip held open under a pointer is a tooltip covering whatever is behind it.
+
+### Putting the box somewhere else
+
+Nothing here portals. A page whose tooltip is clipped or stacked wrongly wraps the positioner in the
+portal it wants:
+
+```tsx
+import { Portal } from "@stealthscale/component-primitives";
+
+<Portal>
+  <Tooltip.Positioner>…</Tooltip.Positioner>
+</Portal>;
+```
+
+That keeps the choice of portal with the page rather than with the component, and it is why this
+package peers on no other component package.
+
+### The accessibility the machine writes
+
+- **The words describe the control.** The control points at the box with `aria-describedby`, so a
+  screen reader reads the words as part of reading the control rather than as something beside it.
+- **A keyboard opens it.** Focus opens the box, but only where the focus came from a keyboard, so
+  clicking a control does not leave a tooltip hanging over the page.
+- **Escape shuts it.** So does scrolling, and pressing the control.
+
+The default element for the control is `button`, because a tooltip attached to something a browser
+does not focus is a tooltip a keyboard never sees. Pass `as` for a control you have already built.
+
 ## Licence
 
 MIT. See [LICENSE](LICENSE).
