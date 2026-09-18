@@ -9,7 +9,7 @@ import { Field } from "@tanstack/react-form";
 import { fieldContext, useAnyForm } from "#contexts.ts";
 import { defaultsOf } from "#defaults.ts";
 import { bound, propertyOf, requiredIn } from "#property.ts";
-import { describedForm } from "#registry.ts";
+import { useDescribedForm } from "#registry.ts";
 import { rendererFor } from "#renderer.ts";
 import { type Schema } from "#schema.ts";
 
@@ -46,7 +46,7 @@ export interface FieldMemberProps {
  */
 export function FieldMember({ indices, path, resolved }: FieldMemberProps): null | ReactElement {
   const form = useAnyForm();
-  const { engine, fieldOptions, layouts, presentation, renderers } = describedForm(form);
+  const { engine, fieldOptions, layouts, presentation, renderers } = useDescribedForm(form);
   const schema = propertyOf(resolved, path);
   const setting = presentation.fields?.[path] ?? {};
   const renderer = schema === undefined ? undefined : rendererFor(renderers, setting, schema);

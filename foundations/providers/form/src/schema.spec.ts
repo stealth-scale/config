@@ -23,6 +23,18 @@ describe("schemaOf", () => {
     expect(converted).toStrictEqual({ ...document, target: DRAFT });
   });
 
+  it("converts a library object once and reads the same document after", () => {
+    let conversions = 0;
+    const object = library(() => {
+      conversions += 1;
+
+      return document;
+    });
+
+    expect(schemaOf(object)).toBe(schemaOf(object));
+    expect(conversions).toBe(1);
+  });
+
   it("returns a document holding a ~standard member with no converter as it is", () => {
     const odd: Schema = { "~standard": { vendor: "none" }, type: "object" };
 

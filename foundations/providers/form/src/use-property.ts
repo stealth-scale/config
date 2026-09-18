@@ -5,7 +5,7 @@
 import { useFieldContext } from "#contexts.ts";
 import { collapse } from "#path.ts";
 import { propertyOf, requiredIn } from "#property.ts";
-import { descriptionOf } from "#registry.ts";
+import { useDescribed } from "#registry.ts";
 import { type Schema } from "#schema.ts";
 
 /**
@@ -40,7 +40,7 @@ const NONE: Property = { required: false, schema: undefined };
  */
 export function useProperty(): Property {
   const field = useFieldContext();
-  const description = descriptionOf(field.form);
+  const description = useDescribed(field.form);
 
   if (description === undefined) return NONE;
 

@@ -10,7 +10,7 @@ import { type Drawing, useDescription } from "#described.ts";
 import { Fields } from "#fields.tsx";
 import { libraryOptionsOf } from "#form-options.ts";
 import { type Layouts } from "#layouts.ts";
-import { describeForm } from "#registry.ts";
+import { useDescribeForm } from "#registry.ts";
 import { type Renderer } from "#renderer.ts";
 import { type Components, type SchemaForm, type UseSchemaFormOptions } from "#schema-form.ts";
 import { useDraft } from "#use-draft.ts";
@@ -148,7 +148,7 @@ export function createSchemaForm<
     );
     const form = hook.useAppForm(libraryOptionsOf(options, description, draft));
 
-    describeForm(form, { ...description, draft });
+    useDescribeForm(form, { ...description, draft });
 
     return form;
   }

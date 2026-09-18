@@ -22,3 +22,16 @@ a form is drawn as data, puts the engine, the renderers and the translator in sc
 - Interpolate `{{name}}` in `translateFrom` and `untranslated`.
 - Keep nothing in `useDraft` when it is given no options.
 - Type `Path<Values>` as a string, so a typed presentation stands where a string is asked for.
+- Follow a form's description through `useDescribed` and `useDescribedForm`, so a translator, a
+  presentation, a field option, an engine or a schema the hook is given after the first render is
+  drawn by `Fields` and by every bound field, even where nothing above them re-renders.
+- Listen to a draft's store once per form rather than once per render, and leave the draft's own
+  writes unread, so writing the form's values to the store does not draw the form again.
+- Open a stepped form on the draft's step when the draft arrives after the first render, which is
+  when a page rendered on a server reads it.
+- Withhold the add control once a repeat group has its `maxItems` items and the remove controls
+  while it has no more than its `minItems`. `ItemProps.onRemove` is optional.
+- Move focus to a refused field inside the element carrying the form's `formId` where the form
+  component writes it as its `id`, and anywhere on the page otherwise.
+- Keep a schema's hash and a library object's converted document by the object, so a form reads one
+  document and hashes a schema once.

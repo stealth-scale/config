@@ -199,9 +199,11 @@ export function Item({ children, index, onRemove }: ItemProps): ReactElement {
   return (
     <div className="item" data-index={index}>
       {children}
-      <button onClick={onRemove} type="button">
-        {words.action("remove", "Remove")}
-      </button>
+      {onRemove === undefined ? null : (
+        <button onClick={onRemove} type="button">
+          {words.action("remove", "Remove")}
+        </button>
+      )}
     </div>
   );
 }
@@ -263,6 +265,7 @@ export function Form({ children }: { readonly children?: ReactNode }): ReactElem
 
   return (
     <form
+      id={form.formId}
       noValidate
       onSubmit={(event) => {
         event.preventDefault();

@@ -1,4 +1,4 @@
-import { type ReactElement } from "react";
+import { type ReactElement, useMemo } from "react";
 
 import { act, fireEvent, render, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
@@ -10,7 +10,7 @@ import { createEngine } from "#engine.ts";
 import { useAppForm, useSchemaForm, withFieldGroup, withForm } from "#hooks.fixtures.ts";
 import { type SchemaValidators } from "#schema-form.ts";
 import { type Schema } from "#schema.ts";
-import { translateFrom } from "#translate.ts";
+import { type Translate, translateFrom } from "#translate.ts";
 
 interface Signup {
   name: string;
@@ -259,6 +259,27 @@ describe("useSchemaForm", () => {
     }
 
     expect(render(<Translated />).getByLabelText("Your name")).toBeDefined();
+  });
+
+  it("draws the fields again through a kept element when the translator changes", () => {
+    const english = translateFrom({ "signup.fields.name.label": "Your name" });
+    const dutch = translateFrom({ "signup.fields.name.label": "Je naam" });
+
+    /**
+     * Builds the form and keeps the element that draws its fields, as a compiled build does.
+     */
+    function Kept({ translate }: { readonly translate: Translate }): ReactElement {
+      const form = useSchemaForm<Signup>({ schema: signup, translate });
+      const fields = useMemo(() => <form.Fields />, [form]);
+
+      return <form.AppForm>{fields}</form.AppForm>;
+    }
+
+    const { getByLabelText, rerender } = render(<Kept translate={english} />);
+
+    rerender(<Kept translate={dutch} />);
+
+    expect(getByLabelText("Je naam")).toBeDefined();
   });
 
   it("evaluates the schema with the engine given", () => {

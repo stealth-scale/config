@@ -13,7 +13,8 @@ import { focusControl } from "#form-defaults.ts";
 import { memberPaths } from "#presentation-of.ts";
 import { type Group } from "#presentation.ts";
 import { bound, countAt, propertyOf } from "#property.ts";
-import { describedForm } from "#registry.ts";
+import { useDescribedForm } from "#registry.ts";
+import { type Schema } from "#schema.ts";
 
 /**
  * Describes what a repeat group is given.
@@ -67,13 +68,24 @@ interface ArrayOperations {
 }
 
 /**
+ * Reads a bound the array's schema states on how many items it holds, or nothing.
+ */
+function boundOf(array: Schema | undefined, keyword: "maxItems" | "minItems"): number | undefined {
+  const stated = array?.[keyword];
+
+  return typeof stated === "number" ? stated : undefined;
+}
+
+/**
  * Draws a group once per item of the array it repeats over.
  *
  * @remarks
  *   The group subscribes to the number of items alone, so a keystroke inside an item re-renders
  *   the item's field and not the group. An added item starts from the item schema's own defaults
  *   and takes focus on its first field once it is drawn, so a keyboard user is not left at the
- *   button. The library removes an item through its own `removeFieldValue`.
+ *   button. The library removes an item through its own `removeFieldValue`. The add control is
+ *   withheld once the array holds its `maxItems`, and the remove controls are withheld while it
+ *   holds no more than its `minItems`, so a person is not offered a change the schema refuses.
  */
 export function RepeatGroup({
   draw,
@@ -84,19 +96,22 @@ export function RepeatGroup({
 }: RepeatGroupProps): ReactElement {
   const form = useAnyForm();
   const arrays: ArrayOperations = form;
-  const { engine, layouts, schema } = describedForm(form);
+  const { engine, layouts, schema } = useDescribedForm(form);
   const name = bound(repeat, indices);
   const count = useSelector(form.store, (state) => countAt(state.values, name));
   const added = useRef(false);
   const [first] = memberPaths(group.of);
+  const array = propertyOf(schema, repeat);
+  const most = boundOf(array, "maxItems");
+  const least = boundOf(array, "minItems");
 
   useEffect(() => {
     if (!added.current) return;
 
     added.current = false;
 
-    if (first !== undefined) focusControl(bound(first, [...indices, count - 1]));
-  }, [count, first, indices]);
+    if (first !== undefined) focusControl(bound(first, [...indices, count - 1]), form.formId);
+  }, [count, first, form.formId, indices]);
 
   const { Group: Layout, Item } = layouts;
 
@@ -112,11 +127,23 @@ export function RepeatGroup({
     );
   };
 
+  /**
+   * Removes the item at an index, where the array allows fewer items than it holds.
+   */
+  const remover = (at: number): (() => void) | undefined =>
+    least !== undefined && count <= least
+      ? undefined
+      : () => void arrays.removeFieldValue(name, at);
+
   return (
-    <Layout closed={group.closed} legend={legend} onAdd={add}>
+    <Layout
+      closed={group.closed}
+      legend={legend}
+      onAdd={most !== undefined && count >= most ? undefined : add}
+    >
       {Array.from({ length: count }, (_, at) => (
         // eslint-disable-next-line react/no-array-index-key -- an item has no identity but its index, which is the name the form binds it by
-        <Item index={at} key={at} onRemove={() => void arrays.removeFieldValue(name, at)}>
+        <Item index={at} key={at} onRemove={remover(at)}>
           {draw([...indices, at])}
         </Item>
       ))}

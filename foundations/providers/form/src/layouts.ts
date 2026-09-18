@@ -50,7 +50,8 @@ export interface GroupProps {
   readonly legend?: string | undefined;
 
   /**
-   * Adds an item, which a repeat group is given and any other group is not.
+   * Adds an item, which a repeat group is given and any other group is not. A repeat group
+   * holding as many items as its array allows is given none either.
    */
   readonly onAdd?: (() => void) | undefined;
 }
@@ -70,9 +71,9 @@ export interface ItemProps {
   readonly index: number;
 
   /**
-   * Removes the item.
+   * Removes the item. Absent where the array allows no fewer items than it holds.
    */
-  readonly onRemove: () => void;
+  readonly onRemove?: (() => void) | undefined;
 }
 
 /**

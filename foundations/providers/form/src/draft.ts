@@ -59,14 +59,25 @@ function stable(value: unknown): string {
 }
 
 /**
+ * The hash of every schema hashed so far, by the schema, so a schema compared on every change to
+ * a form is written out once.
+ */
+const hashes = new WeakMap<Schema, string>();
+
+/**
  * Hashes a schema, so a draft typed against another schema is told apart.
  *
  * @remarks
  *   FNV-1a over the schema written with its keys in order. A change to any keyword changes the
- *   hash, and the order the keywords were written in does not.
+ *   hash, and the order the keywords were written in does not. The hash is kept by the schema
+ *   object, which is read-only, so hashing the same object again costs one lookup.
  * @returns The hash, as eight hexadecimal digits.
  */
 export function schemaHash(schema: Schema): string {
+  const kept = hashes.get(schema);
+
+  if (kept !== undefined) return kept;
+
   const text = stable(schema);
   let hash = 0x81_1c_9d_c5;
 
@@ -75,7 +86,11 @@ export function schemaHash(schema: Schema): string {
     hash = Math.imul(hash, 0x01_00_01_93) >>> 0;
   }
 
-  return hash.toString(16).padStart(8, "0");
+  const written = hash.toString(16).padStart(8, "0");
+
+  hashes.set(schema, written);
+
+  return written;
 }
 
 /**

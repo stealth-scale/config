@@ -25,6 +25,12 @@ interface FieldErrors {
  */
 export interface Invalidated {
   /**
+   * The identifier the form's element carries, where the form component writes it, so a control
+   * is found inside this form rather than the first on the page.
+   */
+  readonly formId?: string | undefined;
+
+  /**
    * The state as it is now, as far as the fields go.
    */
   readonly state: {
@@ -40,12 +46,19 @@ export interface Invalidated {
  *
  * @remarks
  *   The control is found by the `name` attribute the bound field writes, which is the field's
- *   path. Nothing happens where no control on the page carries the name.
+ *   path, inside the element carrying the form's identifier where one is given and it is on the
+ *   page, and anywhere on the page otherwise. Nothing happens where no control carries the name.
+ * @param name - The field's path, as the bound field writes it.
+ * @param formId - The identifier of the form's element, which the form component writes as its
+ *   `id`, so two forms on one page naming the same field each focus their own control.
  */
-export function focusControl(name: string): void {
-  const control = document.querySelector(`[name="${CSS.escape(name)}"]`);
+export function focusControl(name: string, formId?: string): void {
+  const control = `[name="${CSS.escape(name)}"]`;
+  const inside =
+    formId === undefined ? null : document.querySelector(`[id="${CSS.escape(formId)}"]`);
+  const found = inside?.querySelector(control) ?? document.querySelector(control);
 
-  if (control instanceof HTMLElement) control.focus();
+  if (found instanceof HTMLElement) found.focus();
 }
 
 /**
@@ -60,7 +73,7 @@ export function focusFirstInvalid(form: Invalidated): void {
     ([, meta]) => meta !== undefined && meta.errors.length > 0,
   );
 
-  if (found !== undefined) focusControl(found[0]);
+  if (found !== undefined) focusControl(found[0], form.formId);
 }
 
 /**

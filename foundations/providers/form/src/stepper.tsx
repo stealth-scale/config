@@ -9,7 +9,7 @@ import { useAnyForm } from "#contexts.ts";
 import { Member } from "#member.tsx";
 import { memberKey, memberPaths } from "#presentation-of.ts";
 import { type Steps } from "#presentation.ts";
-import { describedForm } from "#registry.ts";
+import { useDescribedForm } from "#registry.ts";
 import { type Schema } from "#schema.ts";
 import { leaveStep } from "#steps.ts";
 import { worded } from "#translate.ts";
@@ -35,20 +35,22 @@ export interface StepperProps {
  *
  * @remarks
  *   The form opens on the step its draft was written on, and writes the step into the draft as a
- *   person leaves it. A wizard validates a step before a person moves forward, and refuses the
- *   move where a field of the step is refused. Moving back, and moving between tabs, validates
- *   nothing.
+ *   person leaves it. The draft's step is read on every render until a person moves, rather than
+ *   once, because a page rendered on a server reads its draft in the render after it hydrates.
+ *   A wizard validates a step before a person moves forward, and refuses the move where a field
+ *   of the step is refused. Moving back, and moving between tabs, validates nothing.
  */
 export function Stepper({ resolved, steps }: StepperProps): null | ReactElement {
   const form = useAnyForm();
-  const { draft, layouts, translate } = describedForm(form);
+  const { draft, layouts, translate } = useDescribedForm(form);
   const words = useWords();
-  const [current, setCurrent] = useState(() =>
+  const [chosen, setChosen] = useState<number>();
+  const current =
+    chosen ??
     Math.max(
       0,
       steps.of.findIndex((step) => step.name === draft.restored?.step),
-    ),
-  );
+    );
   const step = steps.of[current];
 
   if (step === undefined) return null;
@@ -65,7 +67,7 @@ export function Stepper({ resolved, steps }: StepperProps): null | ReactElement 
    */
   const go = (index: number): void => {
     draft.write(form.state.values, steps.of[index]?.name);
-    setCurrent(index);
+    setChosen(index);
   };
 
   /**

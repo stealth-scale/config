@@ -25,19 +25,27 @@ const order: Schema = {
   type: "object",
 };
 
+const bounded: Schema = {
+  properties: { tags: { maxItems: 2, minItems: 1, type: "array" } },
+  type: "object",
+};
+
 const lines: Group = { legend: true, name: "line", of: ["lines[].amount"], repeat: "lines" };
+const tags: Group = { of: [], repeat: "tags" };
 
 /**
  * Builds a form from the schema, starting from the lines given, and draws the group over it.
  */
 function Page({
   group = lines,
+  schema = order,
   values,
 }: {
   readonly group?: Group | undefined;
+  readonly schema?: Schema | undefined;
   readonly values?: Record<string, unknown> | undefined;
 }): ReactElement {
-  const form = useSchemaForm({ schema: order, values });
+  const form = useSchemaForm({ schema, values });
 
   return (
     <form.AppForm>
@@ -45,13 +53,13 @@ function Page({
         draw={(indices) =>
           group.of.map((member) =>
             typeof member === "string" ? (
-              <FieldMember indices={indices} key={member} path={member} resolved={order} />
+              <FieldMember indices={indices} key={member} path={member} resolved={schema} />
             ) : (
               <RepeatGroup
                 draw={(inner) =>
                   member.of.map((path) =>
                     typeof path === "string" ? (
-                      <FieldMember indices={inner} key={path} path={path} resolved={order} />
+                      <FieldMember indices={inner} key={path} path={path} resolved={schema} />
                     ) : null,
                   )
                 }
@@ -95,7 +103,7 @@ describe("RepeatGroup", () => {
   });
 
   it("adds an empty item without moving focus where the group has no field", () => {
-    const { container, getByRole } = render(<Page group={{ of: [], repeat: "tags" }} />);
+    const { container, getByRole } = render(<Page group={tags} />);
     const button = getByRole("button", { name: "Add" });
 
     button.focus();
@@ -112,6 +120,31 @@ describe("RepeatGroup", () => {
 
     await expect(page.findAllByLabelText("Amount")).resolves.toHaveLength(1);
     expect(page.getByLabelText("Amount")).toHaveProperty("value", "3");
+  });
+
+  it("withholds the add control once the array holds its maxItems", () => {
+    const { getAllByRole, queryByRole } = render(
+      <Page group={tags} schema={bounded} values={{ tags: [1, 2] }} />,
+    );
+
+    expect(queryByRole("button", { name: "Add" })).toBeNull();
+    expect(getAllByRole("button", { name: "Remove" })).toHaveLength(2);
+  });
+
+  it("withholds the remove controls while the array holds no more than its minItems", () => {
+    const { getByRole, queryByRole } = render(
+      <Page group={tags} schema={bounded} values={{ tags: [1] }} />,
+    );
+
+    expect(queryByRole("button", { name: "Remove" })).toBeNull();
+    expect(getByRole("button", { name: "Add" })).toBeDefined();
+  });
+
+  it("offers both controls where the array states no bounds", () => {
+    const { getAllByRole, getByRole } = render(<Page group={tags} values={{ tags: [1] }} />);
+
+    expect(getByRole("button", { name: "Add" })).toBeDefined();
+    expect(getAllByRole("button", { name: "Remove" })).toHaveLength(1);
   });
 
   it("binds a group inside a repeat group to both indices", () => {

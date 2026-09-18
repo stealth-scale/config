@@ -7,8 +7,14 @@ import { useFormInScope } from "#contexts.ts";
 import { useFormEnvironment } from "#environment.ts";
 import { identifiers } from "#identifiers.ts";
 import { UNNAMED } from "#presentation-of.ts";
-import { descriptionOf } from "#registry.ts";
+import { type Described, useDescribed } from "#registry.ts";
 import { type Translate, worded } from "#translate.ts";
+
+/**
+ * Stands in for the form where there is none in scope, so the description is read the same way on
+ * every render and reads as nothing.
+ */
+const NOWHERE: Described = { baseStore: {} };
 
 /**
  * Describes an error a schema or a validator answered with a keyword: the engine's issue, or an
@@ -132,7 +138,7 @@ export function wordsOf(translate: Translate, id: string): Words {
 export function useWords(): Words {
   const form = useFormInScope();
   const { translate } = useFormEnvironment();
-  const description = form === undefined ? undefined : descriptionOf(form);
+  const description = useDescribed(form ?? NOWHERE);
 
   return wordsOf(description?.translate ?? translate, description?.id ?? UNNAMED);
 }

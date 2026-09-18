@@ -1,6 +1,6 @@
 import { type ReactElement } from "react";
 
-import { fireEvent, render, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { memoryStore, type SettingStore } from "@stealthscale/settings";
@@ -71,6 +71,34 @@ describe("Stepper", () => {
 
     expect(getByRole("heading", { level: 2 }).textContent).toBe("About you");
     expect(getByLabelText("Bio")).toHaveProperty("value", "Hi");
+  });
+
+  it("moves to the step of a draft that arrives after the first render", () => {
+    const store = memoryStore();
+    const { getByRole } = render(<Page store={store} />);
+
+    act(() => {
+      writeDraft(store, KEY, { hash: schemaHash(profile), step: "about", values: {} });
+    });
+
+    expect(getByRole("heading", { level: 2 }).textContent).toBe("About you");
+  });
+
+  it("keeps the step a person chose when a draft arrives after it", async () => {
+    const store = memoryStore();
+    const { getByRole } = render(<Page steps={{ ...wizard, kind: "tabs" }} store={store} />);
+
+    fireEvent.click(getByRole("button", { name: "About you" }));
+
+    await waitFor(() => {
+      expect(getByRole("heading", { level: 2 }).textContent).toBe("About you");
+    });
+
+    act(() => {
+      writeDraft(store, KEY, { hash: schemaHash(profile), step: "who", values: {} });
+    });
+
+    expect(getByRole("heading", { level: 2 }).textContent).toBe("About you");
   });
 
   it("refuses to move forward while a field of the step is refused", async () => {

@@ -81,7 +81,8 @@ export interface Group<Values = unknown> {
 
   /**
    * The array path this group is drawn once per item of, with `[]` in its members bound to each
-   * index. A group with one draws the add, remove and move controls as well.
+   * index. A group with one draws the add and remove controls as well, within the `minItems` and
+   * `maxItems` the array's schema states.
    */
   readonly repeat?: Path<Values> | undefined;
 }

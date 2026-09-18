@@ -7,7 +7,7 @@ import { useSelector } from "@tanstack/react-form";
 
 import { useAnyForm } from "#contexts.ts";
 import { schemaHash } from "#draft.ts";
-import { describedForm } from "#registry.ts";
+import { useDescribedForm } from "#registry.ts";
 import { type Schema } from "#schema.ts";
 
 /**
@@ -28,7 +28,7 @@ function sameSchema(one: Schema, other: Schema): boolean {
  */
 export function useResolved(): Schema {
   const form = useAnyForm();
-  const { engine, schema } = describedForm(form);
+  const { engine, schema } = useDescribedForm(form);
 
   return useSelector(form.store, (state) => engine.resolve(schema, state.values), {
     compare: sameSchema,

@@ -9,7 +9,7 @@ import { useFormContext } from "#contexts.ts";
 import { Member } from "#member.tsx";
 import { leafPaths, memberKey, stepOf } from "#presentation-of.ts";
 import { type Member as Placed } from "#presentation.ts";
-import { describedForm } from "#registry.ts";
+import { useDescribedForm } from "#registry.ts";
 import { Stepper } from "#stepper.tsx";
 import { useResolved } from "#use-resolved.ts";
 
@@ -43,7 +43,7 @@ export interface FieldsProps {
  */
 export function Fields({ of, step }: FieldsProps): ReactElement {
   const form = useFormContext();
-  const { engine, presentation, schema } = describedForm(form);
+  const { engine, presentation, schema } = useDescribedForm(form);
   const resolved = useResolved();
 
   if (of === undefined && step === undefined && presentation.steps !== undefined) {

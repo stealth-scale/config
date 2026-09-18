@@ -8,6 +8,11 @@ import { focusControl, focusFirstInvalid, formDefaults, type Invalidated } from 
  */
 interface Submittable extends Invalidated {
   /**
+   * The identifier the form's element carries.
+   */
+  readonly formId: string;
+
+  /**
    * Submits the form.
    */
   readonly handleSubmit: () => Promise<void>;
@@ -73,6 +78,23 @@ describe("formDefaults", () => {
   });
 });
 
+/**
+ * Puts a form element carrying an identifier in the document, with a control of the name inside.
+ *
+ * @returns The control inside the form.
+ */
+function formed(formId: string, name: string): HTMLInputElement {
+  const form = document.createElement("form");
+  const control = document.createElement("input");
+
+  form.id = formId;
+  control.name = name;
+  form.append(control);
+  document.body.append(form);
+
+  return control;
+}
+
 describe("focusControl", () => {
   it("moves focus to the control carrying the name", () => {
     mounted([]);
@@ -87,5 +109,33 @@ describe("focusControl", () => {
     focusControl("gone");
 
     expect(document.activeElement).toHaveProperty("name", "email");
+  });
+
+  it("moves focus to the control inside the form carrying the identifier", () => {
+    mounted([]);
+
+    const inside = formed(":r1:", "email");
+
+    focusControl("email", ":r1:");
+
+    expect(document.activeElement).toBe(inside);
+  });
+
+  it("searches the page where no element carries the identifier", () => {
+    mounted([]);
+    focusControl("email", "absent");
+
+    expect(document.activeElement).toHaveProperty("name", "email");
+  });
+});
+
+describe("focusFirstInvalid", () => {
+  it("focuses the refused field inside the form's own element", async () => {
+    const form = mounted(["email"]);
+    const inside = formed(form.formId, "email");
+
+    await form.handleSubmit();
+
+    expect(document.activeElement).toBe(inside);
   });
 });

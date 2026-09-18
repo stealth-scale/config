@@ -64,7 +64,13 @@ export {
 } from "#presentation.ts";
 export { bound, choicesOf, countAt, propertyOf, requiredIn, textOf, valueAt } from "#property.ts";
 export { FormProvider, type FormProviderProps } from "#provider.tsx";
-export { descriptionOf, type FieldRules, type FormDescription } from "#registry.ts";
+export {
+  descriptionOf,
+  type FieldRules,
+  type FormDescription,
+  useDescribed,
+  useDescribedForm,
+} from "#registry.ts";
 export {
   byControl,
   RANK,

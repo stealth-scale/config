@@ -3,7 +3,7 @@ import { renderToString } from "react-dom/server";
 
 import { FieldApi, FormApi } from "@tanstack/react-form";
 import { act, renderHook, type RenderHookResult } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { memoryStore, type SettingStore } from "@stealthscale/settings";
 
@@ -111,7 +111,45 @@ describe("useDraft", () => {
     });
 
     expect(stored(store)).toStrictEqual({ hash: HASH, values: { name: "Roy" } });
+  });
+
+  it("does not read its own write back", () => {
+    const store = memoryStore();
+    const rendered = vi.fn<() => void>();
+    const { result } = renderHook(() => {
+      rendered();
+
+      return useDraft<Signup>({ app: "docs", id: "signup", schema: signup, store });
+    });
+
+    act(() => {
+      result.current.write({ name: "Roy" });
+    });
+
+    expect(result.current.restored).toBeUndefined();
+    expect(rendered).toHaveBeenCalledTimes(1);
+  });
+
+  it("follows a write another document makes", () => {
+    const store = memoryStore();
+    const { result } = kept(store);
+
+    act(() => {
+      writeDraft(store, KEY, { hash: HASH, values: { name: "Roy" } });
+    });
+
     expect(result.current.restored?.values).toStrictEqual({ name: "Roy" });
+  });
+
+  it("listens to the store once however often the form renders", () => {
+    const store = memoryStore();
+    const subscribe = vi.spyOn(store, "subscribe");
+    const { rerender } = kept(store);
+
+    rerender();
+    rerender();
+
+    expect(subscribe).toHaveBeenCalledTimes(1);
   });
 
   it("never writes a password", () => {
@@ -144,7 +182,6 @@ describe("useDraft", () => {
       step: "addresses",
       values: { name: "Roy" },
     });
-    expect(result.current.restored?.step).toBe("addresses");
   });
 
   it("keeps the step a draft was read with", () => {

@@ -9,7 +9,7 @@ import { useFormContext } from "#contexts.ts";
 import { FieldMember } from "#field-member.tsx";
 import { memberKey } from "#presentation-of.ts";
 import { type Group, isGroup, type Member as Placed } from "#presentation.ts";
-import { describedForm } from "#registry.ts";
+import { useDescribedForm } from "#registry.ts";
 import { RepeatGroup } from "#repeat-group.tsx";
 import { type Schema } from "#schema.ts";
 import { type Translate } from "#translate.ts";
@@ -60,7 +60,7 @@ function legendOf(group: Group, words: Words, translate: Translate): string | un
  */
 export function Member({ indices, member, resolved }: MemberProps): null | ReactElement {
   const form = useFormContext();
-  const { layouts, translate } = describedForm(form);
+  const { layouts, translate } = useDescribedForm(form);
   const words = useWords();
 
   if (!isGroup(member)) {

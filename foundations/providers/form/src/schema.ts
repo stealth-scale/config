@@ -31,16 +31,31 @@ function isStandard(source: Schema | StandardJSONSchemaV1): source is StandardJS
 }
 
 /**
+ * The document each library object converted to, by the object, so a form built from one reads
+ * one document for as long as it holds the object.
+ */
+const converted = new WeakMap<StandardJSONSchemaV1, Schema>();
+
+/**
  * Reads a JSON Schema document out of whatever a caller has.
  *
  * @remarks
  *   A library object is converted through its own `~standard.jsonSchema.input` at the draft this
  *   design targets, and the library's refusal of that draft propagates as the library's own
- *   error. A document is returned as it is.
+ *   error. The document is kept by the object, so a form that reads its schema on every render
+ *   reads the same document, which the engine compiles once. A document is returned as it is.
  * @returns The document, at draft 2020-12 where a library produced it.
  */
 export function schemaOf(source: Schema | StandardJSONSchemaV1): Schema {
   if (!isStandard(source)) return source;
 
-  return source["~standard"].jsonSchema.input({ target: DRAFT });
+  const kept = converted.get(source);
+
+  if (kept !== undefined) return kept;
+
+  const document = source["~standard"].jsonSchema.input({ target: DRAFT });
+
+  converted.set(source, document);
+
+  return document;
 }
