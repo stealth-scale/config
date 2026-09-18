@@ -8,7 +8,13 @@ import { type Schema } from "@stealthscale/provider-form";
 import { useAppForm, useSchemaForm } from "#hook.ts";
 
 const terms: Schema = {
-  properties: { consent: { title: "I have read the terms", type: "boolean" } },
+  properties: {
+    consent: {
+      description: "You can withdraw it at any time",
+      title: "I have read the terms",
+      type: "boolean",
+    },
+  },
   required: ["consent"],
   type: "object",
 };
@@ -65,9 +71,13 @@ describe("CheckboxField", () => {
     expect(getByLabelText("I agree").getAttribute("aria-invalid")).toBe("true");
   });
 
-  it("reads the schema's title and whether it requires the box", () => {
-    const { getByLabelText } = render(<Described />);
+  it("reads the schema's title and help text and whether it requires the box", () => {
+    const { getByLabelText, getByText } = render(<Described />);
+    const control = getByLabelText("I have read the terms");
 
-    expect(getByLabelText("I have read the terms").getAttribute("aria-required")).toBe("true");
+    expect(control.getAttribute("aria-required")).toBe("true");
+    expect(control.getAttribute("aria-describedby")).toBe(
+      getByText("You can withdraw it at any time").id,
+    );
   });
 });

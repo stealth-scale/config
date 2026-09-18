@@ -12,13 +12,16 @@ import { type GroupProps, useWords } from "@stealthscale/provider-form";
  *
  * @remarks
  *   A group with columns is a grid, a group with the row direction is a row, and any other group
- *   is a column. A repeat group is handed `onAdd`, and the button reads `<id>.actions.add`.
+ *   is a column. A repeat group is handed `onAdd`, and the button reads `<id>.actions.add`. The
+ *   root element carries the id the foundation gives it, which is how focus moves to the group's
+ *   own controls once the last item of a repeat group is removed.
  */
 export function Group({
   children,
   closed,
   columns,
   direction,
+  id,
   legend,
   onAdd,
 }: GroupProps): ReactElement {
@@ -35,11 +38,11 @@ export function Group({
     </>
   );
 
-  if (legend === undefined) return inner;
+  if (legend === undefined) return <div id={id}>{inner}</div>;
 
   if (closed === true) {
     return (
-      <details>
+      <details id={id}>
         <summary>{legend}</summary>
         {inner}
       </details>
@@ -47,7 +50,7 @@ export function Group({
   }
 
   return (
-    <fieldset>
+    <fieldset id={id}>
       <legend>{legend}</legend>
       {inner}
     </fieldset>

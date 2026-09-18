@@ -16,7 +16,7 @@ function Harness({ removable = true }: { readonly removable?: boolean }): ReactE
 
   return (
     <form.AppForm>
-      <Item index={2} onRemove={removable ? onRemove : undefined}>
+      <Item id="lines-2" index={2} onRemove={removable ? onRemove : undefined}>
         <input aria-label="Inner" />
       </Item>
     </form.AppForm>
@@ -26,11 +26,13 @@ function Harness({ removable = true }: { readonly removable?: boolean }): ReactE
 describe("Item", () => {
   it("draws the members with the button that removes the item", () => {
     const { container, getByRole } = render(<Harness />);
+    const item = container.querySelector<HTMLElement>(".item");
 
     fireEvent.click(getByRole("button", { name: "Remove" }));
 
     expect(onRemove).toHaveBeenCalledTimes(1);
-    expect(container.querySelector<HTMLElement>(".item")?.dataset["index"]).toBe("2");
+    expect(item?.dataset["index"]).toBe("2");
+    expect(item?.id).toBe("lines-2");
   });
 
   it("draws no button where the item cannot be removed", () => {

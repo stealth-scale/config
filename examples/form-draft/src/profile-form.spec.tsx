@@ -88,13 +88,15 @@ describe("ProfileForm", () => {
 
   it("keeps a person on the first step while a field of it is refused", async () => {
     const store = memoryStore();
-    const { getByLabelText, getByRole } = render(<Page store={store} />);
+    const { getAllByRole, getByLabelText, getByRole } = render(<Page store={store} />);
 
     fireEvent.change(getByLabelText("Name"), { target: { value: "R" } });
     fireEvent.click(getByRole("button", { name: "Next" }));
 
     await waitFor(() => {
-      expect(getByRole("alert").textContent).toBe("Enter at least two characters");
+      expect(getAllByRole("alert").map((alert) => alert.textContent)).toContain(
+        "Enter at least two characters",
+      );
     });
     expect(getByRole("heading", { level: 2 }).textContent).toBe("Who you are");
   });

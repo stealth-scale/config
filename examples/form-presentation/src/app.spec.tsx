@@ -77,7 +77,9 @@ describe("App", () => {
     fireEvent.click(page.getByRole("button", { name: "Place order" }));
 
     await waitFor(() => {
-      expect(page.getByRole("alert").textContent).toBe("At least one");
+      expect(page.getAllByRole("alert").map((alert) => alert.textContent)).toContain(
+        "At least one",
+      );
     });
   });
 

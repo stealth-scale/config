@@ -23,19 +23,21 @@ export interface SelectFieldProps extends FieldProps {
 
 /**
  * Draws a select in a frame, bound to the string field in scope, with an empty first choice so
- * a person picks one on purpose. The empty choice reads the field's placeholder from the
- * catalogue, or "Choose" where it has none.
+ * a person picks one on purpose.
+ *
+ * @remarks
+ *   A select takes no placeholder attribute, so the empty choice shows the placeholder the
+ *   foundation resolved, or "Choose" where the catalogue has none.
  */
 export function SelectField({ label, options, required }: SelectFieldProps): ReactElement {
   const field = useBoundField<string>();
   const { schema } = useProperty();
   const words = useWords();
-  const placeholder = words.placeholder(field.name);
   const choices = options ?? (schema === undefined ? [] : choicesOf(schema));
 
   return (
     <Frame label={label} required={required}>
-      {(control) => (
+      {({ placeholder, ...control }) => (
         <select
           {...control}
           onBlur={field.handleBlur}
@@ -44,7 +46,7 @@ export function SelectField({ label, options, required }: SelectFieldProps): Rea
           }}
           value={field.state.value}
         >
-          <option value="">{placeholder === "" ? "Choose" : placeholder}</option>
+          <option value="">{placeholder ?? "Choose"}</option>
           {choices.map((choice) => (
             <option key={choice} value={choice}>
               {words.option(field.name, choice)}

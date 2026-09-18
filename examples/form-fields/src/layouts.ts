@@ -5,12 +5,13 @@
 import { type Layouts } from "@stealthscale/provider-form";
 
 import { Cell } from "#cell.tsx";
+import { Errors } from "#errors.tsx";
 import { Group } from "#group.tsx";
 import { Item } from "#item.tsx";
 import { Step } from "#step.tsx";
 
 /**
- * The layouts a generated form is drawn with: a cell around a field, a group, an item of a
- * repeat group, and a step.
+ * The layouts a generated form is drawn with: a cell around a field, the region for the form's
+ * own errors, a group, an item of a repeat group, and a step.
  */
-export const layouts: Layouts = { Cell, Group, Item, Step };
+export const layouts: Layouts = { Cell, Errors, Group, Item, Step };

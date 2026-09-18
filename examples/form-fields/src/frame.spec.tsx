@@ -66,17 +66,17 @@ function Described(): ReactElement {
 }
 
 describe("Frame", () => {
-  it("ties the label to the control and the control to its help and error", () => {
+  it("ties the label to the control and describes it by nothing that is not on the page", () => {
     const { getByLabelText } = render(<Harness />);
     const control = getByLabelText("Email");
 
-    expect(control.getAttribute("aria-describedby")).toBe(`${control.id}-help ${control.id}-error`);
+    expect(control.getAttribute("aria-describedby")).toBeNull();
     expect(control.getAttribute("name")).toBe("email");
     expect(control.getAttribute("aria-invalid")).toBe("false");
     expect(control.getAttribute("aria-required")).toBe("false");
   });
 
-  it("shows the first error once the field is touched", () => {
+  it("shows the first error once the field is touched and names it on the control", () => {
     const { getByLabelText, getByRole, queryByRole } = render(<Harness />);
 
     expect(queryByRole("alert")).toBeNull();
@@ -85,17 +85,20 @@ describe("Frame", () => {
 
     expect(getByRole("alert").textContent).toBe("Enter it");
     expect(getByLabelText("Email").getAttribute("aria-invalid")).toBe("true");
+    expect(getByLabelText("Email").getAttribute("aria-errormessage")).toBe(getByRole("alert").id);
   });
 
-  it("draws the help text the catalogue has for the field", () => {
+  it("draws the help text the catalogue has for the field and describes the control by it", () => {
     const words = translateFrom({ "form.fields.email.description": "We never share it" });
     const { getByLabelText, getByText } = render(
       <FormProvider translate={words}>
         <Harness />
       </FormProvider>,
     );
+    const help = getByText("We never share it");
 
-    expect(getByText("We never share it").id).toBe(`${getByLabelText("Email").id}-help`);
+    expect(help.id).toBe(`${getByLabelText("Email").id}-help`);
+    expect(getByLabelText("Email").getAttribute("aria-describedby")).toBe(help.id);
   });
 
   it("takes the label given over the path written out", () => {

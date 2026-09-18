@@ -14,15 +14,17 @@ import { Submit } from "#submit.tsx";
  * @remarks
  *   A wizard draws a way back from every step but the first, a way forward from every step but
  *   the last, and the submit on the last. Tabs draw every label as a button as well. The words
- *   read `<id>.actions.back`, `<id>.actions.next` and `<id>.actions.submit`.
+ *   read `<id>.actions.back`, `<id>.actions.next` and `<id>.actions.submit`. The root element
+ *   carries the id the foundation gives it, and the heading takes focus before the first field,
+ *   so a person moving to a step hears its name first.
  */
-export function Step({ children, current, kind, labels, onGo }: StepProps): ReactElement {
+export function Step({ children, current, id, kind, labels, onGo }: StepProps): ReactElement {
   const words = useWords();
   const last = current === labels.length - 1;
 
   return (
-    <div className={kind}>
-      <h2>{labels[current]}</h2>
+    <div className={kind} id={id}>
+      <h2 tabIndex={-1}>{labels[current]}</h2>
       {kind === "tabs" ? (
         <nav>
           {labels.map((label, index) => (

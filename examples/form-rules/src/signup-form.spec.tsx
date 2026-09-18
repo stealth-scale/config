@@ -73,7 +73,9 @@ describe("SignupForm", () => {
     submit(page);
 
     await waitFor(() => {
-      expect(page.getByRole("alert").textContent).toBe("Enter a VAT number like NL123456789B01");
+      expect(page.getAllByRole("alert").map((alert) => alert.textContent)).toContain(
+        "Enter a VAT number like NL123456789B01",
+      );
     });
   });
 
@@ -85,7 +87,9 @@ describe("SignupForm", () => {
     submit(page);
 
     await waitFor(() => {
-      expect(page.getByRole("alert").textContent).toBe("The passwords differ");
+      expect(page.getAllByRole("alert").map((alert) => alert.textContent)).toContain(
+        "The passwords differ",
+      );
     });
   });
 
@@ -96,7 +100,9 @@ describe("SignupForm", () => {
     fireEvent.blur(page.getByLabelText("Username"));
 
     await waitFor(() => {
-      expect(page.getByRole("alert").textContent).toBe("That name is taken");
+      expect(page.getAllByRole("alert").map((alert) => alert.textContent)).toContain(
+        "That name is taken",
+      );
     });
   });
 
@@ -109,7 +115,9 @@ describe("SignupForm", () => {
     submit(page);
 
     await waitFor(() => {
-      expect(page.getByRole("alert").textContent).toBe("Do not put your name in your password");
+      expect(page.getAllByRole("alert").map((alert) => alert.textContent)).toContain(
+        "Do not put your name in your password",
+      );
     });
   });
 

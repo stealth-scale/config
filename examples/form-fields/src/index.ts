@@ -8,9 +8,10 @@
 
 export { Cell } from "#cell.tsx";
 export { CheckboxField, type CheckboxFieldProps } from "#checkbox.tsx";
+export { Errors } from "#errors.tsx";
 export { type FieldLike, type FieldState, useBoundField } from "#field-like.ts";
 export { Form, type FormProps } from "#form.tsx";
-export { type ControlAttributes, type FieldProps, Frame, type FrameProps } from "#frame.tsx";
+export { type FieldProps, Frame, type FrameProps } from "#frame.tsx";
 export { Group } from "#group.tsx";
 export { useAppForm, useSchemaForm, withFieldGroup, withForm } from "#hook.ts";
 export { Item } from "#item.tsx";

@@ -11,12 +11,12 @@ import { useAppForm } from "#hook.ts";
 /**
  * Draws the group under a form, as the foundation does.
  */
-function Harness(props: Omit<GroupProps, "children">): ReactElement {
+function Harness(props: Omit<GroupProps, "children" | "id">): ReactElement {
   const form = useAppForm({ defaultValues: {} });
 
   return (
     <form.AppForm>
-      <Group {...props}>
+      <Group {...props} id="lines">
         <input aria-label="Inner" />
       </Group>
     </form.AppForm>
@@ -24,17 +24,19 @@ function Harness(props: Omit<GroupProps, "children">): ReactElement {
 }
 
 describe("Group", () => {
-  it("draws a fieldset with the legend where it has one", () => {
+  it("draws a fieldset carrying the id where it has a legend", () => {
     const { getByText } = render(<Harness legend="Billing" />);
+    const legend = getByText("Billing");
 
-    expect(getByText("Billing").tagName).toBe("LEGEND");
+    expect(legend.tagName).toBe("LEGEND");
+    expect(legend.closest("fieldset")?.id).toBe("lines");
   });
 
-  it("draws the layout alone where it has no legend", () => {
+  it("draws the layout alone under an element carrying the id where it has no legend", () => {
     const { container } = render(<Harness direction="row" />);
 
     expect(container.querySelector("fieldset")).toBeNull();
-    expect(container.querySelector(".row input")).not.toBeNull();
+    expect(container.querySelector("#lines > .row > input")).not.toBeNull();
   });
 
   it("draws a grid where it has columns", () => {

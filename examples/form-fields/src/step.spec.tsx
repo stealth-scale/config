@@ -23,7 +23,7 @@ function Harness({
   return (
     <form.AppForm>
       <form.Form>
-        <Step current={current} kind={kind} labels={labels} onGo={onGo}>
+        <Step current={current} id="profile-0" kind={kind} labels={labels} onGo={onGo}>
           <input aria-label="Inner" />
         </Step>
       </form.Form>
@@ -34,13 +34,21 @@ function Harness({
 describe("Step", () => {
   it("draws the label of the step and a way forward on the first step", () => {
     const { getByRole, queryByRole } = render(<Harness current={0} />);
+    const heading = getByRole("heading", { level: 2 });
 
-    expect(getByRole("heading", { level: 2 }).textContent).toBe("Who");
+    expect(heading.textContent).toBe("Who");
+    expect(heading.closest("div")?.id).toBe("profile-0");
     expect(queryByRole("button", { name: "Back" })).toBeNull();
 
     fireEvent.click(getByRole("button", { name: "Next" }));
 
     expect(onGo).toHaveBeenLastCalledWith(1);
+  });
+
+  it("gives the heading a tab index so focus moving into the step reads the name first", () => {
+    const { getByRole } = render(<Harness current={0} />);
+
+    expect(getByRole("heading", { level: 2 }).tabIndex).toBe(-1);
   });
 
   it("draws a way back and the submit on the last step", () => {
