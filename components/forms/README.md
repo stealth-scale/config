@@ -1,12 +1,13 @@
 # @stealthscale/component-forms
 
-Draws what a person fills in: the text field, and the search field with a control that empties it.
-Every component binds a recipe and draws nothing of its own, so a theme restyles all of them by
-extending the recipe. The preset under `./theme` registers the recipes with an application's
-compiler.
+Draws what a person fills in: the text field, the field with a mark at one end or both, and the
+search field with a control that empties it. Every component binds a recipe and draws nothing of its
+own, so a theme restyles all of them by extending the recipe. The preset under `./theme` registers
+the recipes with an application's compiler.
 
 Every value a theme can change on a component is an axis of its recipe, so a caller sets it as a
-prop and writes no style. A caller changes the element a component draws with `as`.
+prop and writes no style. A caller changes the element a component draws with `as`. A component with
+parts is published as a namespace, `InputGroup.Root`.
 
 ## Install
 
@@ -37,6 +38,7 @@ import { Input } from "@stealthscale/component-forms";
 | --------- | ------------------------------------------------- | --------- |
 | `size`    | `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`, `4xl` | `md`      |
 | `variant` | `outline`, `subtle`, `flushed`                    | `outline` |
+| `status`  | `info`, `success`, `warning`, `error`             | none      |
 
 The field carries no label of its own. Point a `label` at it, or state `aria-label` where the page
 has drawn the name elsewhere. A field with neither is announced as `edit text` and nothing more.
@@ -47,6 +49,48 @@ disagree.
 
 The focus ring is drawn inside the box, because a ring outside it is clipped where a field sits
 flush against the edge of a panel.
+
+## InputGroup
+
+Draws a field with a mark at one end or both: a currency symbol, a unit, a glyph, or a control. The
+marks are drawn over the field and the field reserves room for them, so the typing never runs
+underneath.
+
+```tsx
+import { InputGroup } from "@stealthscale/component-forms";
+
+<InputGroup.Root marks="start">
+  <InputGroup.Start aria-hidden>€</InputGroup.Start>
+  <InputGroup.Field aria-label="Amount" inputMode="decimal" />
+</InputGroup.Root>;
+```
+
+| Axis    | Values                                            | Default  |
+| ------- | ------------------------------------------------- | -------- |
+| `size`  | `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`, `4xl` | `md`     |
+| `marks` | `start`, `end`, `both`                            | `both`   |
+| `align` | `center`, `start`                                 | `center` |
+
+`marks` states which ends reserve room. State the side you draw a mark on, or leave it at `both` for
+a field marked at either end. The room is one custom property: `size` writes it on the root as the
+control height of that step, and `marks` reads it on the side a mark sits.
+
+`InputGroup.Field` binds the text field, so a group holding one needs no `as`. Another control goes
+in its place with `as`, and the factory draws it under both recipes:
+
+```tsx
+<InputGroup.Field as={Select.Trigger} />
+```
+
+A native `select` is the one control this does not hold at both ends. The browser draws its own
+arrow at the inline end and places it itself, so an end mark lands on top of one.
+
+Set `align="start"` for a control that runs to several lines. A mark centred against a tall box
+floats in the middle of it.
+
+A mark takes no pointer, so a press over one reaches the field behind it, and whatever the mark
+holds takes the pointer back. A mark that carries meaning is labelled by the caller. A decorative
+one states `aria-hidden`, which keeps a screen reader from reading a glyph before every field.
 
 ## SearchInput
 
