@@ -1,0 +1,52 @@
+{
+  "name": "@stealthscale/docs",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Draws the catalogue the specimen plugin indexes.",
+  "license": "MIT",
+  "type": "module",
+  "imports": {
+    "#*": "./src/*"
+  },
+  "scripts": {
+    "build": "vp build",
+    "check": "vp check",
+    "dev": "vp dev",
+    "test": "vp test"
+  },
+  "dependencies": {
+    "@stealthscale/component-actions": "workspace:^",
+    "@stealthscale/component-layout": "workspace:^",
+    "@stealthscale/component-typography": "workspace:^",
+    "@stealthscale/specimen": "workspace:^",
+    "@stealthscale/theme": "workspace:^",
+    "@stealthscale/theme-asphalt": "workspace:^",
+    "@stealthscale/theme-compass": "workspace:^",
+    "@stealthscale/theme-graphite": "workspace:^",
+    "@stealthscale/theme-lantern": "workspace:^",
+    "@stealthscale/theme-pebble": "workspace:^",
+    "@stealthscale/theme-prism": "workspace:^",
+    "@stealthscale/theme-quartz": "workspace:^",
+    "@stealthscale/theme-steel": "workspace:^",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@rolldown/plugin-babel": "catalog:",
+    "@stealthscale/vite-config": "workspace:^",
+    "@stealthscale/vite-config-react": "workspace:^",
+    "@stealthscale/vite-config-specimen": "workspace:^",
+    "@stealthscale/vite-config-theme": "workspace:^",
+    "@stealthscale/vite-config-typescript": "workspace:^",
+    "@stealthscale/vite-plugin-specimen": "workspace:^",
+    "@testing-library/react": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "babel-plugin-react-compiler": "catalog:",
+    "happy-dom": "catalog:",
+    "oxc-transform-react": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
