@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { declarations } from "#declarations.ts";
+import { declarations, labelOf } from "#declarations.ts";
+import { Home } from "#home.tsx";
 
 /**
  * What the reader returned with the other deployment unreachable.
@@ -59,5 +60,19 @@ describe("declarations", () => {
 
   it("says so once where it cannot be reached", async () => {
     expect((await unreachable()).warnings).toBe(1);
+  });
+
+  it("draws a declaration under the label it carries", async () => {
+    expect((await declarations()).map((one) => labelOf(one))).toStrictEqual(["Reports"]);
+  });
+
+  it("draws a declaration carrying no entry under its id", () => {
+    expect(labelOf({ component: Home, id: "remote.plain", path: "/plain" })).toBe("remote.plain");
+  });
+
+  it("draws a declaration whose entry names no label under its id", () => {
+    expect(
+      labelOf({ component: Home, id: "remote.plain", navigation: { order: 1 }, path: "/plain" }),
+    ).toBe("remote.plain");
   });
 });

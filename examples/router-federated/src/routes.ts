@@ -9,13 +9,18 @@ import {
   createRoute,
   createRouter,
   namedRoute,
-  Outlet,
   type RouteDeclaration,
   routeMap,
   routerOptions,
 } from "@stealthscale/provider-router";
 
 import { Home } from "#home.tsx";
+import { shellOf } from "#shell.tsx";
+
+/**
+ * The id this application names its own page under.
+ */
+const HOME = "app.home";
 
 /**
  * Builds the tree over whatever the other deployment declared.
@@ -29,9 +34,9 @@ import { Home } from "#home.tsx";
  * @returns The tree a router is built from.
  */
 export function buildTree(declarations: readonly RouteDeclaration[]): AnyRoute {
-  const root = createAppRootRoute()({ component: Outlet });
+  const root = createAppRootRoute()({ component: shellOf(declarations, HOME) });
   const home = createRoute({
-    ...namedRoute("app.home"),
+    ...namedRoute(HOME),
     component: Home,
     getParentRoute: () => root,
     path: "/",
