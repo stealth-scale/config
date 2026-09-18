@@ -9,7 +9,9 @@
 
 import { definePreset } from "@stealthscale/theme/authoring";
 
+import { recipe as table } from "#table/recipe.ts";
+
 export default definePreset({
   name: "@stealthscale/component-collections",
-  theme: { extend: { recipes: {} } },
+  theme: { extend: { slotRecipes: { table } } },
 });
