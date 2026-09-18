@@ -7,6 +7,7 @@
  * @packageDocumentation
  */
 
+export * as Alert from "#alert/index.ts";
 export * as EmptyState from "#empty-state/index.ts";
 export * from "#skeleton-text/index.ts";
 export * from "#skeleton/index.ts";
