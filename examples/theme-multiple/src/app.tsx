@@ -27,7 +27,24 @@ import { Published } from "#published.tsx";
 /**
  * Lists the themes the application installed, in the order `theme.config.ts` states them.
  */
-const THEMES = ["fathom", "folio", "forge", "abyss"] as const;
+const THEMES = [
+  "fathom",
+  "folio",
+  "forge",
+  "abyss",
+  "graphite",
+  "graphite-dimmed",
+  "graphite-contrast",
+  "steel",
+  "steel-gray",
+  "compass",
+  "compass-contrast",
+  "quartz",
+  "asphalt",
+  "pebble",
+  "lantern",
+  "prism",
+] as const;
 
 /**
  * Selects one of the installed themes.

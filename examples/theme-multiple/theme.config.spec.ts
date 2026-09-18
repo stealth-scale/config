@@ -31,13 +31,46 @@ async function compile(): Promise<string> {
 const css = await compile();
 
 describe("theme.config", () => {
-  it("lists fathom first as the default and abyss last", () => {
+  it("lists fathom first as the default and the published themes after the four examples", () => {
     expect(statement.themes.map((each) => each.name)).toStrictEqual([
       "fathom",
       "folio",
       "forge",
       "abyss",
+      "graphite",
+      "graphite-dimmed",
+      "graphite-contrast",
+      "steel",
+      "steel-gray",
+      "compass",
+      "compass-contrast",
+      "quartz",
+      "asphalt",
+      "pebble",
+      "lantern",
+      "prism",
     ]);
+  });
+
+  it("compiles every published theme's page as a reference into its own neutral ramp", () => {
+    expect(declared(css, "[data-theme=graphite]", "--colors-bg")).toBe("var(--colors-gray-0)");
+    expect(declared(css, "[data-theme=graphite]", "--colors-gray-0")).toBe(
+      "oklch(100.0% 0.0000 0.0)",
+    );
+    expect(declared(css, "[data-theme=steel]", "--colors-bg")).toBe("var(--colors-gray-white)");
+    expect(declared(css, "[data-theme=pebble]", "--colors-gray-950")).toBe(
+      "oklch(14.5% 0.0000 0.0)",
+    );
+    expect(declared(css, "[data-theme=asphalt]", "--fonts-body")).toContain("Inter Variable");
+  });
+
+  it("compiles a derived variant with its own dark ramp", () => {
+    expect(declared(css, "[data-theme=graphite-dimmed]", "--colors-blue-dark-0")).toBe(
+      "oklch(91.0% 0.0481 241.6)",
+    );
+    expect(declared(css, "[data-theme=graphite]", "--colors-blue-dark-0")).toBe(
+      "oklch(91.6% 0.0447 241.1)",
+    );
   });
 
   it("states the preset of the application's own recipes", () => {
