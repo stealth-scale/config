@@ -43,4 +43,10 @@ describe("Form", () => {
 
     expect(container.querySelector("form")).toHaveProperty("noValidate", true);
   });
+
+  it("carries the form's own identifier", () => {
+    const { container } = render(<Harness />);
+
+    expect(container.querySelector("form")?.id).not.toBe("");
+  });
 });

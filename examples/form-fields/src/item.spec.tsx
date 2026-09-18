@@ -11,12 +11,12 @@ const onRemove = vi.fn<() => void>();
 /**
  * Draws the item under a form, as the foundation does.
  */
-function Harness(): ReactElement {
+function Harness({ removable = true }: { readonly removable?: boolean }): ReactElement {
   const form = useAppForm({ defaultValues: {} });
 
   return (
     <form.AppForm>
-      <Item index={2} onRemove={onRemove}>
+      <Item index={2} onRemove={removable ? onRemove : undefined}>
         <input aria-label="Inner" />
       </Item>
     </form.AppForm>
@@ -31,5 +31,12 @@ describe("Item", () => {
 
     expect(onRemove).toHaveBeenCalledTimes(1);
     expect(container.querySelector<HTMLElement>(".item")?.dataset["index"]).toBe("2");
+  });
+
+  it("draws no button where the item cannot be removed", () => {
+    const { getByLabelText, queryByRole } = render(<Harness removable={false} />);
+
+    expect(queryByRole("button")).toBeNull();
+    expect(getByLabelText("Inner")).toBeDefined();
   });
 });

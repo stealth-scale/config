@@ -19,12 +19,17 @@ export interface FormProps {
 /**
  * Draws a form element whose submit runs the library's `handleSubmit`, with the browser's own
  * validation off so the schema's messages are the ones a person reads.
+ *
+ * @remarks
+ *   The element carries the form's own identifier, so a refused submit moves focus to a control
+ *   inside this form rather than the first control on the page with the field's name.
  */
 export function Form({ children }: FormProps): ReactElement {
   const form = useFormContext();
 
   return (
     <form
+      id={form.formId}
       noValidate
       onSubmit={(event) => {
         event.preventDefault();
