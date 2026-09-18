@@ -53,3 +53,11 @@ theme: keep no value's class on a slot for a compound
 - `tagSizes` writes the `size` axis of a tag, its height on the tag scale and its inset, its gap and
   its label one step down, and `below` reads the step under the one it is given so a recipe drawing
   something lighter than a control states no order of its own.
+- The animation styles state `pulse`, which loops the keyframe of that name. The keyframe was
+  already there and nothing named it, so a recipe that wanted a pulse wrote its own animation.
+- `insetSizes` writes the `size` axis of a padded box, the room inside it on the inset scale. A
+  control reads `controlSizes`, which sets a height and pads the sides alone, and a panel, a well or
+  an empty state needs every side padded and no height.
+- `onSlots` lifts one axis onto several parts at once, each part reading its own scale. A size axis
+  moving four parts together is otherwise one object per step holding one entry per part, which is
+  the shape a recipe author should never have to type.

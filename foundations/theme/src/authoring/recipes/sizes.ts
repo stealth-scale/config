@@ -106,6 +106,31 @@ export function tagSizes(sizes: readonly Scale[] = SCALE): Record<string, System
 }
 
 /**
+ * Writes the `size` axis of a padded box: the room inside it on the inset scale.
+ */
+export function insetSizes(): Record<Scale, SystemStyleObject>;
+
+/**
+ * Writes the `size` axis of a padded box for the steps it names.
+ *
+ * @typeParam Offered - The steps the recipe offers.
+ */
+export function insetSizes<const Offered extends Scale>(
+  sizes: readonly Offered[],
+): Record<Offered, SystemStyleObject>;
+
+/**
+ * Writes one entry per step, each the room inside the box on the inset scale.
+ *
+ * @remarks
+ *   A control reads `controlSizes`, which sets a height and pads the sides alone. This pads every
+ *   side and sets no height, which is what a panel, a well or an empty state needs.
+ */
+export function insetSizes(sizes: readonly Scale[] = SCALE): Record<string, SystemStyleObject> {
+  return recordOf(sizes, (size) => ({ padding: `inset.${size}` }));
+}
+
+/**
  * Writes the `size` axis of an icon: a square box on the icon scale.
  */
 export function iconSizes(): Record<Scale, SystemStyleObject>;

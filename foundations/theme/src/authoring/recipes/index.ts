@@ -42,10 +42,11 @@ export {
   controlSizes,
   iconOnly,
   iconSizes,
+  insetSizes,
   tagSizes,
   touchTarget,
 } from "#authoring/recipes/sizes.ts";
-export { type Anatomy, onSlot, slotsOf } from "#authoring/recipes/slots.ts";
+export { type Anatomy, onSlot, onSlots, slotsOf } from "#authoring/recipes/slots.ts";
 export { statusVariants } from "#authoring/recipes/status.ts";
 export {
   divider,

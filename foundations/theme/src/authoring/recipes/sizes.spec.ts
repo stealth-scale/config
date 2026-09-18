@@ -8,6 +8,7 @@ import {
   controlSizes,
   iconOnly,
   iconSizes,
+  insetSizes,
   tagSizes,
   touchTarget,
 } from "#authoring/recipes/sizes.ts";
@@ -53,6 +54,14 @@ describe("sizes", () => {
         position: "relative",
       },
     });
+  });
+
+  it("pads every side of a box on the inset scale", () => {
+    expect(insetSizes(["md"])).toStrictEqual({ md: { padding: "inset.md" } });
+  });
+
+  it("offers every step of the inset scale where a recipe names none", () => {
+    expect(Object.keys(insetSizes())).toHaveLength(8);
   });
 
   it("reads the step below the one it is given", () => {

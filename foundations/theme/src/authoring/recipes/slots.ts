@@ -48,3 +48,43 @@ export function onSlot<const Part extends string, Values extends Record<string, 
   // eslint-disable-next-line typescript/no-unsafe-type-assertion -- built from every value of the axis, each under the one part named
   return Object.fromEntries(lifted) as { [Value in keyof Values]: Record<Part, SystemStyleObject> };
 }
+
+/**
+ * Lifts one axis onto several parts at once, each part reading its own scale.
+ *
+ * @remarks
+ *   A size axis usually moves every part of a component together: the room inside the root, the
+ *   gap in the content, the box of the mark and the size of the title all step at one name. Written
+ *   out that is one object per step holding one entry per part, which is the shape a recipe author
+ *   should never have to type. This takes a scale per part and turns it inside out, so each step of
+ *   the axis holds the styles every part states at that step.
+ *   A part offering fewer steps than another is left out of the steps it does not offer, rather
+ *   than reported, because a recipe may well size three parts over eight steps and a fourth over
+ *   five.
+ * @typeParam Part - Each part the axis styles.
+ * @typeParam Values - Each value of the axis, against the styles a part states.
+ */
+export function onSlots<
+  const Part extends string,
+  Values extends Record<string, SystemStyleObject>,
+>(
+  parts: Readonly<Record<Part, Values>>,
+): {
+  [Value in keyof Values]: Partial<Record<Part, SystemStyleObject>>;
+} {
+  const named = Object.entries<Values>(parts);
+  const steps = new Set(named.flatMap(([, scale]) => Object.keys(scale)));
+  const lifted = [...steps].map((step) => [
+    step,
+    Object.fromEntries(
+      named
+        .map(([slot, scale]) => [slot, scale[step]] as const)
+        .filter((pair): pair is readonly [string, SystemStyleObject] => pair[1] !== undefined),
+    ),
+  ]);
+
+  // eslint-disable-next-line typescript/no-unsafe-type-assertion -- built from every step of the axis, each holding the parts that state one
+  return Object.fromEntries(lifted) as {
+    [Value in keyof Values]: Partial<Record<Part, SystemStyleObject>>;
+  };
+}
