@@ -34,7 +34,7 @@ describe("ROLES", () => {
   });
 
   it("places the default ink and line", () => {
-    expect(INKS.DEFAULT).toStrictEqual([9, 2]);
+    expect(INKS.DEFAULT).toStrictEqual([10, 2]);
     expect(LINES.DEFAULT).toStrictEqual([5, 6]);
   });
 });

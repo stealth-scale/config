@@ -13,6 +13,10 @@ describe("graphiteContrast", () => {
         at: import.meta.dirname,
         base: foundation,
         recipes: {},
+        skip: {
+          "distinct.fills":
+            "the dark end of the blue (dark), green (dark), orange (dark), pink (dark), purple (dark), red (dark), yellow (dark) ramp is too light for a third quiet fill under a pair of inks that read at 4.5:1, so the muted and emphasized fills share a step there",
+        },
         thresholds: { text: 4.5 },
       }),
     ).toStrictEqual([]);

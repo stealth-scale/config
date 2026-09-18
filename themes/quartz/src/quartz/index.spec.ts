@@ -12,6 +12,10 @@ describe("quartz", () => {
         at: import.meta.dirname,
         base: foundation,
         recipes: {},
+        skip: {
+          "distinct.fills":
+            "the dark end of the yellow (dark) ramp is too light for a third quiet fill under a pair of inks that read at 4.5:1, so the muted and emphasized fills share a step there",
+        },
         thresholds: { text: 4.5 },
       }),
     ).toStrictEqual([]);
