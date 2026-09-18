@@ -45,6 +45,9 @@ a new record and mark the old one superseded.
 | [0033](0033-draw-a-field-through-a-ranked-renderer-registry.md)                             | Draw a field through a ranked renderer registry                                     | Proposed |
 | [0034](0034-bind-a-component-package-through-createschemaform.md)                           | Bind a component package through createSchemaForm and attach the schema to the form | Proposed |
 | [0035](0035-keep-a-form-across-a-refresh-as-a-draft-in-the-settings-store.md)               | Keep a form across a refresh as a draft in the settings store                       | Proposed |
+| [0036](0036-parse-a-specimens-metadata-out-of-its-source.md)                                | Parse a specimen's metadata out of its source and never evaluate the module         | Accepted |
+| [0037](0037-classify-a-prop-by-every-declaration-behind-it.md)                              | Classify a prop by every declaration behind it                                      | Accepted |
+| [0038](0038-serve-the-catalogue-as-virtual-modules.md)                                      | Serve the catalogue as virtual modules with a loader per page                       | Accepted |
 
 ## Status
 
