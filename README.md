@@ -6,19 +6,20 @@
 [![node](https://img.shields.io/node/v/@stealthscale/theme)](https://nodejs.org)
 [![license](https://img.shields.io/github/license/stealth-scale/config)](LICENSE)
 
-`@stealthscale/scale` holds the building blocks a stealthscale application is built from. Today that
-is the design system every interface is drawn from, the configuration tiers every package is built
-and released through, and the testing kits both are held to. The component libraries and the
-platform SDK move in next, from their own repositories.
+`@stealthscale/scale` holds the building blocks a stealthscale application is built from. That is
+the design system every interface is drawn from, the component libraries drawn with it, and the
+providers an application renders. It is also the configuration tiers every package here is built and
+released through, and the testing kits that check each of them against its contract.
 
 ## What is here
 
-| Directory      | What it contains                                                      |
-| -------------- | --------------------------------------------------------------------- |
-| `packages/`    | What npm publishes under `@stealthscale/`                             |
-| `foundations/` | The design system every stealthscale interface is drawn from          |
-| `examples/`    | Private applications that each demonstrate one configuration decision |
-| `docs/`        | The decision records, the design proposals and the writing standards  |
+| Directory      | What it contains                                                                  |
+| -------------- | --------------------------------------------------------------------------------- |
+| `foundations/` | The theme, the hooks, the settings store and the providers an application renders |
+| `components/`  | The component libraries, one package for each kind of thing a page draws          |
+| `packages/`    | The build tiers, the bundler plugins and the testing kits                         |
+| `examples/`    | Private applications that each demonstrate one decision                           |
+| `docs/`        | The decision records, the design proposals and the writing standards              |
 
 ## The contract
 
@@ -51,27 +52,68 @@ configures. `import.meta.dirname` names the directory from there and nothing els
 | [`vite-config-react`](packages/vite-config-react)           | Adds the JSX transform, the React lint rules, the DOM a test renders into and the MDX compiler             |
 | [`vite-config-css`](packages/vite-config-css)               | Adds the Stylelint rules a stylesheet is checked against and the plugin that runs them                     |
 | [`vite-config-theme`](packages/vite-config-theme)           | Adds the runtime generator to a design-system package and the stylesheet compiler to an application        |
+| [`vite-config-i18n`](packages/vite-config-i18n)             | Adds the catalogue plugin to a package and puts the words its specifications read in scope                 |
 | [`vite-plugin-base`](packages/vite-plugin-base)             | Supplies the typed plugin and the module-graph readers every bundler plugin here is built on               |
 | [`vite-plugin-sbom`](packages/vite-plugin-sbom)             | Writes a CycloneDX bill of materials from the modules a build reached                                      |
 | [`vite-plugin-theme`](packages/vite-plugin-theme)           | Generates the styling runtime of a design system and compiles the stylesheet of an application             |
+| [`vite-plugin-i18n`](packages/vite-plugin-i18n)             | Finds every catalogue an application can reach, types their keys and answers the module that loads them    |
 | [`pandacss-naming`](packages/pandacss-naming)               | Writes the class names of a design system in one readable scheme, for the stylesheet and the browser alike |
 | [`pandacss-compiler`](packages/pandacss-compiler)           | Renames a compiled stylesheet and its generated runtime into that scheme                                   |
 | [`testing`](packages/testing)                               | Builds the scratch workspaces and manifests a specification runs a tree from                               |
 | [`testing-react`](packages/testing-react)                   | Reads a rendered component through the part names and data attributes on its anatomy                       |
+| [`testing-router`](packages/testing-router)                 | Mounts a route tree in a specification and renders the page a path matches                                 |
 | [`testing-config`](packages/testing-config)                 | Checks a config, plugin or library package against the contract its kind keeps                             |
 | [`testing-theme`](packages/testing-theme)                   | Checks a theme, a recipe or a preset against the theme contract and the contrast table                     |
 
 ## The design system
 
-| Package                      | What it does                                                                                                                               |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| [`theme`](foundations/theme) | Publishes the foundation every recipe is written against, the runtime every component binds with, and the vocabulary a theme is written in |
+| Package                            | What it does                                                                                                                               |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| [`theme`](foundations/theme)       | Publishes the foundation every recipe is written against, the runtime every component binds with, and the vocabulary a theme is written in |
+| [`hooks`](foundations/hooks)       | Answers a question about the page a component draws into: how it is read, what it measures, and what it held a render ago                  |
+| [`settings`](foundations/settings) | Remembers one named setting a person made, held to the values it may take and kept where the reader chooses                                |
 
-A recipe is written against the foundation's vocabulary alone, so a component reads it in a browser
-and a configuration reads it in node alike. Filling the contract takes two calls, and a theme moves
-whatever it wants from there. The build plugin compiles one stylesheet from every preset and theme
-in the dependency graph, and scopes each theme under `data-theme`. It renames every class into the
-naming scheme, so `button--lg` reaches the page rather than the compiler's own name.
+A recipe is written against the foundation's vocabulary alone. That vocabulary reads the same in a
+browser and in node, so a component and a configuration take their values from one place. Filling
+the contract takes two calls, and a theme moves whatever it wants from there. The build plugin
+compiles one stylesheet from every preset and theme in the dependency graph and scopes each theme
+under `data-theme`. It renames the classes into the naming scheme, so `button--lg` reaches the page
+rather than the compiler's own name.
+
+### The providers
+
+| Package                                                     | What it puts in scope                                                                                                       |
+| ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| [`provider-shell`](foundations/providers/shell)             | Every provider below it, each rendered in the order it depends on the one before                                            |
+| [`provider-router`](foundations/providers/router)           | The routes an application navigates by, and the options every router starts from                                            |
+| [`provider-color-mode`](foundations/providers/color-mode)   | A colour mode, remembered, with the first paint settled before the page draws                                               |
+| [`provider-locale`](foundations/providers/locale)           | The locale a page is read in, remembered, with the direction that follows it                                                |
+| [`provider-i18n`](foundations/providers/i18n)               | The words an application is read in, in the locale it is given                                                              |
+| [`provider-form`](foundations/providers/form)               | The contexts a bound field and a bound form share, the engine that reads a JSON Schema, and the draft kept across a refresh |
+| [`provider-hotkeys`](foundations/providers/hotkeys)         | The keyboard shortcuts a page answers to                                                                                    |
+| [`provider-viewport`](foundations/providers/viewport)       | A stated width for a subtree rather than the window's, and which breakpoint it is at                                        |
+| [`provider-environment`](foundations/providers/environment) | The document a subtree lives in, which a portal attaches to and a measurement is taken against                              |
+
+### The components
+
+Every component binds a recipe and draws nothing of its own. A theme moves them all by extending the
+recipe. Each package publishes a preset under `./theme` that registers its recipes with an
+application's compiler.
+
+| Package                               | What it draws                                                                                                |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| [`typography`](components/typography) | `Heading`, `Text`, `Blockquote`, `Code`, `Kbd`, `List` and `Icon`: the components that are text              |
+| [`layout`](components/layout)         | `Container`, `Stack`, `Grid`, `Frame`, `Divider` and `Spacer`: arranging what is already there               |
+| [`actions`](components/actions)       | `Button` and `IconButton`: what a person presses                                                             |
+| [`disclosure`](components/disclosure) | `Collapsible`, `Tabs`, `Tooltip`, `Popover` and `Menu`: what is shown and hidden on the reader's say-so      |
+| [`navigation`](components/navigation) | `Link` and `Breadcrumb`: the ways a person moves between places                                              |
+| [`forms`](components/forms)           | `Input` and `SearchInput`: the controls a person fills in                                                    |
+| [`feedback`](components/feedback)     | `Skeleton`, `SkeletonText` and `EmptyState`: the system reporting on itself                                  |
+| [`data`](components/data)             | `Badge`: one value drawn for reading                                                                         |
+| [`a11y`](components/a11y)             | `SkipNav`, `RovingFocus` and `VisuallyHidden`: what a keyboard and a screen reader need, and an eye does not |
+| [`primitives`](components/primitives) | `Portal`: what is drawn and where, drawing nothing itself                                                    |
+
+`collections`, `content`, `modals`, `screen` and `surfaces` are declared and still empty.
 
 ## The tiers
 
@@ -111,29 +153,37 @@ a package composes and merges like any other. Both tools then ignore it.
 
 ## The examples
 
-| Example                                     | What it shows                                                                    |
-| ------------------------------------------- | -------------------------------------------------------------------------------- |
-| [`app-host`](examples/app-host)             | An application that loads another one at run time through Module Federation      |
-| [`app-remote`](examples/app-remote)         | An application built to be loaded by another one                                 |
-| [`app-tanstack`](examples/app-tanstack)     | A routed application with a federated remote mounted under one of its addresses  |
-| [`app-react`](examples/app-react)           | What the React configuration package adds to an application that renders         |
-| [`app-web`](examples/app-web)               | A pinned port and a proxied path, with no framework in the page                  |
-| [`app-ssr`](examples/app-ssr)               | Server-side rendering and the dependency the server bundle has to contain        |
-| [`app-worker`](examples/app-worker)         | Arithmetic on a worker thread that the dependency scan finds                     |
-| [`lib-bare`](examples/lib-bare)             | A library that takes the workspace root's configuration                          |
-| [`lib-core`](examples/lib-core)             | A library that reaches for neither node's globals nor the browser's              |
-| [`lib-node`](examples/lib-node)             | A library published for node                                                     |
-| [`lib-cli`](examples/lib-cli)               | A library that installs a command named for what it does                         |
-| [`lib-tokens`](examples/lib-tokens)         | A pack hook that writes part of what the library ships                           |
-| [`lib-ui`](examples/lib-ui)                 | A component library four of the example applications share                       |
-| [`lib-actions`](examples/lib-actions)       | A button drawn by a recipe, with the preset that registers it                    |
-| [`lib-surfaces`](examples/lib-surfaces)     | A card of four parts drawn by one slot recipe, with the preset that registers it |
-| [`theme-fathom`](examples/theme-fathom)     | A deep teal theme on marine greys, rounder than the foundation                   |
-| [`theme-folio`](examples/theme-folio)       | An editorial theme with a violet brand and a serif to read it in                 |
-| [`theme-forge`](examples/theme-forge)       | A warm console theme with cream surfaces, an amber brand and flat shadows        |
-| [`theme-abyss`](examples/theme-abyss)       | A theme derived from another one rather than from the foundation                 |
-| [`theme-single`](examples/theme-single)     | A page in one theme that switches its color mode                                 |
-| [`theme-multiple`](examples/theme-multiple) | A page that switches between four themes and two color modes                     |
+| Example                                           | What it shows                                                                                  |
+| ------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| [`app-host`](examples/app-host)                   | An application that loads another one at run time through Module Federation                    |
+| [`app-remote`](examples/app-remote)               | An application built to be loaded by another one                                               |
+| [`router-basic`](examples/router-basic)           | Routing an application whose every address is known when it is built                           |
+| [`router-declared`](examples/router-declared)     | Routing pages that arrive as data, under layouts they name and linked to by id                 |
+| [`router-guarded`](examples/router-guarded)       | Routing only where a condition holds, answering not-found where it does not                    |
+| [`router-federated`](examples/router-federated)   | Routing to pages another deployment declares, at the addresses it states                       |
+| [`app-react`](examples/app-react)                 | What the React configuration package adds to an application that renders                       |
+| [`app-web`](examples/app-web)                     | A pinned port and a proxied path, with no framework in the page                                |
+| [`app-ssr`](examples/app-ssr)                     | Server-side rendering and the dependency the server bundle has to contain                      |
+| [`app-worker`](examples/app-worker)               | Arithmetic on a worker thread that the dependency scan finds                                   |
+| [`lib-bare`](examples/lib-bare)                   | A library that takes the workspace root's configuration                                        |
+| [`lib-core`](examples/lib-core)                   | A library that reaches for neither node's globals nor the browser's                            |
+| [`lib-node`](examples/lib-node)                   | A library published for node                                                                   |
+| [`lib-cli`](examples/lib-cli)                     | A library that installs a command named for what it does                                       |
+| [`lib-tokens`](examples/lib-tokens)               | A pack hook that writes part of what the library ships                                         |
+| [`lib-ui`](examples/lib-ui)                       | A component library four of the example applications share                                     |
+| [`lib-actions`](examples/lib-actions)             | A button drawn by a recipe, with the preset that registers it                                  |
+| [`lib-surfaces`](examples/lib-surfaces)           | A card of four parts drawn by one slot recipe, with the preset that registers it               |
+| [`form-fields`](examples/form-fields)             | The field components the form examples share, bound to the form foundation                     |
+| [`form-basic`](examples/form-basic)               | A contact form drawn from a JSON Schema, read from a catalogue in two languages                |
+| [`form-rules`](examples/form-rules)               | A format and a keyword in the engine, a field that asks a server, and a rule across two fields |
+| [`form-presentation`](examples/form-presentation) | A form drawn from the presentation its schema carries, through a renderer registry             |
+| [`form-draft`](examples/form-draft)               | A form in two steps that keeps a draft across a refresh and leaves the password out of it      |
+| [`theme-fathom`](examples/theme-fathom)           | A deep teal theme on marine greys, rounder than the foundation                                 |
+| [`theme-folio`](examples/theme-folio)             | An editorial theme with a violet brand and a serif to read it in                               |
+| [`theme-forge`](examples/theme-forge)             | A warm console theme with cream surfaces, an amber brand and flat shadows                      |
+| [`theme-abyss`](examples/theme-abyss)             | A theme derived from another one rather than from the foundation                               |
+| [`theme-single`](examples/theme-single)           | A page in one theme that switches its color mode                                               |
+| [`theme-multiple`](examples/theme-multiple)       | A page that switches between four themes and two color modes                                   |
 
 ## Working on it
 
