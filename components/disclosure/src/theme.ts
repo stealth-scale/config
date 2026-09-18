@@ -9,7 +9,9 @@
 
 import { definePreset } from "@stealthscale/theme/authoring";
 
+import { recipe as collapsible } from "#collapsible/recipe.ts";
+
 export default definePreset({
   name: "@stealthscale/component-disclosure",
-  theme: { extend: { recipes: {} } },
+  theme: { extend: { slotRecipes: { collapsible } } },
 });

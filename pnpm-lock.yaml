@@ -245,6 +245,15 @@ catalogs:
     '@vitest/eslint-plugin':
       specifier: ^1.6.27
       version: 1.6.27
+    '@zag-js/collapsible':
+      specifier: 1.43.3
+      version: 1.43.3
+    '@zag-js/react':
+      specifier: 1.43.3
+      version: 1.43.3
+    '@zag-js/types':
+      specifier: 1.43.3
+      version: 1.43.3
     axe-core:
       specifier: ^4.13.0
       version: 4.13.0
@@ -361,6 +370,9 @@ importers:
       '@stealthscale/testing-react':
         specifier: workspace:^
         version: link:packages/testing-react
+      '@stealthscale/testing-router':
+        specifier: workspace:^
+        version: link:packages/testing-router
       '@stealthscale/testing-theme':
         specifier: workspace:^
         version: link:packages/testing-theme
@@ -696,6 +708,16 @@ importers:
         version: 4.1.11(@types/node@26.5.1)(@vitest/browser-playwright@4.1.11)(@vitest/browser-preview@4.1.11)(@vitest/coverage-v8@4.1.11)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(happy-dom@20.14.5)
 
   components/disclosure:
+    dependencies:
+      '@zag-js/collapsible':
+        specifier: 'catalog:'
+        version: 1.43.3
+      '@zag-js/react':
+        specifier: 'catalog:'
+        version: 1.43.3(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@zag-js/types':
+        specifier: 'catalog:'
+        version: 1.43.3
     devDependencies:
       '@arethetypeswrong/core':
         specifier: 'catalog:'
@@ -703,6 +725,9 @@ importers:
       '@rolldown/plugin-babel':
         specifier: 'catalog:'
         version: 0.2.4(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@7.29.7)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(rolldown@1.2.7)
+      '@stealthscale/hooks':
+        specifier: workspace:^
+        version: link:../../foundations/hooks
       '@stealthscale/theme':
         specifier: workspace:^
         version: link:../../foundations/theme
@@ -2078,9 +2103,6 @@ importers:
 
   examples/router-basic:
     dependencies:
-      '@stealthscale/provider-router':
-        specifier: workspace:^
-        version: link:../../foundations/providers/router
       '@tanstack/react-router':
         specifier: 'catalog:'
         version: 1.170.34(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -2146,6 +2168,9 @@ importers:
       '@rolldown/plugin-babel':
         specifier: 'catalog:'
         version: 0.2.4(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@7.29.7)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(rolldown@1.2.7)
+      '@stealthscale/testing-router':
+        specifier: workspace:^
+        version: link:../../packages/testing-router
       '@stealthscale/vite-config':
         specifier: workspace:^
         version: link:../../packages/vite-config
@@ -2207,6 +2232,9 @@ importers:
       '@rolldown/plugin-babel':
         specifier: 'catalog:'
         version: 0.2.4(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@7.29.7)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(rolldown@1.2.7)
+      '@stealthscale/testing-router':
+        specifier: workspace:^
+        version: link:../../packages/testing-router
       '@stealthscale/vite-config':
         specifier: workspace:^
         version: link:../../packages/vite-config
@@ -2259,6 +2287,9 @@ importers:
       '@rolldown/plugin-babel':
         specifier: 'catalog:'
         version: 0.2.4(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@7.29.7)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(rolldown@1.2.7)
+      '@stealthscale/testing-router':
+        specifier: workspace:^
+        version: link:../../packages/testing-router
       '@stealthscale/vite-config':
         specifier: workspace:^
         version: link:../../packages/vite-config
@@ -3196,6 +3227,66 @@ importers:
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
+      babel-plugin-react-compiler:
+        specifier: 'catalog:'
+        version: 1.0.0
+      happy-dom:
+        specifier: 'catalog:'
+        version: 20.14.5
+      oxc-transform-react:
+        specifier: 'catalog:'
+        version: 0.149.0
+      publint:
+        specifier: 'catalog:'
+        version: 0.3.24
+      react:
+        specifier: 'catalog:'
+        version: 19.3.0
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.3.0(react@19.3.0)
+      typescript:
+        specifier: 'catalog:'
+        version: 7.0.2
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.11(@types/node@26.5.1)(@vitest/browser-playwright@4.1.11)(@vitest/browser-preview@4.1.11)(@vitest/coverage-v8@4.1.11)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(happy-dom@20.14.5)
+
+  packages/testing-router:
+    devDependencies:
+      '@arethetypeswrong/core':
+        specifier: 'catalog:'
+        version: 0.18.5
+      '@rolldown/plugin-babel':
+        specifier: 'catalog:'
+        version: 0.2.4(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@7.29.7)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(rolldown@1.2.7)
+      '@stealthscale/provider-router':
+        specifier: workspace:^
+        version: link:../../foundations/providers/router
+      '@stealthscale/testing-config':
+        specifier: workspace:^
+        version: link:../testing-config
+      '@stealthscale/vite-config':
+        specifier: workspace:^
+        version: link:../vite-config
+      '@stealthscale/vite-config-react':
+        specifier: workspace:^
+        version: link:../vite-config-react
+      '@stealthscale/vite-config-typescript':
+        specifier: workspace:^
+        version: link:../vite-config-typescript
+      '@testing-library/react':
+        specifier: 'catalog:'
+        version: 16.3.3(@testing-library/dom@10.4.1)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.3.0
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 19.3.0(@types/react@19.3.0)
+      '@vitest/coverage-v8':
+        specifier: 'catalog:'
+        version: 4.1.11(@vitest/browser@4.1.11)(vitest@4.1.11)
       babel-plugin-react-compiler:
         specifier: 'catalog:'
         version: 1.0.0
@@ -5465,6 +5556,33 @@ packages:
   '@yuku-toolchain/types@0.9.5':
     resolution: {integrity: sha512-KiuLNNgX9uNealaWAR+G3/cMXnRk9x4TY2EkYe/KIag+UPdwiA0RRf1hr1WAxzTP8KGzCTkqUdLPvqh32sEO3w==}
 
+  '@zag-js/anatomy@1.43.3':
+    resolution: {integrity: sha512-KzosWgu0TTtdBNHPUZg2W8E5JsGsExQ8oGkLDmV6Sym9twaATU2YVMCWsfitq3Isss4099wNMsHdjEPK2UyCjw==}
+
+  '@zag-js/collapsible@1.43.3':
+    resolution: {integrity: sha512-ABOmW6o2SxKfuG5qNWeLXYgVDQDe30dyeRCbEGBhWFeYFO0IMvjlOLiLdk6MSXmFjMynUTIuYxaEv8gNhoOkCA==}
+
+  '@zag-js/core@1.43.3':
+    resolution: {integrity: sha512-afREBcZWvPLHz/2AxJeuAP2o6+o3V7NZO/MutLhdclKaVSBlPzCr6qqP9k8hq1zOxk1jogKT5VVGielzWDY2Dw==}
+
+  '@zag-js/dom-query@1.43.3':
+    resolution: {integrity: sha512-kpTTYMemMmHxhp4gyOllK7/Lf86AySTO+AlGds9iQM21eUwi1jvc9q3VTxP+qD/KwHePGftfPwkwxifC3iSGbw==}
+
+  '@zag-js/react@1.43.3':
+    resolution: {integrity: sha512-PVfq738OhicFsGOZNqrsBmdOHuh54XnIhkyJ9HSWDpzQcGHq4fuFWIvfmqW/5o/Xkj+JwFQLoIDVX/KHaUjcXA==}
+    peerDependencies:
+      react: '>=18.0.0'
+      react-dom: '>=18.0.0'
+
+  '@zag-js/store@1.43.3':
+    resolution: {integrity: sha512-NL3Uxk5Rszjd+X+cPXw0N7Kn5TNMyrS6cTMazlBOcN2+J68mzXhNFvM/0H38m0X+3ybK3sE5Ta6NPlhOQADRqw==}
+
+  '@zag-js/types@1.43.3':
+    resolution: {integrity: sha512-QokzUgkJ7a/TRE8SAXqlm1XfiNDbyM8y+mx0PpmzHa8bvmWXLEe/Zx2TRz8aYoGim75NluYzDy3x+WWileF7uA==}
+
+  '@zag-js/utils@1.43.3':
+    resolution: {integrity: sha512-9P9fvFFxuiDcLqX0BYgGNkf0/a/id32nHvQpwgv/Xv3b9n5yeyw2U8nKefpWr+1VfFsrpf2XMXiA2CDSWZgt2g==}
+
   acorn-jsx@5.3.2:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
     peerDependencies:
@@ -6799,6 +6917,9 @@ packages:
 
   property-information@7.2.0:
     resolution: {integrity: sha512-IAtzIB6sUiWaJYrX9smp3V46pBGbBeLFRGdh25kg1334VcBlD8HzhPeNIWQH9zhGmo2itIe25EHt9dQP7G5hmg==}
+
+  proxy-compare@3.0.1:
+    resolution: {integrity: sha512-V9plBAt3qjMlS1+nC8771KNf6oJ12gExvaxnNzN/9yVRLdTv/lc+oJlnSzrdYDAvBfTStPCoiaCOTmTs0adv7Q==}
 
   publint@0.3.24:
     resolution: {integrity: sha512-9zS56KrKBoqi5Qt8h92uMP8TTM9AYZSgnmCo4u2priMqkOZvQnTsziZ2p5LJ2ywbYkAjoCDp2jda9u4cgFefIw==}
@@ -8925,6 +9046,44 @@ snapshots:
 
   '@yuku-toolchain/types@0.9.5': {}
 
+  '@zag-js/anatomy@1.43.3': {}
+
+  '@zag-js/collapsible@1.43.3':
+    dependencies:
+      '@zag-js/anatomy': 1.43.3
+      '@zag-js/core': 1.43.3
+      '@zag-js/dom-query': 1.43.3
+      '@zag-js/types': 1.43.3
+      '@zag-js/utils': 1.43.3
+
+  '@zag-js/core@1.43.3':
+    dependencies:
+      '@zag-js/dom-query': 1.43.3
+      '@zag-js/utils': 1.43.3
+
+  '@zag-js/dom-query@1.43.3':
+    dependencies:
+      '@zag-js/types': 1.43.3
+
+  '@zag-js/react@1.43.3(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
+    dependencies:
+      '@zag-js/core': 1.43.3
+      '@zag-js/store': 1.43.3
+      '@zag-js/types': 1.43.3
+      '@zag-js/utils': 1.43.3
+      react: 19.3.0
+      react-dom: 19.3.0(react@19.3.0)
+
+  '@zag-js/store@1.43.3':
+    dependencies:
+      proxy-compare: 3.0.1
+
+  '@zag-js/types@1.43.3':
+    dependencies:
+      csstype: 3.2.3
+
+  '@zag-js/utils@1.43.3': {}
+
   acorn-jsx@5.3.2(acorn@8.18.0):
     dependencies:
       acorn: 8.18.0
@@ -10305,6 +10464,8 @@ snapshots:
       react-is: 17.0.2
 
   property-information@7.2.0: {}
+
+  proxy-compare@3.0.1: {}
 
   publint@0.3.24:
     dependencies:
