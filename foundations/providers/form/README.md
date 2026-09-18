@@ -50,9 +50,21 @@ return (
 
 The hook starts from the schema's defaults, puts the schema in the form's dynamic slot, and moves
 focus to the first refused field on a submit. `form.Fields` draws the members the presentation
-states, or every field where it states none, or the steps with the controls between them. A form
-written by hand draws `form.AppField` itself and `<form.Fields of={["vat"]} />` for a field on a
-condition.
+states, or every field where it states none, or the steps with the controls between them. Every
+other option is the library's own: `validators` for a rule across fields, `listeners`,
+`onSubmitMeta`, and `fieldOptions` for a rule on one field by its path, typed over the field's
+value.
+
+```ts
+const form = useSchemaForm<Signup>({
+  fieldOptions: { username: { validators: { onBlurAsync: taken, onBlurAsyncDebounceMs: 300 } } },
+  schema: signup,
+  validators: { onSubmit: apart },
+});
+```
+
+A form written by hand draws `form.AppField` itself and `<form.Fields of={["vat"]} />` for a field
+on a condition.
 
 Keep the form across a refresh, and start an edit form from a record:
 

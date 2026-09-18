@@ -15,6 +15,8 @@ a form is drawn as data, puts the engine, the renderers and the translator in sc
   members given.
 - Attach the schema, the presentation, the engine, the translator and the draft to the form, read
   back through `useProperty`, `useWords`, `useResolved` and `descriptionOf`.
+- Take the library's own form options beside the schema, and a field's options by presentation path
+  in `fieldOptions`, typed over the value at that path.
 - Add `schemaFormOptions`, `leaveStep`, `propertyOf`, `requiredIn`, `choicesOf`, `textOf`, `bound`,
   `countAt`, `valueAt`, `interpolate` and the `<id>.actions.<name>` identifier.
 - Interpolate `{{name}}` in `translateFrom` and `untranslated`.

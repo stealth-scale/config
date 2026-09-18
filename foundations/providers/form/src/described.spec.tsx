@@ -79,7 +79,7 @@ describe("useDescription", () => {
     expect(result.current.engine).toBe(defaultEngine());
     expect(result.current.renderers).toStrictEqual([own]);
     expect(result.current.translate).toBe(untranslated);
-    expect(result.current.fieldValidators).toStrictEqual({});
+    expect(result.current.fieldOptions).toStrictEqual({});
   });
 
   it("reads the provider's engine and translator and appends its renderers", () => {

@@ -6,7 +6,13 @@ import { type StandardJSONSchemaV1, type StandardSchemaV1 } from "@standard-sche
 import {
   type AppFieldExtendedReactFormApi,
   type createFormHook,
+  type DeepKeys,
+  type DeepValue,
+  type FieldAsyncValidateOrFn,
+  type FieldOptions,
+  type FieldValidateOrFn,
   type FormAsyncValidateOrFn,
+  type FormOptions,
   type FormValidateOrFn,
   type FormValidators,
 } from "@tanstack/react-form";
@@ -14,7 +20,6 @@ import {
 import { type Engine } from "#engine.ts";
 import { type Path } from "#path.ts";
 import { type Presentation } from "#presentation.ts";
-import { type FieldRules } from "#registry.ts";
 import { type Schema } from "#schema.ts";
 import { type Translate } from "#translate.ts";
 import { type DraftOptions } from "#use-draft.ts";
@@ -58,6 +63,27 @@ export type SchemaValidators<Values> = Omit<
 >;
 
 /**
+ * Describes the library's own form options as a form over a schema fills them: the schema in
+ * the dynamic slot, every other slot open, and the submit meta unstated.
+ *
+ * @typeParam Values - The form's values.
+ */
+export type LibraryOptions<Values> = FormOptions<
+  Values,
+  Sync<Values>,
+  Sync<Values>,
+  Async<Values>,
+  Sync<Values>,
+  Async<Values>,
+  Sync<Values>,
+  Async<Values>,
+  StandardSchemaV1<Values>,
+  Async<Values>,
+  Async<Values>,
+  unknown
+>;
+
+/**
  * Describes the form the hook builds: the library's own form, with the schema in the dynamic
  * slot and the components bound.
  *
@@ -88,6 +114,68 @@ export type SchemaForm<
 >;
 
 /**
+ * Writes a presentation path as the library names the field: each `[]` as an index.
+ */
+type Uncollapsed<P extends string> = P extends `${infer Head}[]${infer Rest}`
+  ? `${Head}[${number}]${Uncollapsed<Rest>}`
+  : P;
+
+/**
+ * Describes a synchronous validator slot of one field, filled or not.
+ */
+type FieldSync<Values, Name extends DeepKeys<Values>> =
+  | FieldValidateOrFn<Values, Name, DeepValue<Values, Name>>
+  | undefined;
+
+/**
+ * Describes an asynchronous validator slot of one field, filled or not.
+ */
+type FieldAsync<Values, Name extends DeepKeys<Values>> =
+  | FieldAsyncValidateOrFn<Values, Name, DeepValue<Values, Name>>
+  | undefined;
+
+/**
+ * Describes the library's own options a form over a schema adds to one of its fields: the
+ * validators, the listeners, and how its asynchronous validators run. The name and the default
+ * are the foundation's.
+ *
+ * @typeParam Values - The form's values.
+ * @typeParam Name - The field, as the library names it.
+ */
+export type SchemaFieldOptions<Values, Name extends DeepKeys<Values>> = Pick<
+  FieldOptions<
+    Values,
+    Name,
+    DeepValue<Values, Name>,
+    FieldSync<Values, Name>,
+    FieldSync<Values, Name>,
+    FieldAsync<Values, Name>,
+    FieldSync<Values, Name>,
+    FieldAsync<Values, Name>,
+    FieldSync<Values, Name>,
+    FieldAsync<Values, Name>,
+    FieldSync<Values, Name>,
+    FieldAsync<Values, Name>
+  >,
+  "asyncAlways" | "asyncDebounceMs" | "listeners" | "validators"
+>;
+
+/**
+ * Describes the options of a form's fields, by the path of the field each applies to.
+ *
+ * @remarks
+ *   A path is written as the presentation writes it, with `[]` for an array's items, so one entry
+ *   covers every row of a repeat group. Each entry is typed over the value at that path, so a
+ *   validator reads the value as the field holds it.
+ * @typeParam Values - The form's values.
+ */
+export type FieldOptionsByPath<Values> = {
+  readonly [P in Path<Values>]?: Uncollapsed<P> extends infer Name extends DeepKeys<Values>
+    ? SchemaFieldOptions<Values, Name>
+    : never;
+};
+
+/**
  * Describes where a form's draft is kept.
  */
 export interface DraftScope extends Pick<DraftOptions, "app" | "store"> {
@@ -99,23 +187,19 @@ export interface DraftScope extends Pick<DraftOptions, "app" | "store"> {
 }
 
 /**
- * Describes what the submit handler of a form over a schema is handed.
+ * Describes what a form built from a schema is given: the library's own form options, less the
+ * defaults and the validators the schema fills, and what the schema adds.
  *
- * @typeParam Values - The form's values.
- */
-export interface Submitted<Values> {
-  /**
-   * The values, which the schema accepted.
-   */
-  readonly value: Values;
-}
-
-/**
- * Describes what a form built from a schema is given.
- *
+ * @remarks
+ *   `onSubmit` receives the library's own props. The draft is forgotten once it returns. A
+ *   `listeners.onChange` runs beside the draft's own, under the debounce the listeners state or
+ *   the foundation's.
  * @typeParam Values - The form's values, stated by the caller. A schema carries no static type.
  */
-export interface UseSchemaFormOptions<Values> {
+export interface UseSchemaFormOptions<Values> extends Omit<
+  LibraryOptions<Values>,
+  "defaultValues" | "validators"
+> {
   /**
    * Where the form is kept across a refresh. The form keeps no draft where this is absent.
    */
@@ -128,21 +212,16 @@ export interface UseSchemaFormOptions<Values> {
   readonly engine?: Engine | undefined;
 
   /**
-   * The library's own field validators, by the path of the field each applies to, which the
-   * form writes onto each field it draws.
+   * The library's own field options, by the path of the field each applies to, which the form
+   * writes onto each field it draws.
    */
-  readonly fieldValidators?: Readonly<Partial<Record<Path<Values>, FieldRules>>> | undefined;
+  readonly fieldOptions?: FieldOptionsByPath<Values> | undefined;
 
   /**
    * The identifier every message identifier of the form begins with. The presentation's, the
    * schema's `x-form.id`, or `form`, where this is absent.
    */
   readonly id?: string | undefined;
-
-  /**
-   * Receives the values once every rule passes. The draft is forgotten once it returns.
-   */
-  readonly onSubmit?: ((submitted: Submitted<Values>) => Promise<void> | void) | undefined;
 
   /**
    * How the form is drawn, stated beside the schema. Takes precedence over the schema's own

@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import { FieldMember } from "#field-member.tsx";
 import { useSchemaForm } from "#hooks.fixtures.ts";
-import { type FieldRules } from "#registry.ts";
+import { type FieldOptionsByPath } from "#schema-form.ts";
 import { type Schema } from "#schema.ts";
 
 const signup: Schema = {
@@ -43,19 +43,15 @@ const business: Schema = {
  * Builds a form from the schema and draws one member of it over the resolved schema given.
  */
 function Page({
+  fieldOptions,
   path,
   resolved = signup,
-  rules,
 }: {
+  readonly fieldOptions?: FieldOptionsByPath<Record<string, unknown>> | undefined;
   readonly path: string;
   readonly resolved?: Schema | undefined;
-  readonly rules?: FieldRules | undefined;
 }): ReactElement {
-  const form = useSchemaForm({
-    fieldValidators: rules === undefined ? undefined : { [path]: rules },
-    schema: signup,
-    values: { name: "Roy" },
-  });
+  const form = useSchemaForm({ fieldOptions, schema: signup, values: { name: "Roy" } });
 
   return (
     <form.AppForm>
@@ -97,15 +93,23 @@ describe("FieldMember", () => {
     expect(getByLabelText("Vat").getAttribute("aria-required")).toBe("true");
   });
 
-  it("writes the field validators given onto the field", () => {
-    const rules: FieldRules = {
-      onChange: ({ value }: { value: unknown }) =>
-        value === "x" ? { keyword: "taken" } : undefined,
+  it("writes the field options given for the path onto the field", () => {
+    const seen: unknown[] = [];
+    const fieldOptions: FieldOptionsByPath<Record<string, unknown>> = {
+      name: {
+        listeners: {
+          onChange: ({ value }) => {
+            seen.push(value);
+          },
+        },
+        validators: { onChange: ({ value }) => (value === "x" ? { keyword: "taken" } : undefined) },
+      },
     };
-    const { getByLabelText, getByRole } = render(<Page path="name" rules={rules} />);
+    const { getByLabelText, getByRole } = render(<Page fieldOptions={fieldOptions} path="name" />);
 
     fireEvent.change(getByLabelText("Full name"), { target: { value: "x" } });
 
     expect(getByRole("alert").textContent).toBe("taken");
+    expect(seen).toStrictEqual(["x"]);
   });
 });

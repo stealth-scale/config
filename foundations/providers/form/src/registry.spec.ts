@@ -9,7 +9,7 @@ import { untranslated } from "#translate.ts";
 const description: FormDescription = {
   draft: { clear: vi.fn<() => void>(), restored: undefined, write: vi.fn<() => void>() },
   engine: defaultEngine(),
-  fieldValidators: {},
+  fieldOptions: {},
   id: "checkout",
   layouts,
   presentation: { id: "checkout" },

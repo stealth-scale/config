@@ -27,6 +27,22 @@ export interface Drawing {
 }
 
 /**
+ * Describes the two members of the options that are typed over the form's values and are kept
+ * untyped in the description, as one object so that one assertion widens both.
+ */
+interface Typed {
+  /**
+   * The field options, by path.
+   */
+  readonly fieldOptions: FormDescription["fieldOptions"];
+
+  /**
+   * How the form is drawn.
+   */
+  readonly presentation: Presentation;
+}
+
+/**
  * Builds the description of a form, less the draft, from the options and the environment.
  *
  * @remarks
@@ -47,17 +63,20 @@ export function useDescription<Values>(
   const schema = schemaOf(options.schema);
   const given =
     options.id === undefined ? options.presentation : { ...options.presentation, id: options.id };
-  // eslint-disable-next-line typescript/no-unsafe-type-assertion -- a presentation over typed values is one over unknown values with its paths narrowed, which the compiler cannot relate across a type parameter
-  const presentation = presentationOf(schema, given) as Presentation;
+  // eslint-disable-next-line typescript/no-unsafe-type-assertion -- a presentation and field options over typed values are the untyped ones with their paths narrowed, which the compiler cannot relate across a type parameter
+  const typed = {
+    fieldOptions: options.fieldOptions ?? {},
+    presentation: presentationOf(schema, given),
+  } as Typed;
 
-  validatePresentation(presentation, engine.paths(schema));
+  validatePresentation(typed.presentation, engine.paths(schema));
 
   return {
     engine,
-    fieldValidators: options.fieldValidators ?? {},
-    id: presentation.id,
+    fieldOptions: typed.fieldOptions,
+    id: typed.presentation.id,
     layouts: drawing.layouts,
-    presentation,
+    presentation: typed.presentation,
     renderers: [...drawing.renderers, ...environment.renderers],
     schema,
     translate: options.translate ?? environment.translate,

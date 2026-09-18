@@ -55,8 +55,8 @@ function Page({
   readonly values?: Partial<Signup> | undefined;
 }): ReactElement {
   const form = useSchemaForm<Signup>({
+    ...(onSubmit && { onSubmit }),
     draft: store && { app: "docs", store },
-    onSubmit,
     schema: signup,
     validators,
     values,
@@ -145,7 +145,9 @@ describe("useSchemaForm", () => {
     fireEvent.click(getByRole("button"));
 
     await waitFor(() => {
-      expect(onSubmit).toHaveBeenCalledWith({ value: { name: "Roy", password: "" } });
+      expect(onSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({ value: { name: "Roy", password: "" } }),
+      );
     });
     expect(store.read(KEY)).toBeNull();
   });
@@ -183,6 +185,49 @@ describe("useSchemaForm", () => {
     await waitFor(() => {
       expect(() => getByRole("alert")).toThrow(/Unable to find/u);
     });
+  });
+
+  it("runs the listener given beside the draft's and hands the submit handler the form", async () => {
+    const seen: string[] = [];
+    const store = memoryStore();
+
+    /**
+     * Builds the form with a change listener and a submit handler reading the form.
+     */
+    function Listened(): ReactElement {
+      const form = useSchemaForm<Signup>({
+        draft: { app: "docs", store },
+        listeners: {
+          onChange: ({ formApi }) => {
+            seen.push(`changed ${formApi.state.values.name}`);
+          },
+          onChangeDebounceMs: 0,
+        },
+        onSubmit: ({ formApi, value }) => {
+          seen.push(`submitted ${value.name} ${formApi.state.submissionAttempts}`);
+        },
+        schema: signup,
+      });
+
+      return (
+        <form.AppForm>
+          <form.Form>
+            <form.Fields />
+            <form.Submit />
+          </form.Form>
+        </form.AppForm>
+      );
+    }
+
+    const { getByLabelText, getByRole } = render(<Listened />);
+
+    fireEvent.change(getByLabelText("Name"), { target: { value: "Roy" } });
+    fireEvent.click(getByRole("button"));
+
+    await waitFor(() => {
+      expect(seen).toStrictEqual(["changed Roy", "submitted Roy 1"]);
+    });
+    expect(store.read(KEY)).toBeNull();
   });
 
   it("runs the form validators given in their own slots", async () => {

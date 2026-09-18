@@ -8,7 +8,7 @@ import { createFormHook } from "@tanstack/react-form";
 import { fieldContext, formContext } from "#contexts.ts";
 import { type Drawing, useDescription } from "#described.ts";
 import { Fields } from "#fields.tsx";
-import { schemaFormOptions } from "#form-options.ts";
+import { libraryOptionsOf } from "#form-options.ts";
 import { type Layouts } from "#layouts.ts";
 import { describeForm } from "#registry.ts";
 import { type Renderer } from "#renderer.ts";
@@ -81,9 +81,10 @@ export interface SchemaFormHooks<
    * @remarks
    *   The schema's defaults are the values to start from, with the values given and then the
    *   draft's written over them. The schema is the validator in the dynamic slot, and the
-   *   caller's validators fill the other slots. The form's change listener writes the draft,
-   *   debounced, and a submit that returns forgets it. The form carries `Fields`, which draws
-   *   it from its presentation.
+   *   caller's validators fill the other slots. Every other option is the library's own and
+   *   reaches the form as it is. The form's change listener writes the draft, debounced, and a
+   *   submit that returns forgets it. The form carries `Fields`, which draws it from its
+   *   presentation.
    * @typeParam Values - The form's values, stated by the caller. A record of unknown values
    *   where the caller states none, which is what a generated form has.
    */
@@ -103,11 +104,6 @@ export interface SchemaFormHooks<
    */
   readonly withForm: ReturnType<typeof createFormHook<FieldComponents, FormComponents>>["withForm"];
 }
-
-/**
- * How long after a change the draft is written, in milliseconds.
- */
-const DEBOUNCE = 300;
 
 /**
  * Binds a component package's components to the form foundation.
@@ -141,7 +137,7 @@ export function createSchemaForm<
     options: UseSchemaFormOptions<Values>,
   ): SchemaForm<Values, FieldComponents, FormComponents & Generated> {
     const description = useDescription(options, drawing);
-    const { draft: scope, onSubmit, validators, values } = options;
+    const scope = options.draft;
     const draft = useDraft<Values>(
       scope && {
         app: scope.app,
@@ -150,24 +146,7 @@ export function createSchemaForm<
         store: scope.store,
       },
     );
-    const shared = schemaFormOptions<Values>(description.schema, {
-      engine: description.engine,
-      values: draft.restored?.values ?? values,
-    });
-    const form = hook.useAppForm({
-      ...shared,
-      listeners: {
-        onChange: ({ formApi }) => {
-          draft.write(formApi.state.values);
-        },
-        onChangeDebounceMs: DEBOUNCE,
-      },
-      onSubmit: async ({ value }) => {
-        await onSubmit?.({ value });
-        draft.clear();
-      },
-      validators: { ...validators, onDynamic: shared.validators.onDynamic },
-    });
+    const form = hook.useAppForm(libraryOptionsOf(options, description, draft));
 
     describeForm(form, { ...description, draft });
 

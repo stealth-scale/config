@@ -75,9 +75,10 @@ export {
 } from "#renderer.ts";
 export {
   type DraftScope,
+  type FieldOptionsByPath,
+  type SchemaFieldOptions,
   type SchemaForm,
   type SchemaValidators,
-  type Submitted,
   type UseSchemaFormOptions,
 } from "#schema-form.ts";
 export { DRAFT, type Schema, schemaOf } from "#schema.ts";

@@ -14,9 +14,13 @@ import { type Translate } from "#translate.ts";
 import { type DraftHandle } from "#use-draft.ts";
 
 /**
- * Describes the library's own field validators, as a field of a generated form takes them.
+ * Describes the library's own options a generated field takes beside its name and its default,
+ * typed over any field: the validators, the listeners, and how its asynchronous validators run.
  */
-export type FieldRules = NonNullable<AnyFieldApi["options"]["validators"]>;
+export type FieldRules = Pick<
+  AnyFieldApi["options"],
+  "asyncAlways" | "asyncDebounceMs" | "listeners" | "validators"
+>;
 
 /**
  * Describes a form built from a schema: what it validates with, what it is drawn from, and what
@@ -34,9 +38,9 @@ export interface FormDescription {
   readonly engine: Engine;
 
   /**
-   * The library's own field validators, by the path of the field each applies to.
+   * The library's own field options, by the path of the field each applies to.
    */
-  readonly fieldValidators: Readonly<Partial<Record<string, FieldRules>>>;
+  readonly fieldOptions: Readonly<Partial<Record<string, FieldRules>>>;
 
   /**
    * The identifier every message identifier of the form begins with.

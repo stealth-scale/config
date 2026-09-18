@@ -41,11 +41,12 @@ export interface FieldMemberProps {
  *   only where the condition holds. A member no renderer suits is skipped as well. A field the
  *   values have no value for, such as one on a condition the values built from the schema never
  *   met, starts from the property's own default. A field with a value keeps it, because a field's
- *   own default is written over an untouched value when the field mounts.
+ *   own default is written over an untouched value when the field mounts. The field options given
+ *   for the path are written onto the field as they are.
  */
 export function FieldMember({ indices, path, resolved }: FieldMemberProps): null | ReactElement {
   const form = useAnyForm();
-  const { engine, fieldValidators, layouts, presentation, renderers } = describedForm(form);
+  const { engine, fieldOptions, layouts, presentation, renderers } = describedForm(form);
   const schema = propertyOf(resolved, path);
   const setting = presentation.fields?.[path] ?? {};
   const renderer = schema === undefined ? undefined : rendererFor(renderers, setting, schema);
@@ -56,10 +57,9 @@ export function FieldMember({ indices, path, resolved }: FieldMemberProps): null
   const Draw = renderer.draw;
   const name = bound(path, indices);
   const missing = form.getFieldValue(name) === undefined;
-  const rules = fieldValidators[path];
   const options = {
     ...(missing && { defaultValue: defaultsOf(schema, undefined, engine) }),
-    ...(rules !== undefined && { validators: rules }),
+    ...fieldOptions[path],
   };
 
   return (
