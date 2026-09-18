@@ -4,8 +4,8 @@
 
 import { manifestAt, owning, text } from "@stealthscale/vite-plugin-base";
 
-import { type Read, type Source } from "#contract.ts";
-import { FRAGMENTS } from "#options.ts";
+import { type Anatomy, type Read, type Source } from "#contract.ts";
+import { FRAGMENTS, PROPS } from "#options.ts";
 import { isRefused, read } from "#read.ts";
 
 /**
@@ -76,9 +76,10 @@ export function ownerOf(path: string): string {
  * Generates the loader properties of one listing.
  *
  * @remarks
- *   A refused file loads a rejection carrying the reason, and carries no fragments loader.
+ *   A refused file loads a rejection carrying the reason, and carries neither a fragments nor a
+ *   props loader. `propped` states whether the index was asked to read props at all.
  */
-function loaders(result: Read): readonly string[] {
+function loaders(result: Read, propped: boolean): readonly string[] {
   const source = `    source: () => import(${JSON.stringify(`${result.path}?raw`)}),`;
 
   if (isRefused(result)) {
@@ -88,6 +89,7 @@ function loaders(result: Read): readonly string[] {
   return [
     `    fragments: () => import(${JSON.stringify(`${FRAGMENTS}${result.id}`)}),`,
     `    load: () => import(${JSON.stringify(result.path)}),`,
+    ...(propped ? [`    props: () => import(${JSON.stringify(`${PROPS}${result.id}`)}),`] : []),
     source,
   ];
 }
@@ -125,8 +127,8 @@ function metadata(result: Read, root: string): readonly string[] {
  *   The import specifier stays absolute, because that is what the bundler resolves. Only the
  *   displayed path is made relative to the root.
  */
-function listing(result: Read, root: string): string {
-  return ["  {", ...metadata(result, root), ...loaders(result), "  }"].join("\n");
+function listing(result: Read, root: string, propped: boolean): string {
+  return ["  {", ...metadata(result, root), ...loaders(result, propped), "  }"].join("\n");
 }
 
 /**
@@ -142,6 +144,7 @@ function listing(result: Read, root: string): string {
 export function listings(
   resolved: Resolved,
   files: readonly Source[],
+  propped = false,
 ): ReadonlyMap<string, Listed> {
   const results = read(files);
   const refused = results.filter((result) => isRefused(result));
@@ -159,7 +162,7 @@ export function listings(
       result.path,
       {
         id: isRefused(result) ? undefined : result.id,
-        listing: listing(result, resolved.root),
+        listing: listing(result, resolved.root, propped),
       },
     ]),
   );
@@ -181,4 +184,18 @@ export function written(listed: Iterable<string>): string {
  */
 export function fragmented(snippets: Readonly<Record<string, string>>): string {
   return `export const fragments = ${JSON.stringify(snippets)};\n`;
+}
+
+/**
+ * Generates the module a catalogue imports one page's props from.
+ *
+ * @param anatomy - The page's parts, what each accepts, and what was dropped.
+ */
+export function anatomised(anatomy: Anatomy): string {
+  return [
+    `export const dropped = ${JSON.stringify(anatomy.dropped)};`,
+    `export const parts = ${JSON.stringify(anatomy.parts)};`,
+    `export const shapes = ${JSON.stringify(anatomy.shapes)};`,
+    "",
+  ].join("\n");
 }

@@ -10,7 +10,8 @@ import {
   withScratchWorkspaceAsync,
 } from "@stealthscale/testing";
 
-import { FRAGMENTS, ID } from "#options.ts";
+import { kit } from "#anatomy/kit.fixtures.ts";
+import { FRAGMENTS, ID, PROPS } from "#options.ts";
 import { specimens } from "#plugin.ts";
 
 const RESOLVED = `\0${ID}`;
@@ -47,7 +48,16 @@ function index(files: Readonly<Record<string, string>> = TREE): Promise<string> 
 
 type Handler = (...args: readonly unknown[]) => unknown;
 
-function hookOf(plugin: Plugin, name: "config" | "configureServer" | "hotUpdate"): Handler {
+function reading(scratch: ScratchWorkspace): Promise<Plugin> {
+  const plugin = specimens({ patterns: PATTERNS, props: {} });
+
+  return configured(plugin, { command: "serve", root: scratch.root }).then(() => plugin);
+}
+
+function hookOf(
+  plugin: Plugin,
+  name: "closeBundle" | "config" | "configureServer" | "hotUpdate",
+): Handler {
   const hook: unknown = plugin[name];
 
   if (typeof hook !== "function") throw new Error(`the plugin has no ${name} hook`);
@@ -213,5 +223,108 @@ describe("plugin", () => {
 
   it("throws when the patterns match no file", async () => {
     await expect(index({ "src/a.ts": "" })).rejects.toThrow(/matched no file/u);
+  });
+
+  it("carries a props loader on every page of the index", async () => {
+    const held = await withScratchWorkspaceAsync(kit(), async (scratch) => {
+      const plugin = await reading(scratch);
+
+      return (await loaded(plugin, RESOLVED)) ?? "";
+    });
+
+    expect(held).toMatch(/props: \(\) => import\("virtual:specimen-props\/badge"\)/u);
+  });
+
+  it("serves what a page's components accept", async () => {
+    const held = await withScratchWorkspaceAsync(kit(), async (scratch) => {
+      const plugin = await reading(scratch);
+
+      await loaded(plugin, RESOLVED);
+
+      return (await loaded(plugin, `\0${PROPS}badge`)) ?? "";
+    });
+
+    expect(held).toMatch(/export const parts = \{"BadgeProps"/u);
+  });
+
+  it("serves what each part resolves to that no table draws", async () => {
+    const held = await withScratchWorkspaceAsync(kit(), async (scratch) => {
+      const plugin = await reading(scratch);
+
+      await loaded(plugin, RESOLVED);
+
+      return (await loaded(plugin, `\0${PROPS}badge`)) ?? "";
+    });
+
+    expect(held).toMatch(/export const dropped = \{"BadgeProps":\{"conditions":2/u);
+  });
+
+  it("resolves a props specifier to an identifier of its own", async () => {
+    await expect(
+      resolved(specimens({ patterns: PATTERNS, props: {} }), `${PROPS}badge`),
+    ).resolves.toBe(`\0${PROPS}badge`);
+  });
+
+  it("declines a props module when the repository reads no props", async () => {
+    const held = await withScratchWorkspaceAsync(kit(), async (scratch) => {
+      const plugin = specimens({ patterns: PATTERNS });
+
+      await configured(plugin, { command: "serve", root: scratch.root });
+      await loaded(plugin, RESOLVED);
+
+      return loaded(plugin, `\0${PROPS}badge`);
+    });
+
+    expect(held).toBeUndefined();
+  });
+
+  it("reloads every loaded props module when a typed file changed", async () => {
+    const held = await withScratchWorkspaceAsync(kit(), async (scratch) => {
+      const plugin = await reading(scratch);
+
+      await loaded(plugin, RESOLVED);
+      await loaded(plugin, `\0${PROPS}badge`);
+
+      return updating(plugin, scratch.path("src/badge/badge.ts"), "", [`\0${PROPS}badge`]);
+    });
+
+    expect(held).toHaveLength(1);
+  });
+
+  it("reloads nothing for a file the index refused while reading props", async () => {
+    const broken = { ...kit(), "src/broken.specimen.tsx": "export default 1;\n" };
+    const held = await withScratchWorkspaceAsync(broken, async (scratch) => {
+      const plugin = await reading(scratch);
+
+      await loaded(plugin, RESOLVED);
+      await loaded(plugin, `\0${PROPS}badge`);
+
+      return updating(plugin, scratch.path("src/badge/badge.ts"), "", [`\0${PROPS}badge`]);
+    });
+
+    expect(held).toHaveLength(1);
+  });
+
+  it("stops the compiler when the bundle closes", async () => {
+    const closed = await withScratchWorkspaceAsync(kit(), async (scratch) => {
+      const plugin = await reading(scratch);
+
+      await loaded(plugin, RESOLVED);
+      await loaded(plugin, `\0${PROPS}badge`);
+
+      return Reflect.apply(hookOf(plugin, "closeBundle"), undefined, []);
+    });
+
+    expect(closed).toBeUndefined();
+  });
+
+  it("stops without complaint when no compiler was started", async () => {
+    const closed = await withScratchWorkspaceAsync(kit(), async (scratch) => {
+      const plugin = await reading(scratch);
+
+      return Reflect.apply(hookOf(plugin, "closeBundle"), undefined, []);
+    });
+
+    expect(closed).toBeUndefined();
   });
 });

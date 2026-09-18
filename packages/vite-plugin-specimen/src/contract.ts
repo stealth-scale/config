@@ -8,6 +8,119 @@
  */
 
 /**
+ * Selects the group a table draws a prop's row under.
+ *
+ * @remarks
+ *   A variant is declared by the component's recipe and is the axis a theme moves. An option is
+ *   declared by the component's own source and is everything else it accepts. A property declared
+ *   anywhere else is dropped, and counted rather than hidden.
+ */
+export type Kind = "option" | "variant";
+
+/**
+ * Describes one prop, flattened to what a table draws.
+ */
+export interface Prop {
+  /**
+   * The type as the compiler prints it, without the optional half.
+   */
+  accepts: string;
+
+  /**
+   * The value the component falls back to when nobody passes the prop. Empty where the
+   * declaration states none.
+   */
+  fallback: string;
+
+  /**
+   * Which kind of prop it is, which is what a table groups by.
+   */
+  kind: Kind;
+
+  /**
+   * The name a caller writes.
+   */
+  name: string;
+
+  /**
+   * The named types this prop's type refers to, so a table can show what is in them. Sorted.
+   */
+  refers: string[];
+
+  /**
+   * Whether a caller has to pass it.
+   */
+  required: boolean;
+
+  /**
+   * The opening sentence of the prop's doc comment. Empty for most variants, because a recipe
+   * generates its axes rather than documenting them.
+   */
+  says: string;
+}
+
+/**
+ * Describes one member of a type a prop refers to.
+ */
+export interface Member {
+  /**
+   * The member's type as the compiler prints it. Empty for an option of a union, which has a name
+   * and no type of its own.
+   */
+  accepts: string;
+
+  /**
+   * The member's name, or the option as it prints.
+   */
+  name: string;
+
+  /**
+   * The opening sentence of the member's doc comment. Empty where it has none.
+   */
+  says: string;
+}
+
+/**
+ * Counts the properties a part resolves to that no table draws.
+ *
+ * @remarks
+ *   Reported rather than hidden. One root resolves to 1341 properties of which six are its own, and
+ *   a table that silently drops 1335 of them is a table nobody can trust.
+ */
+export interface Dropped {
+  /**
+   * Properties with no declaration at all, which is what a styling condition resolves to.
+   */
+  conditions: number;
+
+  /**
+   * Properties declared outside the component's package and outside a recipe: the style props, the
+   * rendering library's own, and the factory's.
+   */
+  foreign: number;
+}
+
+/**
+ * Describes what one page's components accept.
+ */
+export interface Anatomy {
+  /**
+   * The properties each part resolves to that no table draws, keyed by the part.
+   */
+  dropped: Record<string, Dropped>;
+
+  /**
+   * Every part against the props it takes, each sorted by name.
+   */
+  parts: Record<string, Prop[]>;
+
+  /**
+   * The named types those props refer to, keyed by the package that declared them and the name.
+   */
+  shapes: Record<string, Member[]>;
+}
+
+/**
  * Describes one specimen file as the reader receives it.
  */
 export interface Source {
@@ -142,6 +255,15 @@ export interface Indexed {
    * The path of the file relative to the project root, with forward slashes on every platform.
    */
   path: string;
+
+  /**
+   * Loads what the page's components accept, read out of their types.
+   *
+   * @remarks
+   *   Present where the index was asked to read props, and absent on a file that declares no page.
+   *   Split like the scenes, so a catalogue pays for a page's props only where somebody opens them.
+   */
+  props?: (() => Promise<Anatomy>) | undefined;
 
   /**
    * Loads the text of the file.

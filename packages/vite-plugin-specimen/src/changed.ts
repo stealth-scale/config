@@ -69,6 +69,24 @@ export async function reindexes(
 }
 
 /**
+ * Matches a file the compiler reads, whatever the change to it was.
+ */
+const TYPED = /\.[cm]?[jt]sx?$/u;
+
+/**
+ * Returns true when a change makes what the compiler last read stale.
+ *
+ * @remarks
+ *   Any typed file under a searched directory, rather than the ones a page reaches. The compiler
+ *   answers a page afresh in tens of milliseconds, and working out which pages a type change
+ *   reaches would cost more than that.
+ * @param roots - The absolute directories the patterns start searching in.
+ */
+export function retyped(roots: readonly string[], file: string): boolean {
+  return TYPED.test(file) && roots.some((root) => file.startsWith(`${root}/`));
+}
+
+/**
  * Returns the identifier of the page a file declares.
  *
  * @returns The identifier, or undefined when the index lists no page for the file.

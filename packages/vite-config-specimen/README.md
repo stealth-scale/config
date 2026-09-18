@@ -53,11 +53,16 @@ export default defineConfig(import.meta.dirname, {
 `patterns` has no default. A pattern resolves against the application root, and an application that
 shows a catalogue of a workspace's components sits beside those components rather than above them.
 
-`catalogue()` adds two things: the index plugin, and every specimen as an entry the dependency scan
-walks before the server starts. A specimen is reached through a dynamic import the scan does not
-follow, so without the entries the first page a reader opens re-optimises and reloads the catalogue.
+State `props` to have each page carry what its components accept, resolved out of their types. Left
+out, nothing loads a compiler. Every member of `Options` reaches the plugin as written, and the
+plugin's README documents what a page then gets.
 
-Naming the entries disables Vite's own inference, which is why `**/*.html` is named beside them.
+`catalogue()` adds the index plugin, and every specimen as an entry the dependency scan walks before
+the server starts. A specimen is reached through a dynamic import the scan does not follow, so
+without the entries the first page a reader opens re-optimises and reloads the catalogue.
+
+Naming the entries stops Vite working the entries out for itself, which is why `**/*.html` is named
+beside them.
 
 ## The workspace root
 

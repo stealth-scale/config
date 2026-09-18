@@ -66,7 +66,13 @@
   },
   "peerDependencies": {
     "@stealthscale/vite-plugin-base": "workspace:^",
+    "typescript": "catalog:",
     "vite": "catalog:peer"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
   },
   "engines": {
     "node": ">=26.0.0"

@@ -11,11 +11,13 @@ import {
   type UserConfig,
 } from "vite";
 
-import { type Changed, type Indexing, pageOf, pathOf, reindexes } from "#changed.ts";
-import { fragmented, type Listed, listings, type Resolved, written } from "#emit.ts";
+import { type Compiler } from "#anatomy/compiler.ts";
+import { type Settled, settled } from "#anatomy/reading.ts";
+import { type Changed, type Indexing, pageOf, pathOf, reindexes, retyped } from "#changed.ts";
+import { anatomised, fragmented, type Listed, listings, type Resolved, written } from "#emit.ts";
 import { found, roots } from "#found.ts";
 import { fragments } from "#fragments.ts";
-import { FRAGMENTS, ID, type Options } from "#options.ts";
+import { FRAGMENTS, ID, type Options, PROPS } from "#options.ts";
 
 /**
  * The resolved identifier of the index, whose leading NUL marks the module as this plugin's.
@@ -26,6 +28,11 @@ const RESOLVED = `\0${ID}`;
  * The resolved identifier prefix of a page's fragments. The page's identifier follows it.
  */
 const RESOLVED_FRAGMENTS = `\0${FRAGMENTS}`;
+
+/**
+ * The resolved identifier prefix of a page's props. The page's identifier follows it.
+ */
+const RESOLVED_PROPS = `\0${PROPS}`;
 
 /**
  * The build output the watcher ignores.
@@ -73,7 +80,7 @@ interface Updated extends Changed {
  */
 interface Watching {
   /**
-   * The environment the file changed in.
+   * The environment a file changed in.
    */
   readonly environment: {
     /**
@@ -108,6 +115,16 @@ interface State {
   last: ReadonlyMap<string, Listed>;
 
   /**
+   * The compiler, from the moment a page's props were first asked for.
+   */
+  opening: Promise<Compiler> | undefined;
+
+  /**
+   * The reading a repository stated, or undefined where it reads no props.
+   */
+  reading: Settled | undefined;
+
+  /**
    * The root and command the bundler resolved.
    */
   resolved: Resolved;
@@ -123,20 +140,35 @@ interface State {
  *
  * @returns The generated source, or undefined when the identifier is not this plugin's.
  * @throws {@link Error} When the patterns match nothing, a build meets a file it cannot read, or
- *   the requested fragments belong to no listed page.
+ *   the requested page belongs to no listed specimen.
  */
-function generated(state: State, patterns: readonly string[], id: string): string | undefined {
+async function generated(
+  state: State,
+  patterns: readonly string[],
+  id: string,
+): Promise<string | undefined> {
   if (id === RESOLVED) {
-    state.last = listings(state.resolved, found(state.resolved.root, patterns));
+    const files = found(state.resolved.root, patterns);
+
+    state.last = listings(state.resolved, files, state.reading !== undefined);
 
     return written([...state.last.values()].map((listed) => listed.listing));
   }
 
-  if (!id.startsWith(RESOLVED_FRAGMENTS)) return undefined;
+  if (id.startsWith(RESOLVED_FRAGMENTS)) {
+    const path = pathOf(state, id.slice(RESOLVED_FRAGMENTS.length));
 
-  const path = pathOf(state, id.slice(RESOLVED_FRAGMENTS.length));
+    return fragmented(fragments({ path, text: readFileSync(path, "utf8") }));
+  }
 
-  return fragmented(fragments({ path, text: readFileSync(path, "utf8") }));
+  if (!id.startsWith(RESOLVED_PROPS) || state.reading === undefined) return undefined;
+
+  const path = pathOf(state, id.slice(RESOLVED_PROPS.length));
+  const { compiler } = await import("#anatomy/compiler.ts");
+
+  state.opening ??= compiler(state.resolved.root);
+
+  return anatomised((await state.opening).anatomyOf(path, state.reading));
 }
 
 /**
@@ -156,22 +188,59 @@ function refragmented(
 }
 
 /**
- * Builds the plugin that indexes the specimens the patterns match.
+ * Restarts the compiler on a change to a typed file, and returns every props module that was
+ * loaded.
+ *
+ * @remarks
+ *   Every loaded module rather than the ones the file reaches. Nothing happens where the compiler
+ *   was never started, there being nothing to read again.
+ */
+async function reread(
+  state: State,
+  file: string,
+  graph: Watching["environment"]["moduleGraph"],
+): Promise<EnvironmentModuleNode[]> {
+  if (state.opening === undefined || !retyped(state.watched, file)) return [];
+
+  (await state.opening).restart();
+
+  return [...state.last.values()].flatMap((listed) => {
+    const node =
+      listed.id === undefined ? undefined : graph.getModuleById(`${RESOLVED_PROPS}${listed.id}`);
+
+    return node === undefined ? [] : [node];
+  });
+}
+
+/**
+ * Indexes the specimens the patterns match, and answers that index as a virtual module.
  *
  * @remarks
  *   The index is generated when a catalogue first imports it, and again whenever a page appears,
  *   disappears, or changes the metadata it declares. Editing a scene reloads its page and leaves
  *   the index alone.
- * @param options - Where to search. `Options` documents every member.
+ * @param options - Where to search, and whether to read props. `Options` documents every member.
  */
 export function specimens(options: Options): Plugin {
   const state: State = {
     last: new Map(),
+    opening: undefined,
+    reading: options.props === undefined ? undefined : settled(options.props),
     resolved: { command: "build", root: process.cwd() },
     watched: [],
   };
 
   return {
+    /**
+     * Stops the compiler, where one was started.
+     */
+    async closeBundle(): Promise<void> {
+      const held = await state.opening;
+
+      held?.close();
+      state.opening = undefined;
+    },
+
     /**
      * Excludes build output from the watcher, because the watched directories are whole trees.
      */
@@ -208,7 +277,11 @@ export function specimens(options: Options): Plugin {
       changed: Updated,
     ): Promise<EnvironmentModuleNode[] | undefined> {
       const graph = this.environment.moduleGraph;
-      const reloaded = [...changed.modules, ...refragmented(state, changed.file, graph)];
+      const reloaded = [
+        ...changed.modules,
+        ...refragmented(state, changed.file, graph),
+        ...(await reread(state, changed.file, graph)),
+      ];
       const index = (await reindexes(state, options.patterns, changed))
         ? graph.getModuleById(RESOLVED)
         : undefined;
@@ -219,18 +292,18 @@ export function specimens(options: Options): Plugin {
     },
 
     /**
-     * Serves the index or one page's fragments.
+     * Serves the index, one page's fragments, or one page's props.
      *
      * @remarks
-     *   Served without a source map. Both modules are generated rather than transformed, and the
-     *   bundler generates a map anyway unless the hook returns one explicitly. The maps were four
-     *   fifths of the payload: a 289 kB index carried 232 kB of map, which a catalogue pays on
-     *   every page.
+     *   Served without a source map. Every module here is generated rather than transformed, and
+     *   the bundler generates a map anyway unless the hook returns one explicitly. The maps were
+     *   four fifths of the payload: a 289 kB index carried 232 kB of map, and one compound's props
+     *   5 MB of which 4.3 MB was map.
      * @returns The generated source and a null map, or undefined when the module is not this
      *   plugin's.
      */
-    load(id: string): undefined | Written {
-      const code = generated(state, options.patterns, id);
+    async load(id: string): Promise<undefined | Written> {
+      const code = await generated(state, options.patterns, id);
 
       return code === undefined ? undefined : { code, map: null };
     },
@@ -238,14 +311,14 @@ export function specimens(options: Options): Plugin {
     name: "stealth:specimens",
 
     /**
-     * Claims the index specifier and every fragments specifier.
+     * Claims the index specifier and every fragments and props specifier.
      *
      * @returns The resolved identifier, or undefined for any other import.
      */
     resolveId(id: string): string | undefined {
       if (id === ID) return RESOLVED;
 
-      return id.startsWith(FRAGMENTS) ? `\0${id}` : undefined;
+      return id.startsWith(FRAGMENTS) || id.startsWith(PROPS) ? `\0${id}` : undefined;
     },
   };
 }

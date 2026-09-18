@@ -1,6 +1,8 @@
 /**
- * Declares the specifiers the plugin resolves and the options a repository configures it with.
+ * Names the modules the plugin answers, and describes what a repository configures it with.
  */
+
+import { type Reading } from "#anatomy/reading.ts";
 
 /**
  * The specifier a catalogue imports the index from.
@@ -12,6 +14,11 @@ export const ID = "virtual:specimen-index";
  * follows it.
  */
 export const FRAGMENTS = "virtual:specimen-fragments/";
+
+/**
+ * The specifier prefix a catalogue imports one page's props from. The page's identifier follows it.
+ */
+export const PROPS = "virtual:specimen-props/";
 
 /**
  * Describes what a repository configures the index with.
@@ -28,4 +35,14 @@ export interface Options {
    *   pointing into `node_modules` is how an installed package's specimens are found.
    */
   readonly patterns: readonly string[];
+
+  /**
+   * Reads what each page's components accept, out of their types.
+   *
+   * @remarks
+   *   Left out, no page carries props and no compiler is started. Stated, each page gets a loader
+   *   for its own and the compiler starts when the first page is opened. `Reading` documents every
+   *   member and every member has a default, so `props: {}` turns the reading on.
+   */
+  readonly props?: Reading | undefined;
 }

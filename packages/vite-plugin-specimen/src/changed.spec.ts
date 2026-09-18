@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { type Changed, type Indexing, pageOf, pathOf, reindexes } from "#changed.ts";
+import { type Changed, type Indexing, pageOf, pathOf, reindexes, retyped } from "#changed.ts";
 import { listings } from "#emit.ts";
 
 const ROOT = "/work";
@@ -54,6 +54,16 @@ describe("changed", () => {
     await expect(
       reindexes(indexing(page("data/badge")), PATTERNS, update(page("data/badge"))),
     ).resolves.toBe(false);
+  });
+
+  it.each([
+    { give: `${ROOT}/src/badge/badge.ts`, want: true },
+    { give: `${ROOT}/src/badge/badge.tsx`, want: true },
+    { give: `${ROOT}/src/badge/badge.mjs`, want: true },
+    { give: `${ROOT}/src/badge/styles.css`, want: false },
+    { give: "/elsewhere/badge.ts", want: false },
+  ])("reads $give as making the compiler stale: $want", ({ give, want }) => {
+    expect(retyped([`${ROOT}/src`], give)).toBe(want);
   });
 
   it("returns the identifier of the page a file declares", () => {

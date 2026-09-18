@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { withScratchWorkspace } from "@stealthscale/testing";
 
 import { type Source } from "#contract.ts";
-import { fragmented, listings, ownerOf, type Resolved, written } from "#emit.ts";
+import { anatomised, fragmented, listings, ownerOf, type Resolved, written } from "#emit.ts";
 
 const SERVING: Resolved = { command: "serve", root: "/work" };
 
@@ -101,6 +101,26 @@ describe("emit", () => {
 
   it("writes the pages as one exported list", () => {
     expect(written(["  { id: 1 }"])).toBe("export const pages = [\n  { id: 1 },\n];\n");
+  });
+
+  it("carries a props loader when the index was asked to read props", () => {
+    const held = listings(SERVING, [file("feedback/badge")], true);
+
+    expect(listed(held, "/work/src/badge/badge.specimen.tsx")).toMatch(
+      /props: \(\) => import\("virtual:specimen-props\/feedback\/badge"\)/u,
+    );
+  });
+
+  it("carries no props loader when it was not", () => {
+    const held = listings(SERVING, [file("feedback/badge")]);
+
+    expect(listed(held, "/work/src/badge/badge.specimen.tsx")).not.toMatch(/props:/u);
+  });
+
+  it("writes the anatomy as three exported records", () => {
+    expect(anatomised({ dropped: {}, parts: {}, shapes: {} })).toBe(
+      "export const dropped = {};\nexport const parts = {};\nexport const shapes = {};\n",
+    );
   });
 
   it("writes the fragments as one exported record", () => {
