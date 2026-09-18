@@ -3,7 +3,7 @@
  * a layout, and a repeat group once per item.
  */
 
-import { type ReactElement } from "react";
+import { type ReactElement, useId } from "react";
 
 import { useFormContext } from "#contexts.ts";
 import { FieldMember } from "#field-member.tsx";
@@ -62,6 +62,7 @@ export function Member({ indices, member, resolved }: MemberProps): null | React
   const form = useFormContext();
   const { layouts, translate } = useDescribedForm(form);
   const words = useWords();
+  const id = useId();
 
   if (!isGroup(member)) {
     return <FieldMember indices={indices} path={member} resolved={resolved} />;
@@ -95,6 +96,7 @@ export function Member({ indices, member, resolved }: MemberProps): null | React
       closed={member.closed}
       columns={member.columns}
       direction={member.direction}
+      id={id}
       legend={legend}
     >
       {draw(indices)}

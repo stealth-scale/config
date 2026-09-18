@@ -10,6 +10,13 @@ import { type Path } from "#path.ts";
  */
 export interface Field {
   /**
+   * The purpose of the field as the browser's `autocomplete` attribute names it: `email`,
+   * `given-name`, `postal-code`. Written on the control, so a browser fills it and a person who
+   * finds typing hard is asked once.
+   */
+  readonly autocomplete?: string | undefined;
+
+  /**
    * Selects the renderer that draws it, by the name the renderer registered.
    */
   readonly control?: string | undefined;

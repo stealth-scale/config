@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import { memoryStore, type SettingStore } from "@stealthscale/settings";
 
 import { draftKey, schemaHash, writeDraft } from "#draft.ts";
-import { useSchemaForm } from "#hooks.fixtures.ts";
+import { useJumpingForm, useSchemaForm } from "#hooks.fixtures.ts";
 import { type Steps } from "#presentation.ts";
 import { type Schema } from "#schema.ts";
 import { Stepper } from "#stepper.tsx";
@@ -27,6 +27,21 @@ const wizard: Steps = {
 
 const words = translateFrom({ "profile.about": "About you" });
 const KEY = draftKey("docs", "profile");
+
+/**
+ * Builds a form over the profile with the jumping step layout, in the steps given.
+ */
+function Jumping({ steps }: { readonly steps: Steps }): ReactElement {
+  const form = useJumpingForm({ id: "profile", schema: profile, translate: words });
+
+  return (
+    <form.AppForm>
+      <form.Form>
+        <Stepper resolved={profile} steps={steps} />
+      </form.Form>
+    </form.AppForm>
+  );
+}
 
 /**
  * Builds a form from the schema over the store given and draws it in the steps given.
@@ -130,6 +145,18 @@ describe("Stepper", () => {
     });
   });
 
+  it("moves focus into the step once it is drawn", async () => {
+    const { getByLabelText, getByRole } = render(<Page />);
+
+    fireEvent.change(getByLabelText("Name"), { target: { value: "Roy" } });
+    fireEvent.click(getByRole("button", { name: "Next" }));
+
+    await waitFor(() => {
+      expect(document.activeElement).toBe(getByRole("heading", { level: 2 }));
+    });
+    expect(getByRole("heading", { level: 2 }).textContent).toBe("About you");
+  });
+
   it("moves back without validating", async () => {
     const store = memoryStore();
 
@@ -152,6 +179,48 @@ describe("Stepper", () => {
     await waitFor(() => {
       expect(getByRole("heading", { level: 2 }).textContent).toBe("About you");
     });
+  });
+
+  it("refuses to move a wizard more than one step forward at a time", async () => {
+    const three: Steps = { kind: "wizard", of: [...wizard.of, { name: "done", of: [] }] };
+    const { getByLabelText, getByRole } = render(<Jumping steps={three} />);
+
+    fireEvent.change(getByLabelText("Name"), { target: { value: "Roy" } });
+    fireEvent.click(getByRole("button", { name: "Jump" }));
+    fireEvent.click(getByRole("button", { name: "Next" }));
+
+    await waitFor(() => {
+      expect(getByRole("heading", { level: 2 }).textContent).toBe("About you");
+    });
+  });
+
+  it("lets tabs move as far as they like", async () => {
+    const three: Steps = { kind: "tabs", of: [...wizard.of, { name: "done", of: [] }] };
+    const { getByRole } = render(<Jumping steps={three} />);
+
+    fireEvent.click(getByRole("button", { name: "Jump" }));
+
+    await waitFor(() => {
+      expect(getByRole("heading", { level: 2 }).textContent).toBe("Done");
+    });
+  });
+
+  it("refuses a move to an index no step is drawn at", () => {
+    const { getByRole } = render(<Jumping steps={{ ...wizard, kind: "tabs" }} />);
+
+    fireEvent.click(getByRole("button", { name: "Rewind" }));
+    fireEvent.click(getByRole("button", { name: "Jump" }));
+
+    expect(getByRole("heading", { level: 2 }).textContent).toBe("Who");
+  });
+
+  it("writes no draft when the tab being drawn is picked", () => {
+    const store = memoryStore();
+    const { getByRole } = render(<Page steps={{ ...wizard, kind: "tabs" }} store={store} />);
+
+    fireEvent.click(getByRole("button", { name: "Who" }));
+
+    expect(store.read(KEY)).toBeNull();
   });
 
   it("draws nothing for steps with no step in them", () => {

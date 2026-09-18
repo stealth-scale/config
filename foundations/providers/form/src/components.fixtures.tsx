@@ -1,8 +1,15 @@
-import { type ReactElement, type ReactNode, useId } from "react";
+import { type ReactElement, type ReactNode } from "react";
 
 import { useFieldContext, useFormContext } from "#contexts.ts";
-import { type CellProps, type GroupProps, type ItemProps, type StepProps } from "#layouts.ts";
-import { choicesOf, textOf } from "#property.ts";
+import { type FieldAria, useFieldAria } from "#field-aria.ts";
+import {
+  type CellProps,
+  type ErrorsProps,
+  type GroupProps,
+  type ItemProps,
+  type StepProps,
+} from "#layouts.ts";
+import { choicesOf } from "#property.ts";
 import { useProperty } from "#use-property.ts";
 import { useWords } from "#words.ts";
 
@@ -28,32 +35,24 @@ function useBound<Value>(): Bound<Value> {
 }
 
 interface FrameProps extends FieldProps {
-  readonly children: (attributes: {
-    "aria-invalid": boolean;
-    "aria-required": boolean;
-    id: string;
-    name: string;
-  }) => ReactNode;
+  readonly children: (control: FieldAria["control"]) => ReactNode;
 }
 
 /**
- * Draws the label and the first error around a control, as a component package's frame does.
+ * Draws the label, the help text and the first error around a control, as a component package's
+ * frame does, spreading what the foundation computes onto each.
  */
-function Frame({ children, required = false }: FrameProps): ReactElement {
-  const field = useBound<unknown>();
-  const { schema } = useProperty();
-  const words = useWords();
-  const id = useId();
-  const [error] = field.state.meta.errors;
-  const shown = field.state.meta.isTouched && error !== undefined;
+function Frame({ children, required }: FrameProps): ReactElement {
+  const aria = useFieldAria({ required });
 
   return (
     <div className="field">
-      <label htmlFor={id}>
-        {words.label(field.name, schema === undefined ? undefined : textOf(schema, "title"))}
-      </label>
-      {children({ "aria-invalid": shown, "aria-required": required, id, name: field.name })}
-      {shown ? <p role="alert">{words.error(field.name, error)}</p> : null}
+      <label {...aria.label.props}>{aria.label.text}</label>
+      {children(aria.control)}
+      {aria.description === undefined ? null : (
+        <p {...aria.description.props}>{aria.description.text}</p>
+      )}
+      {aria.error === undefined ? null : <p {...aria.error.props}>{aria.error.text}</p>}
     </div>
   );
 }
@@ -66,9 +65,9 @@ export function TextField({ required }: FieldProps): ReactElement {
 
   return (
     <Frame required={required}>
-      {(attributes) => (
+      {(control) => (
         <input
-          {...attributes}
+          {...control}
           onBlur={field.handleBlur}
           onChange={(event) => {
             field.handleChange(event.target.value);
@@ -86,9 +85,9 @@ export function NumberField({ required }: FieldProps): ReactElement {
 
   return (
     <Frame required={required}>
-      {(attributes) => (
+      {(control) => (
         <input
-          {...attributes}
+          {...control}
           onBlur={field.handleBlur}
           onChange={(event) => {
             field.handleChange(event.target.valueAsNumber);
@@ -106,9 +105,9 @@ export function CheckboxField({ required }: FieldProps): ReactElement {
 
   return (
     <Frame required={required}>
-      {(attributes) => (
+      {(control) => (
         <input
-          {...attributes}
+          {...control}
           checked={field.state.value}
           onBlur={field.handleBlur}
           onChange={(event) => {
@@ -128,9 +127,9 @@ export function SelectField({ required }: FieldProps): ReactElement {
 
   return (
     <Frame required={required}>
-      {(attributes) => (
+      {(control) => (
         <select
-          {...attributes}
+          {...control}
           onBlur={field.handleBlur}
           onChange={(event) => {
             field.handleChange(event.target.value);
@@ -153,11 +152,22 @@ export function Cell({ children, span }: CellProps): ReactNode {
   return span === undefined ? children : <div className={`span-${span}`}>{children}</div>;
 }
 
+export function Errors({ errors, id }: ErrorsProps): ReactElement {
+  return (
+    <div className="errors" id={id} role="alert" tabIndex={-1}>
+      {errors.map((error) => (
+        <p key={error}>{error}</p>
+      ))}
+    </div>
+  );
+}
+
 export function Group({
   children,
   closed,
   columns,
   direction,
+  id,
   legend,
   onAdd,
 }: GroupProps): ReactElement {
@@ -174,11 +184,11 @@ export function Group({
     </>
   );
 
-  if (legend === undefined) return inner;
+  if (legend === undefined) return <div id={id}>{inner}</div>;
 
   if (closed === true) {
     return (
-      <details>
+      <details id={id}>
         <summary>{legend}</summary>
         {inner}
       </details>
@@ -186,18 +196,18 @@ export function Group({
   }
 
   return (
-    <fieldset>
+    <fieldset id={id}>
       <legend>{legend}</legend>
       {inner}
     </fieldset>
   );
 }
 
-export function Item({ children, index, onRemove }: ItemProps): ReactElement {
+export function Item({ children, id, index, onRemove }: ItemProps): ReactElement {
   const words = useWords();
 
   return (
-    <div className="item" data-index={index}>
+    <div className="item" data-index={index} id={id}>
       {children}
       {onRemove === undefined ? null : (
         <button onClick={onRemove} type="button">
@@ -208,13 +218,13 @@ export function Item({ children, index, onRemove }: ItemProps): ReactElement {
   );
 }
 
-export function Step({ children, current, kind, labels, onGo }: StepProps): ReactElement {
+export function Step({ children, current, id, kind, labels, onGo }: StepProps): ReactElement {
   const words = useWords();
   const last = current === labels.length - 1;
 
   return (
-    <div className={kind}>
-      <h2>{labels[current]}</h2>
+    <div className={kind} id={id}>
+      <h2 tabIndex={-1}>{labels[current]}</h2>
       {kind === "tabs" ? (
         <nav>
           {labels.map((label, index) => (
@@ -257,6 +267,34 @@ export function Step({ children, current, kind, labels, onGo }: StepProps): Reac
         )}
       </p>
     </div>
+  );
+}
+
+/**
+ * Draws the step beside two controls that ask for a step two forward and two back, which is how a
+ * layout asks for a step the stepper refuses to move to.
+ */
+export function JumpingStep(props: StepProps): ReactElement {
+  return (
+    <>
+      <Step {...props} />
+      <button
+        onClick={() => {
+          props.onGo(props.current + 2);
+        }}
+        type="button"
+      >
+        Jump
+      </button>
+      <button
+        onClick={() => {
+          props.onGo(props.current - 2);
+        }}
+        type="button"
+      >
+        Rewind
+      </button>
+    </>
   );
 }
 

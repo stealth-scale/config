@@ -1,6 +1,12 @@
 /**
  * Types the components a component package hands the foundation to lay a generated form out: a
- * group, an item of a repeat group, a cell around a field, and a step.
+ * group, an item of a repeat group, a cell around a field, a step, and the region the form's own
+ * errors are read from.
+ *
+ * @remarks
+ *   Every layout but the cell is given an `id` and writes it on its root element. That is the one
+ *   contract the foundation's focus management rests on: a step, an item and the errors region are
+ *   found by their id when focus has to move into them.
  */
 
 import { type ComponentType, type ReactNode } from "react";
@@ -18,6 +24,27 @@ export interface CellProps {
    * How many columns the field takes, inside a group that states a count.
    */
   readonly span?: number | undefined;
+}
+
+/**
+ * Describes what the region for the form's own errors is given.
+ *
+ * @remarks
+ *   The region is drawn on every render, empty until an issue at the root of the schema or a form
+ *   validator refuses the whole value, so it is on the page before its words change and a screen
+ *   reader announces them. It carries `role="alert"` and `tabIndex={-1}`, because a refused submit
+ *   that no field accounts for moves focus to it.
+ */
+export interface ErrorsProps {
+  /**
+   * The errors, resolved to words, or none.
+   */
+  readonly errors: readonly string[];
+
+  /**
+   * The id the region carries, which the foundation finds it by.
+   */
+  readonly id: string;
 }
 
 /**
@@ -45,6 +72,11 @@ export interface GroupProps {
   readonly direction?: "column" | "row" | undefined;
 
   /**
+   * The id the group's root element carries, which the foundation finds it by.
+   */
+  readonly id: string;
+
+  /**
    * The legend, resolved, or nothing where the group draws no fieldset.
    */
   readonly legend?: string | undefined;
@@ -66,6 +98,11 @@ export interface ItemProps {
   readonly children: ReactNode;
 
   /**
+   * The id the item's root element carries, which the foundation finds it by.
+   */
+  readonly id: string;
+
+  /**
    * The item's index, from zero.
    */
   readonly index: number;
@@ -78,6 +115,11 @@ export interface ItemProps {
 
 /**
  * Describes what the component around the step being drawn is given.
+ *
+ * @remarks
+ *   Focus moves into the step once a person has moved to it: to the first element inside the
+ *   root that can take focus. A layout that gives its heading `tabIndex={-1}` has the step's name
+ *   read out before the first field, which is what a wizard wants.
  */
 export interface StepProps {
   /**
@@ -91,6 +133,11 @@ export interface StepProps {
   readonly current: number;
 
   /**
+   * The id the step's root element carries, which the foundation finds it by.
+   */
+  readonly id: string;
+
+  /**
    * Whether the steps are a wizard, which validates a step before it is left, or tabs.
    */
   readonly kind: "tabs" | "wizard";
@@ -102,7 +149,7 @@ export interface StepProps {
 
   /**
    * Moves to the step at an index. A wizard refuses to move forward while the step being drawn
-   * has a field its rules refuse.
+   * has a field its rules refuse, and refuses to move more than one step forward at a time.
    */
   readonly onGo: (index: number) => void;
 }
@@ -115,6 +162,11 @@ export interface Layouts {
    * Draws the component around one field.
    */
   readonly Cell: ComponentType<CellProps>;
+
+  /**
+   * Draws the region the form's own errors are read from.
+   */
+  readonly Errors: ComponentType<ErrorsProps>;
 
   /**
    * Draws a group: a fieldset where it has a legend, and a layout alone where it has none.

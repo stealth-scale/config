@@ -9,7 +9,9 @@ import { type Schema } from "#schema.ts";
 
 /**
  * Describes what a renderer is handed. The field itself is read through `useFieldContext`, as
- * every field component bound with `createFormHook` reads it.
+ * every field component bound with `createFormHook` reads it, and what ties the control to its
+ * label, its help text and its error is read through `useFieldAria` and spread onto each
+ * element. The control's `name` and `id` come with it, and the foundation moves focus by them.
  */
 export interface RendererProps {
   /**
@@ -38,7 +40,9 @@ export type Suits = (presentation: Field, schema: Schema) => number | undefined;
  */
 export interface Renderer {
   /**
-   * Draws the field, frame included, as a field component bound to the contexts does.
+   * Draws the field, frame included, as a field component bound to the contexts does, with the
+   * props `useFieldAria` computes spread onto the control, the label, the help text and the
+   * error.
    */
   readonly draw: ComponentType<RendererProps>;
 

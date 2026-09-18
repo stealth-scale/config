@@ -26,10 +26,13 @@ export interface CatalogueEntry {
 }
 
 /**
- * Lists the keywords of a property whose failure a form reads a message for.
+ * Lists the keywords of a schema whose failure a form reads a message for, at the root or at a
+ * property.
  */
 const FAILING = [
+  "anyOf",
   "const",
+  "dependentRequired",
   "enum",
   "format",
   "maximum",
@@ -38,6 +41,8 @@ const FAILING = [
   "minimum",
   "minItems",
   "minLength",
+  "not",
+  "oneOf",
   "pattern",
   "type",
 ] as const;
@@ -62,8 +67,12 @@ function requiredOf(
 }
 
 /**
- * Lists the failures one property reads a message for: each keyword that can fail, and each
+ * Lists the failures one schema reads a message for: each keyword that can fail, and each
  * property it requires.
+ *
+ * @remarks
+ *   The root's `type` is left out, because a form always submits the object its schema
+ *   describes.
  */
 function failures(
   path: string,
@@ -73,7 +82,7 @@ function failures(
   const entries: CatalogueEntry[] = [];
 
   for (const keyword of FAILING) {
-    if (node[keyword] !== undefined) {
+    if (node[keyword] !== undefined && (path !== "" || keyword !== "type")) {
       entries.push({ english: "", id: form.error(path, keyword)[0] });
     }
   }
@@ -134,8 +143,9 @@ function ofGroups<Values>(
  *   Every identifier is computable without rendering the form, so a translator receives a
  *   complete catalogue for a form nobody has rendered. A failure's English is empty, because the
  *   engine's own message is the development text at run time and a catalogue entry replaces it.
- *   An array's item has no label of its own, because a repeat group draws it under the group's
- *   legend.
+ *   A failure at the root of the schema, such as a `oneOf` no branch of which matched, is listed
+ *   under `<id>.errors.<keyword>`. An array's item has no label of its own, because a repeat
+ *   group draws it under the group's legend.
  * @typeParam Values - The form's values, or `unknown` for a form without a type.
  */
 export function catalogue<Values>(
@@ -143,7 +153,7 @@ export function catalogue<Values>(
   presentation: Presentation<Values>,
 ): readonly CatalogueEntry[] {
   const form = identifiers(presentation.id);
-  const entries: CatalogueEntry[] = requiredOf("", schema, form);
+  const entries: CatalogueEntry[] = failures("", schema, form);
   const seen = new Set<string>(entries.map((entry) => entry.id));
 
   walk(schema, (path, node) => {

@@ -28,7 +28,9 @@ function Page({
 
   return (
     <form.AppForm>
-      <form.Fields {...props} />
+      <form.Form>
+        <form.Fields {...props} />
+      </form.Form>
     </form.AppForm>
   );
 }
@@ -104,6 +106,28 @@ describe("Fields", () => {
 
     expect(getByRole("heading", { level: 2 }).textContent).toBe("Who");
     expect(named(container)).toStrictEqual(["name"]);
+  });
+
+  it("draws the region for the form's own errors before the members", () => {
+    const { container, getByRole } = render(<Page />);
+    const form = container.querySelector("form");
+    const region = getByRole("alert");
+
+    expect(form?.firstElementChild).toBe(region);
+    expect(region.id).toBe(`${form?.id ?? ""}-errors`);
+  });
+
+  it("draws the region before the steps as well", () => {
+    const steps: Presentation = { id: "p", steps: { of: [{ name: "who", of: ["name"] }] } };
+    const { container, getByRole } = render(<Page presentation={steps} />);
+
+    expect(container.querySelector("form")?.firstElementChild).toBe(getByRole("alert"));
+  });
+
+  it("draws no region for the members given, so a hand-written form draws them as often as it likes", () => {
+    const { queryByRole } = render(<Page of={["name"]} presentation={{ id: "p", of: [] }} />);
+
+    expect(queryByRole("alert")).toBeNull();
   });
 
   it("throws when the step named is not in the presentation", () => {

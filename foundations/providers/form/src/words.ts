@@ -59,9 +59,10 @@ export interface Words {
   readonly action: (name: string, fallback: string) => string;
 
   /**
-   * Resolves a field's help text, with the fallback given or an empty string as the default.
+   * Resolves a field's help text, with the fallback given or an empty string as the default. An
+   * identifier the presentation states for it is tried before the derived one.
    */
-  readonly description: (path: string, fallback?: string) => string;
+  readonly description: (path: string, fallback?: string, identifier?: string) => string;
 
   /**
    * Resolves an error: a keyworded one under the form's own identifier and then the shared one,
@@ -70,9 +71,10 @@ export interface Words {
   readonly error: (path: string, error: unknown) => string;
 
   /**
-   * Resolves a field's label, with the fallback given or the path written out as the default.
+   * Resolves a field's label, with the fallback given or the path written out as the default. An
+   * identifier the presentation states for it is tried before the derived one.
    */
-  readonly label: (path: string, fallback?: string) => string;
+  readonly label: (path: string, fallback?: string, identifier?: string) => string;
 
   /**
    * Resolves a group's legend, with the name written out as the default.
@@ -85,14 +87,23 @@ export interface Words {
   readonly option: (path: string, value: string) => string;
 
   /**
-   * Resolves a field's placeholder, or an empty string where the catalogue has none.
+   * Resolves a field's placeholder, or an empty string where the catalogue has none. An
+   * identifier the presentation states for it is tried before the derived one.
    */
-  readonly placeholder: (path: string) => string;
+  readonly placeholder: (path: string, identifier?: string) => string;
 
   /**
    * Resolves a step's label, with the name written out as the default.
    */
   readonly step: (name: string) => string;
+}
+
+/**
+ * Lists the keys to try for one word: the identifier the presentation states, where it states
+ * one, and then the derived one.
+ */
+function keys(derived: string, identifier?: string): string | string[] {
+  return identifier === undefined ? derived : [identifier, derived];
 }
 
 /**
@@ -103,8 +114,8 @@ export function wordsOf(translate: Translate, id: string): Words {
 
   return {
     action: (name, fallback) => translate(ids.action(name), { defaultValue: fallback }),
-    description: (path, fallback = "") =>
-      translate(ids.description(path), { defaultValue: fallback }),
+    description: (path, fallback = "", identifier) =>
+      translate(keys(ids.description(path), identifier), { defaultValue: fallback }),
     error: (path, error) => {
       if (isKeyworded(error)) {
         const { keyword, message, values } = error;
@@ -119,11 +130,12 @@ export function wordsOf(translate: Translate, id: string): Words {
 
       return translate(text, { defaultValue: text });
     },
-    label: (path, fallback = worded(path)) =>
-      translate(ids.label(path), { defaultValue: fallback }),
+    label: (path, fallback = worded(path), identifier) =>
+      translate(keys(ids.label(path), identifier), { defaultValue: fallback }),
     legend: (name) => translate(ids.legend(name), { defaultValue: worded(name) }),
     option: (path, value) => translate(ids.option(path, value), { defaultValue: value }),
-    placeholder: (path) => translate(ids.placeholder(path), { defaultValue: "" }),
+    placeholder: (path, identifier) =>
+      translate(keys(ids.placeholder(path), identifier), { defaultValue: "" }),
     step: (name) => translate(ids.step(name), { defaultValue: worded(name) }),
   };
 }

@@ -86,6 +86,15 @@ describe("wordsOf", () => {
     expect(words.placeholder("email")).toBe("");
   });
 
+  it("tries an identifier the presentation states before the derived one", () => {
+    expect(words.label("email", undefined, "checkout.actions.submit")).toBe("Place order");
+    expect(words.label("email", undefined, "absent")).toBe("Email address");
+    expect(words.description("name", "Fallback", "checkout.fields.email.description")).toBe(
+      "We never share it",
+    );
+    expect(words.placeholder("name", "checkout.steps.pay.label")).toBe("Payment");
+  });
+
   it("reads a keyworded error under the form's identifier and then the shared one", () => {
     expect(words.error("email", { keyword: "format", message: "Bad" })).toBe(
       "Enter an address like name@example.com",

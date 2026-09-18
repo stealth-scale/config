@@ -29,7 +29,12 @@ const annotated: Schema = {
       },
       type: "object",
     },
-    email: { type: "string", "x-control": "email", "x-placeholder": "checkout.hint" },
+    email: {
+      type: "string",
+      "x-autocomplete": "email",
+      "x-control": "email",
+      "x-placeholder": "checkout.hint",
+    },
     lines: {
       items: { properties: { amount: { type: "number", "x-options": { currency: "EUR" } } } },
       type: "array",
@@ -59,7 +64,7 @@ describe("presentationOf", () => {
     expect(presentationOf(annotated).fields).toStrictEqual({
       "billing.city": { span: 2 },
       "billing.line1": { label: "common.street" },
-      email: { control: "email", placeholder: "checkout.hint" },
+      email: { autocomplete: "email", control: "email", placeholder: "checkout.hint" },
       "lines[].amount": { options: { currency: "EUR" } },
       notes: { description: "checkout.notes.help" },
     });
@@ -92,6 +97,7 @@ describe("presentationOf", () => {
     });
 
     expect(presentation.fields?.email).toStrictEqual({
+      autocomplete: "email",
       control: "email",
       placeholder: "checkout.hint",
     });

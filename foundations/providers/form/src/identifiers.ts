@@ -57,15 +57,16 @@ export interface Identifiers {
  * @remarks
  *   Every index in a path is collapsed, so one identifier covers every row of a repeat group. A
  *   form with `id: "checkout"` and a field at `billing.vat` reads
- *   `checkout.fields.billing.vat.label` with no configuration.
+ *   `checkout.fields.billing.vat.label` with no configuration. An error at the root of the
+ *   schema, whose path is empty, reads `checkout.errors.<keyword>`.
  * @param id - The identifier every identifier of the form begins with.
  */
 export function identifiers(id: string): Identifiers {
   /**
-   * Prefixes one derived identifier with the form's.
+   * Prefixes one derived identifier with the form's, leaving an empty path out.
    */
   const of = (kind: string, path: string, leaf: string): string =>
-    `${id}.${kind}.${collapse(path)}.${leaf}`;
+    path === "" ? `${id}.${kind}.${leaf}` : `${id}.${kind}.${collapse(path)}.${leaf}`;
 
   return {
     action: (name) => `${id}.actions.${name}`,

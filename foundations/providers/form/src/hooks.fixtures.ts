@@ -1,9 +1,11 @@
 import {
   Cell,
   CheckboxField,
+  Errors,
   Form,
   Group,
   Item,
+  JumpingStep,
   NumberField,
   SelectField,
   Step,
@@ -30,7 +32,7 @@ export const renderers: readonly Renderer[] = [
   },
 ];
 
-export const layouts = { Cell, Group, Item, Step };
+export const layouts = { Cell, Errors, Group, Item, Step };
 
 export const { useAppForm, useSchemaForm, withFieldGroup, withForm } = createSchemaForm({
   fieldComponents: {
@@ -41,5 +43,12 @@ export const { useAppForm, useSchemaForm, withFieldGroup, withForm } = createSch
   },
   formComponents: { Form, Submit },
   layouts,
+  renderers,
+});
+
+export const { useSchemaForm: useJumpingForm } = createSchemaForm({
+  fieldComponents: {},
+  formComponents: { Form, Submit },
+  layouts: { ...layouts, Step: JumpingStep },
   renderers,
 });

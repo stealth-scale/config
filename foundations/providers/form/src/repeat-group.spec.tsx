@@ -1,6 +1,6 @@
 import { type ReactElement } from "react";
 
-import { fireEvent, render } from "@testing-library/react";
+import { fireEvent, render, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { FieldMember } from "#field-member.tsx";
@@ -113,13 +113,43 @@ describe("RepeatGroup", () => {
     expect(container.querySelectorAll(".item")).toHaveLength(1);
   });
 
-  it("removes the item whose control is pressed", async () => {
+  it("removes the item whose control is pressed and focuses the item taking its place", async () => {
     const page = render(<Page values={{ lines: [{ amount: 2 }, { amount: 3 }] }} />);
 
     fireEvent.click(page.getAllByRole("button", { name: "Remove" })[0] ?? page.container);
 
     await expect(page.findAllByLabelText("Amount")).resolves.toHaveLength(1);
     expect(page.getByLabelText("Amount")).toHaveProperty("value", "3");
+    expect(document.activeElement).toBe(page.getByLabelText("Amount"));
+  });
+
+  it("focuses the last item once the last one is removed", async () => {
+    const page = render(<Page values={{ lines: [{ amount: 2 }, { amount: 3 }] }} />);
+
+    fireEvent.click(page.getAllByRole("button", { name: "Remove" })[1] ?? page.container);
+
+    await expect(page.findAllByLabelText("Amount")).resolves.toHaveLength(1);
+    expect(document.activeElement).toBe(page.getByLabelText("Amount"));
+  });
+
+  it("focuses the group's add control once the only item is removed", async () => {
+    const page = render(<Page values={{ lines: [{ amount: 2 }] }} />);
+
+    fireEvent.click(page.getByRole("button", { name: "Remove" }));
+
+    await waitFor(() => {
+      expect(page.queryByLabelText("Amount")).toBeNull();
+    });
+    expect(document.activeElement).toBe(page.getByRole("button", { name: "Add" }));
+  });
+
+  it("writes the ids the foundation gives the group and its items", () => {
+    const { container } = render(<Page values={{ lines: [{ amount: 2 }, { amount: 3 }] }} />);
+    const group = container.querySelector("fieldset");
+    const items = [...container.querySelectorAll<HTMLElement>(".item")].map((item) => item.id);
+
+    expect(group?.id).not.toBe("");
+    expect(items).toStrictEqual([`${group?.id ?? ""}-0`, `${group?.id ?? ""}-1`]);
   });
 
   it("withholds the add control once the array holds its maxItems", () => {

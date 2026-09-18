@@ -80,4 +80,21 @@ describe("leaveStep", () => {
     await expect(leaveStep(form, ["vat"])).resolves.toBe(true);
     expect(runs()).toBe(0);
   });
+
+  it("counts a row of a repeat group under the path the step names", async () => {
+    const form = new FormApi({
+      defaultValues: { lines: [{ amount: 0 }] },
+      validators: {
+        onSubmit: (): { fields: Record<string, string> } => ({
+          fields: { "lines[0].amount": "refused" },
+        }),
+      },
+    });
+
+    form.mount();
+    new FieldApi({ form, name: "lines[0].amount" }).mount();
+
+    await expect(leaveStep(form, ["lines[].amount"])).resolves.toBe(false);
+    expect(form.getFieldMeta("lines[0].amount")?.isTouched).toBe(true);
+  });
 });

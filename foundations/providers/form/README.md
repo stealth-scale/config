@@ -1,10 +1,14 @@
 # @stealthscale/provider-form
 
 `@stealthscale/provider-form` is the foundation every form in the design system is built on. A JSON
-Schema document is the source. The default values and the message identifiers are derived from it,
-it validates as the Standard Schema the form library runs, and how it is drawn is stated beside it
-as data or in the schema's own `x-form` keyword. A component package binds its components with one
-call, and an application builds a form from a schema with one hook.
+Schema document is the source of the form. Three things come from that document:
+
+- The default values and the message identifiers are derived from it.
+- It validates as the Standard Schema the form library runs.
+- How the form is drawn is stated beside it as data, or in the schema's own `x-form` keyword.
+
+A component package binds its components with one call, and an application builds a form from a
+schema with one hook.
 
 This package draws no element and validates nothing by itself. Every rule beyond the schema is one
 of the library's own field or form validators, and every element comes from the component package.
@@ -28,7 +32,7 @@ import { createSchemaForm } from "@stealthscale/provider-form";
 export const { useAppForm, useSchemaForm, withFieldGroup, withForm } = createSchemaForm({
   fieldComponents: { Checkbox, Number, Select, Text },
   formComponents: { Form, Submit },
-  layouts: { Cell, Group, Item, Step },
+  layouts: { Cell, Errors, Group, Item, Step },
   renderers,
 });
 ```
@@ -49,9 +53,10 @@ return (
 ```
 
 The hook starts from the schema's defaults, puts the schema in the form's dynamic slot, and moves
-focus to the first refused field on a submit. `form.Fields` draws the members the presentation
-states, or every field where it states none, or the steps with the controls between them. Every
-other option is the library's own: `validators` for a rule across fields, `listeners`,
+focus to the first refused field on a submit. Where no field holds the error, focus moves to the
+region `form.Fields` draws the form's own errors in. `form.Fields` draws the members the
+presentation states, or every field where it states none, or the steps with the controls between
+them. Every other option is the library's own: `validators` for a rule across fields, `listeners`,
 `onSubmitMeta`, and `fieldOptions` for a rule on one field by its path, typed over the field's
 value.
 
@@ -78,8 +83,8 @@ const form = useSchemaForm<Profile>({
 ```
 
 Wrap the application once. A form below it reads the engine, the renderers and the translator from
-it, and each is an override on the form that needs one. The translator is i18next's `t`, handed in
-as it is, or `translateFrom` over a map of words.
+it, and each is an override on the form that needs one. The translator is i18next's `t`, passed
+through unchanged, or `translateFrom` over a map of words.
 
 ```tsx
 const engine = createEngine({ formats: [vatNumber] });
@@ -105,6 +110,8 @@ schema's `title`, then the path.
   the same from a schema's own keywords. `Layouts` types the components that lay it out.
 - `identifiers` derives every message identifier a form reads, `catalogue` lists them, and
   `useWords` resolves them through the translator in scope.
+- `useFieldAria` resolves a field's label, help text and error with the props that tie the three to
+  the control. `RootErrors` draws the region the errors of a form as a whole are read from.
 - `FormProvider` puts the engine, the renderers and the translator in scope.
 - `useDraft` keeps a form's values and step across a refresh. `leaveStep` validates a step before a
   person leaves it.

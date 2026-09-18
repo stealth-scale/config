@@ -24,6 +24,7 @@ export const FORM = "x-form";
  * Maps each per-field keyword to the member of a field it reads into.
  */
 export const KEYWORDS = {
+  autocomplete: "x-autocomplete",
   control: "x-control",
   description: "x-description",
   label: "x-label",
@@ -50,6 +51,7 @@ type Layout<Values> = Pick<Presentation<Values>, "of" | "steps">;
  * @returns The field, or nothing where the property writes none of the keywords.
  */
 function fieldOf(node: Schema): Field | undefined {
+  const autocomplete = node[KEYWORDS.autocomplete];
   const control = node[KEYWORDS.control];
   const description = node[KEYWORDS.description];
   const label = node[KEYWORDS.label];
@@ -57,6 +59,7 @@ function fieldOf(node: Schema): Field | undefined {
   const placeholder = node[KEYWORDS.placeholder];
   const span = node[KEYWORDS.span];
   const field: Field = {
+    ...(typeof autocomplete === "string" && { autocomplete }),
     ...(typeof control === "string" && { control }),
     ...(typeof description === "string" && { description }),
     ...(typeof label === "string" && { label }),

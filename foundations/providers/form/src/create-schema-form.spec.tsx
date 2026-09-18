@@ -1,6 +1,6 @@
 import { type ReactElement, useMemo } from "react";
 
-import { act, fireEvent, render, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { memoryStore, type SettingStore } from "@stealthscale/settings";
@@ -79,6 +79,13 @@ function stored(store: SettingStore): unknown {
   const text = store.read(KEY);
 
   return text === null ? undefined : JSON.parse(text);
+}
+
+/**
+ * Lists the alerts with words in them, which leaves out the form's own region while it is empty.
+ */
+function shown(): HTMLElement[] {
+  return screen.getAllByRole("alert").filter((alert) => alert.textContent !== "");
 }
 
 describe("createSchemaForm", () => {
@@ -171,19 +178,19 @@ describe("useSchemaForm", () => {
 
     fireEvent.change(getByLabelText("Name"), { target: { value: "R" } });
 
-    expect(() => getByRole("alert")).toThrow(/Unable to find/u);
+    expect(shown()).toHaveLength(0);
 
     fireEvent.click(getByRole("button"));
 
     await waitFor(() => {
-      expect(getByRole("alert")).toBeDefined();
+      expect(shown()).toHaveLength(1);
     });
     expect(document.activeElement).toBe(getByLabelText("Name"));
 
     fireEvent.change(getByLabelText("Name"), { target: { value: "Roy" } });
 
     await waitFor(() => {
-      expect(() => getByRole("alert")).toThrow(/Unable to find/u);
+      expect(shown()).toHaveLength(0);
     });
   });
 
@@ -238,7 +245,7 @@ describe("useSchemaForm", () => {
     fireEvent.click(getByRole("button"));
 
     await waitFor(() => {
-      expect(getByRole("alert").textContent).toBe("containsName");
+      expect(shown().map((alert) => alert.textContent)).toStrictEqual(["containsName"]);
     });
   });
 

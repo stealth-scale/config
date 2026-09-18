@@ -30,4 +30,8 @@ describe("identifiers", () => {
       "checkout.errors.lines[].amount.minimum",
     );
   });
+
+  it("leaves the empty path of the root out of a failure's identifier", () => {
+    expect(checkout.error("", "oneOf")).toStrictEqual(["checkout.errors.oneOf", "errors.oneOf"]);
+  });
 });

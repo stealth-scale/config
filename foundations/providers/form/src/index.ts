@@ -28,13 +28,31 @@ export {
   type Keyword,
 } from "#engine.ts";
 export { defaultEnvironment, type FormEnvironment, useFormEnvironment } from "#environment.ts";
+export {
+  type ControlProps,
+  type DescriptionProps,
+  type ErrorProps,
+  type FieldAria,
+  type FieldAriaOptions,
+  type LabelProps,
+  useFieldAria,
+  type Worded,
+} from "#field-aria.ts";
 export { Fields, type FieldsProps } from "#fields.tsx";
-export { focusControl, focusFirstInvalid, formDefaults, type Invalidated } from "#form-defaults.ts";
+export {
+  errorsId,
+  focusControl,
+  focusFirstInvalid,
+  focusInside,
+  type Invalidated,
+} from "#focus.ts";
+export { formDefaults } from "#form-defaults.ts";
 export { schemaFormOptions, type SchemaFormOptions, type SchemaFormStart } from "#form-options.ts";
 export { type Identifiers, identifiers } from "#identifiers.ts";
 export { type Issue } from "#issues.ts";
 export {
   type CellProps,
+  type ErrorsProps,
   type GroupProps,
   type ItemProps,
   type Layouts,
@@ -79,6 +97,7 @@ export {
   type RendererProps,
   type Suits,
 } from "#renderer.ts";
+export { RootErrors } from "#root-errors.tsx";
 export {
   type DraftScope,
   type FieldOptionsByPath,
@@ -102,5 +121,6 @@ export {
 export { type DraftHandle, type DraftOptions, useDraft } from "#use-draft.ts";
 export { type Property, useProperty } from "#use-property.ts";
 export { useResolved } from "#use-resolved.ts";
+export { rootErrorsOf, useRootErrors } from "#use-root-errors.ts";
 export { isSchema, PERSIST, sensitivePaths } from "#walk.ts";
 export { useWords, type Words, wordsOf } from "#words.ts";

@@ -35,3 +35,10 @@ a form is drawn as data, puts the engine, the renderers and the translator in sc
   component writes it as its `id`, and anywhere on the page otherwise.
 - Keep a schema's hash and a library object's converted document by the object, so a form reads one
   document and hashes a schema once.
+- Add `useFieldAria`, which resolves the label, the help text and the first error of the field in
+  scope with the props that tie the three to the control. `aria-describedby` names the help text and
+  the error only while each is on the page.
+- Add the `Errors` layout and `RootErrors`, the region the errors of a form as a whole are read
+  from. The foundation moves focus to it when a submit is refused and no field holds the error.
+- Give `GroupProps`, `ItemProps` and `StepProps` an `id`. A layout writes it on its root element,
+  and the foundation moves focus into a group, an item or a step by it.

@@ -60,6 +60,21 @@ describe("catalogue", () => {
     expect(entries).toContainEqual({ english: "", id: "checkout.errors.billing.vat.required" });
   });
 
+  it("lists a failure at the root of the schema and leaves its type out", () => {
+    const guarded: Schema = {
+      ...checkout,
+      not: { required: ["kind"] },
+      oneOf: [{ required: ["name"] }, { required: ["kind"] }],
+    };
+    const ids = catalogue(guarded, presentation)
+      .filter((entry) => entry.id.startsWith("checkout.errors."))
+      .map((entry) => entry.id);
+
+    expect(ids).toContain("checkout.errors.not");
+    expect(ids).toContain("checkout.errors.oneOf");
+    expect(ids).not.toContain("checkout.errors.type");
+  });
+
   it("lists a legend for a group drawing a fieldset", () => {
     expect(catalogue(checkout, presentation)).toContainEqual({
       english: "Address",
