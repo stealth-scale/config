@@ -54,15 +54,3 @@ export type Routed = ReturnType<typeof createRouter<typeof routeTree>>;
 export function routed(): Routed {
   return createRouter({ defaultPreload: "intent", routeTree, scrollRestoration: true });
 }
-
-declare module "@tanstack/react-router" {
-  /**
-   * Registers this application's router, which is where the library reads its paths from.
-   */
-  interface Register {
-    /**
-     * The router every typed hook and every `Link` in this application is checked against.
-     */
-    router: Routed;
-  }
-}

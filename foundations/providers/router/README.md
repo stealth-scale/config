@@ -263,13 +263,22 @@ const { result } = await mountRoute(buildTree(await declarations()), "/app/invoi
 The library works paths, params and search out from one declared router type. An application whose
 routes are all in the build declares it and gets a checked `Link`.
 
+Put it in a declaration file beside the tree. The statement is type-only and erases to nothing.
+
 ```ts
+// src/register.d.ts
+import { type Routed } from "#routes.ts";
+
 declare module "@tanstack/react-router" {
   interface Register {
-    router: ReturnType<typeof createRouter<typeof routeTree>>;
+    router: Routed;
   }
 }
 ```
 
+The import keeps the file a module. `declare module` with no import and no export is an ambient
+declaration, which replaces the library's types rather than adding to them.
+
 That augmentation names `@tanstack/react-router`, so an application importing everything else from
-this package still names the library in this one file.
+this package still names the library in this one file. A route this package compiled is not in the
+registered tree, which is why `RouteLink` and `useRouteParams` exist.

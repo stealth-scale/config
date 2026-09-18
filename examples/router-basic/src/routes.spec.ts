@@ -1,8 +1,20 @@
-import { describe, expect, it } from "vitest";
+import { type RegisteredRouter, type RouteIds } from "@tanstack/react-router";
+import { describe, expect, expectTypeOf, it } from "vitest";
 
 import { routed } from "#routes.ts";
 
+/**
+ * Every route this application serves, which the library only knows once the router is registered.
+ */
+type Served = "__root__" | "/invoices" | "/invoices/$id";
+
 describe("routes", () => {
+  it("registers this application's router with the library", () => {
+    expectTypeOf<RouteIds<RegisteredRouter["routeTree"]>>().toEqualTypeOf<Served>();
+
+    expect(routed().routesById).toBeDefined();
+  });
+
   it("serves the list and the invoice beneath it", () => {
     expect(Object.keys(routed().routesById)).toStrictEqual([
       "__root__",
