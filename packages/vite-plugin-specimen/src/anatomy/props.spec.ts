@@ -66,6 +66,27 @@ describe("props", () => {
     expect(propOf(await read(), "label").kind).toBe("option");
   });
 
+  it("calls a property a dependency declares an option", async () => {
+    expect(propOf(await read(), "open").kind).toBe("option");
+    expect(propOf(await read(), "onOpenChange").says).toBe("Called when it opens or closes.");
+  });
+
+  it("calls a property declared by a dependency of a dependency an option", async () => {
+    expect(propOf(await read(), "onEscapeKeyDown").kind).toBe("option");
+  });
+
+  it("drops a property a peer declares", async () => {
+    const held = await read();
+
+    expect(held.parts["BadgeProps"]?.some((one) => one.name === "margin")).toBe(false);
+  });
+
+  it("drops a property the compiler's own library declares", async () => {
+    const held = await read();
+
+    expect(held.parts["BadgeProps"]?.some((one) => one.name === "stack")).toBe(false);
+  });
+
   it("keeps a variant a style prop shares a name with", async () => {
     expect(propOf(await read(), "gap").kind).toBe("variant");
   });
@@ -74,14 +95,8 @@ describe("props", () => {
     expect(propOf(await read(), "gap").accepts).toBe('"lg" | "sm"');
   });
 
-  it("drops a property only the styling package declares", async () => {
-    const held = await read();
-
-    expect(held.parts["BadgeProps"]?.some((one) => one.name === "margin")).toBe(false);
-  });
-
-  it("counts the properties the styling package declares", async () => {
-    expect((await read()).dropped["BadgeProps"]?.foreign).toBe(1);
+  it("counts the properties declared outside the package and its dependencies", async () => {
+    expect((await read()).dropped["BadgeProps"]?.foreign).toBe(2);
   });
 
   it("counts the properties with no declaration at all", async () => {

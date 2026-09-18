@@ -3,8 +3,10 @@
  *
  * @remarks
  *   `tone` is a variant, `gap` a variant a style prop shadows, `label` an option the component
- *   declares, `margin` a style prop and the conditions properties with no declaration at all. The
- *   styling package sits under `node_modules` for real, so the compiler resolves it the way it
+ *   declares, `open` an option the machine it depends on declares, `onEscapeKeyDown` an option a
+ *   package the machine depends on declares, `margin` a style prop of a peer, `stack` a property
+ *   the compiler's own library declares, and the conditions properties with no declaration at all.
+ *   The packages sit under `node_modules` for real, so the compiler resolves them the way it
  *   resolves anything.
  */
 
@@ -30,6 +32,33 @@ const SYSTEM = [
 ].join("\n");
 
 /**
+ * The state machine the component is built over, a dependency of the kit, whose props a caller
+ * sets on the component.
+ */
+const MACHINE = [
+  'import { type DismissHandlers } from "@kit/dismiss";',
+  "",
+  "export interface MachineProps extends DismissHandlers {",
+  "  /** Called when it opens or closes. */",
+  "  onOpenChange?: (details: { open: boolean }) => void;",
+  "  /** Whether it is open. */",
+  "  open?: boolean;",
+  "}",
+  "",
+].join("\n");
+
+/**
+ * A package the machine depends on, which the kit never names itself.
+ */
+const DISMISS = [
+  "export interface DismissHandlers {",
+  "  /** Called when escape is pressed. */",
+  "  onEscapeKeyDown?: () => void;",
+  "}",
+  "",
+].join("\n");
+
+/**
  * The component's recipe, which declares the axes a theme moves.
  */
 const RECIPE = [
@@ -49,6 +78,7 @@ const RECIPE = [
  * The component itself, whose props type is the recipe's axes over the styling package's.
  */
 const BADGE = [
+  'import { type MachineProps } from "@kit/machine";',
   'import { type StyleProps } from "@kit/system";',
   "",
   'import { type Variants } from "#badge/recipe.ts";',
@@ -95,7 +125,7 @@ const BADGE = [
   "  next: Deep2;",
   "}",
   "",
-  "export interface Own {",
+  'export interface Own extends Pick<Error, "stack"> {',
   "  /**",
   "   * The words it shows.",
   "   *",
@@ -130,7 +160,7 @@ const BADGE = [
   "",
   'export type Conditions = { [K in "_focus" | "_hover"]?: StyleProps };',
   "",
-  "export type BadgeProps = Conditions & Own & StyleProps & Variants;",
+  "export type BadgeProps = Conditions & MachineProps & Own & StyleProps & Variants;",
   "",
   "export function Badge(): void {}",
   "",
@@ -174,9 +204,23 @@ const CONFIG = JSON.stringify({
  */
 export function kit(): Readonly<Record<string, string>> {
   return {
+    "node_modules/@kit/dismiss/index.d.ts": DISMISS,
+    "node_modules/@kit/dismiss/package.json": '{ "name": "@kit/dismiss", "types": "index.d.ts" }',
+    "node_modules/@kit/machine/index.d.ts": MACHINE,
+    "node_modules/@kit/machine/package.json": JSON.stringify({
+      dependencies: { "@kit/dismiss": "*" },
+      name: "@kit/machine",
+      types: "index.d.ts",
+    }),
     "node_modules/@kit/system/index.d.ts": SYSTEM,
     "node_modules/@kit/system/package.json": '{ "name": "@kit/system", "types": "index.d.ts" }',
-    "package.json": '{ "imports": { "#*": "./src/*" }, "name": "kit", "type": "module" }',
+    "package.json": JSON.stringify({
+      dependencies: { "@kit/machine": "*" },
+      imports: { "#*": "./src/*" },
+      name: "kit",
+      peerDependencies: { "@kit/system": "*" },
+      type: "module",
+    }),
     "src/badge/badge.specimen.tsx": [
       'import { type StyleProps } from "@kit/system";',
       "",
