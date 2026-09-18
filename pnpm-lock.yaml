@@ -3934,6 +3934,45 @@ importers:
         specifier: 'catalog:'
         version: 4.1.11(@types/node@26.5.1)(@vitest/browser-playwright@4.1.11)(@vitest/browser-preview@4.1.11)(@vitest/coverage-v8@4.1.11)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(happy-dom@20.14.5)
 
+  packages/vite-config-specimen:
+    devDependencies:
+      '@arethetypeswrong/core':
+        specifier: 'catalog:'
+        version: 0.18.5
+      '@stealthscale/testing-config':
+        specifier: workspace:^
+        version: link:../testing-config
+      '@stealthscale/vite-config':
+        specifier: workspace:^
+        version: link:../vite-config
+      '@stealthscale/vite-config-core':
+        specifier: workspace:^
+        version: link:../vite-config-core
+      '@stealthscale/vite-config-typescript':
+        specifier: workspace:^
+        version: link:../vite-config-typescript
+      '@stealthscale/vite-plugin-specimen':
+        specifier: workspace:^
+        version: link:../vite-plugin-specimen
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.5.1
+      '@vitest/coverage-v8':
+        specifier: 'catalog:'
+        version: 4.1.11(@vitest/browser@4.1.11)(vitest@4.1.11)
+      publint:
+        specifier: 'catalog:'
+        version: 0.3.24
+      typescript:
+        specifier: 'catalog:'
+        version: 7.0.2
+      vite:
+        specifier: 'catalog:'
+        version: '@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1)'
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.11(@types/node@26.5.1)(@vitest/browser-playwright@4.1.11)(@vitest/browser-preview@4.1.11)(@vitest/coverage-v8@4.1.11)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(happy-dom@20.14.5)
+
   packages/vite-config-theme:
     devDependencies:
       '@arethetypeswrong/core':
@@ -4067,6 +4106,45 @@ importers:
       '@types/spdx-expression-parse':
         specifier: 'catalog:'
         version: 4.0.0
+      typescript:
+        specifier: 'catalog:'
+        version: 7.0.2
+      vite:
+        specifier: 'catalog:'
+        version: '@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1)'
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.11(@types/node@26.5.1)(@vitest/browser-playwright@4.1.11)(@vitest/browser-preview@4.1.11)(@vitest/coverage-v8@4.1.11)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(happy-dom@20.14.5)
+
+  packages/vite-plugin-specimen:
+    devDependencies:
+      '@arethetypeswrong/core':
+        specifier: 'catalog:'
+        version: 0.18.5
+      '@stealthscale/testing':
+        specifier: workspace:^
+        version: link:../testing
+      '@stealthscale/testing-config':
+        specifier: workspace:^
+        version: link:../testing-config
+      '@stealthscale/vite-config':
+        specifier: workspace:^
+        version: link:../vite-config
+      '@stealthscale/vite-config-typescript':
+        specifier: workspace:^
+        version: link:../vite-config-typescript
+      '@stealthscale/vite-plugin-base':
+        specifier: workspace:^
+        version: link:../vite-plugin-base
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.5.1
+      '@vitest/coverage-v8':
+        specifier: 'catalog:'
+        version: 4.1.11(@vitest/browser@4.1.11)(vitest@4.1.11)
+      publint:
+        specifier: 'catalog:'
+        version: 0.3.24
       typescript:
         specifier: 'catalog:'
         version: 7.0.2

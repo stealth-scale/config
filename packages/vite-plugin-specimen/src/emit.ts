@@ -1,0 +1,184 @@
+/**
+ * Generates the modules a catalogue imports: the page index, and one page's scenes as source.
+ */
+
+import { manifestAt, owning, text } from "@stealthscale/vite-plugin-base";
+
+import { type Read, type Source } from "#contract.ts";
+import { FRAGMENTS } from "#options.ts";
+import { isRefused, read } from "#read.ts";
+
+/**
+ * Describes the two fields the plugin reads from a resolved configuration.
+ *
+ * @remarks
+ *   Narrower than Vite's own type, so a specification supplies two fields instead of building a
+ *   whole configuration.
+ */
+export interface Resolved {
+  /**
+   * Whether the bundler is building or serving.
+   */
+  readonly command: "build" | "serve";
+
+  /**
+   * The project root the patterns resolve against.
+   */
+  readonly root: string;
+}
+
+/**
+ * Describes one file's generated listing and the identifier it is addressed by.
+ */
+export interface Listed {
+  /**
+   * The page identifier, or undefined when the reader refused the file.
+   */
+  id: string | undefined;
+
+  /**
+   * The listing, as generated source.
+   */
+  listing: string;
+}
+
+/**
+ * Converts an absolute path into the path a catalogue displays.
+ *
+ * @returns The path relative to the root, with forward slashes.
+ */
+function shown(path: string, root: string): string {
+  const relative = path.startsWith(`${root}/`) ? path.slice(root.length + 1) : path;
+
+  return relative.replaceAll("\\", "/");
+}
+
+/**
+ * Resolves the name of the package a file belongs to.
+ *
+ * @remarks
+ *   The nearest manifest above the file that declares a name, which is the specifier a reader
+ *   imports the page's components from. The search continues past a manifest that declares none,
+ *   such as one written only to mark a directory as ESM.
+ * @returns The package name, or an empty string when no manifest above the file declares one.
+ */
+export function ownerOf(path: string): string {
+  for (let directory = owning(path); directory !== undefined; directory = owning(directory)) {
+    const name = text(manifestAt(directory) ?? {}, "name");
+
+    if (name !== undefined && name !== "") return name;
+  }
+
+  return "";
+}
+
+/**
+ * Generates the loader properties of one listing.
+ *
+ * @remarks
+ *   A refused file loads a rejection carrying the reason, and carries no fragments loader.
+ */
+function loaders(result: Read): readonly string[] {
+  const source = `    source: () => import(${JSON.stringify(`${result.path}?raw`)}),`;
+
+  if (isRefused(result)) {
+    return [`    load: () => Promise.reject(new Error(${JSON.stringify(result.wrong)})),`, source];
+  }
+
+  return [
+    `    fragments: () => import(${JSON.stringify(`${FRAGMENTS}${result.id}`)}),`,
+    `    load: () => import(${JSON.stringify(result.path)}),`,
+    source,
+  ];
+}
+
+/**
+ * Generates the metadata properties of one listing, one property per line.
+ */
+function metadata(result: Read, root: string): readonly string[] {
+  const path = shown(result.path, root);
+  const fields = isRefused(result)
+    ? {
+        about: result.wrong,
+        group: "",
+        id: path,
+        package: "",
+        path,
+        title: path.slice(path.lastIndexOf("/") + 1),
+      }
+    : {
+        about: result.about,
+        group: result.group,
+        id: result.id,
+        package: ownerOf(result.path),
+        path,
+        title: result.title,
+      };
+
+  return Object.entries(fields).map(([key, value]) => `    ${key}: ${JSON.stringify(value)},`);
+}
+
+/**
+ * Generates one listing.
+ *
+ * @remarks
+ *   The import specifier stays absolute, because that is what the bundler resolves. Only the
+ *   displayed path is made relative to the root.
+ */
+function listing(result: Read, root: string): string {
+  return ["  {", ...metadata(result, root), ...loaders(result), "  }"].join("\n");
+}
+
+/**
+ * Reads the files and generates a listing for each.
+ *
+ * @remarks
+ *   A build throws on the first set of unreadable files and names all of them. A dev server lists
+ *   each one with a rejecting loader instead, so the rest of the catalogue keeps working while a
+ *   file is half-written.
+ * @returns Each file's listing, keyed by absolute path, in the order the files were given.
+ * @throws {@link Error} When the command is not `serve` and a file could not be read.
+ */
+export function listings(
+  resolved: Resolved,
+  files: readonly Source[],
+): ReadonlyMap<string, Listed> {
+  const results = read(files);
+  const refused = results.filter((result) => isRefused(result));
+
+  if (refused.length > 0 && resolved.command !== "serve") {
+    const named = refused.map((result) => `  ${result.path}: ${result.wrong}`).join("\n");
+
+    throw new Error(
+      `specimen: could not index ${refused.length} of ${results.length} files:\n${named}`,
+    );
+  }
+
+  return new Map(
+    results.map((result) => [
+      result.path,
+      {
+        id: isRefused(result) ? undefined : result.id,
+        listing: listing(result, resolved.root),
+      },
+    ]),
+  );
+}
+
+/**
+ * Generates the module a catalogue imports the pages from.
+ *
+ * @param listed - Every listing, in the order the pages are shown.
+ */
+export function written(listed: Iterable<string>): string {
+  return `export const pages = [\n${[...listed].join(",\n")},\n];\n`;
+}
+
+/**
+ * Generates the module a catalogue imports one page's scenes as source from.
+ *
+ * @param snippets - Each scene's source, keyed by title.
+ */
+export function fragmented(snippets: Readonly<Record<string, string>>): string {
+  return `export const fragments = ${JSON.stringify(snippets)};\n`;
+}
