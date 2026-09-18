@@ -25,6 +25,13 @@ import { classesOf, recipeElement, slotElement } from "#rendered.ts";
 export type Draw<Props extends object> = (props: Props) => ParentNode;
 
 /**
+ * Renders the component and settles it, for one whose state machine commits after it mounts.
+ *
+ * @typeParam Props - The component's props, which the check fills from the recipe's axes.
+ */
+export type DrawAsync<Props extends object> = (props: Props) => PromiseLike<ParentNode>;
+
+/**
  * Describes what a bound check takes beside the recipe.
  */
 export interface BoundChecks {
@@ -235,6 +242,70 @@ function renders(
 }
 
 /**
+ * Carries what one run of the check needs: the renders it makes, and how it reads each one.
+ *
+ * @typeParam Props - The component's props, which the check fills from the recipe's axes.
+ */
+interface Planned<Props extends object> {
+  /**
+   * One entry per render: the props to draw with, and how to read what came back.
+   */
+  readonly cases: ReadonlyArray<readonly [props: Props, read: (drawn: ParentNode) => string[]]>;
+
+  /**
+   * The violations the recipe has before anything is drawn.
+   */
+  readonly stated: readonly string[];
+}
+
+/**
+ * Plans every render the check makes and how each one is read, which is everything the two checks
+ * share.
+ *
+ * @remarks
+ *   The sync check and the awaiting one differ only in how they get a container out of the
+ *   callback, so the recipe is read once here and both walk the result.
+ * @typeParam Props - The component's props, which the check fills from the recipe's axes.
+ */
+function planned<Props extends object>(recipe: Declared, options: BoundChecks): Planned<Props> {
+  const { slot } = options;
+  const owner = slot === undefined ? recipe.className : slotClass(recipe.className, slot);
+  const find =
+    options.subject ??
+    ((container: ParentNode): Element =>
+      slot === undefined
+        ? recipeElement(container, recipe.className)
+        : slotElement(container, recipe.className, slot));
+
+  const fixed = options.defaults ?? {};
+
+  return {
+    cases: renders(recipe).map(([picked, when]) => {
+      // Each key is an axis the recipe offers and each value one the axis takes, which is what Props names.
+      // eslint-disable-next-line typescript/no-unsafe-type-assertion -- see above
+      const props = Object.fromEntries(
+        Object.entries(picked).map(([axis, value]) => [axis, propOf(value)]),
+      ) as Props;
+
+      /**
+       * Reads the classes off what one render produced and reports what differs from the recipe.
+       */
+      const read = (drawn: ParentNode): string[] => [
+        ...differences(
+          owner,
+          actualClasses(find(drawn), owner),
+          expectedClasses(recipe, owner, slot, { ...fixed, ...picked }),
+          when,
+        ),
+      ];
+
+      return [props, read] as const;
+    }),
+    stated: unemitted(recipe, fixed),
+  };
+}
+
+/**
  * Reports every class a bound component lacks or has against its recipe, over one render per
  * value of every axis and one with nothing picked.
  *
@@ -246,30 +317,34 @@ export function boundViolations<Props extends object>(
   draw: Draw<Props>,
   options: BoundChecks = {},
 ): readonly string[] {
-  const { slot } = options;
-  const owner = slot === undefined ? recipe.className : slotClass(recipe.className, slot);
-  const find =
-    options.subject ??
-    ((container: ParentNode): Element =>
-      slot === undefined
-        ? recipeElement(container, recipe.className)
-        : slotElement(container, recipe.className, slot));
+  const { cases, stated } = planned<Props>(recipe, options);
 
-  const fixed = options.defaults ?? {};
-  const differing = renders(recipe).flatMap(([picked, when]) => {
-    // Each key is an axis the recipe offers and each value one the axis takes, which is what Props names.
-    // eslint-disable-next-line typescript/no-unsafe-type-assertion -- see above
-    const props = Object.fromEntries(
-      Object.entries(picked).map(([axis, value]) => [axis, propOf(value)]),
-    ) as Props;
+  return [...stated, ...cases.flatMap(([props, read]) => read(draw(props)))];
+}
 
-    return differences(
-      owner,
-      actualClasses(find(draw(props)), owner),
-      expectedClasses(recipe, owner, slot, { ...fixed, ...picked }),
-      when,
-    );
-  });
+/**
+ * Reports the same differences for a component whose state machine commits after it mounts.
+ *
+ * @remarks
+ *   Such a component schedules its first update on a microtask, so a render that is not awaited
+ *   commits outside the test's act scope and React reports an update it did not see. The renders
+ *   run one after another rather than together, because each one mounts into the document and two
+ *   act scopes open at once report the same thing.
+ * @returns Each difference as a sentence naming the class and the render, or an empty array for
+ *   a component that writes the classes its recipe says.
+ */
+export async function boundMachineViolations<Props extends object>(
+  recipe: Declared,
+  draw: DrawAsync<Props>,
+  options: BoundChecks = {},
+): Promise<readonly string[]> {
+  const { cases, stated } = planned<Props>(recipe, options);
+  const differing: string[] = [];
 
-  return [...unemitted(recipe, fixed), ...differing];
+  for (const [props, read] of cases) {
+    // eslint-disable-next-line no-await-in-loop -- each render mounts into the document, so one settles before the next opens its act scope
+    differing.push(...read(await draw(props)));
+  }
+
+  return [...stated, ...differing];
 }

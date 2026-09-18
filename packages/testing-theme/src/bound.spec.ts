@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { defineRecipe, defineSlotRecipe } from "@stealthscale/theme/authoring";
 
-import { boundViolations, type Draw } from "#bound.ts";
+import { boundMachineViolations, boundViolations, type Draw, type DrawAsync } from "#bound.ts";
 import { compoundClass, slotClass, slotVariantClass, variantClass } from "#classes.ts";
 
 type Props = Readonly<Record<string, boolean | string | undefined>>;
@@ -265,5 +265,70 @@ describe("boundViolations", () => {
     const drawn: Draw<Props> = () => marked(["odd"], "odd");
 
     expect(boundViolations(odd, drawn)).toStrictEqual([]);
+  });
+});
+
+describe("boundMachineViolations", () => {
+  const settling: DrawAsync<Props> = async (props) => {
+    await Promise.resolve();
+
+    return marked(buttonClasses(props));
+  };
+
+  it("returns an empty array when the element has every class the recipe writes", async () => {
+    await expect(boundMachineViolations(button, settling)).resolves.toStrictEqual([]);
+  });
+
+  it("reports a class the element lacks when its value is picked", async () => {
+    const deaf: DrawAsync<Props> = async (props) => {
+      await Promise.resolve();
+
+      return marked(buttonClasses({ ...props, variant: undefined }));
+    };
+
+    await expect(boundMachineViolations(button, deaf)).resolves.toStrictEqual([
+      "button lacks button--ghost when variant is ghost",
+      "button has button--solid when variant is ghost, which the recipe does not write",
+    ]);
+  });
+
+  it("reads a slot of a slot recipe the same way the synchronous check does", async () => {
+    const title: DrawAsync<Props> = async (props) => {
+      await Promise.resolve();
+
+      return titled([
+        slotClass("card", "title"),
+        slotVariantClass("card", "title", "size", String(props["size"] ?? "md")),
+      ]);
+    };
+
+    await expect(boundMachineViolations(card, title, { slot: "title" })).resolves.toStrictEqual([
+      "card__title has card__title--md when nothing is picked, which the recipe does not write",
+      "card__title has card__title--md when size is md, which the recipe does not write",
+      "card__title lacks card__title--muted when tone is muted",
+      "card__title has card__title--md when tone is muted, which the recipe does not write",
+    ]);
+  });
+
+  it("reports a value a default prop fixes that staticCss does not list", async () => {
+    await expect(
+      boundMachineViolations(button, settling, { defaults: { variant: "solid" } }),
+    ).resolves.toContain(
+      "button fixes variant solid through a default prop, which staticCss does not list",
+    );
+  });
+
+  it("draws once for every render the synchronous check makes", async () => {
+    let drawings = 0;
+    const counted: DrawAsync<Props> = async (props) => {
+      drawings += 1;
+      await Promise.resolve();
+
+      return marked(buttonClasses(props));
+    };
+
+    await boundMachineViolations(button, counted);
+
+    expect(drawings).toBe(6);
   });
 });

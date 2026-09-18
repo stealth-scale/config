@@ -18,6 +18,7 @@ import * as published from "#index.ts";
 
 const SURFACE = [
   "axesOf",
+  "boundMachineViolations",
   "boundViolations",
   "byStep",
   "classesOf",

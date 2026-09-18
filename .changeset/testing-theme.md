@@ -25,3 +25,9 @@ testing-theme: find a part by its slot class and a recipe file by its directory
   where they style different parts. A grid offering three columns on its root and a span of three on
   its entry writes one class on the root and another on the entry. Two axes sharing a value on one
   part are still reported.
+- `boundMachineViolations` reports the same differences as `boundViolations` for a component whose
+  state machine commits after it mounts. Such a component cannot be rendered synchronously without
+  leaving an update outside the act scope React checks, so this awaits each render. The renders run
+  one after another, because each mounts into the document and two act scopes open at once report
+  the same thing. `boundViolations` is unchanged, which keeps the 55 synchronous call sites as they
+  are.
