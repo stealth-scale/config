@@ -43,6 +43,7 @@ export {
   iconOnly,
   iconSizes,
   insetSizes,
+  sizeVariants,
   tagSizes,
   touchTarget,
 } from "#authoring/recipes/sizes.ts";

@@ -94,6 +94,7 @@ const SURFACE = [
   "shadows",
   "sidebar",
   "simpleGrid",
+  "sizeVariants",
   "slides",
   "slotsOf",
   "spanCounts",

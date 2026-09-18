@@ -9,6 +9,7 @@ import {
   iconOnly,
   iconSizes,
   insetSizes,
+  sizeVariants,
   tagSizes,
   touchTarget,
 } from "#authoring/recipes/sizes.ts";
@@ -54,6 +55,19 @@ describe("sizes", () => {
         position: "relative",
       },
     });
+  });
+
+  it("writes whatever a recipe states for each step it names", () => {
+    expect(
+      sizeVariants((size) => ({ paddingInlineEnd: `control.${size}` }), ["sm", "md"]),
+    ).toStrictEqual({
+      md: { paddingInlineEnd: "control.md" },
+      sm: { paddingInlineEnd: "control.sm" },
+    });
+  });
+
+  it("writes every step of the scale where a recipe names none", () => {
+    expect(Object.keys(sizeVariants(() => ({ width: "full" })))).toHaveLength(8);
   });
 
   it("pads every side of a box on the inset scale", () => {

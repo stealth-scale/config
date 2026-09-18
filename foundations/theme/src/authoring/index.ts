@@ -105,6 +105,7 @@ export {
   onSlots,
   overlay,
   ratioVariants,
+  sizeVariants,
   slotsOf,
   spanCounts,
   statusVariants,

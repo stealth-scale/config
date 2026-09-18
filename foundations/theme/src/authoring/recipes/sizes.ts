@@ -106,6 +106,43 @@ export function tagSizes(sizes: readonly Scale[] = SCALE): Record<string, System
 }
 
 /**
+ * Writes one entry per step of the scale, each holding whatever the recipe states for that step.
+ */
+export function sizeVariants(
+  write: (size: Scale) => SystemStyleObject,
+): Record<Scale, SystemStyleObject>;
+
+/**
+ * Writes one entry per step a recipe names, each holding whatever it states for that step.
+ *
+ * @typeParam Offered - The steps the recipe offers.
+ */
+export function sizeVariants<const Offered extends Scale>(
+  write: (size: Offered) => SystemStyleObject,
+  sizes: readonly Offered[],
+): Record<Offered, SystemStyleObject>;
+
+/**
+ * Writes a `size` axis whose steps no helper here already covers.
+ *
+ * @remarks
+ *   The helpers beside this one write the axes a control, an icon, a tag or a padded box needs,
+ *   which is most of them. A recipe wanting something else, such as the room a field leaves at its
+ *   end for a control sitting in it, would otherwise write the scale out by hand and stop reaching
+ *   a step the scale later gains. This takes the styles of one step and writes them for every step,
+ *   so the recipe names the token pattern once.
+ * @param write - Answers the styles one step holds, given that step's name.
+ * @param sizes - The steps to write, which is every one unless a recipe names fewer.
+ * @returns One entry per step.
+ */
+export function sizeVariants(
+  write: (size: Scale) => SystemStyleObject,
+  sizes: readonly Scale[] = SCALE,
+): Record<string, SystemStyleObject> {
+  return recordOf(sizes, (size) => write(size));
+}
+
+/**
  * Writes the `size` axis of a padded box: the room inside it on the inset scale.
  */
 export function insetSizes(): Record<Scale, SystemStyleObject>;
