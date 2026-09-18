@@ -238,7 +238,9 @@ Each pattern is a function from typed props to a style object, and nothing is ge
 them: `stack`, `hstack`, `vstack`, `flex`, `center`, `grid`, `simpleGrid`, `visuallyHidden`,
 `absoluteCenter`, `cluster`, `sidebar`, `switcher`, `cover`, `frame`, `reel`, `scrollable`,
 `sticky`, and `bento` with `bentoCell` for a dense grid of tiles that span columns and rows.
-`responsive(value, transform)` applies a function to every breakpoint of a responsive prop.
+`responsive(value, transform)` applies a function to every breakpoint of a responsive prop. The
+compiler's base preset is installed without its own patterns, so no pattern module is generated and
+a recipe named `stack`, `grid`, `container`, `divider` or `spacer` shares its name with nothing.
 
 ### Looks and motions
 

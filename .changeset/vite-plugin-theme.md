@@ -9,3 +9,6 @@ vite-plugin-theme: watch the workspace packages and draw the foundation without 
   without a restart.
 - An application whose statement names no theme compiles the foundation and the published presets
   alone. `Application.themes` is optional.
+- The compiler's base preset is installed without its patterns in both rendered configurations, so
+  the runtime carries no pattern module and the compiler reports no conflict between a recipe named
+  `stack`, `grid`, `container`, `divider` or `spacer` and a pattern of the same name.
