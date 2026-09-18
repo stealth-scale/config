@@ -50,6 +50,7 @@ a new record and mark the old one superseded.
 | [0038](0038-serve-the-catalogue-as-virtual-modules.md)                                      | Serve the catalogue as virtual modules with a loader per page                       | Accepted |
 | [0039](0039-count-a-dependencys-declaration-as-the-components-own.md)                       | Count a dependency's declaration as the component's own                             | Proposed |
 | [0040](0040-stamp-data-recipe-outside-a-production-build-only.md)                           | Stamp data-recipe outside a production build only                                   | Proposed |
+| [0041](0041-publish-the-catalogue-from-the-specimen-package.md)                             | Publish the catalogue from the specimen package                                     | Proposed |
 
 ## Status
 
