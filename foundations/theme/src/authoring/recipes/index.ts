@@ -27,10 +27,24 @@ export {
   widthSizes,
 } from "#authoring/recipes/flow.ts";
 export { interactive, link } from "#authoring/recipes/interactive.ts";
-export { type Look, LOOKS, lookVariants } from "#authoring/recipes/looks.ts";
+export {
+  type Flat,
+  FLATS,
+  flatVariants,
+  type Look,
+  LOOKS,
+  lookVariants,
+} from "#authoring/recipes/looks.ts";
 export { motion, type Motion, MOTIONS, motionVariants } from "#authoring/recipes/motion.ts";
 export { cornerVariants, ratioVariants } from "#authoring/recipes/shape.ts";
-export { controlSizes, iconOnly, iconSizes, touchTarget } from "#authoring/recipes/sizes.ts";
+export {
+  below,
+  controlSizes,
+  iconOnly,
+  iconSizes,
+  tagSizes,
+  touchTarget,
+} from "#authoring/recipes/sizes.ts";
 export { type Anatomy, onSlot, slotsOf } from "#authoring/recipes/slots.ts";
 export { statusVariants } from "#authoring/recipes/status.ts";
 export {

@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { recipeViolations } from "@stealthscale/testing-theme";
 
 import { defineRecipe } from "#authoring/recipe.ts";
-import { LOOKS, lookVariants } from "#authoring/recipes/looks.ts";
+import { FLATS, flatVariants, LOOKS, lookVariants } from "#authoring/recipes/looks.ts";
 
 describe("lookVariants", () => {
   it("lists six looks", () => {
@@ -30,6 +30,36 @@ describe("lookVariants", () => {
 
   it("reads a layer style the foundation defines for every look", () => {
     const recipe = defineRecipe({ className: "x", variants: { variant: lookVariants(LOOKS) } });
+
+    expect(recipeViolations(recipe)).toStrictEqual([]);
+  });
+});
+
+describe("flatVariants", () => {
+  it("lists five looks", () => {
+    expect(FLATS).toHaveLength(5);
+  });
+
+  it("leaves ghost out because a look that never repaints leaves it identical to plain", () => {
+    expect(FLATS).not.toContain("ghost");
+  });
+
+  it("reads the flat layer style of each look's own name", () => {
+    expect(flatVariants(FLATS)).toStrictEqual({
+      outline: { layerStyle: "flat.outline" },
+      plain: { layerStyle: "flat.plain" },
+      solid: { layerStyle: "flat.solid" },
+      subtle: { layerStyle: "flat.subtle" },
+      surface: { layerStyle: "flat.surface" },
+    });
+  });
+
+  it("offers every look where a recipe names none", () => {
+    expect(Object.keys(flatVariants()).toSorted()).toStrictEqual([...FLATS].toSorted());
+  });
+
+  it("reads a layer style the foundation defines for every flat look", () => {
+    const recipe = defineRecipe({ className: "x", variants: { variant: flatVariants(FLATS) } });
 
     expect(recipeViolations(recipe)).toStrictEqual([]);
   });

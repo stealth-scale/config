@@ -55,3 +55,43 @@ export function lookVariants<const Offered extends Look>(
 export function lookVariants(looks: readonly Look[] = LOOKS): Record<string, SystemStyleObject> {
   return recordOf(looks, (look) => ({ layerStyle: LAYER_STYLES[look] }));
 }
+
+/**
+ * Selects one of the looks a thing that is read rather than pressed can be drawn in.
+ */
+export type Flat = "outline" | "plain" | "solid" | "subtle" | "surface";
+
+/**
+ * Lists every flat look, in the order a documentation page shows them.
+ *
+ * @remarks
+ *   Ghost is not among them. A ghost control is a transparent box that fills in under a pointer,
+ *   and a look that never repaints leaves it identical to plain.
+ */
+export const FLATS: readonly Flat[] = ["solid", "subtle", "surface", "outline", "plain"];
+
+/**
+ * Writes the `variant` axis of a thing that holds still, each look one layer style.
+ *
+ * @remarks
+ *   A badge, a tag or a chip reads as part of what it labels. Drawn in a fill it would repaint
+ *   under a pointer, which reads as something to press, so it reads a flat look instead.
+ * @typeParam Offered - The looks the recipe offers, which is every one unless it names them.
+ */
+export function flatVariants(): Record<Flat, SystemStyleObject>;
+
+/**
+ * Writes the `variant` axis for the flat looks a recipe names.
+ *
+ * @typeParam Offered - The looks the recipe offers.
+ */
+export function flatVariants<const Offered extends Flat>(
+  looks: readonly Offered[],
+): Record<Offered, SystemStyleObject>;
+
+/**
+ * Writes one entry per look, each reading the flat layer style of its name.
+ */
+export function flatVariants(looks: readonly Flat[] = FLATS): Record<string, SystemStyleObject> {
+  return recordOf(looks, (look) => ({ layerStyle: `flat.${look}` }));
+}

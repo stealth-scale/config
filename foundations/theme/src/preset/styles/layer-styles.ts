@@ -111,6 +111,19 @@ function outlined(line: string, hovered: string): Look {
 }
 
 /**
+ * Writes a flat look: a background and the ink on it, and nothing a pointer changes.
+ *
+ * @remarks
+ *   A badge, a tag and a chip read as part of what they label rather than as something to press,
+ *   so they repaint under no pointer. A fill would repaint: a badge inside a row that hovers is
+ *   under the pointer whenever the row is, and a badge that lights up on its own reads as a
+ *   control a reader can press and then cannot.
+ */
+function flat(background: string, color = "colorPalette.fg"): Look {
+  return { value: { background, color } };
+}
+
+/**
  * Writes an indicator: a bar in the palette's solid along one edge of a positioned box.
  */
 function indicator(edge: LayerStyle): Look {
@@ -282,6 +295,27 @@ export const layerStyles: LayerStyles = {
           "colorPalette.muted",
           "colorPalette.emphasized",
         ).value,
+        backgroundClip: "padding-box",
+        borderColor: "colorPalette.border",
+        borderWidth: "sm",
+      },
+    },
+  },
+  flat: {
+    outline: {
+      value: {
+        backgroundClip: "padding-box",
+        borderColor: "colorPalette.border",
+        borderWidth: "sm",
+        color: "colorPalette.fg",
+      },
+    },
+    plain: { value: { color: "colorPalette.fg" } },
+    solid: flat("colorPalette.solid", "colorPalette.contrast"),
+    subtle: flat("colorPalette.subtle"),
+    surface: {
+      value: {
+        ...flat("colorPalette.subtle").value,
         backgroundClip: "padding-box",
         borderColor: "colorPalette.border",
         borderWidth: "sm",

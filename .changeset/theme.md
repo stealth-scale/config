@@ -43,3 +43,13 @@ theme: keep no value's class on a slot for a compound
 - The per-slot pruning drops a class from a slot only where no value that styles the slot writes it.
   A grid drawing three columns and an entry spanning three write the same class on their own slots,
   and the root lost its columns to the entry's span.
+- The semantic sizes state `tag`, the height of something read beside a control rather than pressed:
+  a badge, a chip or a pill. It grows on the control's own shares from a base of half the height, so
+  a theme that stretches its controls stretches the tags beside them by the same amount.
+- `flatVariants` writes a `variant` axis that holds still, reading the `flat` layer styles: a look
+  with a background and an ink and nothing a pointer changes. A badge drawn in a fill repaints
+  whenever a pointer crosses it, which reads as a control a reader can press and then cannot. There
+  is no flat ghost, a look that never repaints leaving it identical to plain.
+- `tagSizes` writes the `size` axis of a tag, its height on the tag scale and its inset, its gap and
+  its label one step down, and `below` reads the step under the one it is given so a recipe drawing
+  something lighter than a control states no order of its own.

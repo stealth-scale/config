@@ -13,9 +13,9 @@ import { recordOf } from "#record.ts";
 import { SCALE, type Scale } from "#scales/geometry.ts";
 
 /**
- * The inset a control leads with where a mark opens it, one step below its own.
+ * Pairs each step with the one below it, the smallest reading itself.
  */
-const LEADING: Readonly<Record<Scale, Scale>> = {
+const BELOW: Readonly<Record<Scale, Scale>> = {
   "2xl": "xl",
   "3xl": "2xl",
   "4xl": "3xl",
@@ -52,11 +52,56 @@ export function controlSizes<const Offered extends Scale>(
  */
 export function controlSizes(sizes: readonly Scale[] = SCALE): Record<string, SystemStyleObject> {
   return recordOf(sizes, (size) => ({
-    "&:has(> svg:first-child)": { paddingInlineStart: `inset.${LEADING[size]}` },
+    "&:has(> svg:first-child)": { paddingInlineStart: `inset.${below(size)}` },
     gap: `gap.${size}`,
     height: `control.${size}`,
     paddingInline: `inset.${size}`,
     textStyle: `label.${size}`,
+  }));
+}
+
+/**
+ * Reads the step below the one named, the smallest step reading itself.
+ *
+ * @remarks
+ *   A recipe drawing something lighter than a control at the same name reads the step below
+ *   rather than restating the order of the scale, so a scale that gains a step reaches it too.
+ * @param size - The step to read below.
+ * @returns The step below it, or `xs` where it is already the smallest.
+ */
+export function below(size: Scale): Scale {
+  return BELOW[size];
+}
+
+/**
+ * Writes the `size` axis of a tag: its height, its inset, its gap and its label.
+ */
+export function tagSizes(): Record<Scale, SystemStyleObject>;
+
+/**
+ * Writes the `size` axis of a tag for the steps it names.
+ *
+ * @typeParam Offered - The steps the recipe offers.
+ */
+export function tagSizes<const Offered extends Scale>(
+  sizes: readonly Offered[],
+): Record<Offered, SystemStyleObject>;
+
+/**
+ * Writes one entry per step, the height on the tag scale and the rest one step below.
+ *
+ * @remarks
+ *   A tag is read beside a control of its own name, so it is shorter than one and its inset, its
+ *   gap and its label all come from the step below. A medium tag beside a medium button is half
+ *   its height and carries the small label, which is the proportion a badge in a row of controls
+ *   needs to read as a label on something rather than as a control of its own.
+ */
+export function tagSizes(sizes: readonly Scale[] = SCALE): Record<string, SystemStyleObject> {
+  return recordOf(sizes, (size) => ({
+    gap: `gap.${below(size)}`,
+    height: `tag.${size}`,
+    paddingInline: `inset.${below(size)}`,
+    textStyle: `label.${below(size)}`,
   }));
 }
 

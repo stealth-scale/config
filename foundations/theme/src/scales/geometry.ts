@@ -193,6 +193,19 @@ export function icons(base = 1.25): Sized {
 }
 
 /**
+ * Draws the heights of a tag, keyed `xs` to `4xl`.
+ *
+ * @remarks
+ *   A tag is a badge, a chip or a pill: something read beside a control rather than pressed, and
+ *   drawn shorter than one. It grows on the control's own shares, so a theme that stretches its
+ *   controls stretches the tags beside them by the same amount and the two keep their proportion.
+ * @param base - The height of a medium tag, in rem.
+ */
+export function tags(base = 1.5): Sized {
+  return scaled(base, CONTROLS);
+}
+
+/**
  * Draws the padding inside a control, keyed `xs` to `4xl`.
  *
  * @param base - The padding of a medium control, in rem.

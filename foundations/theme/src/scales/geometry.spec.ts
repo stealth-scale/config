@@ -1,12 +1,19 @@
 import { describe, expect, it } from "vitest";
 
-import { controls, gaps, icons, insets } from "#scales/geometry.ts";
+import { controls, gaps, icons, insets, tags } from "#scales/geometry.ts";
 import { tokenAt } from "#tokens.fixtures.ts";
 
 const STEPS = ["2xl", "3xl", "4xl", "lg", "md", "sm", "xl", "xs"];
 
+/**
+ * Reads a length in rem as the number it states.
+ */
+function rem(length: unknown): number {
+  return Number(String(length).replace("rem", ""));
+}
+
 describe("geometry", () => {
-  it.each([controls, icons, insets, gaps])("draws eight steps with %o", (scale) => {
+  it.each([controls, icons, insets, gaps, tags])("draws eight steps with %o", (scale) => {
     expect(Object.keys(scale()).toSorted()).toStrictEqual(STEPS);
   });
 
@@ -39,5 +46,20 @@ describe("geometry", () => {
     expect(tokenAt(gaps(), "xs")).toBe("0.2500rem");
     expect(tokenAt(gaps(), "xl")).toBe("1.0000rem");
     expect(tokenAt(gaps(), "4xl")).toBe("3.0000rem");
+  });
+
+  it("draws a medium tag at the base it was given", () => {
+    expect(tokenAt(tags(), "md")).toBe("1.5000rem");
+    expect(tokenAt(tags(2), "md")).toBe("2.0000rem");
+  });
+
+  it("draws a tag on the shares a control grows by", () => {
+    expect(tokenAt(tags(), "xs")).toBe("1.2000rem");
+    expect(tokenAt(tags(), "xl")).toBe("1.8000rem");
+    expect(tokenAt(tags(), "4xl")).toBe("3.0000rem");
+  });
+
+  it.each(STEPS)("draws a tag shorter than the control named %s", (step) => {
+    expect(rem(tokenAt(tags(), step))).toBeLessThan(rem(tokenAt(controls(), step)));
   });
 });
