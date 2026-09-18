@@ -15,8 +15,9 @@ export {
   type DrawAsync,
 } from "#bound.ts";
 export { compoundClass, recipeClass, slotClass, slotVariantClass, variantClass } from "#classes.ts";
-export { THRESHOLDS, type Thresholds } from "#contrast.ts";
+export { type Measured, type Pair, THRESHOLDS, type Thresholds } from "#contrast.ts";
 export { type PresetCheck, type PresetChecks, presetViolations } from "#preset-checks.ts";
+export { gamut, outsideGamut, type Ramp, rampsOf } from "#ramp.ts";
 export { type RecipeCheck, type RecipeChecks, recipeViolations } from "#recipe-checks.ts";
 export {
   axesOf,
@@ -30,6 +31,16 @@ export {
 } from "#recipe.ts";
 export { classesOf, recipeClasses, recipeElement, slotClasses, slotElement } from "#rendered.ts";
 export {
+  formatReport,
+  type Margin,
+  report,
+  type StatusApart,
+  type Steps,
+  type ThemeReport,
+} from "#report.ts";
+export { type StatusPair, statusPairs } from "#status.ts";
+export {
+  colorAt,
   extendedRecipes,
   fontsOf,
   palettesOf,
@@ -38,3 +49,11 @@ export {
   type Resolving,
 } from "#theme.ts";
 export { type ThemeCheck, type ThemeChecks, violations } from "#violations.ts";
+export {
+  DEFICIENCIES,
+  type Deficiency,
+  distance,
+  distanceFor,
+  simulated,
+  written,
+} from "#vision.ts";

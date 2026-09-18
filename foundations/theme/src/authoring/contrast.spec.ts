@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { contrast, luminance, readable } from "#authoring/contrast.ts";
+import { contrast, linear, luminance, oklab, readable } from "#authoring/contrast.ts";
 
 const WHITE = "oklch(100.0% 0.0000 0.0)";
 
@@ -18,6 +18,7 @@ describe("contrast", () => {
   it.each([
     "oklch(100.0% 0.0000 0.0)",
     "oklch(1 0 0)",
+    "oklch(100% 0 none)",
     "#ffffff",
     "#fff",
     "rgb(255, 255, 255)",
@@ -33,6 +34,21 @@ describe("contrast", () => {
   it("returns NaN for a color it has no reader for", () => {
     expect(luminance("rebeccapurple")).toBeNaN();
     expect(luminance("var(--colors-red-500)")).toBeNaN();
+  });
+
+  it("reads a color into linear channels", () => {
+    expect(linear("#ff0000")).toStrictEqual({ blue: 0, green: 0, red: 1 });
+    expect(linear("rebeccapurple")).toBeUndefined();
+  });
+
+  it("reads white and black into the ends of the OKLab lightness axis", () => {
+    expect(oklab(WHITE)?.l).toBeCloseTo(1, 3);
+    expect(oklab(BLACK)?.l).toBeCloseTo(0, 3);
+  });
+
+  it("reads a color drawn in OKLCH back to the lightness it was written at", () => {
+    expect(oklab("oklch(54.0% 0.1906 257.5)")?.l).toBeCloseTo(0.54, 3);
+    expect(oklab("rebeccapurple")).toBeUndefined();
   });
 
   it("measures the widest pair as 21", () => {

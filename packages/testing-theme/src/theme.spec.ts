@@ -9,7 +9,15 @@ import {
 import foundation from "@stealthscale/theme/theme";
 
 import { foundationTheme, paletteTheme } from "#theme.fixtures.ts";
-import { extendedRecipes, fontsOf, palettesOf, publishedRecipes, resolved } from "#theme.ts";
+import {
+  colorAt,
+  extendedRecipes,
+  fontsOf,
+  lightnessAt,
+  palettesOf,
+  publishedRecipes,
+  resolved,
+} from "#theme.ts";
 
 describe("theme", () => {
   it("reads a color written outright in one mode", () => {
@@ -82,6 +90,38 @@ describe("theme", () => {
     expect(resolved(paletteTheme(), { value: "{colors.primary.500}" }, "_dark")).toBe(
       "oklch(58.0% 0.1400 262.0)",
     );
+  });
+
+  it("reads the color a path names through the theme and then the base", () => {
+    const theme = paletteTheme();
+
+    expect(colorAt(theme, "primary.solid", "base", {})).toBe("oklch(37.0% 0.1260 262.0)");
+    expect(colorAt(theme, "primary.solid.hover", "_dark", {})).toBe("oklch(80.0% 0.1092 262.0)");
+    expect(colorAt(theme, "bg", "base", { base: foundation })).toBe("oklch(97.0% 0.0060 262.0)");
+    expect(colorAt(theme, "bg", "base", {})).toBeUndefined();
+  });
+
+  it("reads a group at its own value", () => {
+    const theme = paletteTheme({
+      solid: { DEFAULT: { value: "#123456" }, hover: { value: "#0" } },
+    });
+
+    expect(colorAt(theme, "primary.solid", "base", {})).toBe("#123456");
+    expect(colorAt(theme, "primary.solid.hover", "base", {})).toBe("#0");
+  });
+
+  it("reads the lightness of the color a path names", () => {
+    const theme = paletteTheme({ solid: { value: "#000000" } });
+
+    expect(lightnessAt(theme, "primary.solid", "base", {})).toBe(0);
+    expect(lightnessAt(theme, "primary.contrast", "base", {})).toBeCloseTo(0.97, 2);
+  });
+
+  it("reads no lightness where the color cannot be resolved or read", () => {
+    const theme = paletteTheme({ solid: { value: "nope" } });
+
+    expect(lightnessAt(theme, "primary.solid", "base", {})).toBeUndefined();
+    expect(lightnessAt(theme, "bg", "base", {})).toBeUndefined();
   });
 
   it("lists every group with a solid fill as a palette", () => {

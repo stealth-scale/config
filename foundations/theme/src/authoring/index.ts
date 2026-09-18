@@ -39,7 +39,16 @@ export {
   type ThemeColors,
   type ThemeTokens,
 } from "#authoring/contract.ts";
-export { contrast, type Level, luminance, readable } from "#authoring/contrast.ts";
+export {
+  contrast,
+  type Level,
+  linear,
+  type Linear,
+  luminance,
+  oklab,
+  type Oklab,
+  readable,
+} from "#authoring/contrast.ts";
 export { type RecipeExtension, type SlotRecipeExtension } from "#authoring/extension.ts";
 export { deepMerge } from "#authoring/merge.ts";
 export {
@@ -182,6 +191,7 @@ export {
 export {
   alphaScale,
   backgrounds,
+  BORDER_STEPS,
   borders,
   colorScale,
   controls,
@@ -190,6 +200,7 @@ export {
   families,
   type Families,
   fontSizes,
+  FOREGROUND_STEPS,
   foregrounds,
   gaps,
   icons,
@@ -203,13 +214,21 @@ export {
   palettes,
   type Palettes,
   radii,
+  ramp,
   type Ratio,
   RATIOS,
   ROLE_SIZES,
+  ROLE_STEPS,
+  type RoleSteps,
   SCALE,
   type Scale,
   shadows,
   slides,
+  type Step,
+  stepped,
+  type Steps,
+  surfaces,
+  type SurfaceSteps,
   type TextRole,
   typography,
   type Width,

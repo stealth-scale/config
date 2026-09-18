@@ -20,7 +20,7 @@ export interface Leaf {
 /**
  * Reports whether a node is a token, which is an object carrying a value.
  */
-export function isToken(node: unknown): boolean {
+export function isToken(node: unknown): node is object {
   return typeof node === "object" && node !== null && "value" in node;
 }
 
