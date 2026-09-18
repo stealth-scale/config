@@ -1,0 +1,71 @@
+{
+  "name": "@stealthscale/vite-config-specimen",
+  "version": "0.0.0",
+  "description": "Configures an application that shows a catalogue, and the workspace root the specimens sit under.",
+  "keywords": [
+    "catalogue",
+    "specimen",
+    "vite-config"
+  ],
+  "homepage": "https://github.com/stealth-scale/config/tree/main/packages/vite-config-specimen#readme",
+  "bugs": "https://github.com/stealth-scale/config/issues",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stealth-scale/config.git",
+    "directory": "packages/vite-config-specimen"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "imports": {
+    "#*": "./src/*"
+  },
+  "exports": {
+    ".": {
+      "stealth-source": "./src/index.ts",
+      "default": "./dist/index.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": "./dist/index.mjs",
+      "./package.json": "./package.json"
+    },
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vp pack",
+    "check": "vp check",
+    "prepublishOnly": "vp pack",
+    "test": "vp test"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/core": "catalog:",
+    "@stealthscale/testing-config": "workspace:^",
+    "@stealthscale/vite-config": "workspace:^",
+    "@stealthscale/vite-config-core": "workspace:^",
+    "@stealthscale/vite-config-typescript": "workspace:^",
+    "@stealthscale/vite-plugin-specimen": "workspace:^",
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "publint": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "@stealthscale/vite-config": "workspace:^",
+    "@stealthscale/vite-config-core": "workspace:^",
+    "@stealthscale/vite-plugin-specimen": "workspace:^",
+    "vite": "catalog:peer"
+  },
+  "engines": {
+    "node": ">=26.0.0"
+  }
+}

@@ -21,8 +21,13 @@ const SOURCES = "src/**/*.{ts,tsx}";
 
 /**
  * The suffixes a file carries when it is not itself a source.
+ *
+ * @remarks
+ *   A specimen belongs here for the reason a fixture does. It declares a page for a catalogue to
+ *   draw rather than behaviour to assert, and it runs in the catalogue rather than in the package
+ *   it documents, so it resolves what it imports through the workspace root.
  */
-const APART = [".spec.ts", ".spec.tsx", ".fixtures.ts", ".fixtures.tsx", ".d.ts"];
+const APART = [".spec.ts", ".spec.tsx", ".fixtures.ts", ".fixtures.tsx", ".specimen.tsx", ".d.ts"];
 
 /**
  * The files a barrel is named, which gather a block rather than declare one.

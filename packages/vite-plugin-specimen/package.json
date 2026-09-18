@@ -1,0 +1,80 @@
+{
+  "name": "@stealthscale/vite-plugin-specimen",
+  "version": "0.0.0",
+  "description": "Indexes specimen files from their source, so a catalogue lists every page without loading one.",
+  "keywords": [
+    "catalogue",
+    "design-system",
+    "specimen",
+    "vite",
+    "vite-plugin"
+  ],
+  "homepage": "https://github.com/stealth-scale/config/tree/main/packages/vite-plugin-specimen#readme",
+  "bugs": "https://github.com/stealth-scale/config/issues",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stealth-scale/config.git",
+    "directory": "packages/vite-plugin-specimen"
+  },
+  "files": [
+    "client.d.ts",
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "imports": {
+    "#*": "./src/*"
+  },
+  "exports": {
+    ".": {
+      "stealth-source": "./src/index.ts",
+      "default": "./dist/index.mjs"
+    },
+    "./package.json": "./package.json",
+    "./client": "./client.d.ts"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": "./dist/index.mjs",
+      "./package.json": "./package.json",
+      "./client": "./client.d.ts"
+    },
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vp pack",
+    "check": "vp check",
+    "prepublishOnly": "vp pack",
+    "test": "vp test"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/core": "catalog:",
+    "@stealthscale/testing": "workspace:^",
+    "@stealthscale/testing-config": "workspace:^",
+    "@stealthscale/vite-config": "workspace:^",
+    "@stealthscale/vite-config-typescript": "workspace:^",
+    "@stealthscale/vite-plugin-base": "workspace:^",
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "publint": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "@stealthscale/vite-plugin-base": "workspace:^",
+    "typescript": "catalog:",
+    "vite": "catalog:peer"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=26.0.0"
+  }
+}

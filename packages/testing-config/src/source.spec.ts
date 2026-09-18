@@ -78,6 +78,10 @@ describe("specs", () => {
     expect(checked({ "src/held.fixtures.tsx": VALUE })).toStrictEqual([]);
   });
 
+  it("leaves a specimen alone because it declares a page rather than behaviour", () => {
+    expect(checked({ "src/held.specimen.tsx": VALUE })).toStrictEqual([]);
+  });
+
   it("leaves a declaration file alone", () => {
     expect(checked({ "src/held.d.ts": TYPES })).toStrictEqual([]);
   });
@@ -209,6 +213,12 @@ describe("declared", () => {
     expect(imported({ "src/held.fixtures.ts": 'import { it } from "vitest";\n' })).toStrictEqual(
       [],
     );
+  });
+
+  it("reads past a specimen because it runs in the catalogue", () => {
+    expect(
+      imported({ "src/held.specimen.tsx": 'import { specimen } from "@kit/specimen";\n' }),
+    ).toStrictEqual([]);
   });
 
   it("names every undeclared import it finds in path order", () => {

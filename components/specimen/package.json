@@ -1,20 +1,20 @@
 {
-  "name": "@stealthscale/component-actions",
-  "version": "0.1.0",
-  "description": "Draws what a person presses: a button, a toggle, and the triggers that carry an action.",
+  "name": "@stealthscale/specimen",
+  "version": "0.0.0",
+  "description": "Declares what a page of a catalogue is, and draws a component once per value of an axis.",
   "keywords": [
-    "actions",
-    "button",
-    "components",
-    "react"
+    "catalogue",
+    "design-system",
+    "react",
+    "specimen"
   ],
-  "homepage": "https://github.com/stealth-scale/config/tree/main/components/actions#readme",
+  "homepage": "https://github.com/stealth-scale/config/tree/main/components/specimen#readme",
   "bugs": "https://github.com/stealth-scale/config/issues",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/stealth-scale/config.git",
-    "directory": "components/actions"
+    "directory": "components/specimen"
   },
   "files": [
     "dist",
@@ -31,16 +31,11 @@
       "stealth-source": "./src/index.ts",
       "default": "./dist/index.js"
     },
-    "./theme": {
-      "stealth-source": "./src/theme.ts",
-      "default": "./dist/theme.js"
-    },
     "./package.json": "./package.json"
   },
   "publishConfig": {
     "exports": {
       ".": "./dist/index.js",
-      "./theme": "./dist/theme.js",
       "./package.json": "./package.json"
     },
     "access": "public"
@@ -54,11 +49,10 @@
   "devDependencies": {
     "@arethetypeswrong/core": "catalog:",
     "@rolldown/plugin-babel": "catalog:",
-    "@stealthscale/theme": "workspace:^",
+    "@stealthscale/component-layout": "workspace:^",
+    "@stealthscale/component-typography": "workspace:^",
     "@stealthscale/vite-config": "workspace:^",
     "@stealthscale/vite-config-react": "workspace:^",
-    "@stealthscale/vite-config-specimen": "workspace:^",
-    "@stealthscale/vite-config-theme": "workspace:^",
     "@stealthscale/vite-config-typescript": "workspace:^",
     "@testing-library/react": "catalog:",
     "@types/react": "catalog:",
@@ -73,7 +67,8 @@
     "vitest": "catalog:"
   },
   "peerDependencies": {
-    "@stealthscale/theme": "workspace:^",
+    "@stealthscale/component-layout": "workspace:^",
+    "@stealthscale/component-typography": "workspace:^",
     "react": "catalog:"
   },
   "engines": {
