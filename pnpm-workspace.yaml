@@ -38,6 +38,7 @@ catalog:
   "@zag-js/collapsible": 1.43.3
   "@zag-js/react": 1.43.3
   "@zag-js/tabs": 1.43.3
+  "@zag-js/tooltip": 1.43.3
   "@zag-js/types": 1.43.3
   "@commitlint/cli": ^21.2.2
   "@vitest/eslint-plugin": ^1.6.27
