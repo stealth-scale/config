@@ -12,9 +12,9 @@ describe("@stealthscale/vite-config-specimen", () => {
     await expect(
       violations({
         arguments: {
+          catalogue: [{ patterns: PATTERNS }],
           crawled: [PATTERNS],
           indexed: [{ patterns: PATTERNS }],
-          layers: [{ patterns: PATTERNS }],
         },
         at: join(import.meta.dirname, ".."),
         kind: "config",

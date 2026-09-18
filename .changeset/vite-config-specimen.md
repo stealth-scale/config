@@ -2,13 +2,9 @@
 "@stealthscale/vite-config-specimen": minor
 ---
 
-add the specimen config package
+exclude specimens from package coverage
 
-- `layers(options)` adds the index plugin and every specimen as an entry the dependency scan walks
-  before a server starts serving.
-- `workspace(files)` relaxes four rules on `**/*.specimen.tsx` from the workspace root, where the
-  linter reads its configuration.
-- `indexed` and `crawled` are published separately for a repository that states one without the
-  other.
-
-21 tests, 100% on all four metrics.
+- `uncounted(files)` contributes `test.omit` for `**/*.specimen.tsx`.
+- `layers()` carries that omission and is the call a package holding specimens makes.
+- `catalogue(options)` is the call an application showing a catalogue makes, and carries what
+  `layers(options)` carried.

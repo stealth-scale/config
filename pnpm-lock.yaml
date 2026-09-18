@@ -385,6 +385,9 @@ importers:
       '@stealthscale/example-lib-surfaces':
         specifier: workspace:^
         version: link:examples/lib-surfaces
+      '@stealthscale/specimen':
+        specifier: workspace:^
+        version: link:components/specimen
       '@stealthscale/testing':
         specifier: workspace:^
         version: link:packages/testing

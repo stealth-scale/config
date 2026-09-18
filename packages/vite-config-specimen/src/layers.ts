@@ -1,21 +1,21 @@
 /**
- * Collects the layers an application that shows a catalogue extends its tier with.
+ * Collects the layers a package that holds specimens extends its tier with.
  */
 
 import { type Layer } from "@stealthscale/vite-config-core";
-import { type Options } from "@stealthscale/vite-plugin-specimen";
 
-import { crawled } from "#crawled.ts";
-import { indexed } from "#indexed.ts";
+import { uncounted } from "#uncounted.ts";
 
 /**
- * Returns the layers an application that shows a catalogue extends its tier with.
+ * Returns the layers a package holding specimens extends its tier with.
  *
  * @remarks
- *   A list rather than a tier, because a catalogue is an ordinary application first: it picks
- *   whichever tier its framework calls for and adds these.
- * @param stated - Where the specimens are. `Options` documents every member.
+ *   A list rather than a tier, because a component package picks whichever tier its framework
+ *   calls for and adds these. A package that keeps its specimens somewhere other than beside its
+ *   source calls `uncounted()` with its own globs instead. The lint departures are not among these
+ *   layers: the linter runs from the workspace root, so a root config states them through
+ *   `workspace()`.
  */
-export function layers(stated: Options): readonly Layer[] {
-  return [indexed(stated), ...crawled(stated.patterns)];
+export function layers(): readonly Layer[] {
+  return [...uncounted()];
 }
