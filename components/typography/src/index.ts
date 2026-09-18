@@ -17,5 +17,6 @@ export * from "#icon/index.ts";
 export * from "#kbd/index.ts";
 export * as List from "#list/index.ts";
 export * from "#mark/index.ts";
+export * from "#quote/index.ts";
 export * from "#strong/index.ts";
 export * from "#text/index.ts";

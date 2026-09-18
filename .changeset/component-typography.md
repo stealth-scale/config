@@ -2,7 +2,7 @@
 "@stealthscale/component-typography": minor
 ---
 
-component-typography: publish Em, Strong and Mark
+component-typography: publish Em, Strong, Mark and Quote
 
 - `Em` marks a run of words the writer stressed. The element is `em` and it exposes the `emphasis`
   role. The recipe declares `fontStyle: italic` rather than relying on the browser's default, so a
@@ -25,3 +25,9 @@ component-typography: publish Em, Strong and Mark
   line above rather than opening the line.
 - A compound named `tinted` draws the palette ink where a status meets `plain` or `text`, the two
   looks that write no fill and would otherwise take a status and show nothing.
+- The mark defaults to `inset: xs` and `radius: l1` beside its subtle fill, so a highlight with no
+  props sits off the glyphs rather than running against them.
+- `Quote` quotes a run inside the line around it. The element is `q`, and the browser draws the
+  marks from the `quotes` property against the `lang` in force. It offers `marks` at `auto` and
+  `none`, defaulting to `auto`, beside `tone` and `motion`. Set `marks="none"` where the text
+  already holds its punctuation. `Blockquote.Root` remains the quotation set as its own block.

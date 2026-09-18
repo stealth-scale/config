@@ -9,6 +9,8 @@
  *   whose background and ink are the palette pairs the contrast gate measures, so a highlight
  *   clears the text ratio in both color modes. The inset writes `paddingInline` alone, because
  *   block padding on an inline box overflows into the line above rather than opening the line.
+ *   The defaults draw a finished highlight: a subtle fill, the tightest inset and the tightest
+ *   corner. A mark with nothing picked sits off the glyphs rather than running against them.
  */
 
 import {
@@ -34,7 +36,7 @@ export const recipe = defineRecipe({
       variant: ["plain", "text"],
     },
   ],
-  defaultVariants: { variant: "subtle" },
+  defaultVariants: { inset: "xs", radius: "l1", variant: "subtle" },
   jsx: [/Mark$/u],
   variants: {
     /**

@@ -154,8 +154,8 @@ import { Mark, MarkPropsProvider } from "@stealthscale/component-typography";
 | --------- | -------------------------------------------------------- | -------- |
 | `variant` | `solid`, `subtle`, `surface`, `outline`, `plain`, `text` | `subtle` |
 | `status`  | `info`, `success`, `warning`, `error`                    | none     |
-| `radius`  | `l1`, `l2`, `l3`, `full`                                 | none     |
-| `inset`   | `xs`, `sm`, `md`                                         | none     |
+| `radius`  | `l1`, `l2`, `l3`, `full`                                 | `l1`     |
+| `inset`   | `xs`, `sm`, `md`                                         | `xs`     |
 | `motion`  | `fade`, `rise`, `reveal`                                 | none     |
 | `effect`  | `glow`, `shine`                                          | none     |
 
@@ -167,6 +167,29 @@ distinction drawn in colour alone.
 The base clones the box decoration, so a highlight that runs onto a second line carries its inset
 and its corners onto both. The inset opens the inline axis alone: block padding on an inline box
 overflows into the line above rather than opening the line.
+
+## Quote
+
+Quotes a run of words inside the line around it. The element is `q`. The browser draws the marks
+from the `quotes` property, which resolves against the `lang` in force on the element or an
+ancestor. A German page is therefore marked with German quotation marks, and the caller writes none.
+
+```tsx
+import { Quote } from "@stealthscale/component-typography";
+
+<Quote cite="https://example.org/paper">a measured claim</Quote>;
+<Quote marks="none">the caller writes the punctuation</Quote>;
+```
+
+| Axis     | Values                                                                | Default |
+| -------- | --------------------------------------------------------------------- | ------- |
+| `marks`  | `auto`, `none`                                                        | `auto`  |
+| `tone`   | `default`, `muted`, `inverted`, `info`, `success`, `warning`, `error` | inherit |
+| `motion` | `fade`, `rise`, `reveal`                                              | none    |
+
+Set `marks="none"` where the text already holds its punctuation, as a quotation inside another one
+does. Use `Blockquote.Root` for a quotation set as its own block, which is a `figure` with its own
+content, caption and icon. State `cite` with the source's address where there is one.
 
 ## Kbd
 
@@ -282,6 +305,7 @@ import { Blockquote } from "@stealthscale/component-typography";
 | `EmProps`              | `type`      | The run's variants and everything an `em` takes          |
 | `StrongProps`          | `type`      | The run's variants and everything a `strong` takes       |
 | `MarkProps`            | `type`      | The highlight's variants and everything a `mark` takes   |
+| `QuoteProps`           | `type`      | The quotation's variants and everything a `q` takes      |
 | `KbdProps`             | `type`      | The key's variants and everything a `kbd` takes          |
 | `IconProps`            | `type`      | The icon's variants and everything an `svg` takes        |
 | `List.RootProps`       | `type`      | The list's variants and everything a `ul` takes          |

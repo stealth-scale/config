@@ -24,8 +24,8 @@ describe("recipe", () => {
     ]);
   });
 
-  it("draws a subtle highlight when nothing is asked for", () => {
-    expect(defaultsOf(recipe)).toStrictEqual({ variant: "subtle" });
+  it("draws a finished highlight when nothing is asked for", () => {
+    expect(defaultsOf(recipe)).toStrictEqual({ inset: "xs", radius: "l1", variant: "subtle" });
   });
 
   it("offers the five flat looks and the weight", () => {
