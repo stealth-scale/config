@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import { type Catalogues, NONE, useTranslation } from "@stealthscale/provider-i18n";
 
 import { LocaleContext, type LocaleContextValue } from "#context.ts";
-import { Translated } from "#translated.tsx";
+import { I18nProvider } from "#i18n.tsx";
 
 const CATALOGUES: Catalogues = {
   bundled: {
@@ -47,12 +47,12 @@ function mounted(locale: string, catalogues: Catalogues | undefined, children: R
 
   render(
     <LocaleContext value={value}>
-      <Translated catalogues={catalogues}>{children}</Translated>
+      <I18nProvider catalogues={catalogues}>{children}</I18nProvider>
     </LocaleContext>,
   );
 }
 
-describe("Translated", () => {
+describe("I18nProvider", () => {
   it("reads the catalogues in the locale in force", () => {
     mounted("nl", CATALOGUES, <Worded />);
 

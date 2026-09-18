@@ -12,7 +12,7 @@ import {
 } from "@stealthscale/provider-environment";
 import { HotkeysProvider, type HotkeysProviderOptions } from "@stealthscale/provider-hotkeys";
 import { type Catalogues, type I18nSettings } from "@stealthscale/provider-i18n";
-import { LocaleProvider, Translated } from "@stealthscale/provider-locale";
+import { I18nProvider, LocaleProvider } from "@stealthscale/provider-locale";
 import { type Size, ViewportProvider } from "@stealthscale/provider-viewport";
 import { type SettingStore } from "@stealthscale/settings";
 
@@ -113,13 +113,13 @@ export function Shell({
       <ColorModeProvider app={app} store={store}>
         <Themed theme={theme}>
           <LocaleProvider app={app} locales={locales} store={store}>
-            <Translated catalogues={catalogues} settings={i18n}>
+            <I18nProvider catalogues={catalogues} settings={i18n}>
               <ViewportProvider sizes={sizes}>
                 <HotkeysProvider {...(hotkeys === undefined ? {} : { defaultOptions: hotkeys })}>
                   {children}
                 </HotkeysProvider>
               </ViewportProvider>
-            </Translated>
+            </I18nProvider>
           </LocaleProvider>
         </Themed>
       </ColorModeProvider>

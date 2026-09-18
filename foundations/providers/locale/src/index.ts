@@ -10,6 +10,7 @@
 
 export { browserLanguages } from "#browser.ts";
 export { LocaleContext, type LocaleContextValue, useLocale } from "#context.ts";
+export { I18nProvider, type I18nProviderProps } from "#i18n.tsx";
 export { negotiate, type Preference, preferences } from "#negotiate.ts";
 export { LocaleProvider, type LocaleProviderProps } from "#provider.tsx";
 export { LOCALE_SETTING, localeSetting } from "#setting.ts";
@@ -24,4 +25,3 @@ export {
   widened,
   widenedChain,
 } from "#tags.ts";
-export { Translated, type TranslatedProps } from "#translated.tsx";

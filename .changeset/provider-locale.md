@@ -12,8 +12,8 @@ provider-locale: decide which locale a page is read in
   onto whichever document `@stealthscale/provider-environment` names.
 - Given `locale` and `onLocaleChange` the provider reads in what it is told and remembers nothing,
   so a router that carries the locale in the URL drives it.
-- `Translated` mounts the i18n provider in the locale in force, so a change of locale changes every
-  string below.
+- This package's own `I18nProvider` mounts the one from `@stealthscale/provider-i18n` in the locale
+  in force, so a change of locale changes every string below.
 - `negotiate` runs ECMA-402's lookup: each requested tag is truncated in turn, so `nl-BE` reaches
   `nl`. Where truncation finds nothing, both sides widen to their likely script and region, so
   `zh-HK` reaches `zh-Hant` and `en-GB` reaches `en-US`.

@@ -27,8 +27,8 @@ import { catalogues } from "virtual:i18n";
 `app` is the only required prop. Every setting a person makes is remembered under it, so two
 applications on one origin keep their own.
 
-Routes and data stay the application's own. It renders its router and its clients as children, so an
-application without either bundles neither.
+An application renders its router and its data clients as children, so one without either bundles
+neither. Routes and data stay its own.
 
 ## The order
 
@@ -38,7 +38,7 @@ application without either bundles neither.
 | `ColorModeProvider`   | Chooses and remembers the mode, and writes it on the document root                    |
 | `ThemeProvider`       | Draws below in the theme and the chosen mode                                          |
 | `LocaleProvider`      | Follows the theme, and decides the writing direction                                  |
-| `Translated`          | Reads the catalogues in the locale, so it follows it                                  |
+| `I18nProvider`        | Reads the catalogues in the locale, so it follows it                                  |
 | `ViewportProvider`    | Reads the theme's breakpoints, so it follows the theme                                |
 | `HotkeysProvider`     | Depends on nothing below it                                                           |
 
@@ -52,7 +52,7 @@ the machine is passed nothing, which is how both of them spell that.
 `Themed` is exported for an application that composes the providers itself and wants the same
 bridge.
 
-## What each prop reaches
+## The props
 
 `catalogues` and `i18n` reach the i18n provider. `locales` reaches the locale provider. `theme`
 reaches the theme provider. `sizes` reaches the viewport. `hotkeys` reaches the shortcuts.

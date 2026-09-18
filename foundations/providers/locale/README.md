@@ -15,13 +15,13 @@ The package peers on `@stealthscale/provider-environment`, `@stealthscale/provid
 ## Usage
 
 ```tsx
-import { LocaleProvider, Translated } from "@stealthscale/provider-locale";
+import { I18nProvider, LocaleProvider } from "@stealthscale/provider-locale";
 import { catalogues } from "virtual:i18n";
 
 <LocaleProvider app="orders" locales={["en-US", "nl", "ar-EG"]}>
-  <Translated catalogues={catalogues}>
+  <I18nProvider catalogues={catalogues}>
     <App />
-  </Translated>
+  </I18nProvider>
 </LocaleProvider>;
 ```
 
@@ -29,8 +29,9 @@ import { catalogues } from "virtual:i18n";
 what a person chose, else the best of those offers for what their browser asks for, else the first.
 The choice is remembered under `app`, so two applications on one origin keep their own.
 
-`Translated` mounts the i18n provider in whichever locale is in force, so changing the locale
-changes every string below. Leave `catalogues` out and it renders its children untouched.
+This package's own `I18nProvider` mounts the one from `@stealthscale/provider-i18n` in whichever
+locale is in force, so changing the locale changes every string below. Leave `catalogues` out and it
+renders its children untouched.
 
 ## Reading it
 
