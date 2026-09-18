@@ -22,3 +22,7 @@ testing-config: hold a package's barrels to a specification where it asks
 - `source.jsx` reports a file suffixed `.tsx` that writes no JSX, which sends a reader looking for
   markup that was never written. The other way round needs no check, a compiler refusing JSX in a
   `.ts` file.
+- `source.declared` reads past a specifier carrying a URI scheme, not just a `node:` builtin. A
+  bundler's virtual module such as `virtual:i18n` is answered by a plugin rather than installed, so
+  no manifest declares it. A package name carries no colon and a scoped name opens with `@`, so
+  nothing installed matches.

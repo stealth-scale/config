@@ -165,6 +165,12 @@ describe("declared", () => {
     expect(imported({ "src/held.ts": 'import { join } from "node:path";\n' })).toStrictEqual([]);
   });
 
+  it("reads past a virtual module because a bundler plugin answers it", () => {
+    expect(
+      imported({ "src/held.ts": 'import { catalogues } from "virtual:i18n";\n' }),
+    ).toStrictEqual([]);
+  });
+
   it("reads what a module re-exports as an import too", () => {
     expect(imported({ "src/index.ts": 'export { Portal } from "elsewhere";\n' })).toStrictEqual([
       "src/index.ts imports elsewhere, which the manifest does not declare",

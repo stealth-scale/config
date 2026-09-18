@@ -113,14 +113,25 @@ export function specs(at: string, barrels = false): readonly string[] {
 }
 
 /**
- * Reads the package a specifier names, or nothing where it names a file or a builtin.
+ * Matches a specifier that opens with a scheme, which names something other than a package.
+ *
+ * @remarks
+ *   `node:path` is a builtin and `virtual:i18n` is a module a bundler plugin answers. Neither is
+ *   installed, so neither is a manifest's to declare. A scoped package opens with `@` and a package
+ *   name carries no colon, so nothing installed matches this.
+ */
+const SCHEME = /^[a-z][a-z\d+.-]*:/u;
+
+/**
+ * Reads the package a specifier names, or nothing where it names a file, a builtin or a virtual
+ * module.
  *
  * @remarks
  *   A subpath is dropped, so `@acme/theme/authoring` reads as `@acme/theme`, because a manifest
  *   declares the package and not the entry a file reached it through.
  */
 function packageOf(specifier: string): string | undefined {
-  if (specifier.startsWith(".") || specifier.startsWith("#") || specifier.startsWith("node:")) {
+  if (specifier.startsWith(".") || specifier.startsWith("#") || SCHEME.test(specifier)) {
     return undefined;
   }
 
