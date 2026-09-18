@@ -5,9 +5,15 @@ import * as barrel from "#index.ts";
 describe("index", () => {
   it("names everything a specimen is written with and nothing beside it", () => {
     expect(Object.keys(barrel).toSorted()).toStrictEqual([
+      "Catalogue",
       "Matrix",
+      "Page",
+      "Rail",
       "captionOf",
+      "declared",
+      "grouped",
       "nameOf",
+      "parted",
       "scene",
       "specimen",
     ]);

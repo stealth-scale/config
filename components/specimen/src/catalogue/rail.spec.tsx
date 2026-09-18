@@ -1,9 +1,9 @@
 import { render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import { type Group } from "#grouped.ts";
-import { Rail } from "#rail.tsx";
-import { type Indexed } from "#types.ts";
+import { type Group } from "#catalogue/grouped.ts";
+import { Rail } from "#catalogue/rail.tsx";
+import { type Indexed } from "#catalogue/types.ts";
 
 function entry(id: string, title: string): Indexed {
   return {

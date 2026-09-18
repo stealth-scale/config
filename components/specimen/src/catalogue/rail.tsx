@@ -9,7 +9,7 @@ import { Stack } from "@stealthscale/component-layout";
 import { Text } from "@stealthscale/component-typography";
 import { useTranslation } from "@stealthscale/provider-i18n";
 
-import { type Group } from "#grouped.ts";
+import { type Group } from "#catalogue/grouped.ts";
 
 /**
  * Describes what the rail takes.
@@ -39,7 +39,7 @@ export interface RailProps {
  *   nothing yet. The element changes with the router, and the rail's shape does not.
  */
 export function Rail({ chosen, groups, onChoose }: RailProps): ReactElement {
-  const { t } = useTranslation("docs");
+  const { t } = useTranslation("specimen");
 
   return (
     <Stack aria-label={t("rail.label")} as="nav" gap="lg">

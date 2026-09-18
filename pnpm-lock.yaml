@@ -1367,6 +1367,16 @@ importers:
         version: 4.1.11(@types/node@26.5.1)(@vitest/browser-playwright@4.1.11)(@vitest/browser-preview@4.1.11)(@vitest/coverage-v8@4.1.11)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(happy-dom@20.14.5)
 
   components/specimen:
+    dependencies:
+      '@stealthscale/component-actions':
+        specifier: workspace:^
+        version: link:../actions
+      '@stealthscale/provider-i18n':
+        specifier: workspace:^
+        version: link:../../foundations/providers/i18n
+      '@stealthscale/vite-plugin-specimen':
+        specifier: workspace:^
+        version: link:../../packages/vite-plugin-specimen
     devDependencies:
       '@arethetypeswrong/core':
         specifier: 'catalog:'
@@ -1383,6 +1393,9 @@ importers:
       '@stealthscale/vite-config':
         specifier: workspace:^
         version: link:../../packages/vite-config
+      '@stealthscale/vite-config-i18n':
+        specifier: workspace:^
+        version: link:../../packages/vite-config-i18n
       '@stealthscale/vite-config-react':
         specifier: workspace:^
         version: link:../../packages/vite-config-react

@@ -1,7 +1,7 @@
 # @stealthscale/specimen
 
-`@stealthscale/specimen` is what a specimen file is written with: the declaration a catalogue reads,
-and the arrangement that draws a component once per value of an axis.
+`@stealthscale/specimen` is both halves of a catalogue: what a specimen file is written with, and
+what draws the pages an application indexed.
 
 ## Install
 
@@ -9,10 +9,46 @@ and the arrangement that draws a component once per value of an axis.
 pnpm add -D @stealthscale/specimen
 ```
 
-The package peers on `@stealthscale/component-layout`, `@stealthscale/component-typography` and
-`react`. A package writing specimens does not declare it, the way a package writing specifications
-does not declare the testing kits: a specimen runs in the catalogue and resolves through the
-workspace root.
+The package peers on `@stealthscale/component-actions`, `@stealthscale/component-layout`,
+`@stealthscale/component-typography`, `@stealthscale/provider-i18n`,
+`@stealthscale/vite-plugin-specimen` and `react`. A package writing specimens does not declare it,
+the way a package writing specifications does not declare the testing kits: a specimen runs in the
+catalogue and resolves through the workspace root.
+
+## The catalogue
+
+An application hands `Catalogue` the pages the plugin indexed, under the providers it decides.
+
+```tsx
+import { I18nProvider, LocaleProvider } from "@stealthscale/provider-locale";
+import { Catalogue } from "@stealthscale/specimen";
+import { catalogues } from "virtual:i18n";
+import { pages } from "virtual:specimen-index";
+
+<LocaleProvider app="docs" locales={["en"]}>
+  <I18nProvider catalogues={catalogues}>
+    <Catalogue listed={pages} />
+  </I18nProvider>
+</LocaleProvider>;
+```
+
+The pages are passed in rather than imported, so this package draws a catalogue without the build
+plugin in its own graph and a specification renders one without a build at all.
+
+`Rail` lists every page under the group it declares, with pages that declare none collected under an
+empty name and listed last. `Page` loads a page's module and draws its scenes, which is the first
+time that component reaches the browser.
+
+`grouped`, `declared` and `parted` are the shaping behind those. `parted` splits what a page's parts
+accept into the variants a theme moves and the options a caller sets, each row carrying the members
+of every named type it refers to, with the dropped counts beside them.
+
+## The words
+
+Every word the catalogue writes itself is a key under the `specimen` namespace, in
+`locales/en/specimen.json`. An application overriding one declares the same key under the same
+namespace: the plugin reads packages deepest first and the application last, so the application
+wins.
 
 ## specimen
 

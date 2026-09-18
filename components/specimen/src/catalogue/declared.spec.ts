@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { declared } from "#declared.ts";
+import { declared } from "#catalogue/declared.ts";
 
 const scene = { draw: (): null => null, title: "Sizes" };
 

@@ -52,6 +52,7 @@
     "@stealthscale/component-layout": "workspace:^",
     "@stealthscale/component-typography": "workspace:^",
     "@stealthscale/vite-config": "workspace:^",
+    "@stealthscale/vite-config-i18n": "workspace:^",
     "@stealthscale/vite-config-react": "workspace:^",
     "@stealthscale/vite-config-typescript": "workspace:^",
     "@testing-library/react": "catalog:",
@@ -67,8 +68,11 @@
     "vitest": "catalog:"
   },
   "peerDependencies": {
+    "@stealthscale/component-actions": "workspace:^",
     "@stealthscale/component-layout": "workspace:^",
     "@stealthscale/component-typography": "workspace:^",
+    "@stealthscale/provider-i18n": "workspace:^",
+    "@stealthscale/vite-plugin-specimen": "workspace:^",
     "react": "catalog:"
   },
   "engines": {

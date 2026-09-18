@@ -2,7 +2,7 @@
  * Reads the page a specimen module declares, without trusting the module to have declared one.
  */
 
-import { type Scene, type Specimen } from "@stealthscale/specimen";
+import { type Scene, type Specimen } from "#page.ts";
 
 /**
  * Returns true when a value is a scene the catalogue can draw.

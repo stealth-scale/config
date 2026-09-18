@@ -3,8 +3,8 @@ import { type ReactElement } from "react";
 import { render, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { Page } from "#page.tsx";
-import { type Indexed } from "#types.ts";
+import { Page } from "#catalogue/page.tsx";
+import { type Indexed } from "#catalogue/types.ts";
 
 function entry(module: unknown, about = ""): Indexed {
   return {

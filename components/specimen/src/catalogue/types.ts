@@ -1,5 +1,5 @@
 /**
- * Re-exports the index's types, so no module of this application imports the plugin at run time.
+ * Re-exports the index's types, so no module of the catalogue imports the plugin at run time.
  *
  * @remarks
  *   An inline `import { type Indexed } from "…"` is not erased under `verbatimModuleSyntax`. It

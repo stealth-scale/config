@@ -6,10 +6,10 @@ import { type ReactElement, useEffect, useState } from "react";
 
 import { Stack } from "@stealthscale/component-layout";
 import { Heading, Text } from "@stealthscale/component-typography";
-import { type Specimen } from "@stealthscale/specimen";
 
-import { declared } from "#declared.ts";
-import { type Indexed } from "#types.ts";
+import { declared } from "#catalogue/declared.ts";
+import { type Indexed } from "#catalogue/types.ts";
+import { type Specimen } from "#page.ts";
 
 /**
  * Describes what a page takes.

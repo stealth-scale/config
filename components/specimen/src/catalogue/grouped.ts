@@ -2,7 +2,7 @@
  * Sorts the index into the groups a rail lists.
  */
 
-import { type Indexed } from "#types.ts";
+import { type Indexed } from "#catalogue/types.ts";
 
 /**
  * One heading of a rail, and the pages under it.

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { grouped } from "#grouped.ts";
-import { type Indexed } from "#types.ts";
+import { grouped } from "#catalogue/grouped.ts";
+import { type Indexed } from "#catalogue/types.ts";
 
 function entry(id: string, group: string): Indexed {
   return {

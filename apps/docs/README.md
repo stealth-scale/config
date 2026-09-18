@@ -1,8 +1,8 @@
 # @stealthscale/docs
 
-`@stealthscale/docs` draws the catalogue the specimen plugin indexes. It is the first application in
-the workspace to call `specimen.catalogue()`, so it is what proves the plugin against real pages
-rather than a scratch workspace.
+`@stealthscale/docs` hosts the catalogue. It is the first application in the workspace to call
+`specimen.catalogue()`, so it is what proves the plugin against real pages rather than a scratch
+workspace.
 
 ## Run it
 
@@ -10,49 +10,45 @@ rather than a scratch workspace.
 pnpm --filter @stealthscale/docs dev
 ```
 
-The server listens on port 4100. The patterns reach across the workspace, so every `*.specimen.tsx`
+The server listens on port 4100. The patterns search across the workspace, so every `*.specimen.tsx`
 under `components/*/src` is indexed whether or not this application depends on the package holding
 it.
 
-## What it draws
+## What is here
 
-A rail on one side, the open page on the other. The rail lists every page under the group it
-declares, with a page that declares none listed last. Choosing a page loads its module, which is the
-first time that component reaches the browser.
-
-The index is read at module scope and is fixed for the life of the page. The selection is state
-rather than an address, so a reader cannot yet link to a page.
-
-## The words
-
-Every word the catalogue writes itself is a key under the `docs` namespace, in
-`locales/en/docs.json`. Nothing in `src` holds a sentence a reader sees.
+Four files and a manifest. The application settles the locale, loads the catalogues, hands the pages
+the plugin indexed to `Catalogue`, and states which themes the page can wear.
 
 ```
-locales/en/docs.json     the words this application owns
-src/i18n.gen.d.ts        written by the plugin, each key typed as the string it is
+src/app.tsx          the providers, and the pages handed to the kit
+src/main.tsx         the mount
+theme.config.ts      the twelve themes, and static: "*"
+vite.config.ts       the layers
 ```
 
-`LocaleProvider` settles which locale to read in and writes `lang` and `dir` onto the document root,
-so a right-to-left locale turns the page without a component asking for it. `I18nProvider` takes the
-locale it settled on and hands the catalogues below.
+Everything drawn below `Catalogue` belongs to `@stealthscale/specimen`. A rail, a page and the
+shaping behind them live there, so a consumer installs a catalogue rather than writing one.
 
-The plugin walks this application's dependencies and reads every
-`locales/<language>/<namespace>.json` it finds, deepest package first and the application last. A
-word a component package declares is therefore overridden by a word of the same key here, which is
-how a catalogue renames something the library called one thing.
+## The host's own decisions
 
-A specimen's own words belong to the package that holds it, not here. No package declares one yet.
+`theme.config.ts` states `static: "*"`, which compiles every recipe outright. The compiler extracts
+a value written as a JSX literal and nothing it reads from a prop, so without it a scene drawing
+`variant={one}` renders every look, size and status alike. A product application states nothing
+there.
+
+The twelve themes are listed so a switcher has the whole set to move between on the day one exists.
+
+Any word the kit writes can be renamed here by declaring the same key under the `specimen`
+namespace. The plugin reads packages deepest first and this application last.
 
 ## Still missing
 
 The three virtual modules are the contract, and this reads one of them. `virtual:specimen-fragments`
-and `virtual:specimen-props` are already served and nothing here opens them, so a page shows its
+and `virtual:specimen-props` are already served and nothing opens them yet, so a page shows its
 scenes and neither its source nor what its parts accept.
 
-The chrome is not here either. A theme switcher, a colour-mode toggle and a width switcher belong to
-`@stealthscale/specimen`, and arrive as the components they need land. `theme.config.ts` already
-lists all twelve themes, so a switcher has the whole set to move between on the day it exists.
+The chrome is missing too. A theme switcher, a colour-mode toggle and a width switcher belong to
+`@stealthscale/specimen`, and arrive as the components they need land.
 
 ## Licence
 
