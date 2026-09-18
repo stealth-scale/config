@@ -35,6 +35,8 @@ a new record and mark the old one superseded.
 | [0023](0023-name-every-route-and-link-by-reference.md)                | Name every route and link by reference                                             | Proposed |
 | [0024](0024-refuse-a-failing-condition-as-not-found.md)               | Refuse a failing condition as not-found                                            | Proposed |
 | [0025](0025-draw-one-page-per-matched-route.md)                       | Draw one page per matched route                                                    | Proposed |
+| [0026](0026-bind-zags-machines-directly.md)                           | Bind Zag's machines directly                                                       | Accepted |
+| [0027](0027-connect-a-machine-once-at-its-root.md)                    | Connect a machine once at its root                                                 | Accepted |
 
 ## Status
 
