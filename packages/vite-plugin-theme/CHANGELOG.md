@@ -1,5 +1,16 @@
 # @stealthscale/vite-plugin-theme
 
+## 0.1.3
+
+### Patch Changes
+
+- [#27](https://github.com/stealth-scale/config/pull/27) [`d9273ab`](https://github.com/stealth-scale/config/commit/d9273ab627a7c7dfc0060956023ababe0d44a2b7) Thanks [@stealth-rklopper](https://github.com/stealth-rklopper)! - vite-plugin-theme: generate a runtime that writes no slot attribute
+  
+  - The generated slot binding no longer writes `data-slot` on a part. A part's slot class,
+    `card__header`, names the recipe and the slot, and the testing kit reads that class instead.
+- Updated dependencies [[`d9273ab`](https://github.com/stealth-scale/config/commit/d9273ab627a7c7dfc0060956023ababe0d44a2b7)]:
+  - @stealthscale/pandacss-compiler@0.2.0
+
 ## 0.1.2
 
 ### Patch Changes

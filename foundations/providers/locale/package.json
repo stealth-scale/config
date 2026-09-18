@@ -1,6 +1,6 @@
 {
   "name": "@stealthscale/provider-locale",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Decides which locale a page is read in, remembers the choice, and writes the direction that follows.",
   "keywords": [
     "bcp47",

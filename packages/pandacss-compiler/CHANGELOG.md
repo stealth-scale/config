@@ -1,5 +1,16 @@
 # @stealthscale/pandacss-compiler
 
+## 0.2.0
+
+### Minor Changes
+
+- [#27](https://github.com/stealth-scale/config/pull/27) [`d9273ab`](https://github.com/stealth-scale/config/commit/d9273ab627a7c7dfc0060956023ababe0d44a2b7) Thanks [@stealth-rklopper](https://github.com/stealth-rklopper)! - pandacss-compiler: drop the slot attribute from the generated slot binding
+  
+  - `rewriteRuntime` rewrites a third file, `jsx/create-slot-recipe-context`, and drops the line that
+    writes `data-slot` on a part, once in the provider and once in the part. Every part carries its
+    slot class, `card__header`, which names the recipe and the slot, so the attribute repeated it. A
+    rewrite that imports nothing marks its file with a comment on its first line.
+
 ## 0.1.1
 
 ### Patch Changes

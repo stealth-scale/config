@@ -1,6 +1,6 @@
 {
   "name": "@stealthscale/component-surfaces",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Draws the surface under a thing, and the rule between two of them.",
   "keywords": [
     "card",
