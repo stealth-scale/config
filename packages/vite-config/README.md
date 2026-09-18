@@ -92,8 +92,8 @@ has no consumer to read an exports map, and configures build output and a module
 
 Note: `run.cache()`, `run.ci()`, `staged.checked()`, `staged.formatted()` and `test.projects()`
 reach the workspace tier alone. A task table, a commit hook and the project list are read once for
-the whole tree, so declaring any of them inside a package has every package repeat it while the
-runner reads the root's copy regardless.
+the whole tree, so declaring any of them inside a package makes every package repeat it while the
+runner reads the root's copy anyway.
 
 ## Reference
 
@@ -122,7 +122,7 @@ Sixteen namespaces sit at the package root, one for each part of a configuration
 
 Note: the linter and the formatter run from the workspace root and read the root configuration only.
 A `lint` or `fmt` layer written in a package composes and merges as any other layer does, and
-neither tool ever reads it. Express a package's own answer as the glob that selects its files.
+neither tool ever reads it. Express a package's own rules as the glob that selects its files.
 
 Setting `STEALTH_HOSTS` or `STEALTH_ORIGINS` replaces the list the repository declared rather than
 adding to it. Each is a comma-separated list, so a developer gets the names they arranged on their
@@ -153,8 +153,8 @@ const layer = contribute({
 ```
 
 Removals run first. A removal targeting a layer that nothing above it stated throws rather than
-passing quietly. The presets then merge their configuration keys. Each contribution appends to a
-list a preset declared, and each override rewrites the result at the end.
+being ignored. The presets then merge their configuration keys. Each contribution appends to a list
+a preset declared, and each override rewrites the result at the end.
 
 A layer of any kind has a `name` a removal can target. A contribution, a removal and an override
 each take a `because` as well, which the type requires. A layer states `apply` to take part in a

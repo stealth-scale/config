@@ -57,7 +57,7 @@ rename("md:grid-tc_repeat(3,_minmax(0,_1fr))", config); // "md:grid-tc-repeat-3-
 
 ## The rules
 
-The scheme is sound under three rules, which a gate holds and this package trusts:
+The scheme is sound under four rules, which a gate holds and this package trusts:
 
 - The values of one recipe are unique across its axes, and no value equals a boolean axis's name or
   a compound's name. `size: lg` and `radius: lg` in one recipe would both read `button--lg`.

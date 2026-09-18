@@ -36,8 +36,8 @@ pnpm changeset
 ```
 
 Write one changeset per package, named after the package, and split a change spanning packages
-across their files. Use the register of a commit body: the first line names the package and the
-mechanism, and the bullets give the prop, the token or the number.
+across their files. Use the register of a commit body. The first line states the package and the
+mechanism. The bullets give the prop, the token or the number.
 
 ## Pull requests
 

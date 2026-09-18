@@ -3,7 +3,7 @@
 `@stealthscale/testing-react` reads a rendered React component through the markings on its anatomy.
 A specification finds a piece of a component by the `data-part` name it is marked with, and reads
 its state from the data attributes beside it. A class name, the text and the shape of the tree all
-move under a restyling, so a specification reaching through any of those three fails on a change
+change under a restyling, so a specification reading through any of those three fails on a change
 that broke nothing.
 
 ## Install
@@ -33,7 +33,7 @@ it("opens the panel its trigger names", () => {
 
 Each reader finds its part first. A reader that fails to match throws and quotes the selector it
 looked for, so a renamed part fails the specification that reads it rather than passing as an absent
-value. `parts` is the one exception. It hands back an empty array instead of throwing, which lets a
+value. `parts` is the one exception. It returns an empty array instead of throwing, which lets a
 specification assert that a component drew none of a part.
 
 ## Reference
@@ -50,14 +50,14 @@ specification assert that a component drew none of a part.
 | `violations` | `(Component: ElementType, options?: ConformanceOptions) => readonly string[]`     | Each departure from the contract as a phrase, or an empty array for a component that conforms |
 
 Note: `attr` and `aria` take the same three arguments and differ in the form of the name they
-expect. `attr` indexes `dataset`, so `data-crop-shape` is asked for as `cropShape`. `aria` calls
-`getAttribute`, so the same attribute is asked for as it is written. A caller passing the written
-form to `attr` receives `undefined` and no complaint.
+expect. `attr` indexes `dataset`, so `data-crop-shape` is read as `cropShape`. `aria` calls
+`getAttribute`, so the same attribute is read as it is written. A caller passing the written form to
+`attr` receives `undefined` and no error.
 
-| Type                 | Declaration                                          | What it describes                                                                                             |
-| -------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `Rendered`           | `Element & ElementCSSInlineStyle & HTMLOrSVGElement` | The element a reader hands back, in HTML or SVG. The `style` member reaches a custom property set at run time |
-| `ConformanceOptions` | `interface`                                          | Which optional checks `violations` runs, and how to reach a component that cannot render on its own           |
+| Type                 | Declaration                                          | What it describes                                                                                          |
+| -------------------- | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `Rendered`           | `Element & ElementCSSInlineStyle & HTMLOrSVGElement` | The element a reader returns, in HTML or SVG. The `style` member reaches a custom property set at run time |
+| `ConformanceOptions` | `interface`                                          | Which optional checks `violations` runs, and how to reach a component that cannot render on its own        |
 
 ## Conformance
 
@@ -74,6 +74,7 @@ else.
 
 | Field      | Type                                    | Default     | What it turns on                                                                              |
 | ---------- | --------------------------------------- | ----------- | --------------------------------------------------------------------------------------------- |
+| `as`       | `boolean`                               | `undefined` | Renders the component with `as="a"` and expects the element back as `A`                       |
 | `asChild`  | `boolean`                               | `undefined` | Renders the component with `asChild` and an anchor child, and expects the element back as `A` |
 | `children` | `boolean`                               | `undefined` | Passes a string as `children` and expects it in the element's `textContent`                   |
 | `element`  | `string`                                | `undefined` | The tag the component is expected to render, spelled upper-case                               |
@@ -114,7 +115,61 @@ A phrase states what the component did. The order of the list is the order the c
 | `does not forward ref`                          | The ref reached no element, or reached one other than the element under check               |
 | `does not spread unknown props`                 | An attribute the component does not name never reached the element                          |
 | `does not render children`                      | `children` was given and the text did not arrive                                            |
+| `does not honour as`                            | `as` was given and the element is not the one it named                                      |
 | `does not honour asChild`                       | `asChild` was given and the element is not the child's                                      |
+
+## Accessibility
+
+`accessibilityViolations(Component, options)` renders the component under the same `props` and
+`wrapper` the conformance check takes, runs axe over what it rendered, and returns each rule it
+breaks as `id: help`. A rule axe cannot decide, which it reports as incomplete, is left out.
+
+```tsx
+import { accessibilityViolations } from "@stealthscale/testing-react";
+
+await expect(
+  accessibilityViolations(Button, { props: { children: "Save" } }),
+).resolves.toStrictEqual([]);
+```
+
+## Machines
+
+A component built on a state machine has two behaviours no plain component does, and both cost a
+specification a case unless the kit handles them.
+
+`settled()` waits for whatever the last interaction started. A machine schedules its own update
+rather than making one during the event, so an assertion straight after `fireEvent` reads the state
+from before the press. Awaiting this flushes it inside `act`, which is also what stops React warning
+about an update it did not see.
+
+```tsx
+import { settled } from "@stealthscale/testing-react";
+
+fireEvent.click(screen.getByRole("tab", { name: "Second" }));
+await settled();
+
+expect(screen.getByRole("tab", { name: "Second" }).getAttribute("aria-selected")).toBe("true");
+```
+
+`rootedViolations(parts, expected)` draws each part on its own and reports the ones that draw rather
+than throw. A part reads its machine through a context the root provides, so one drawn outside its
+root has no api, and returning nothing there gives a part with no behaviour and no error. One call
+covers every part of a component.
+
+```tsx
+import { rootedViolations } from "@stealthscale/testing-react";
+
+expect(
+  rootedViolations(
+    { Content, Indicator, Trigger },
+    "A part of Collapsible was drawn outside the root that holds it together.",
+  ),
+).toStrictEqual([]);
+```
+
+The expectation takes a string, matched anywhere in what was thrown, or a pattern. A part that
+throws something else is reported separately from one that drew, because the two are different
+faults.
 
 ## Licence
 

@@ -40,7 +40,7 @@ export default { static: "*", themes: [fathom, abyss] };
 ```
 
 The first theme is the default: its values and its extensions apply while no attribute is set. Every
-theme is compiled under `[data-theme=<name>]` as well, the first included, so a subtree can wear any
+theme is compiled under `[data-theme=<name>]` as well, the first included, so a subtree can take any
 theme. A recipe written in the application itself is registered through a preset the statement
 carries under `presets`, installed after every package's preset and before the themes. The
 application imports the stylesheet through the system package's `styles.css` subpath, and the plugin
@@ -97,7 +97,7 @@ rule that wins while the attribute is set and matches nothing while it is not. A
 styles and keyframes have no rule to nest under the attribute, so only the first theme's apply.
 
 The compiler emits the theme attribute under its own name and signs the root element. Both are
-rewritten before the rules reach the stylesheet, so nothing a page sees names the compiler.
+rewritten before the rules reach the stylesheet, so nothing on the page names the compiler.
 
 The rules are compiled once per change however many stylesheets declare the cascade order, and the
 compiler's diagnostics are reported once with them.
@@ -105,7 +105,7 @@ compiler's diagnostics are reported once with them.
 ## What is watched
 
 A change to the statement, a theme, a preset or a manifest restarts the compiler. A file that
-appears, changes or is deleted under the scanned globs is handed to the running compiler, which
+appears, changes or is deleted under the scanned globs is passed to the running compiler, which
 reads it from disk itself. Anything else is left to Vite. Under a dev server, every stylesheet the
 rules were appended to is invalidated on either, so the next request retransforms it. Under a build
 that watches, the same changes reach the plugin through `watchChange`, and the rebuild compiles from
@@ -113,10 +113,10 @@ the changed compiler.
 
 ## Diagnostics
 
-What the compiler could not make sense of is reported through the bundler as one warning per
-compile, with the severity, the code, the message, the file and the help the compiler offered. An
-application whose graph names no package publishing a preset beside the system package is warned
-about too, because its stylesheet carries the foundation's values and no component's rules.
+Whatever the compiler could not parse is reported through the bundler as one warning per compile,
+with the severity, the code, the message, the file and the help the compiler offered. An application
+whose graph names no package publishing a preset beside the system package is warned about too,
+because its stylesheet carries the foundation's values and no component's rules.
 
 ## Licence
 

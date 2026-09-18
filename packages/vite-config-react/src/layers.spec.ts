@@ -18,6 +18,8 @@ describe("layers", () => {
   it("names every layer for the call a consumer wrote under this package's own name", () => {
     expect(layers().map((one) => one.name)).toStrictEqual([
       "react.plugin.refresh",
+      "react.plugin.compiler",
+      "react.plugin.compiler(pack)",
       "react.test.cleanup",
       "react.test.document",
     ]);
@@ -26,11 +28,29 @@ describe("layers", () => {
   it("adds the MDX compiler in the build and in the packer when asked", () => {
     expect(layers({ mdx: true }).map((one) => one.name)).toStrictEqual([
       "react.plugin.refresh",
+      "react.plugin.compiler",
+      "react.plugin.compiler(pack)",
       "react.test.cleanup",
       "react.test.document",
       "react.plugin.mdx",
       "react.plugin.mdx(pack)",
     ]);
+  });
+
+  it("drops the compiler for a package that asks to memoise by hand", () => {
+    expect(
+      layers({ compiler: false })
+        .map((one) => one.name)
+        .join(),
+    ).not.toContain("compiler");
+  });
+
+  it("keeps the compiler for a package that names the React to write against", () => {
+    expect(
+      layers({ compiler: { target: "18" } })
+        .map((one) => one.name)
+        .join(),
+    ).toContain("compiler");
   });
 
   it("leaves MDX out unless asked", () => {

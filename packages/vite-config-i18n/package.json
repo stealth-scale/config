@@ -1,0 +1,72 @@
+{
+  "name": "@stealthscale/vite-config-i18n",
+  "version": "0.0.0",
+  "description": "Configures a package or an application with words: the catalogue plugin, and the words in scope for its specifications.",
+  "keywords": [
+    "i18n",
+    "vite-config"
+  ],
+  "homepage": "https://github.com/stealth-scale/config/tree/main/packages/vite-config-i18n#readme",
+  "bugs": "https://github.com/stealth-scale/config/issues",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stealth-scale/config.git",
+    "directory": "packages/vite-config-i18n"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "imports": {
+    "#*": "./src/*"
+  },
+  "exports": {
+    ".": {
+      "stealth-source": "./src/index.ts",
+      "default": "./dist/index.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": "./dist/index.mjs",
+      "./package.json": "./package.json"
+    },
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vp pack",
+    "check": "vp check",
+    "prepublishOnly": "vp pack",
+    "test": "vp test"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/core": "catalog:",
+    "@stealthscale/provider-i18n": "workspace:^",
+    "@stealthscale/testing-config": "workspace:^",
+    "@stealthscale/vite-config": "workspace:^",
+    "@stealthscale/vite-config-core": "workspace:^",
+    "@stealthscale/vite-config-typescript": "workspace:^",
+    "@stealthscale/vite-plugin-i18n": "workspace:^",
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "publint": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "@stealthscale/provider-i18n": "workspace:^",
+    "@stealthscale/vite-config-core": "workspace:^",
+    "@stealthscale/vite-plugin-i18n": "workspace:^",
+    "vite": "catalog:peer",
+    "vitest": "catalog:peer"
+  },
+  "engines": {
+    "node": ">=26.0.0"
+  }
+}

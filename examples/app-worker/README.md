@@ -14,7 +14,7 @@ pnpm --filter @stealthscale/example-app-worker test
 
 The page awaits the worker at the top level, so its module finishes evaluating once the total
 arrives. That suits an example of three amounts. A page with anything else to paint needs a
-different arrangement. The development server answers on port 4500 and the preview server on
+different arrangement. The development server listens on port 4500 and the preview server on
 port 4501.
 
 ## The configuration

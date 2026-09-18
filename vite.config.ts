@@ -3,7 +3,7 @@ import * as react from "@stealthscale/vite-config-react";
 
 import { layers as exampleAppWorker } from "./examples/app-worker/vite.layers.ts";
 import { layers as exampleLibUi } from "./examples/lib-ui/vite.layers.ts";
-import { fmt } from "./packages/vite-config/src/index.ts";
+import { fmt, lint } from "./packages/vite-config/src/index.ts";
 import { defineConfig } from "./packages/vite-config/src/preset/workspace.ts";
 
 export default defineConfig(import.meta.dirname, {
@@ -17,6 +17,15 @@ export default defineConfig(import.meta.dirname, {
         "wrapped changelog is undone by the next `changeset version` and the diff it leaves is " +
         "nobody's to read. The text is already wrapped where it is written, in the changeset",
       files: ["**/CHANGELOG.md"],
+    }),
+
+    lint.relax({
+      because:
+        "a component package is created before the component it will hold, so its barrel states " +
+        "in a module header what the package is for and exports nothing until the first " +
+        "component lands in it",
+      files: ["components/*/src/index.ts"],
+      rules: { "unicorn/no-empty-file": "off" },
     }),
 
     exampleAppWorker,

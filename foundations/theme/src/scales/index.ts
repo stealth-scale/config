@@ -16,7 +16,20 @@ export {
   paletteRoles,
 } from "#scales/color.ts";
 export { radii, shadows } from "#scales/depth.ts";
-export { controls, gaps, icons, insets, type Scale } from "#scales/geometry.ts";
+export {
+  controls,
+  type Corner,
+  CORNERS,
+  gaps,
+  icons,
+  insets,
+  type Ratio,
+  RATIOS,
+  SCALE,
+  type Scale,
+  type Width,
+  WIDTHS,
+} from "#scales/geometry.ts";
 export { slides } from "#scales/motion.ts";
 export {
   families,
@@ -25,4 +38,4 @@ export {
   palettes,
   type Palettes,
 } from "#scales/palettes.ts";
-export { fontSizes, typography } from "#scales/type.ts";
+export { fontSizes, ROLE_SIZES, type TextRole, typography } from "#scales/type.ts";

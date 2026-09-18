@@ -48,7 +48,7 @@ None. This decision is a process bootstrap.
 **Negative:**
 
 - The docblock and the record argue the same decision. No check compares them.
-- Each decision of this size costs one file and one review. A docblock cost neither.
+- Each decision of this size costs one file and one review. A docblock costs neither.
 
 **Neutral:**
 

@@ -9,6 +9,8 @@
  * @packageDocumentation
  */
 
-export { type ConformanceOptions, violations } from "#conformance.tsx";
+export { accessibilityViolations } from "#accessibility.ts";
+export { type ConformanceOptions, violations } from "#conformance.ts";
 export { aria, attr, holds, renderedAs } from "#dom.ts";
+export { drawn, pressed, rootedViolations, settled } from "#machine.ts";
 export { only, part, parts, type Rendered } from "#part.ts";

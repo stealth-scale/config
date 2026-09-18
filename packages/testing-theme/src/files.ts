@@ -8,7 +8,7 @@
  */
 
 import { readdirSync, readFileSync } from "node:fs";
-import { basename, join, relative } from "node:path";
+import { basename, dirname, join, relative } from "node:path";
 
 import { camelCased } from "#tokens.ts";
 
@@ -22,7 +22,8 @@ export interface RecipeFile {
   file: string;
 
   /**
-   * The key the preset lists the recipe under, which is the file name in camel case.
+   * The key the preset lists the recipe under: the file's name in camel case, or the directory's
+   * where the file is named `recipe.ts`.
    */
   key: string;
 
@@ -68,9 +69,14 @@ const SLOTTED = /\bdefineSlotRecipe\s*\(/u;
 const EXTENSION = /^export const extension\b/mu;
 
 /**
- * Fixes the suffix a recipe file carries.
+ * Fixes the suffix a recipe file carries where it is named for its recipe.
  */
 const RECIPE_SUFFIX = ".recipe.ts";
+
+/**
+ * Fixes the name a recipe file carries where its directory is named for its recipe.
+ */
+const RECIPE_FILE = "recipe.ts";
 
 /**
  * Lists the two directories a theme keeps its extensions in.
@@ -94,23 +100,35 @@ function sourcesUnder(at: string): readonly string[] {
 }
 
 /**
- * Lists every recipe file under a directory: a file named `*.recipe.ts` that exports `recipe`.
+ * Reports whether a file is named as a recipe file, by its suffix or by its bare name.
+ */
+function isRecipeFile(file: string): boolean {
+  return file.endsWith(RECIPE_SUFFIX) || basename(file) === RECIPE_FILE;
+}
+
+/**
+ * Writes the key a recipe file registers under: its own name, or its directory's where the file
+ * is named `recipe.ts`.
+ */
+function keyOf(file: string): string {
+  const name = basename(file);
+
+  return camelCased(name === RECIPE_FILE ? basename(dirname(file)) : basename(file, RECIPE_SUFFIX));
+}
+
+/**
+ * Lists every recipe file under a directory: a file named `*.recipe.ts` or `recipe.ts` that
+ * exports `recipe`.
  */
 export function recipeFiles(at: string): readonly RecipeFile[] {
   return sourcesUnder(at)
-    .filter((file) => file.endsWith(RECIPE_SUFFIX))
+    .filter((file) => isRecipeFile(file))
     .flatMap((file) => {
       const source = readFileSync(join(at, file), "utf8");
 
       if (!RECIPE.test(source)) return [];
 
-      return [
-        {
-          file,
-          key: camelCased(basename(file, RECIPE_SUFFIX)),
-          slotted: SLOTTED.test(source),
-        },
-      ];
+      return [{ file, key: keyOf(file), slotted: SLOTTED.test(source) }];
     });
 }
 

@@ -76,11 +76,11 @@ byte for byte.
 | `sbom`    | `(stated?: Described) => Plugin`                                | A plugin that emits the document alongside the bundle |
 | `written` | `(stated: Described, bundling: Bundling, at: string) => string` | The serialised document for one build                 |
 
-The bundler knows the plugin as `stealth:sbom` and calls it at `generateBundle`, after the module
-graph is complete and before the output is written. `written` does the same work without a bundler
-around it, taking the build context that hook receives as `bundling` and the directory of the
-package being described as `at`. `Described` and `Supplier` are exported as types, and the preceding
-tables list their fields.
+The bundler registers the plugin as `stealth:sbom` and calls it at `generateBundle`, after the
+module graph is complete and before the output is written. `written` does the same work without a
+bundler around it, taking the build context that hook receives as `bundling` and the directory of
+the package being described as `at`. `Described` and `Supplier` are exported as types, and the
+preceding tables list their fields.
 
 ## The document
 

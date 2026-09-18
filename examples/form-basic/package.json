@@ -1,0 +1,41 @@
+{
+  "name": "@stealthscale/example-form-basic",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Renders a contact form from a JSON Schema, with every word read from a catalogue in two languages.",
+  "license": "MIT",
+  "type": "module",
+  "imports": {
+    "#*": "./src/*"
+  },
+  "scripts": {
+    "build": "vp build",
+    "check": "vp check",
+    "dev": "vp dev",
+    "test": "vp test"
+  },
+  "dependencies": {
+    "@stealthscale/example-form-fields": "workspace:^",
+    "@stealthscale/provider-form": "workspace:^",
+    "@stealthscale/settings": "workspace:^",
+    "@tanstack/react-form": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@rolldown/plugin-babel": "catalog:",
+    "@stealthscale/vite-config": "workspace:^",
+    "@stealthscale/vite-config-css": "workspace:^",
+    "@stealthscale/vite-config-react": "workspace:^",
+    "@stealthscale/vite-config-typescript": "workspace:^",
+    "@testing-library/react": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "babel-plugin-react-compiler": "catalog:",
+    "happy-dom": "catalog:",
+    "oxc-transform-react": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

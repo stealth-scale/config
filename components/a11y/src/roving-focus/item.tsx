@@ -1,0 +1,106 @@
+/**
+ * Draws one item of the group, which holds the tab stop when the arrows reach it.
+ *
+ * @remarks
+ *   Exactly one item is reachable by Tab and every other is at minus one, which is what makes the
+ *   whole group one stop in the tab order. A disabled item registers with nothing, so the arrows
+ *   pass over it, and it does not claim the stop when a pointer focuses it: an item that claimed
+ *   the stop without registering would leave the stop pointing at nothing and take the group out
+ *   of the tab order. The element is kept in state rather than in a ref, because the effect that
+ *   registers it has to run again once the element is there, and a ref changing starts no effect.
+ */
+
+import {
+  type ComponentProps,
+  type ReactElement,
+  type Ref,
+  use,
+  useEffect,
+  useId,
+  useState,
+} from "react";
+
+import { useCallbackRef } from "@stealthscale/hooks";
+
+import { withContext } from "#roving-focus/context.ts";
+import { RovingFocusContext } from "#roving-focus/use-roving-focus.ts";
+
+/**
+ * Draws the element an item is laid out on.
+ */
+const Shell = withContext("div", "item");
+
+/**
+ * Describes what an item takes beside everything a styled element takes.
+ */
+export interface ItemProps extends ComponentProps<typeof Shell> {
+  /**
+   * Whether the arrows pass over the item.
+   */
+  disabled?: boolean | undefined;
+
+  /**
+   * The id the item answers to, which the group generates where a caller states none.
+   */
+  id?: string | undefined;
+
+  /**
+   * Where a caller wants the element.
+   */
+  ref?: Ref<HTMLDivElement> | undefined;
+}
+
+/**
+ * Takes the tab stop when the arrows reach it, and leaves the tab order otherwise.
+ *
+ * @throws {@link Error} When it is drawn outside a group.
+ */
+export function Item(props: ItemProps): ReactElement {
+  const { disabled = false, id: named, ref: handed, ...rest } = props;
+  const group = use(RovingFocusContext);
+
+  if (group === undefined) {
+    throw new Error("RovingFocus.Item is drawn inside RovingFocus.Root and nowhere else.");
+  }
+
+  const generated = useId();
+  const id = named ?? generated;
+  const { activeId, onFocus, register } = group;
+  const [element, setElement] = useState<HTMLDivElement | null>(null);
+
+  /**
+   * Keeps the element the item registers, and hands it to whatever asked for it.
+   */
+  const attach = useCallbackRef((node: HTMLDivElement | null): void => {
+    setElement(node);
+
+    if (typeof handed === "function") handed(node);
+    else if (handed !== null && handed !== undefined) handed.current = node;
+  });
+
+  /**
+   * Reports focus reaching the item, which moves the tab stop to it.
+   */
+  const claim = useCallbackRef((): void => {
+    if (!disabled) onFocus(id);
+  });
+
+  useEffect((): (() => void) | undefined => {
+    if (element === null || disabled) return undefined;
+
+    return register({ element, id });
+  }, [disabled, element, id, register]);
+
+  return (
+    <Shell
+      aria-disabled={disabled || undefined}
+      data-active={activeId === id ? "" : undefined}
+      data-disabled={disabled ? "" : undefined}
+      id={id}
+      onFocus={claim}
+      ref={attach}
+      tabIndex={!disabled && activeId === id ? 0 : -1}
+      {...rest}
+    />
+  );
+}

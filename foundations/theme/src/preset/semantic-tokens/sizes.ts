@@ -1,5 +1,6 @@
 /**
- * Defines the semantic sizes a recipe reads: the height of a control and the box of an icon.
+ * Defines the semantic sizes a recipe reads: the height of a control, the box of an icon and the
+ * height of a tag beside them.
  *
  * @remarks
  *   A recipe writes `height: "control.md"` and a theme moves every control by restating the
@@ -7,7 +8,7 @@
  */
 
 import { type SemanticTokens } from "#pandacss.ts";
-import { controls, icons } from "#scales/geometry.ts";
+import { controls, icons, tags } from "#scales/geometry.ts";
 
 /**
  * Describes the sizes a theme states.
@@ -15,9 +16,10 @@ import { controls, icons } from "#scales/geometry.ts";
 type Sizes = NonNullable<SemanticTokens["sizes"]>;
 
 /**
- * Lists the two scales, each `xs` to `xl`.
+ * Lists the three scales, each `xs` to `4xl`.
  */
 export const sizes: Sizes = {
   control: controls(),
   icon: icons(),
+  tag: tags(),
 };

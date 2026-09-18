@@ -1,0 +1,42 @@
+{
+  "name": "@stealthscale/example-router-federated",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Routes to pages another deployment declares, at the addresses that deployment states.",
+  "license": "MIT",
+  "type": "module",
+  "imports": {
+    "#*": "./src/*"
+  },
+  "scripts": {
+    "build": "vp build",
+    "check": "vp check",
+    "dev": "vp dev",
+    "preview": "vp preview",
+    "test": "vp test"
+  },
+  "dependencies": {
+    "@module-federation/runtime": "catalog:",
+    "@stealthscale/example-lib-ui": "workspace:^",
+    "@stealthscale/provider-router": "workspace:^",
+    "@tanstack/react-router": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@module-federation/vite": "catalog:",
+    "@rolldown/plugin-babel": "catalog:",
+    "@stealthscale/testing-router": "workspace:^",
+    "@stealthscale/vite-config": "workspace:^",
+    "@stealthscale/vite-config-react": "workspace:^",
+    "@stealthscale/vite-config-typescript": "workspace:^",
+    "@testing-library/react": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "babel-plugin-react-compiler": "catalog:",
+    "happy-dom": "catalog:",
+    "oxc-transform-react": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

@@ -108,6 +108,14 @@ describe("App", () => {
     expect(getAllByRole("article")).toHaveLength(4);
   });
 
+  it("draws the typography and the actions below the bento", () => {
+    const { getByRole } = render(<App />);
+
+    expect(getByRole("heading", { name: "Typography" })).toBeDefined();
+    expect(getByRole("heading", { name: "Actions" })).toBeDefined();
+    expect(getByRole("button", { name: "Close" })).toBeDefined();
+  });
+
   it("draws the looks, the motions and the bento below the candy", () => {
     const { getByRole } = render(<App />);
 

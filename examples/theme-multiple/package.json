@@ -15,6 +15,8 @@
     "test": "vp test"
   },
   "dependencies": {
+    "@stealthscale/component-actions": "workspace:^",
+    "@stealthscale/component-typography": "workspace:^",
     "@stealthscale/example-lib-actions": "workspace:^",
     "@stealthscale/example-lib-surfaces": "workspace:^",
     "@stealthscale/example-theme-abyss": "workspace:^",
@@ -26,6 +28,7 @@
     "react-dom": "catalog:"
   },
   "devDependencies": {
+    "@rolldown/plugin-babel": "catalog:",
     "@stealthscale/vite-config": "workspace:^",
     "@stealthscale/vite-config-react": "workspace:^",
     "@stealthscale/vite-config-theme": "workspace:^",
@@ -35,6 +38,7 @@
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "babel-plugin-react-compiler": "catalog:",
     "happy-dom": "catalog:",
     "oxc-transform-react": "catalog:",
     "typescript": "catalog:",

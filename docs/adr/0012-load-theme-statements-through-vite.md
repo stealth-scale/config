@@ -88,7 +88,7 @@ Parsing reproduces the literals and loses everything else.
   the plugin.
 - Opening an importer for a build resolves a second configuration and starts a module runner, which
   is work a build would not otherwise do.
-- A failure inside a theme module surfaces as an import error from the plugin rather than as a
+- A failure inside a theme module is reported as an import error from the plugin rather than as a
   configuration error from the compiler, so the message names the wrong layer first.
 
 **Neutral:**

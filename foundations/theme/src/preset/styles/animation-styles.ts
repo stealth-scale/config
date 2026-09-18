@@ -112,6 +112,7 @@ export const animationStyles: AnimationStyles = {
   },
   parallax: scrolled("parallax", "scroll()", {}),
   progress: scrolled("progress", "scroll()", { transformOrigin: "left" }),
+  pulse: loop("pulse", "ambient", "in-out"),
   "pulse-glow": {
     value: { ...loop("pulse-glow", "ambient", "in-out").value, animationDirection: "alternate" },
   },

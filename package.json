@@ -5,7 +5,7 @@
   "description": "Builds, checks, tests and releases every stealthscale package.",
   "type": "module",
   "scripts": {
-    "bootstrap": "pnpm -r --filter '{foundations/*}' --filter '{packages/*}' run build",
+    "bootstrap": "pnpm -r --filter '{foundations/*}' --filter '{packages/*}' --filter '{components/*}' run build",
     "prepare": "lefthook install",
     "ready": "pnpm run bootstrap && vp run ci"
   },
@@ -18,6 +18,7 @@
     "@stealthscale/testing": "workspace:^",
     "@stealthscale/testing-config": "workspace:^",
     "@stealthscale/testing-react": "workspace:^",
+    "@stealthscale/testing-router": "workspace:^",
     "@stealthscale/testing-theme": "workspace:^",
     "@stealthscale/vite-config": "workspace:^",
     "@stealthscale/vite-config-css": "workspace:^",

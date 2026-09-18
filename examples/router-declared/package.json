@@ -1,0 +1,38 @@
+{
+  "name": "@stealthscale/example-router-declared",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Draws routes that arrive as data, under layouts they name, linked to by id rather than by path.",
+  "license": "MIT",
+  "type": "module",
+  "imports": {
+    "#*": "./src/*"
+  },
+  "scripts": {
+    "build": "vp build",
+    "check": "vp check",
+    "dev": "vp dev",
+    "test": "vp test"
+  },
+  "dependencies": {
+    "@stealthscale/provider-router": "workspace:^",
+    "@tanstack/react-router": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@rolldown/plugin-babel": "catalog:",
+    "@stealthscale/testing-router": "workspace:^",
+    "@stealthscale/vite-config": "workspace:^",
+    "@stealthscale/vite-config-react": "workspace:^",
+    "@stealthscale/vite-config-typescript": "workspace:^",
+    "@testing-library/react": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "babel-plugin-react-compiler": "catalog:",
+    "happy-dom": "catalog:",
+    "oxc-transform-react": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

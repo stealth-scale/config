@@ -12,6 +12,7 @@ import * as manifest from "#manifest.ts";
 import { type Arguments, factories, prefixOf, walked, type Walked } from "#module.ts";
 import * as plugin from "#plugin.ts";
 import * as readme from "#readme.ts";
+import * as source from "#source.ts";
 import { composes, type Tiers } from "#tier.ts";
 
 /**
@@ -34,6 +35,9 @@ export type Check =
   | "plugin.named"
   | "plugin.peer"
   | "readme.exports"
+  | "source.declared"
+  | "source.jsx"
+  | "source.specs"
   | "tier.composes";
 
 /**
@@ -54,6 +58,12 @@ export interface Conformance {
    * The directory holding the package's manifest.
    */
   readonly at: string;
+
+  /**
+   * Whether a barrel needs a specification beside it too, which a component package asks for
+   * because a barrel there is where a component's public surface is written.
+   */
+  readonly barrels?: boolean | undefined;
 
   /**
    * Which contract the package is held to.
@@ -154,6 +164,9 @@ const RUNS: ReadonlyArray<readonly [Check, readonly manifest.Kind[]]> = [
   ["manifest.peers", ["config", "library", "plugin"]],
   ["module.factories", ["config"]],
   ["readme.exports", ["config"]],
+  ["source.specs", ["config", "library", "plugin"]],
+  ["source.declared", ["config", "library", "plugin"]],
+  ["source.jsx", ["config", "library", "plugin"]],
   ["layer.kind", ["config"]],
   ["layer.named", ["config"]],
   ["layer.reasoned", ["config"]],
@@ -179,6 +192,9 @@ const RUNNERS: Readonly<Record<Check, Runner>> = {
   "plugin.named": ({ stated }) => plugin.named(stated.module, stated.arguments ?? {}),
   "plugin.peer": ({ published }) => plugin.peer(published),
   "readme.exports": ({ stated, walked: barrel }) => readme.exports(stated.at, barrel.namespaces),
+  "source.declared": ({ published, stated }) => source.declared(stated.at, published),
+  "source.jsx": ({ stated }) => source.jsx(stated.at),
+  "source.specs": ({ stated }) => source.specs(stated.at, stated.barrels === true),
   "tier.composes": ({ published, stated }) => composes(published, stated.tiers ?? {}, stated.at),
 };
 

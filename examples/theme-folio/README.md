@@ -1,9 +1,9 @@
 # @stealthscale/example-theme-folio
 
-`@stealthscale/example-theme-folio` states Folio: an editorial product, set to be read. A violet
-brand on greys tinted to match, body text a step larger than the foundation's, a scale that climbs
-by a major third, and a serif to read it in. It is a root theme, like Fathom, that also moves the
-type.
+`@stealthscale/example-theme-folio` states Folio, an editorial product set to be read. It puts a
+violet brand on greys tinted to match, sets body text a step larger than the foundation's, climbs
+the scale by a major third, and reads in a serif. It is a root theme, like Fathom, that also changes
+the type.
 
 ## Run it
 

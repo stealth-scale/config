@@ -23,7 +23,7 @@ states none of its own.
 workspace tier, which adds a task table, a commit hook and the project list to the node tier's lint,
 pack and test layers.
 
-The directory each layer is handed is this package rather than the root. A run started inside a
+The directory each layer receives is this package rather than the root. A run started inside a
 package that has no configuration of its own is configuring that package, so `pack.published` reads
 the `stealth-source` condition in this `package.json` and finds `src/index.ts` behind it.
 

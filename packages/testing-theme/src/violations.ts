@@ -25,6 +25,7 @@ export type ThemeCheck =
   | "contract.references"
   | "contract.roles"
   | "contract.styles"
+  | "contract.variants"
   | "contrast.boundary"
   | "contrast.focus"
   | "contrast.text"
@@ -97,6 +98,16 @@ function compoundsOf(theme: Theme, options: ThemeChecks): readonly string[] {
 }
 
 /**
+ * Runs the variants check where the specification maps each key to its recipe, and nothing
+ * where it lists keys alone.
+ */
+function variantsOf(theme: Theme, options: ThemeChecks): readonly string[] {
+  if (options.recipes === undefined || isKeys(options.recipes)) return [];
+
+  return contract.variants(theme, options.recipes);
+}
+
+/**
  * Runs one check and reports what it found.
  */
 type Runner = (theme: Theme, options: ThemeChecks) => readonly string[];
@@ -114,6 +125,7 @@ const RUNNERS: ReadonlyArray<readonly [ThemeCheck, Runner]> = [
   ["contract.modes", (theme) => contract.modes(theme)],
   ["contract.references", (theme, options) => contract.references(theme, options)],
   ["contract.extensions", (theme, options) => contract.extensions(theme, keysOf(options))],
+  ["contract.variants", variantsOf],
   ["contract.compounds", compoundsOf],
   [
     "contract.listed",

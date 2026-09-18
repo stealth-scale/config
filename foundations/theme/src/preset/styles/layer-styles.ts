@@ -73,10 +73,54 @@ function blurred(strength: string): Look {
 }
 
 /**
- * Writes a fill: a background, the ink on it, and the background it hovers to.
+ * Writes a fill: a background, the ink on it, the background it hovers to, and the background it
+ * is pressed to.
+ *
+ * @remarks
+ *   A solid fill is pressed to the background it hovers to, because the palette states no role
+ *   below its solid, and the squeeze an interactive control draws carries the press there.
  */
-function fill(background: string, color: string, hovered: string): Look {
-  return { value: { _hover: { background: hovered }, background, color } };
+function fill(background: string, color: string, hovered: string, pressed = hovered): Look {
+  return {
+    value: { _active: { background: pressed }, _hover: { background: hovered }, background, color },
+  };
+}
+
+/**
+ * Writes an outline: a line round the box, the ink inside it, and the background it fills with
+ * as a pointer hovers and presses.
+ *
+ * @remarks
+ *   An outline reads as pressed by filling in rather than by changing its line, because a line
+ *   one step darker is the same change a hover makes and a press that looks like a hover reads
+ *   as nothing happening. The fill is clipped to the padding box, so a rounded corner is drawn
+ *   as one antialiased curve: a fill that runs under the line lays a second curve over the first,
+ *   and the two read as a corner heavier than the edges it joins.
+ */
+function outlined(line: string, hovered: string): Look {
+  return {
+    value: {
+      _active: { background: "colorPalette.muted", borderColor: hovered },
+      _hover: { background: "colorPalette.subtle", borderColor: hovered },
+      backgroundClip: "padding-box",
+      borderColor: line,
+      borderWidth: "sm",
+      color: "colorPalette.fg",
+    },
+  };
+}
+
+/**
+ * Writes a flat look: a background and the ink on it, and nothing a pointer changes.
+ *
+ * @remarks
+ *   A badge, a tag and a chip read as part of what they label rather than as something to press,
+ *   so they repaint under no pointer. A fill would repaint: a badge inside a row that hovers is
+ *   under the pointer whenever the row is, and a badge that lights up on its own reads as a
+ *   control a reader can press and then cannot.
+ */
+function flat(background: string, color = "colorPalette.fg"): Look {
+  return { value: { background, color } };
 }
 
 /**
@@ -231,14 +275,48 @@ export const layerStyles: LayerStyles = {
   },
   disabled: { value: { cursor: "disabled", opacity: "disabled" } },
   fill: {
-    ghost: fill("transparent", "colorPalette.fg", "colorPalette.muted"),
+    ghost: fill("transparent", "colorPalette.fg", "colorPalette.muted", "colorPalette.emphasized"),
     muted: fill("colorPalette.muted", "colorPalette.fg", "colorPalette.emphasized"),
-    plain: { value: { color: "colorPalette.fg" } },
+    plain: {
+      value: { _active: { color: "colorPalette.solid" }, color: "colorPalette.fg" },
+    },
     solid: fill("colorPalette.solid", "colorPalette.contrast", "colorPalette.solid.hover"),
-    subtle: fill("colorPalette.subtle", "colorPalette.fg", "colorPalette.muted"),
+    subtle: fill(
+      "colorPalette.subtle",
+      "colorPalette.fg",
+      "colorPalette.muted",
+      "colorPalette.emphasized",
+    ),
     surface: {
       value: {
-        ...fill("colorPalette.subtle", "colorPalette.fg", "colorPalette.muted").value,
+        ...fill(
+          "colorPalette.subtle",
+          "colorPalette.fg",
+          "colorPalette.muted",
+          "colorPalette.emphasized",
+        ).value,
+        backgroundClip: "padding-box",
+        borderColor: "colorPalette.border",
+        borderWidth: "sm",
+      },
+    },
+  },
+  flat: {
+    outline: {
+      value: {
+        backgroundClip: "padding-box",
+        borderColor: "colorPalette.border",
+        borderWidth: "sm",
+        color: "colorPalette.fg",
+      },
+    },
+    plain: { value: { color: "colorPalette.fg" } },
+    solid: flat("colorPalette.solid", "colorPalette.contrast"),
+    subtle: flat("colorPalette.subtle"),
+    surface: {
+      value: {
+        ...flat("colorPalette.subtle").value,
+        backgroundClip: "padding-box",
         borderColor: "colorPalette.border",
         borderWidth: "sm",
       },
@@ -277,22 +355,8 @@ export const layerStyles: LayerStyles = {
     },
   },
   outline: {
-    solid: {
-      value: {
-        _hover: { background: "colorPalette.subtle" },
-        borderColor: "colorPalette.solid",
-        borderWidth: "sm",
-        color: "colorPalette.fg",
-      },
-    },
-    subtle: {
-      value: {
-        _hover: { borderColor: "colorPalette.border.hover" },
-        borderColor: "colorPalette.border",
-        borderWidth: "sm",
-        color: "colorPalette.fg",
-      },
-    },
+    solid: outlined("colorPalette.solid", "colorPalette.solid"),
+    subtle: outlined("colorPalette.border", "colorPalette.border.hover"),
   },
   ripple: {
     value: {

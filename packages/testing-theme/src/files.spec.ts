@@ -28,6 +28,21 @@ describe("files", () => {
     ]);
   });
 
+  it("lists a recipe file named for its directory under the directory's name", () => {
+    const found = withScratchWorkspace(
+      {
+        "src/button/recipe.ts": RECIPE,
+        "src/menu-item/recipe.ts": SLOTTED,
+      },
+      (workspace) => recipeFiles(workspace.path("src")),
+    );
+
+    expect(found).toStrictEqual([
+      { file: "button/recipe.ts", key: "button", slotted: false },
+      { file: "menu-item/recipe.ts", key: "menuItem", slotted: true },
+    ]);
+  });
+
   it("passes over a specification and a recipe file that exports no recipe", () => {
     const found = withScratchWorkspace(
       {

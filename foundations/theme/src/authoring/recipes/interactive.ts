@@ -1,5 +1,6 @@
 /**
- * Writes what every control the reader can press has in common, and what a link has.
+ * Writes what every control the reader can press has in common, what a link has, and what a row of
+ * a list the reader chooses from has.
  */
 
 import type { SystemStyleObject } from "#generated/types/system.d.mts";
@@ -15,7 +16,9 @@ import type { SystemStyleObject } from "#generated/types/system.d.mts";
  */
 export function interactive(): SystemStyleObject {
   return {
-    _disabled: { layerStyle: "disabled" },
+    _active: { scale: "0.98" },
+    _disabled: { _active: { scale: "1" }, layerStyle: "disabled" },
+    _motionReduce: { _active: { scale: "1" } },
     cursor: "button",
     focusRingColor: "colorPalette.focusRing",
     focusVisibleRing: "outside",
@@ -43,5 +46,35 @@ export function link(): SystemStyleObject {
     focusRingColor: "colorPalette.focusRing",
     focusVisibleRing: "outside",
     textDecoration: "none",
+  };
+}
+
+/**
+ * Writes the base of a row in a list the reader chooses from: a full-width line that holds a mark,
+ * a label and a hint side by side, and that the list moves a highlight over.
+ *
+ * @remarks
+ *   The row carries no focus ring and no press, because a list of this kind keeps focus on the
+ *   container and moves a highlight over the rows. The pointer is the arrow rather than the hand,
+ *   which is what the menu pattern asks for and what every desktop menu does. The row is positioned
+ *   so a mark can be placed in the gutter the list leaves for one.
+ */
+export function row(): SystemStyleObject {
+  return {
+    _disabled: { layerStyle: "disabled" },
+    alignItems: "center",
+    borderRadius: "l1",
+    cursor: "menuitem",
+    display: "flex",
+    flex: "0 0 auto",
+    inlineSize: "100%",
+    outline: "0",
+    position: "relative",
+    textAlign: "start",
+    textDecoration: "none",
+    transitionDuration: "fast",
+    transitionProperty: "common",
+    transitionTimingFunction: "out",
+    userSelect: "none",
   };
 }

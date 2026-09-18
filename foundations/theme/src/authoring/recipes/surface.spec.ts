@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { recipeViolations } from "@stealthscale/testing-theme";
 
 import { defineRecipe } from "#authoring/recipe.ts";
-import { divider, surface } from "#authoring/recipes/surface.ts";
+import { divider, liftVariants, surface } from "#authoring/recipes/surface.ts";
 
 describe("surface", () => {
   it("draws a panel lifted a little when nothing is stated", () => {
@@ -19,6 +19,20 @@ describe("surface", () => {
 
   it("lifts the panel to the level it was given", () => {
     expect(surface("xl")).toMatchObject({ boxShadow: "xl" });
+  });
+
+  it("offers both lifts when a recipe names none", () => {
+    expect(Object.keys(liftVariants())).toStrictEqual(["raised", "floating"]);
+  });
+
+  it("lifts a control under a pointer and drops it under a press", () => {
+    expect(liftVariants(["raised"])).toStrictEqual({
+      raised: {
+        _active: { boxShadow: "none" },
+        _hover: { boxShadow: "md" },
+        boxShadow: "sm",
+      },
+    });
   });
 
   it("draws a hairline across the page when nothing is stated", () => {

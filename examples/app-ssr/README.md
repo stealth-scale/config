@@ -20,7 +20,7 @@ script writes the server bundle:
 vp build --ssr src/server.ts --outDir dist/server
 ```
 
-The development server answers on port 4600 and the preview server on port 4601, so the source and
+The development server listens on port 4600 and the preview server on port 4601, so the source and
 the build can run beside each other.
 
 ## The configuration

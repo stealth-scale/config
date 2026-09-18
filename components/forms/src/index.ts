@@ -1,0 +1,11 @@
+/**
+ * Publishes what a person fills in: the text field, and the search field with a control that
+ * empties it. Each component binds a recipe a theme can extend and draws nothing of its own. The
+ * recipes reach an application's compiler through the preset under `./theme`, and the components
+ * reach its bundle through here.
+ *
+ * @packageDocumentation
+ */
+
+export * from "#input/index.ts";
+export * from "#search-input/index.ts";

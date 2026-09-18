@@ -14,7 +14,7 @@ pnpm --filter @stealthscale/example-app-react test
 
 `vp test` renders `Badge` into a happy-dom document and reads the text back out of it. It renders
 `notes.mdx` the same way and reads the heading, the list and the badge the page imports. The
-development server answers on port 4300 and refuses to start when something else already has it.
+development server listens on port 4300 and refuses to start when something else already has it.
 
 ## The configuration
 
@@ -28,7 +28,7 @@ is deployed rather than published. The file adds four calls beside it.
   root configuration only.
 - `css.layers()` appends one plugin that runs Stylelint over the stylesheets this package imports.
   It runs during a build and behind the development server alike, and a rule you change applies on
-  the next run rather than after a cache is thrown away.
+  the next run rather than after a cache is cleared.
 - `define.manifest()` substitutes `__NAME__` and `__VERSION__` into the bundle. Both values come
   from the manifest the composer supplies rather than from disk.
 - `server.port(4300)` pins the development server and fails its start on a taken port instead of

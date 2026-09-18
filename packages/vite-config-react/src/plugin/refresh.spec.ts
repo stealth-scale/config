@@ -57,11 +57,7 @@ describe("refresh", () => {
     expect(shipped()["jsx"]).toBe("react-jsx");
   });
 
-  it("memoises with the compiler", () => {
-    expect(options({}).compiler).toBe(true);
-  });
-
-  it("lets a package the compiler cannot reason about turn it off", () => {
-    expect(options({ compiler: false }).compiler).toBe(false);
+  it("leaves the plugin's own compiler option alone", () => {
+    expect(options({})).not.toHaveProperty("compiler");
   });
 });

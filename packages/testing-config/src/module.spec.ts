@@ -48,6 +48,17 @@ describe("module", () => {
     ]);
   });
 
+  it("enters an object that reaches itself once", () => {
+    const loop: Record<string, unknown> = {};
+
+    loop["inner"] = { back: loop, run: (): number => 1 };
+
+    const found = walked({ ns: loop }, {});
+
+    expect(found.factories.map((factory) => factory.path)).toStrictEqual(["ns.inner.run"]);
+    expect(found.violations).toStrictEqual([]);
+  });
+
   it("reports such an export inside a namespace by its path", () => {
     const barrel = { lint: { level: 3 } };
 

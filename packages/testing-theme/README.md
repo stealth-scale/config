@@ -64,64 +64,107 @@ expect(recipeClasses(container, "button")).toContain(variantClass("button", "var
 
 ### `violations(theme, options)`
 
-| Check                 | Reports                                                                                                                            |
-| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `name.attribute`      | A name outside `[a-z][a-z0-9-]*`, which a page cannot write as the theme attribute                                                 |
-| `contract.roles`      | A palette that leaves one of the twelve roles out, and a family that leaves one of its members out                                 |
-| `contract.modes`      | A color stated in one mode and not the other                                                                                       |
-| `contract.references` | A reference that points at a token nothing defines, or at itself                                                                   |
-| `contract.extensions` | An extension naming a recipe key the workspace does not publish, or naming `className` or `slots`                                  |
-| `contract.compounds`  | A compound for a selection the component's recipe declares no compound for, where `recipes` maps each key to its recipe            |
-| `contract.listed`     | A file under `recipes/` or `slot-recipes/` exporting `extension` that the theme does not list, where `at` is given                 |
-| `contract.styles`     | A text, layer or animation style that states nothing, and a text style without a `fontSize`                                        |
-| `contrast.text`       | A text pair below 7:1: every ink on every surface, and each palette's `contrast` on its solids and its inks on its fills           |
-| `contrast.boundary`   | A boundary pair below 3:1: the emphasized line and the subtle ink on every surface, and each palette's solid and lines on the page |
-| `contrast.focus`      | A palette's `focusRing` below 3:1 on any surface                                                                                   |
-| `fonts.installed`     | A font package the theme names that does not resolve from `at`, and nothing where `at` is not given                                |
+| Check                 | Reports                                                                                                                                                                   |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name.attribute`      | A name outside `[a-z][a-z0-9-]*`, which a page cannot write as the theme attribute                                                                                        |
+| `contract.roles`      | A palette that leaves one of the twelve roles out, and a family that leaves one of its members out                                                                        |
+| `contract.modes`      | A color stated in one mode and not the other                                                                                                                              |
+| `contract.references` | A reference that points at a token nothing defines, or at itself                                                                                                          |
+| `contract.extensions` | An extension naming a recipe key the workspace does not publish, or naming `className` or `slots`                                                                         |
+| `contract.variants`   | A variant on an axis the recipe does not offer, a value the axis does not offer, or a part the recipe's value does not style, where `recipes` maps each key to its recipe |
+| `contract.compounds`  | A compound for a selection the component's recipe declares no compound for, or styling a part the recipe's compound does not, where `recipes` maps each key to its recipe |
+| `contract.listed`     | A file under `recipes/` or `slot-recipes/` exporting `extension` that the theme does not list, where `at` is given                                                        |
+| `contract.styles`     | A text, layer or animation style that states nothing, and a text style without a `fontSize`                                                                               |
+| `contrast.text`       | A text pair below 7:1: every ink on every surface, and each palette's `contrast` on its solids and its inks on its fills                                                  |
+| `contrast.boundary`   | A boundary pair below 3:1: the emphasized line and the subtle ink on every surface, and each palette's solid and lines on the page                                        |
+| `contrast.focus`      | A palette's `focusRing` below 3:1 on any surface                                                                                                                          |
+| `fonts.installed`     | A font package the theme names that does not resolve from `at`, and nothing where `at` is not given                                                                       |
 
 `options.recipes` lists the recipe keys the workspace publishes, or maps each key to its recipe,
-which adds the compound check. `publishedRecipes(...presets)` builds that map out of the presets the
-component packages publish, so the list is the one an application installs rather than one written
-out by hand. `options.base` names the preset the theme is layered on, which the resolver follows a
-reference into. `options.thresholds` moves any of the three ratios. `options.skip` leaves a check
-out, each with a reason.
+which adds the variants check and the compound check. `publishedRecipes(...presets)` builds that map
+out of the presets the component packages publish, so the list is the one an application installs
+rather than one written out by hand. `options.base` names the preset the theme is layered on, which
+the resolver follows a reference into. `options.thresholds` changes any of the three ratios.
+`options.skip` leaves a check out, each with a reason.
 
 ### `recipeViolations(recipe, options)`
 
-| Check               | Reports                                                                                                                                                                                                                       |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `recipe.className`  | A class name outside `[a-z][a-z0-9-]*`                                                                                                                                                                                        |
-| `recipe.values`     | A value that writes the class another value writes, across the recipe's axes, or that a boolean axis writes at `true`                                                                                                         |
-| `recipe.compounds`  | A compound without a name, two compounds under one name, and a compound whose name writes the class of a variant                                                                                                              |
-| `recipe.colors`     | A color written outright, a ramp step, a reference, a hue, a palette role that does not exist, or `colorPalette` pointed at a hue                                                                                             |
-| `recipe.tokens`     | A token the preset does not define, named by one word or by a path, in any category a property reads, and any composition name it does not define. A CSS-wide keyword and a size a box takes from its content are passed over |
-| `recipe.conditions` | A condition neither the compiler's base preset nor the preset defines                                                                                                                                                         |
-| `recipe.lengths`    | A length in `px`, `rem` or `pt` on a property outside `options.lengths`, the compiler's token function and a custom property's fallback left out                                                                              |
-| `recipe.modes`      | `_dark`, `_light`, `_osDark` or `_osLight` anywhere in the recipe                                                                                                                                                             |
-| `recipe.slots`      | A slot `options.parts` stamps no part for, and a part no slot styles                                                                                                                                                          |
-| `recipe.subtle`     | `fg.subtle` as a text color                                                                                                                                                                                                   |
+| Check               | Reports                                                                                                                                                                                                                   |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `recipe.className`  | A class name outside `[a-z][a-z0-9-]*`                                                                                                                                                                                    |
+| `recipe.values`     | A value that writes the class another value writes, across the recipe's axes, or that a boolean axis writes at `true`                                                                                                     |
+| `recipe.compounds`  | A compound without a name, two compounds under one name, and a compound whose name writes the class of a variant                                                                                                          |
+| `recipe.empty`      | A value or a compound that states no styles, whose class the runtime writes and no rule reaches                                                                                                                           |
+| `recipe.defaults`   | A default naming an axis the recipe does not offer, or a value the axis does not offer                                                                                                                                    |
+| `recipe.selections` | A compound matched on an axis the recipe does not offer, or on a value the axis does not offer                                                                                                                            |
+| `recipe.jsx`        | A name in `options.names` that no `jsx` pattern matches, and a pattern that matches no name, where `names` lists what a consumer writes the component under                                                               |
+| `recipe.colors`     | A color written outright, a ramp step, a reference, a hue, a palette role that does not exist, or `colorPalette` pointed at a hue                                                                                         |
+| `recipe.tokens`     | A token the preset does not define, named by one word or by a path, in any category a property reads, and any composition name it does not define. A CSS-wide keyword and a size a box takes from its content are ignored |
+| `recipe.conditions` | A condition neither the compiler's base preset nor the preset defines                                                                                                                                                     |
+| `recipe.lengths`    | A length in `px`, `rem` or `pt` on a property outside `options.lengths`, the compiler's token function and a custom property's fallback left out                                                                          |
+| `recipe.modes`      | `_dark`, `_light`, `_osDark` or `_osLight` anywhere in the recipe                                                                                                                                                         |
+| `recipe.slots`      | A slot `options.parts` stamps no part for, and a part no slot styles                                                                                                                                                      |
+| `recipe.subtle`     | `fg.subtle` as a text color                                                                                                                                                                                               |
 
 The color properties and the category each property reads are taken from the compiler's base preset
 at run time. The tokens and conditions are read from `options.preset`, which is the foundation
 unless a theme package states its own.
 
+### `boundViolations(recipe, draw, options)`
+
+Checks a bound component against its recipe. `draw(props)` renders the component with the props a
+caller would write and returns what it rendered into. The check renders the component once with
+nothing picked and once per value of every axis. On each render it reads the classes that open with
+the recipe's class off the element and compares them with what the recipe writes: the class of each
+value picked or defaulted and the class of each compound whose selection matches. Each class the
+element lacks is reported, and so is each class it has that the recipe does not write. A part of a
+slot recipe, named by `options.slot`, gets a value's class only where the value styles that slot.
+`options.defaults` names the values a binding fixes through its default props, whose classes the
+element has where nothing is picked. A fixed value is written by no JSX literal, so the check also
+reports one the recipe does not list under `staticCss`. `options.subject` finds the element where
+`data-recipe` and the slot class do not identify it.
+
+```tsx
+import { render } from "@testing-library/react";
+
+import { boundViolations } from "@stealthscale/testing-theme";
+
+expect(boundViolations(recipe, (props) => render(<Button {...props} />).container)).toStrictEqual(
+  [],
+);
+expect(
+  boundViolations(
+    recipe,
+    (props) =>
+      render(
+        <List.Root {...props}>
+          <List.Item />
+        </List.Root>,
+      ).container,
+    {
+      slot: "item",
+    },
+  ),
+).toStrictEqual([]);
+```
+
 ### `presetViolations(preset, options)`
 
-| Check               | Reports                                                                                        |
-| ------------------- | ---------------------------------------------------------------------------------------------- |
-| `preset.registered` | A `*.recipe.ts` file under `at` the preset does not register, and a key no recipe file defines |
-| `preset.keys`       | A recipe registered under a key that is not its class name in camel case                       |
-| `preset.slots`      | A slot recipe under `recipes`, and a recipe without slots under `slotRecipes`                  |
+| Check               | Reports                                                                                                       |
+| ------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `preset.registered` | A `*.recipe.ts` or `recipe.ts` file under `at` the preset does not register, and a key no recipe file defines |
+| `preset.keys`       | A recipe registered under a key that is not its class name in camel case                                      |
+| `preset.slots`      | A slot recipe under `recipes`, and a recipe without slots under `slotRecipes`                                 |
 
 ### Readers
 
-| Export                                                                          | Reads                                                                                                                                                                        |
-| ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `recipeClass`, `variantClass`, `slotClass`, `slotVariantClass`, `compoundClass` | The classes a recipe emits, in the naming scheme of `@stealthscale/pandacss-naming`                                                                                          |
-| `axesOf`, `valuesOf`, `defaultsOf`, `slotsOf`, `scaleOf`, `byStep`              | What a recipe declares, without rendering                                                                                                                                    |
-| `recipeElement`, `slotElement`, `classesOf`, `recipeClasses`, `slotClasses`     | What a rendered component drew, by `data-recipe` on the element a recipe was bound to and on the root of a compound component, and by `data-part` or `data-slot` on one part |
-| `resolved`, `palettesOf`, `extendedRecipes`, `fontsOf`                          | What a theme states, with every reference followed                                                                                                                           |
-| `publishedRecipes`                                                              | Every recipe the presets of the component packages register, keyed as they register it, for `options.recipes`                                                                |
+| Export                                                                          | Reads                                                                                                                                                                           |
+| ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `recipeClass`, `variantClass`, `slotClass`, `slotVariantClass`, `compoundClass` | The classes a recipe emits, in the naming scheme of `@stealthscale/pandacss-naming`                                                                                             |
+| `axesOf`, `valuesOf`, `defaultsOf`, `slotsOf`, `scaleOf`, `byStep`              | What a recipe declares, without rendering                                                                                                                                       |
+| `recipeElement`, `slotElement`, `classesOf`, `recipeClasses`, `slotClasses`     | What a rendered component drew, by `data-recipe` on the element a recipe was bound to and on the root of a compound component, and by the slot class or `data-part` on one part |
+| `resolved`, `palettesOf`, `extendedRecipes`, `fontsOf`                          | What a theme states, with every reference followed                                                                                                                              |
+| `publishedRecipes`                                                              | Every recipe the presets of the component packages register, keyed as they register it, for `options.recipes`                                                                   |
 
 ## Licence
 

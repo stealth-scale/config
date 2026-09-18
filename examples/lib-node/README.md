@@ -17,7 +17,7 @@ pnpm --filter @stealthscale/example-lib-node test
 
 ## The configuration
 
-The file picks the tier and hands it this package's directory:
+The file picks the tier and passes it this package's directory:
 
 ```ts
 import { defineConfig } from "@stealthscale/vite-config/preset/node";
@@ -39,6 +39,6 @@ beside it, and `pack.quality` reads the result back as a package manager and a t
 ## The packer and the tier
 
 The packer already resolves for node, so the node group of pack layers returns the base group
-unchanged. The tier moves what the linter and the test runner assume about the runtime. It also
+unchanged. The tier changes what the linter and the test runner assume about the runtime. It also
 records the target where a reader of the configuration finds it, which keeps that choice visible on
 the day it changes.

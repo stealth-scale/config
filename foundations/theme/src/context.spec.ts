@@ -49,6 +49,15 @@ describe("createRecipeContext", () => {
     expect(container.firstElementChild?.className).toBe("button button--ghost");
   });
 
+  it("draws the class of a variant a default prop names", () => {
+    const Ghost = createRecipeContext(button).withContext("button", {
+      defaultProps: { variant: "ghost" },
+    });
+    const { container } = render(createElement(Ghost, null, "Go"));
+
+    expect(container.firstElementChild?.className).toBe("button button--ghost");
+  });
+
   it("returns the three factories a compound component is built from", () => {
     const bound = createSlotRecipeContext(dialog);
 
@@ -69,6 +78,29 @@ describe("createRecipeContext", () => {
     expect(container.querySelector("h2")?.className).toBe("dialog__title");
   });
 
+  it("keeps a class one value writes on a slot where another value of the same name does not", () => {
+    const grid = defineSlotRecipe({
+      className: "grid",
+      defaultVariants: { columns: "1" },
+      slots: ["root", "item"],
+      variants: {
+        columns: { "1": { root: { gridTemplateColumns: "1fr" } } },
+        span: { "1": { item: { gridColumn: "span 1" } } },
+      },
+    });
+    const { withContext, withProvider } = createSlotRecipeContext(grid);
+    const Root = withProvider("div", "root");
+    const Item = withContext("div", "item");
+    const { container } = render(
+      createElement(Root, { span: "1" }, createElement(Item, null, "One")),
+    );
+
+    expect(container.firstElementChild?.className).toBe("grid__root grid__root--1");
+    expect(container.firstElementChild?.firstElementChild?.className).toBe(
+      "grid__item grid__item--1",
+    );
+  });
+
   it("stamps the recipe's name on the part that provides the variants", () => {
     const { withContext, withProvider } = createSlotRecipeContext(dialog);
     const Content = withProvider("section", "content");
@@ -76,9 +108,19 @@ describe("createRecipeContext", () => {
     const { container } = render(createElement(Content, null, createElement(Title, null, "Hello")));
 
     expect(container.querySelector("section")?.dataset["recipe"]).toBe("dialog");
-    expect(container.querySelector("section")?.dataset["slot"]).toBe("content");
     expect(container.querySelector("h2")?.dataset["recipe"]).toBeUndefined();
-    expect(container.querySelector("h2")?.dataset["slot"]).toBe("title");
+  });
+
+  it("writes each part's slot class and no slot attribute", () => {
+    const { withContext, withProvider } = createSlotRecipeContext(dialog);
+    const Content = withProvider("section", "content");
+    const Title = withContext("h2", "title");
+    const { container } = render(createElement(Content, null, createElement(Title, null, "Hello")));
+
+    expect(container.querySelector("section")?.classList).toContain("dialog__content");
+    expect(container.querySelector("section")?.dataset["slot"]).toBeUndefined();
+    expect(container.querySelector("h2")?.classList).toContain("dialog__title");
+    expect(container.querySelector("h2")?.dataset["slot"]).toBeUndefined();
   });
 
   it("stamps the recipe's name on a root provider that draws no slot of its own", () => {
@@ -131,7 +173,7 @@ describe("createRecipeContext", () => {
     expect(container.firstElementChild?.className).toBe("card__root");
   });
 
-  it("draws the class of a value a compound matches on among others on the slot it styles", () => {
+  it("draws a compound's class without the class of a value it matches on that styles no slot", () => {
     const { withContext, withProvider } = createSlotRecipeContext(
       defineSlotRecipe({
         className: "card",
@@ -149,9 +191,7 @@ describe("createRecipeContext", () => {
     );
 
     expect(container.firstElementChild?.className).toBe("card__root");
-    expect(container.querySelector("h2")?.className).toBe(
-      "card__title card__title--md card__title--loud",
-    );
+    expect(container.querySelector("h2")?.className).toBe("card__title card__title--loud");
   });
 
   it("draws no compound class for a slot compound that carries no name", () => {
@@ -163,7 +203,7 @@ describe("createRecipeContext", () => {
     }).withProvider("div", "root");
     const { container } = render(createElement(Root, { size: "lg" }, "Body"));
 
-    expect(container.firstElementChild?.className).toBe("card__root card__root--lg");
+    expect(container.firstElementChild?.className).toBe("card__root");
   });
 
   it("draws the class of a slot compound on the slot it styles and on no other", () => {
@@ -183,7 +223,7 @@ describe("createRecipeContext", () => {
 
     expect(container.firstElementChild?.className).toBe("card__root");
     expect(container.querySelector("h2")?.className).toBe(
-      "card__title card__title--lg card__title--compound__size-lg",
+      "card__title card__title--compound__size-lg",
     );
   });
 });

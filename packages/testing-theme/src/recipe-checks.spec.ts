@@ -23,29 +23,84 @@ const button = defineRecipe({
   },
 });
 
+const INK = { color: "fg" };
+
+const SIZES = { lg: { height: "control.lg" }, md: { height: "control.md" } };
+
 describe("recipeViolations", () => {
   it("passes a recipe built from the helpers", () => {
     expect(recipeViolations(button)).toStrictEqual([]);
   });
 
   it("reports a class name that is not kebab case", () => {
-    expect(recipeViolations({ className: "Button" })).toStrictEqual([
+    expect(recipeViolations({ base: INK, className: "Button" })).toStrictEqual([
       "recipe.className: Button is not a class name in kebab case",
     ]);
   });
 
   it("reports a value two axes share", () => {
-    const recipe = { className: "button", variants: { radius: { lg: {} }, size: { lg: {} } } };
+    const recipe = {
+      base: INK,
+      className: "button",
+      variants: { radius: { lg: { borderRadius: "l2" } }, size: { lg: { height: "control.lg" } } },
+    };
 
     expect(recipeViolations(recipe)).toStrictEqual([
       "recipe.values: button writes button--lg for size lg and for radius lg",
     ]);
   });
 
+  it("passes a value two axes share where each styles a part the other does not", () => {
+    const recipe = defineSlotRecipe({
+      base: { item: INK, root: { display: "grid" } },
+      className: "grid",
+      slots: ["root", "item"],
+      variants: {
+        columns: { "3": { root: { gridTemplateColumns: "repeat(3, minmax(0, 1fr))" } } },
+        span: { "3": { item: { gridColumn: "span 3" } } },
+      },
+    });
+
+    expect(recipeViolations(recipe)).toStrictEqual([]);
+  });
+
+  it("reads no part off a slot recipe's value that is not an object", () => {
+    const recipe = {
+      base: { root: INK },
+      className: "grid",
+      slots: ["root"],
+      variants: { columns: { "3": "odd" }, gap: { "3": "odd" } },
+    };
+
+    expect(recipeViolations(recipe)).not.toContain(
+      "recipe.values: grid writes grid__root--3 for gap 3 and for columns 3",
+    );
+  });
+
+  it("reports a value two axes share on one part of a slot recipe", () => {
+    const recipe = defineSlotRecipe({
+      base: { root: { display: "grid" } },
+      className: "grid",
+      slots: ["root"],
+      variants: {
+        columns: { "3": { root: { gridTemplateColumns: "repeat(3, minmax(0, 1fr))" } } },
+        gap: { "3": { root: { gap: "gap.md" } } },
+      },
+    });
+
+    expect(recipeViolations(recipe)).toStrictEqual([
+      "recipe.values: grid writes grid__root--3 for gap 3 and for columns 3",
+    ]);
+  });
+
   it("reports a value that is also the name of a boolean axis", () => {
     const recipe = {
+      base: INK,
       className: "button",
-      variants: { loading: { false: {}, true: {} }, state: { loading: {} } },
+      variants: {
+        loading: { false: { opacity: "1" }, true: { layerStyle: "disabled" } },
+        state: { loading: { layerStyle: "disabled" } },
+      },
     };
 
     expect(recipeViolations(recipe)).toStrictEqual([
@@ -55,9 +110,10 @@ describe("recipeViolations", () => {
 
   it("reports a compound without a name", () => {
     const recipe = defineRecipe({
+      base: INK,
       className: "button",
-      compoundVariants: [{ css: {}, size: "lg" }],
-      variants: { size: { lg: {}, md: {} } },
+      compoundVariants: [{ css: { fontWeight: "bold" }, size: "lg" }],
+      variants: { size: SIZES },
     });
 
     expect(recipeViolations(recipe)).toStrictEqual([
@@ -66,24 +122,34 @@ describe("recipeViolations", () => {
   });
 
   it("reports a compound without a class as one without a name", () => {
-    expect(
-      recipeViolations({ className: "button", compoundVariants: [{ css: {}, size: "lg" }] }),
-    ).toStrictEqual(["recipe.compounds: button declares compound 1 without a name"]);
+    const recipe = {
+      base: INK,
+      className: "button",
+      compoundVariants: [{ css: { fontWeight: "bold" }, size: "lg" }],
+      variants: { size: SIZES },
+    };
+
+    expect(recipeViolations(recipe)).toStrictEqual([
+      "recipe.compounds: button declares compound 1 without a name",
+    ]);
   });
 
   it("reads no values off an axis that is not an object", () => {
-    expect(recipeViolations({ className: "button", variants: { size: "odd" } })).toStrictEqual([]);
+    expect(
+      recipeViolations({ base: INK, className: "button", variants: { size: "odd" } }),
+    ).toStrictEqual([]);
   });
 
   it("reports two compounds under one name and a name that is a variant's class", () => {
     const recipe = defineRecipe({
+      base: INK,
       className: "button",
       compoundVariants: [
-        { css: {}, name: "hero", size: "lg" },
-        { css: {}, name: "hero", size: "md" },
-        { css: {}, name: "md", size: "lg" },
+        { css: { fontWeight: "bold" }, name: "hero", size: "lg" },
+        { css: { fontWeight: "bold" }, name: "hero", size: "md" },
+        { css: { fontWeight: "bold" }, name: "md", size: "lg" },
       ],
-      variants: { size: { lg: {}, md: {} } },
+      variants: { size: SIZES },
     });
 
     expect(recipeViolations(recipe)).toStrictEqual([
@@ -94,13 +160,159 @@ describe("recipeViolations", () => {
 
   it("passes a slot recipe whose compound is named per slot", () => {
     const recipe = defineSlotRecipe({
+      base: { root: { display: "flex" }, title: { textStyle: "heading.md" } },
       className: "card",
-      compoundVariants: [{ css: { root: {}, title: {} }, name: "hero", size: "lg" }],
+      compoundVariants: [
+        {
+          css: { root: { gap: "gap.lg" }, title: { fontWeight: "bold" } },
+          name: "hero",
+          size: "lg",
+        },
+      ],
       slots: ["root", "title"],
-      variants: { size: { lg: {}, md: {} } },
+      variants: { size: { lg: { root: { gap: "gap.lg" } }, md: { root: { gap: "gap.md" } } } },
     });
 
     expect(recipeViolations(recipe)).toStrictEqual([]);
+  });
+
+  it("reports a value that states no styles", () => {
+    const recipe = { base: INK, className: "x", variants: { size: { md: INK, none: {} } } };
+
+    expect(recipeViolations(recipe)).toStrictEqual([
+      "recipe.empty: x offers size none with no styles, so its class has no rule",
+    ]);
+  });
+
+  it("passes a base that states no styles", () => {
+    expect(recipeViolations({ base: {}, className: "x" })).toStrictEqual([]);
+    expect(recipeViolations({ className: "x" })).toStrictEqual([]);
+  });
+
+  it("reports a compound that states no styles", () => {
+    const recipe = defineRecipe({
+      base: INK,
+      className: "x",
+      compoundVariants: [{ css: {}, name: "hero", size: "lg" }],
+      variants: { size: SIZES },
+    });
+
+    expect(recipeViolations(recipe)).toStrictEqual([
+      "recipe.empty: x declares compound 1 with no styles",
+    ]);
+  });
+
+  it("reports a slot recipe's value that states no styles on any slot", () => {
+    const recipe = defineSlotRecipe({
+      base: { root: { display: "flex" }, title: { textStyle: "heading.md" } },
+      className: "card",
+      slots: ["root", "title"],
+      variants: { size: { lg: { root: {} }, md: { root: { gap: "gap.md" } } } },
+    });
+
+    expect(recipeViolations(recipe)).toStrictEqual([
+      "recipe.empty: card offers size lg with no styles, so its class has no rule",
+    ]);
+  });
+
+  it("passes a slot nothing styles", () => {
+    const recipe = defineSlotRecipe({
+      base: { root: { display: "flex" } },
+      className: "card",
+      slots: ["root", "ghost", "title"],
+      variants: { size: { md: { title: { textStyle: "heading.md" } } } },
+    });
+
+    expect(recipeViolations(recipe)).toStrictEqual([]);
+  });
+
+  it("counts a slot a compound styles as styled", () => {
+    const recipe = defineSlotRecipe({
+      base: { root: { display: "flex" } },
+      className: "card",
+      compoundVariants: [{ css: { title: { fontWeight: "bold" } }, name: "hero", size: "md" }],
+      slots: ["root", "title"],
+      variants: { size: { md: { root: { gap: "gap.md" } } } },
+    });
+
+    expect(recipeViolations(recipe)).toStrictEqual([]);
+  });
+
+  it("reports a default naming an axis the recipe does not offer", () => {
+    const recipe = { base: INK, className: "x", defaultVariants: { size: "md" } };
+
+    expect(recipeViolations(recipe)).toStrictEqual([
+      "recipe.defaults: x defaults size to md, and offers no such axis",
+    ]);
+  });
+
+  it("reports a default naming a value the axis does not offer", () => {
+    const recipe = {
+      base: INK,
+      className: "x",
+      defaultVariants: { loading: true, size: "xl" },
+      variants: { loading: { true: { layerStyle: "disabled" } }, size: SIZES },
+    };
+
+    expect(recipeViolations(recipe)).toStrictEqual([
+      "recipe.defaults: x defaults size to xl, which the axis does not offer",
+    ]);
+  });
+
+  it("reads no defaults off a value that is not an object", () => {
+    expect(recipeViolations({ base: INK, className: "x", defaultVariants: "md" })).toStrictEqual(
+      [],
+    );
+  });
+
+  it("reports a compound matched on an axis the recipe does not offer", () => {
+    const recipe = {
+      base: INK,
+      className: "x",
+      compoundVariants: [{ className: "x--hero", css: { fontWeight: "bold" }, tone: "loud" }],
+      variants: { size: SIZES },
+    };
+
+    expect(recipeViolations(recipe)).toStrictEqual([
+      "recipe.selections: x matches compound 1 on tone, which the recipe does not offer",
+    ]);
+  });
+
+  it("reports a compound matched on a value the axis does not offer among a list", () => {
+    const recipe = {
+      base: INK,
+      className: "x",
+      compoundVariants: [{ className: "x--hero", css: { fontWeight: "bold" }, size: ["lg", "xl"] }],
+      variants: { size: SIZES },
+    };
+
+    expect(recipeViolations(recipe)).toStrictEqual([
+      "recipe.selections: x matches compound 1 on size xl, which the axis does not offer",
+    ]);
+  });
+
+  it("passes a recipe whose patterns match every name and every name matches a pattern", () => {
+    const recipe = { ...button, jsx: [/Button$/u, "SubmitButton"] };
+
+    expect(
+      recipeViolations(recipe, { names: ["Button", "IconButton", "SubmitButton"] }),
+    ).toStrictEqual([]);
+  });
+
+  it("reports a name no pattern matches and a pattern that matches no name", () => {
+    const recipe = { ...button, jsx: [/^List(\.\w+)?$/u, "Menu"] };
+
+    expect(recipeViolations(recipe, { names: ["List.Root", "Button"] })).toStrictEqual([
+      "recipe.jsx: button tracks no tag named Button",
+      "recipe.jsx: button tracks Menu, which matches no published name",
+    ]);
+  });
+
+  it("reports a recipe that states no patterns where names are given", () => {
+    expect(recipeViolations(button, { names: ["Button"] })).toStrictEqual([
+      "recipe.jsx: button states no jsx patterns",
+    ]);
+    expect(recipeViolations(button, { names: [] })).toStrictEqual([]);
   });
 
   it.each([
@@ -251,7 +463,11 @@ describe("recipeViolations", () => {
   });
 
   it("reports a slot the anatomy stamps no part for and a part no slot styles", () => {
-    const dialog = defineSlotRecipe({ className: "dialog", slots: ["content", "extra"] });
+    const dialog = defineSlotRecipe({
+      base: { content: { display: "flex" }, extra: { display: "flex" } },
+      className: "dialog",
+      slots: ["content", "extra"],
+    });
 
     expect(recipeViolations(dialog, { parts: ["content", "title"] })).toStrictEqual([
       "recipe.slots: dialog styles extra, which the anatomy stamps no part for",
@@ -260,7 +476,7 @@ describe("recipeViolations", () => {
   });
 
   it("reports every part when the recipe styles no slot", () => {
-    expect(recipeViolations({ className: "x" }, { parts: ["root"] })).toStrictEqual([
+    expect(recipeViolations({ base: INK, className: "x" }, { parts: ["root"] })).toStrictEqual([
       "recipe.slots: x styles no slot for the part root",
     ]);
   });
@@ -278,7 +494,9 @@ describe("recipeViolations", () => {
   });
 
   it("passes over a compound variant that is not an object", () => {
-    expect(recipeViolations({ className: "x", compoundVariants: [null] })).toStrictEqual([]);
+    expect(recipeViolations({ base: INK, className: "x", compoundVariants: [null] })).toStrictEqual(
+      [],
+    );
   });
 
   it("reports the subtle ink written as a text color", () => {
@@ -297,8 +515,8 @@ describe("recipeViolations", () => {
   });
 
   it("reports a skip that gives no reason", () => {
-    expect(recipeViolations({ className: "x" }, { skip: { "recipe.colors": " " } })).toStrictEqual([
-      "skip of recipe.colors gives no reason",
-    ]);
+    expect(
+      recipeViolations({ base: INK, className: "x" }, { skip: { "recipe.colors": " " } }),
+    ).toStrictEqual(["skip of recipe.colors gives no reason"]);
   });
 });

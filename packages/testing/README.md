@@ -46,9 +46,9 @@ it("writes the manifest of every package in the tree", () => {
 
 `packageFiles` and `workspaceFiles` key every file from the workspace root, so spreading them into
 one object describes a whole tree. `withScratchWorkspace` writes that object under the system
-temporary directory and hands the function a workspace. The directory goes whether the function
-returns or throws, and an error it raised reaches the caller unchanged. The operating system
-supplies the last part of the directory name, so two calls never collide.
+temporary directory and passes the function a workspace. The directory is deleted whether the
+function returns or throws, and an error it raised reaches the caller unchanged. The operating
+system supplies the last part of the directory name, so two calls never collide.
 
 ## Reference
 
@@ -85,19 +85,19 @@ supplies the last part of the directory name, so two calls never collide.
 
 ### Plugin drivers
 
-| Export        | Signature                                                                                          | What it does                                                                                                                                    |
-| ------------- | -------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Configured`  | `{ root: string; [field: string]: unknown }`                                                       | The resolved configuration a driven plugin reads. `root` is the one field every house plugin reads, and any further field is handed on as given |
-| `Graphed`     | `{ id: string }`                                                                                   | A module as the graph hands one back, cut down to the id a plugin invalidates it by                                                             |
-| `HookContext` | `interface`                                                                                        | What a hook reads off `this`: `addWatchFile`, `environment.moduleGraph`, `warn`, and the `invalidated`, `warned` and `watched` records          |
-| `hookContext` | `(graphed?: readonly string[]) => HookContext`                                                     | Builds the context a hook reads `this` from. Its module graph answers for the ids in `graphed` and for nothing else                             |
-| `configured`  | `(plugin: Plugin, config: Configured) => Promise<void>`                                            | Calls `configResolved` with `config`                                                                                                            |
-| `started`     | `(plugin: Plugin, context: HookContext) => Promise<void>`                                          | Calls `buildStart` with `context` bound as `this`                                                                                               |
-| `resolved`    | `(plugin: Plugin, id: string, importer?: string) => Promise<string \| undefined>`                  | Calls `resolveId` and returns the id the plugin answered with, read from a string or from an object, or undefined where it declined             |
-| `loaded`      | `(plugin: Plugin, id: string) => Promise<string \| undefined>`                                     | Calls `load` and returns the code the plugin answered with, read from a string or from an object, or undefined where it declined                |
-| `transformed` | `(plugin: Plugin, context: HookContext, code: string, id: string) => Promise<string \| undefined>` | Calls `transform` with `context` bound as `this` and returns the code written back, or undefined where the plugin passed on the module          |
-| `updated`     | `(plugin: Plugin, context: HookContext, file: string, content?: string) => Promise<void>`          | Calls `hotUpdate` with `context` bound as `this`, for a file whose `read` resolves to `content`                                                 |
-| `generated`   | `(plugin: Plugin, bundling: object) => Promise<void>`                                              | Calls `generateBundle` with `bundling` bound as `this`                                                                                          |
+| Export        | Signature                                                                                          | What it does                                                                                                                                         |
+| ------------- | -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Configured`  | `{ root: string; [field: string]: unknown }`                                                       | The resolved configuration a driven plugin reads. `root` is the one field every house plugin reads, and any further field is passed through as given |
+| `Graphed`     | `{ id: string }`                                                                                   | A module as the graph returns one, cut down to the id a plugin invalidates it by                                                                     |
+| `HookContext` | `interface`                                                                                        | What a hook reads off `this`: `addWatchFile`, `environment.moduleGraph`, `warn`, and the `invalidated`, `warned` and `watched` records               |
+| `hookContext` | `(graphed?: readonly string[]) => HookContext`                                                     | Builds the context a hook reads `this` from. Its module graph resolves the ids in `graphed` and no others                                            |
+| `configured`  | `(plugin: Plugin, config: Configured) => Promise<void>`                                            | Calls `configResolved` with `config`                                                                                                                 |
+| `started`     | `(plugin: Plugin, context: HookContext) => Promise<void>`                                          | Calls `buildStart` with `context` bound as `this`                                                                                                    |
+| `resolved`    | `(plugin: Plugin, id: string, importer?: string) => Promise<string \| undefined>`                  | Calls `resolveId` and returns the id the plugin returned, read from a string or from an object, or undefined where it declined                       |
+| `loaded`      | `(plugin: Plugin, id: string) => Promise<string \| undefined>`                                     | Calls `load` and returns the code the plugin returned, read from a string or from an object, or undefined where it declined                          |
+| `transformed` | `(plugin: Plugin, context: HookContext, code: string, id: string) => Promise<string \| undefined>` | Calls `transform` with `context` bound as `this` and returns the code written back, or undefined where the plugin declined the module                |
+| `updated`     | `(plugin: Plugin, context: HookContext, file: string, content?: string) => Promise<void>`          | Calls `hotUpdate` with `context` bound as `this`, for a file whose `read` resolves to `content`                                                      |
+| `generated`   | `(plugin: Plugin, bundling: object) => Promise<void>`                                              | Calls `generateBundle` with `bundling` bound as `this`                                                                                               |
 
 ### Measurement
 

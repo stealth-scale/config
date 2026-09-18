@@ -1,10 +1,10 @@
 # @stealthscale/example-lib-ui
 
-`app-host`, `app-remote`, `app-ssr` and `app-tanstack` all import `Panel` from this package. React
-is a peer dependency rather than a dependency, so each of them renders the component against the
-copy of React the application itself installed. The example covers a browser library that publishes
-a stylesheet. It also covers a coverage departure written at the workspace root on the package's
-behalf.
+`app-host`, `app-remote`, `app-ssr` and `router-federated` all import `Panel` from this package.
+React is a peer dependency rather than a dependency, so each of them renders the component against
+the copy of React the application itself installed. The example covers a browser library that
+publishes a stylesheet. It also covers a coverage departure written at the workspace root on the
+package's behalf.
 
 ## Run it
 

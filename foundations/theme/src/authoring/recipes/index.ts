@@ -11,10 +11,62 @@
 export { dense } from "#authoring/recipes/dense.ts";
 export { field } from "#authoring/recipes/field.ts";
 export { floating, overlay } from "#authoring/recipes/floating.ts";
-export { interactive, link } from "#authoring/recipes/interactive.ts";
-export { type Look, LOOKS, lookVariants } from "#authoring/recipes/looks.ts";
-export { motion } from "#authoring/recipes/motion.ts";
-export { controlSizes, iconOnly, iconSizes, touchTarget } from "#authoring/recipes/sizes.ts";
-export { type Anatomy, slotsOf } from "#authoring/recipes/slots.ts";
+export {
+  type Align,
+  ALIGNMENTS,
+  alignVariants,
+  columnCounts,
+  type Count,
+  COUNTS,
+  DISTRIBUTIONS,
+  fittedColumns,
+  gapSizes,
+  type Justify,
+  justifyVariants,
+  spanCounts,
+  widthSizes,
+} from "#authoring/recipes/flow.ts";
+export { interactive, link, row } from "#authoring/recipes/interactive.ts";
+export {
+  type Flat,
+  FLATS,
+  flatVariants,
+  type Highlight,
+  HIGHLIGHTS,
+  highlightVariants,
+  type Look,
+  LOOKS,
+  lookVariants,
+} from "#authoring/recipes/looks.ts";
+export { motion, type Motion, MOTIONS, motionVariants } from "#authoring/recipes/motion.ts";
+export { cornerVariants, ratioVariants } from "#authoring/recipes/shape.ts";
+export {
+  below,
+  controlSizes,
+  iconOnly,
+  iconSizes,
+  insetSizes,
+  sizeVariants,
+  tagSizes,
+  touchTarget,
+} from "#authoring/recipes/sizes.ts";
+export { type Anatomy, onSlot, onSlots, slotsOf } from "#authoring/recipes/slots.ts";
 export { statusVariants } from "#authoring/recipes/status.ts";
-export { divider, type Elevation, surface } from "#authoring/recipes/surface.ts";
+export {
+  divider,
+  type Elevation,
+  type Lift,
+  LIFTED,
+  liftVariants,
+  surface,
+} from "#authoring/recipes/surface.ts";
+export {
+  textSizes,
+  type Tone,
+  TONES,
+  toneVariants,
+  truncate,
+  type Weight,
+  WEIGHTS,
+  weightVariants,
+} from "#authoring/recipes/text.ts";

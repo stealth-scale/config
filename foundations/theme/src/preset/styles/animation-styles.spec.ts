@@ -8,6 +8,7 @@ const LOOPS = [
   "float",
   "marquee",
   "meteor",
+  "pulse",
   "pulse-glow",
   "shimmer",
   "spin",

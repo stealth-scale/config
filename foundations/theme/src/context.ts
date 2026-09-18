@@ -85,11 +85,12 @@ export interface RecipeBinding<Variants extends RecipeVariantRecord> {
   usePropsContext: () => RecipeSelection<Variants> | undefined;
 
   /**
-   * Binds an element, which then takes the recipe's variants beside its own props.
+   * Binds an element, which then takes the recipe's variants beside its own props. A default prop
+   * may name a variant, for a component that fixes one of the recipe's values.
    */
   withContext: <Tag extends ElementType>(
     Component: Tag,
-    options?: JsxFactoryOptions<ComponentProps<Tag>>,
+    options?: JsxFactoryOptions<ComponentProps<Tag> & Partial<RecipeSelection<Variants>>>,
   ) => StyledComponent<Tag, RecipeSelection<Variants>>;
 }
 
@@ -229,11 +230,6 @@ function toSlotRuntimeConfig<Slots extends string, Variants extends SlotRecipeVa
 }
 
 /**
- * Lists the keys of a compound that are not axes.
- */
-const UNMATCHED = new Set(["className", "classNames", "css", "name"]);
-
-/**
  * Writes the key one value of one axis is read under.
  */
 function keyOf(axis: string, value: unknown): string {
@@ -256,47 +252,18 @@ function styles(styled: Styled, axis: string, value: unknown, slot: string): voi
 }
 
 /**
- * Records the slots each variant value styles through its own styles.
- */
-function styledByVariants<Slots extends string, Variants extends SlotRecipeVariantRecord<Slots>>(
-  recipe: SlotRecipe<Slots, Variants>,
-  styled: Styled,
-): void {
-  for (const [axis, values] of Object.entries(recipe.variants ?? {})) {
-    for (const [value, slotStyles] of Object.entries(values)) {
-      for (const slot of Object.keys(slotStyles)) styles(styled, axis, value, slot);
-    }
-  }
-}
-
-/**
- * Records the slots each value styles through a compound matched on it.
- */
-function styledByCompounds<Slots extends string, Variants extends SlotRecipeVariantRecord<Slots>>(
-  recipe: SlotRecipe<Slots, Variants>,
-  styled: Styled,
-): void {
-  for (const compound of recipe.compoundVariants ?? []) {
-    for (const [axis, selected] of Object.entries(compound)) {
-      if (UNMATCHED.has(axis)) continue;
-      for (const value of Array.isArray(selected) ? selected : [selected]) {
-        for (const slot of Object.keys(compound.css)) styles(styled, axis, value, slot);
-      }
-    }
-  }
-}
-
-/**
- * Lists, for each value of each axis, the slots the value styles: through its own styles, or
- * through a compound matched on it.
+ * Lists, for each value of each axis, the slots the value styles.
  */
 function styledSlots<Slots extends string, Variants extends SlotRecipeVariantRecord<Slots>>(
   recipe: SlotRecipe<Slots, Variants>,
 ): ReadonlyMap<string, ReadonlySet<string>> {
   const styled: Styled = new Map();
 
-  styledByVariants(recipe, styled);
-  styledByCompounds(recipe, styled);
+  for (const [axis, values] of Object.entries(recipe.variants ?? {})) {
+    for (const [value, slotStyles] of Object.entries(values)) {
+      for (const slot of Object.keys(slotStyles)) styles(styled, axis, value, slot);
+    }
+  }
 
   return styled;
 }
@@ -307,9 +274,14 @@ function styledSlots<Slots extends string, Variants extends SlotRecipeVariantRec
  * @remarks
  *   The runtime hands every slot the whole variant map, so a slot carried a class for every value
  *   the caller picked whether or not the value styled it, which was fifteen dead classes on one
- *   card. A value styles a slot through its own styles or through a compound matched on it, and
- *   the class of any other value is dropped from that slot. The classes are derived here as the
- *   runtime writes them, through the naming scheme.
+ *   card. A value styles a slot through the styles it names for that slot, and the class of any
+ *   other value is dropped from that slot. A class another value on the same slot writes is kept,
+ *   because a class carries the value and not the axis: a grid drawing three columns and an entry
+ *   spanning three write the same class on their own slots, and dropping it from the root for the
+ *   span would drop the columns with it. A compound keeps no value's class, because the compiler
+ *   emits a compound's styles under the compound's own class, which the runtime writes on the
+ *   slot where the selection matches. The classes are derived here as the runtime writes them,
+ *   through the naming scheme.
  * @typeParam Slots - Every part the recipe styles.
  * @typeParam Variants - Each axis it offers, against the values it takes.
  */
@@ -326,20 +298,20 @@ function pruned<Slots extends string, Variants extends SlotRecipeVariantRecord<S
   const pruning = (props?: RecipeSelection<Variants>): SlotRecord<Slots, string> => {
     const selection: Readonly<Record<string, unknown>> = runtime.getVariantProps(props);
     const kept = Object.entries(runtime(props)).map(([slot, written]) => {
-      const dead = new Set(
-        Object.entries(selection)
-          .filter(([axis, value]) => {
-            const slots = styled.get(keyOf(axis, value));
+      const alive = new Set<string>();
+      const unstyled = new Set<string>();
 
-            return slots === undefined || !slots.has(slot);
-          })
-          .map(([axis, value]) =>
-            atomicClass(
-              variantClass(`${recipe.className}__${slot}`, axis, String(value)),
-              SEPARATOR,
-            ),
-          ),
-      );
+      for (const [axis, value] of Object.entries(selection)) {
+        const name = atomicClass(
+          variantClass(`${recipe.className}__${slot}`, axis, String(value)),
+          SEPARATOR,
+        );
+
+        if (styled.get(keyOf(axis, value))?.has(slot) === true) alive.add(name);
+        else unstyled.add(name);
+      }
+
+      const dead = new Set([...unstyled].filter((each) => !alive.has(each)));
 
       return [
         slot,
@@ -402,9 +374,9 @@ function stamped<Props>(
  * @remarks
  *   The part that provides the variants carries the recipe's name as `data-recipe`, so a compound
  *   component is found by the same handle as one that draws a single element. Every part carries
- *   its own slot as `data-slot`, which the generated factories write. The compiler's own
- *   `dataAttr` option does nothing here, because it reads a name off the recipe a part is styled
- *   with and a part is styled with the slot's styles alone.
+ *   its slot class, `card__header`, which the generated factories write and which names the
+ *   recipe and the slot. The compiler's own `dataAttr` option does nothing here, because it reads
+ *   a name off the recipe a part is styled with and a part is styled with the slot's styles alone.
  * @typeParam Slots - Every part the recipe styles.
  * @typeParam Variants - Each axis it offers, against the values it takes.
  */

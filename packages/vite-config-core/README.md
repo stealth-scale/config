@@ -52,8 +52,8 @@ export function layers(): readonly Extendable[] {
 export const defineConfig: Defining = configuring(layers);
 ```
 
-`configuring` reads the defaults once per invocation rather than once per call. A tier working its
-list out from the environment is asked again on every build. The defaults come first in the list a
+`configuring` reads the defaults once per invocation rather than once per call. A tier that derives
+its list from the environment is read again on every build. The defaults come first in the list a
 package extends. A removal applies only to layers above it, so a package can take a default back.
 
 ## Reference
@@ -70,7 +70,7 @@ The entry point publishes nine functions and thirteen types.
 | `override`     | `(stated: Omit<Stated<Override>, "kind">) => Override`                            | A layer that rewrites the merged configuration                            |
 | `named`        | `<Of extends Layer>(name: string, layer: Of) => Of`                               | The same layer under a new name                                           |
 | `owned`        | `(name: string, layers: readonly Extendable[]) => readonly Layer[]`               | The flattened layers, renamed `owner/name`                                |
-| `contextOf`    | `(env: ConfigEnv, declared: string, from?: string) => Context`                    | The context handed to every layer                                         |
+| `contextOf`    | `(env: ConfigEnv, declared: string, from?: string) => Context`                    | The context passed to every layer                                         |
 
 | Type         | What it describes                                                                                         |
 | ------------ | --------------------------------------------------------------------------------------------------------- |
@@ -80,7 +80,7 @@ The entry point publishes nine functions and thirteen types.
 | `Context`    | What is being configured and where it sits                                                                |
 | `Defining`   | The signature a tier's `defineConfig` presents, with the configuration argument optional                  |
 | `Extendable` | A layer, or an array nesting layers to any depth                                                          |
-| `Layer`      | Any of `Contribution`, `Override`, `Preset` and `Removal`, told apart by `kind`                           |
+| `Layer`      | Any of `Contribution`, `Override`, `Preset` and `Removal`, distinguished by `kind`                        |
 | `Manifest`   | The `package.json` fields the kernel reads: `dependencies`, `exports`, `name`, `version` and `workspaces` |
 | `Stated`     | A layer as a caller writes it, before it is branded                                                       |
 
@@ -101,7 +101,7 @@ in the process environment overrides both.
 
 ## Layer kinds
 
-Each constructor takes a plain object and hands it back branded. The brand hangs on a symbol this
+Each constructor takes a plain object and returns it branded. The brand hangs on a symbol this
 package never exports, so an object with the right fields is still rejected where a layer is
 expected. The brand exists in the type alone. A minted layer serialises as exactly what the caller
 wrote.
@@ -113,7 +113,7 @@ wrote.
 | `Removal`      | `name`, `because`, `target` | `apply`                   |
 | `Override`     | `name`, `because`, `refine` | `apply`                   |
 
-- `config` takes a `UserConfig`, or a function handed the context that may answer with a promise.
+- `config` takes a `UserConfig`, or a function given the context that may return a promise.
 - `at` is a run of property names separated by dots, such as `test.setupFiles`. A path cannot name a
   property whose own name contains a dot.
 - `item` is the value to append. A contribution stating `itemOf` as well appends what that function
@@ -121,7 +121,7 @@ wrote.
 - `target` names the layer to take back. `refine` receives the context and the configuration
   composed so far. It returns the configuration to continue with.
 - `apply` decides which commands the layer takes part in. A layer stating none takes part in every
-  command. The string form is matched against the command, and the function form is handed the whole
+  command. The string form is matched against the command, and the function form receives the whole
   environment, which includes the mode.
 - `enforce` orders one preset among the rest. An absent value sorts with `pre`, `post` sorts after
   both, and the sort is stable.
@@ -141,15 +141,15 @@ A preset has no `because` field at all. Each of the other three kinds requires o
 6. Each override rewrites what the step before it produced, in the order the overrides were written.
 7. The keys written beside `extends` are merged over the result.
 
-Warning: a removal with no matching layer above it throws rather than passing quietly. Step 2 runs
+Warning: a removal with no matching layer above it throws rather than being ignored. Step 2 runs
 before it, so a removal aimed at a layer that only applies to `serve` needs the same `apply` on
 itself. A build throws otherwise.
 
 Step 4 settles the preset configurations concurrently. One preset's function cannot depend on
 another's having run. Where two contributions name the same path, both items are appended in
 flattened order, and neither is merged into the other. A path whose value is not an array is
-replaced by a list containing the one item. An override reads what the layers decided. It never sees
-the keys the caller wrote beside `extends`, because step 7 merges those afterwards.
+replaced by a list containing the one item. An override reads what the layers decided. It never
+reads the keys the caller wrote beside `extends`, because step 7 merges those afterwards.
 
 ## Licence
 

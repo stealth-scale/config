@@ -1,14 +1,15 @@
 /**
- * Rewrites the lines of a generated runtime that write a class name, so the browser writes the
- * scheme the stylesheet was renamed to.
+ * Rewrites the lines of a generated runtime that write a class name or an attribute of the
+ * compiler's own, so the browser writes the scheme the stylesheet was renamed to and nothing else.
  *
  * @remarks
  *   The compiler emits the runtime from templates and offers no hook into the names, so each
  *   template line is matched as the installed compiler writes it and replaced with a call into the
  *   naming package. Every atomic class passes `toClass` in `helpers`. Every variant class passes
  *   `transform` in the recipe runtime before it reaches the same `toClass`, and every compound
- *   class passes `formatClassName` there. A compiler release that moves a line fails the rewrite,
- *   which is the version pin.
+ *   class passes `formatClassName` there. The slot binding writes `data-slot` on every part, which
+ *   the part's slot class already says, and that line is dropped. A compiler release that moves a
+ *   line fails the rewrite, which is the version pin.
  */
 
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
@@ -32,7 +33,23 @@ const EXTENSIONS = ["mjs", "js"];
 const MARK = "<separator>";
 
 /**
- * Describes one line to find once and what to write in its place.
+ * Opens a rewritten file that imports nothing, so a second run recognises it.
+ */
+const REWRITTEN = "// rewritten by @stealthscale/pandacss-compiler\n";
+
+/**
+ * Matches the directive a generated JSX file opens with, which has to stay its first line.
+ */
+const DIRECTIVE = /^"use client";\n/u;
+
+/**
+ * The directory codegen writes the JSX bindings into, present only where the compiler was
+ * configured with a JSX framework.
+ */
+const JSX = "jsx";
+
+/**
+ * Describes one line to find a fixed number of times and what to write in its place.
  */
 interface Edit {
   /**
@@ -48,6 +65,10 @@ interface Edit {
    * The line to write in its place, with the separator's mark where the scheme reads it.
    */
   replacement: string;
+  /**
+   * How many times the anchor is found where the rewrite needs it. One unless stated.
+   */
+  times?: number | undefined;
 }
 
 /**
@@ -64,7 +85,7 @@ interface Rewrite {
    */
   file: string;
   /**
-   * The names the rewritten file imports from the naming package.
+   * The names the rewritten file imports from the naming package, or none.
    */
   names: readonly string[];
 }
@@ -112,10 +133,35 @@ const RECIPES: Rewrite = {
 };
 
 /**
- * Writes the import a rewritten file opens with, which also marks the file as rewritten.
+ * Rewrites the slot binding: the line that writes `data-slot` on a part is dropped, once in the
+ * provider and once in the part, because the slot class already names the slot.
+ */
+const SLOTS: Rewrite = {
+  edits: [
+    {
+      anchor: /'data-slot': slot,\n\s*/gu,
+      line: "'data-slot': slot,",
+      replacement: "",
+      times: 2,
+    },
+  ],
+  file: join("jsx", "create-slot-recipe-context"),
+  names: [],
+};
+
+/**
+ * Writes the line a rewritten file opens with, which also marks the file as rewritten: the import
+ * of what it uses from the scheme, or a comment where it uses nothing.
  */
 function header(names: readonly string[]): string {
-  return `import { ${names.join(", ")} } from "${NAMING}";\n`;
+  return names.length === 0 ? REWRITTEN : `import { ${names.join(", ")} } from "${NAMING}";\n`;
+}
+
+/**
+ * Writes how many times an anchor is expected, as the error a moved line raises reads it.
+ */
+function expected(times: number): string {
+  return times === 1 ? "once" : `${String(times)} times`;
 }
 
 /**
@@ -124,14 +170,16 @@ function header(names: readonly string[]): string {
  * @remarks
  *   The replacement is given as a function, so a `$` in it is written as it is rather than read
  *   as a substitution pattern.
- * @throws {@link Error} When the anchor is absent from the text or appears more than once.
+ * @throws {@link Error} When the anchor is found any number of times but the one the edit
+ * states.
  */
 function applied(file: string, text: string, edit: Edit, separator: Separator): string {
   const found = text.match(edit.anchor)?.length ?? 0;
+  const times = edit.times ?? 1;
 
-  if (found !== 1) {
+  if (found !== times) {
     throw new Error(
-      `${file} contains ${edit.line} ${String(found)} times where the rewrite needs it once`,
+      `${file} contains ${edit.line} ${String(found)} times where the rewrite needs it ${expected(times)}`,
     );
   }
 
@@ -142,16 +190,22 @@ function applied(file: string, text: string, edit: Edit, separator: Separator): 
 
 /**
  * Rewrites one file, and leaves a file the rewrite was already applied to as it is.
+ *
+ * @remarks
+ *   The header goes after the `"use client"` directive where the file opens with one, because a
+ *   directive counts only as the first statement of a module.
  */
 function rewrite(file: string, rewriting: Rewrite, separator: Separator): void {
   const source = readFileSync(file, "utf8");
   const opening = header(rewriting.names);
+  const directive = DIRECTIVE.exec(source)?.[0] ?? "";
+  const body = source.slice(directive.length);
 
-  if (source.startsWith(opening)) return;
+  if (body.startsWith(opening)) return;
 
   writeFileSync(
     file,
-    `${opening}${rewriting.edits.reduce((text, edit) => applied(file, text, edit, separator), source)}`,
+    `${directive}${opening}${rewriting.edits.reduce((text, edit) => applied(file, text, edit, separator), body)}`,
   );
 }
 
@@ -160,13 +214,15 @@ function rewrite(file: string, rewriting: Rewrite, separator: Separator): void {
  *
  * @remarks
  *   The runtime is read under its `mjs` extension, or under `js` where the compiler was configured
- *   for that. A second run on a rewritten runtime changes nothing.
- * @param dir - The directory codegen wrote the runtime into, holding `helpers` and
- *   `recipes/runtime`.
+ *   for that. The slot binding is rewritten where the runtime has a `jsx` directory, which it has
+ *   only where the compiler was configured with a JSX framework. A second run on a rewritten
+ *   runtime changes nothing.
+ * @param dir - The directory codegen wrote the runtime into, holding `helpers`, `recipes/runtime`
+ *   and, with a JSX framework, `jsx/create-slot-recipe-context`.
  * @param separator - The separator the compiler was configured with, which the scheme reads at
  *   run time.
  * @throws {@link Error} When the directory contains no runtime, or a template line is not found
- *   once in its file.
+ *   in its file as many times as the rewrite needs it.
  */
 export function rewriteRuntime(dir: string, separator: Separator): void {
   const extension = EXTENSIONS.find((each) => existsSync(join(dir, `helpers.${each}`)));
@@ -177,4 +233,6 @@ export function rewriteRuntime(dir: string, separator: Separator): void {
 
   rewrite(join(dir, `${HELPERS.file}.${extension}`), HELPERS, separator);
   rewrite(join(dir, `${RECIPES.file}.${extension}`), RECIPES, separator);
+  if (existsSync(join(dir, JSX)))
+    rewrite(join(dir, `${SLOTS.file}.${extension}`), SLOTS, separator);
 }

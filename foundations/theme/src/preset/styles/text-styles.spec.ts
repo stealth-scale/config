@@ -44,6 +44,9 @@ describe("textStyles", () => {
 
   it("offers a label for every control size", () => {
     expect(Object.keys(tokenAt(textStyles, "label") ?? {}).toSorted()).toStrictEqual([
+      "2xl",
+      "3xl",
+      "4xl",
       "lg",
       "md",
       "sm",
@@ -51,6 +54,17 @@ describe("textStyles", () => {
       "xs",
     ]);
     expect(tokenAt(textStyles, "label.md")).toMatchObject({ fontWeight: "medium" });
+  });
+
+  it("grows a label slower than its control above xl", () => {
+    expect(tokenAt(textStyles, "label.2xl")).toMatchObject({ fontSize: "lg" });
+    expect(tokenAt(textStyles, "label.4xl")).toMatchObject({ fontSize: "2xl" });
+  });
+
+  it("offers a heading from xs to 4xl and a body from xs to xl", () => {
+    expect(Object.keys(tokenAt(textStyles, "heading") ?? {})).toHaveLength(8);
+    expect(tokenAt(textStyles, "heading.4xl")).toMatchObject({ fontSize: "8xl" });
+    expect(Object.keys(tokenAt(textStyles, "body") ?? {})).toHaveLength(5);
   });
 
   it("sets code in the monospaced face", () => {

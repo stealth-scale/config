@@ -1,7 +1,7 @@
 # @stealthscale/vite-config-typescript
 
 `@stealthscale/vite-config-typescript` publishes the TypeScript settings every stealth package
-compiles under. `base.json` sets the compiler options and says nothing about where the code runs.
+compiles under. `base.json` sets the compiler options and states nothing about where the code runs.
 `node.json` and `web.json` each add one environment on top of it. A package extends one of the three
 and states nothing further unless its layout differs.
 

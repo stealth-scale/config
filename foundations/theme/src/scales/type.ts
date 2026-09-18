@@ -3,6 +3,28 @@
  */
 
 import { type TextStyles, type Tokens } from "#pandacss.ts";
+import { type Scale } from "#scales/geometry.ts";
+
+/**
+ * Selects one of the roles a component's words are read at.
+ */
+export type TextRole = "body" | "code" | "display" | "heading" | "label";
+
+/**
+ * Lists the steps each role offers, which is what a component's `size` axis reads.
+ *
+ * @remarks
+ *   A role states the steps it has here and the styles it draws them in beside its own
+ *   definition, and a specification holds the two to each other. A component reads this list
+ *   rather than restating one, so a role that gains a step reaches every component that reads it.
+ */
+export const ROLE_SIZES = {
+  body: ["xs", "sm", "md", "lg", "xl"],
+  code: ["sm", "md"],
+  display: ["sm", "md", "lg"],
+  heading: ["xs", "sm", "md", "lg", "xl", "2xl", "3xl", "4xl"],
+  label: ["xs", "sm", "md", "lg", "xl", "2xl", "3xl", "4xl"],
+} as const satisfies Record<TextRole, readonly Scale[]>;
 
 /**
  * Describes the sizes a theme states.
@@ -14,7 +36,8 @@ type Sizes = NonNullable<Tokens["fontSizes"]>;
  *
  * @remarks
  *   The display sizes climb faster than the ratio would take them, because a heading three rungs
- *   above the body reads as emphasis rather than as a heading.
+ *   above the body reads as emphasis rather than as a heading. The top two steps carry a hero,
+ *   where the words are the page and a size the paragraph could reach is not loud enough.
  */
 const STEPS: ReadonlyArray<readonly [name: string, rungs: number]> = [
   ["2xs", -3],
@@ -29,6 +52,8 @@ const STEPS: ReadonlyArray<readonly [name: string, rungs: number]> = [
   ["5xl", 8],
   ["6xl", 10],
   ["7xl", 12],
+  ["8xl", 14],
+  ["9xl", 16],
 ];
 
 /**
@@ -50,7 +75,7 @@ const TIGHTEST = 1.1;
  */
 interface Step {
   /**
-   * The step's name, `2xs` to `7xl`.
+   * The step's name, `2xs` to `9xl`.
    */
   name: string;
 

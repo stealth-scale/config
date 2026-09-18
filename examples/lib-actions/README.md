@@ -12,12 +12,12 @@ pnpm --filter @stealthscale/example-lib-actions test
 pnpm --filter @stealthscale/example-lib-actions build
 ```
 
-`vp test` runs three specifications. The recipe's asserts that no value in it is a color, a pixel
-length or a color mode, through `recipeViolations` from `@stealthscale/testing-theme`. The preset's
-asserts that every `*.recipe.ts` file under `src/` is registered under its class name, through
-`presetViolations`. The component's renders `Button` into a happy-dom document, reads the classes
-the binding wrote, and checks the component against the conformance contract of
-`@stealthscale/testing-react`.
+`vp test` runs three specifications. The recipe's specification asserts that no value in it is a
+color, a pixel length or a color mode, through `recipeViolations` from
+`@stealthscale/testing-theme`. The preset's asserts that every `*.recipe.ts` file under `src/` is
+registered under its class name, through `presetViolations`. The component's renders `Button` into a
+happy-dom document, reads the classes the binding wrote, and checks the component against the
+conformance contract of `@stealthscale/testing-react`.
 
 The manifest publishes `./theme` beside `.`, and `build` writes `dist/index.js` for the first and
 `dist/theme.js` for the second. An application's build plugin finds the package on its dependency
@@ -29,17 +29,17 @@ graph by that subpath.
 `@stealthscale/theme/authoring`: `interactive()` for the hand, the transition and the focus ring,
 `stack()` for the row, `controlSizes()` for a size axis, `lookVariants()` for a look axis and
 `statusVariants()` for a status axis. Every value is a semantic token, a layer style or a text
-style, so a theme moves all. The recipe points at the `primary` palette, and the status axis points
-the palette at an intent, so an error button and a primary button are one recipe.
+style, so a theme can change all of them. The recipe points at the `primary` palette, and the status
+axis points the palette at an intent, so an error button and a primary button are one recipe.
 
 ## The component
 
 `src/button/button.ts` binds the recipe with `createRecipeContext` from `@stealthscale/theme` and
 draws a `button` element through the binding. The binding stamps `data-recipe="button"` on the
 element and writes the class of each variant a caller picks. Color, size and margin are the
-recipe's, so a theme moves every button by extending it. The binding types the component by a name
-the theme package publishes, so the declaration this package publishes refers to that package alone,
-and `ButtonProps` is read off the component.
+recipe's, so a theme restyles every button by extending it. The binding types the component by a
+name the theme package publishes, so the declaration this package publishes refers to that package
+alone, and `ButtonProps` is read off the component.
 
 ## The preset
 

@@ -1,0 +1,77 @@
+{
+  "name": "@stealthscale/testing-router",
+  "version": "0.0.0",
+  "description": "Mounts a route tree in a specification and renders the page a path matches.",
+  "keywords": [
+    "react",
+    "router",
+    "testing"
+  ],
+  "homepage": "https://github.com/stealth-scale/config/tree/main/packages/testing-router#readme",
+  "bugs": "https://github.com/stealth-scale/config/issues",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stealth-scale/config.git",
+    "directory": "packages/testing-router"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "imports": {
+    "#*": "./src/*"
+  },
+  "exports": {
+    ".": {
+      "stealth-source": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": "./dist/index.js",
+      "./package.json": "./package.json"
+    },
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vp pack",
+    "check": "vp check",
+    "prepublishOnly": "vp pack",
+    "test": "vp test"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/core": "catalog:",
+    "@rolldown/plugin-babel": "catalog:",
+    "@stealthscale/provider-router": "workspace:^",
+    "@stealthscale/testing-config": "workspace:^",
+    "@stealthscale/vite-config": "workspace:^",
+    "@stealthscale/vite-config-react": "workspace:^",
+    "@stealthscale/vite-config-typescript": "workspace:^",
+    "@testing-library/react": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "babel-plugin-react-compiler": "catalog:",
+    "happy-dom": "catalog:",
+    "oxc-transform-react": "catalog:",
+    "publint": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "@stealthscale/provider-router": "workspace:^",
+    "@testing-library/react": "catalog:",
+    "react": "catalog:"
+  },
+  "engines": {
+    "node": ">=26.0.0"
+  }
+}

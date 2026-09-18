@@ -1,0 +1,179 @@
+/**
+ * Checks a recipe for the classes the runtime writes that no rule reaches: a value or a compound
+ * that states no styles, a default naming a value no axis offers, a compound matched on such a
+ * value, and a tag pattern that misses the component's name.
+ *
+ * @remarks
+ *   The runtime writes a class for every value it is handed and the compiler emits a rule only for
+ *   a value that states styles, so each of these puts a class on the page that nothing styles, and
+ *   nothing before this check reported it. The pattern check reads the other way: a tag the
+ *   patterns miss leaves the component's variants out of an application's sheet.
+ */
+
+import { type Declared } from "#recipe.ts";
+
+/**
+ * Lists the keys of a compound that are not axes.
+ */
+const UNMATCHED = new Set(["className", "classNames", "css", "name"]);
+
+/**
+ * Reports whether a value is a plain object, which an axis's values and a compound are.
+ */
+function isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Lists each axis of a recipe against the values it takes, each with the styles it states.
+ */
+function axesOf(
+  recipe: Declared,
+): ReadonlyArray<readonly [axis: string, values: Readonly<Record<string, unknown>>]> {
+  return Object.entries(recipe.variants ?? {}).map(([axis, values]) => [
+    axis,
+    isRecord(values) ? values : {},
+  ]);
+}
+
+/**
+ * Reports whether a style object declares nothing, which the compiler emits no rule for.
+ */
+function isEmpty(styles: unknown): boolean {
+  return !isRecord(styles) || Object.keys(styles).length === 0;
+}
+
+/**
+ * Reports whether a slot recipe's value, base or compound states styles on one slot.
+ */
+export function slotStyled(slotted: unknown, slot: string): boolean {
+  return isRecord(slotted) && !isEmpty(slotted[slot]);
+}
+
+/**
+ * Reports whether styles reach the element a recipe draws, or any slot of a slot recipe.
+ */
+function reaches(recipe: Declared, styles: unknown): boolean {
+  return recipe.slots === undefined
+    ? !isEmpty(styles)
+    : recipe.slots.some((slot) => slotStyled(styles, slot));
+}
+
+/**
+ * Reports every value and compound the compiler emits no rule for, because the runtime still
+ * writes their classes.
+ *
+ * @remarks
+ *   For a slot recipe a value counts as styled where any slot under it states styles. A base that
+ *   states nothing is not reported: the recipe's class and each slot's class are written either
+ *   way, and a theme extends the base through them.
+ */
+export function emptyViolations(recipe: Declared): readonly string[] {
+  const values = axesOf(recipe).flatMap(([axis, offered]) =>
+    Object.entries(offered)
+      .filter(([, styles]) => !reaches(recipe, styles))
+      .map(
+        ([value]) =>
+          `${recipe.className} offers ${axis} ${value} with no styles, so its class has no rule`,
+      ),
+  );
+  const compounds = (recipe.compoundVariants ?? []).flatMap((compound, index) =>
+    isRecord(compound) && !reaches(recipe, compound["css"])
+      ? [`${recipe.className} declares compound ${String(index + 1)} with no styles`]
+      : [],
+  );
+
+  return [...values, ...compounds];
+}
+
+/**
+ * Reports every default that names an axis the recipe does not offer, or a value the axis does
+ * not offer.
+ */
+export function defaultViolations(recipe: Declared): readonly string[] {
+  if (!isRecord(recipe.defaultVariants)) return [];
+
+  const axes = new Map(axesOf(recipe));
+
+  return Object.entries(recipe.defaultVariants).flatMap(([axis, value]) => {
+    const values = axes.get(axis);
+    const written = String(value);
+
+    if (values === undefined) {
+      return [`${recipe.className} defaults ${axis} to ${written}, and offers no such axis`];
+    }
+
+    return Object.hasOwn(values, written)
+      ? []
+      : [`${recipe.className} defaults ${axis} to ${written}, which the axis does not offer`];
+  });
+}
+
+/**
+ * Reports every compound matched on an axis the recipe does not offer, or on a value the axis
+ * does not offer.
+ */
+export function selectionViolations(recipe: Declared): readonly string[] {
+  const axes = new Map(axesOf(recipe));
+
+  return (recipe.compoundVariants ?? []).flatMap((compound, index) => {
+    if (!isRecord(compound)) return [];
+
+    const ordinal = `compound ${String(index + 1)}`;
+
+    return Object.entries(compound)
+      .filter(([axis]) => !UNMATCHED.has(axis))
+      .flatMap(([axis, selected]) => {
+        const values = axes.get(axis);
+
+        if (values === undefined) {
+          return [
+            `${recipe.className} matches ${ordinal} on ${axis}, which the recipe does not offer`,
+          ];
+        }
+
+        const chosen: readonly unknown[] = Array.isArray(selected) ? selected : [selected];
+
+        return chosen
+          .filter((value) => !Object.hasOwn(values, String(value)))
+          .map(
+            (value) =>
+              `${recipe.className} matches ${ordinal} on ${axis} ${String(value)}, which the axis does not offer`,
+          );
+      });
+  });
+}
+
+/**
+ * Reports whether a tag pattern matches a name a consumer writes.
+ */
+function tracks(pattern: RegExp | string, name: string): boolean {
+  return typeof pattern === "string" ? pattern === name : pattern.test(name);
+}
+
+/**
+ * Reports every name the recipe's tag patterns miss, and every pattern that matches no name.
+ *
+ * @remarks
+ *   The compiler extracts a component's variants from the tags its patterns match, so a pattern
+ *   that misses the name a consumer writes leaves that component's variants out of the sheet in
+ *   an application that does not write every variant statically.
+ */
+export function jsxViolations(recipe: Declared, names: readonly string[]): readonly string[] {
+  const patterns = recipe.jsx;
+
+  if (patterns === undefined) {
+    return names.length === 0 ? [] : [`${recipe.className} states no jsx patterns`];
+  }
+
+  const missed = names
+    .filter((name) => !patterns.some((pattern) => tracks(pattern, name)))
+    .map((name) => `${recipe.className} tracks no tag named ${name}`);
+  const idle = patterns
+    .filter((pattern) => !names.some((name) => tracks(pattern, name)))
+    .map(
+      (pattern) => `${recipe.className} tracks ${String(pattern)}, which matches no published name`,
+    );
+
+  return [...missed, ...idle];
+}

@@ -11,4 +11,8 @@ describe("spacing", () => {
   it("draws a medium gap at half a rem", () => {
     expect(tokenAt(spacing, "gap.md")).toBe("0.5000rem");
   });
+
+  it("leaves the marker gutter at two and a half ems", () => {
+    expect(tokenAt(spacing, "marker")).toBe("2.5em");
+  });
 });

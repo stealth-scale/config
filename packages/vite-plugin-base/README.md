@@ -101,7 +101,7 @@ export function registry(): Plugin {
 | `licensed`        | `(at: string) => readonly Licensed[]`                                                          | The licence files in a package's top directory                                                                   |
 | `text`            | `(manifest: Manifest, field: string) => string \| undefined`                                   | The field's value, when that value is a string                                                                   |
 | `writeIfChanged`  | `(at: string, content: string) => boolean`                                                     | True when the file was written, false when it already held the content                                           |
-| `emptyDir`        | `(at: string) => void`                                                                         | Nothing. The directory and everything under it are gone                                                          |
+| `emptyDir`        | `(at: string) => void`                                                                         | Nothing. The directory and everything under it are deleted                                                       |
 | `syncDir`         | `(from: string, to: string) => void`                                                           | Nothing. `to` holds exactly the files of `from`, and only the files that differed were written                   |
 
 | Type         | What it describes                                                                               |
@@ -124,7 +124,7 @@ export function registry(): Plugin {
 runner the working directory is the workspace root, so a plugin reading `process.cwd()` describes
 the wrong package.
 
-Note: rolldown defines no `configResolved` hook. A build that resolves no configuration hands the
+Note: rolldown defines no `configResolved` hook. A build that resolves no configuration passes the
 write step the directory the process started in.
 
 ## Reading the graph
@@ -138,7 +138,7 @@ kinds of module stay out of the result:
 - A module whose nearest manifest does not parse, or parses to anything but an object.
 - A module whose nearest manifest does not declare a `name`.
 
-Every reader here answers undefined, or an empty result, where the file system refuses. One
+Every reader here returns undefined, or an empty result, where the file system refuses. One
 dependency with an unreadable manifest costs the crawl an entry and never fails the build.
 
 ## Walking the dependencies
@@ -146,10 +146,10 @@ dependency with an unreadable manifest costs the crawl an entry and never fails 
 `dependencies` starts at the manifest in `root` and reads `dependencies` alone: a peer is installed
 by whoever depends on the package, and a development dependency is the package's own business. Each
 package is resolved from the package that names it, the way Node resolves it, so a package is found
-where the package manager put it for that dependent. A package that is not installed is passed over.
-The result places a package after every package it depends on, which is the order a consumer needs
-when a later contribution has to win over an earlier one. Two packages depending on each other are
-placed in the order they were met.
+where the package manager put it for that dependent. A package that is not installed is skipped. The
+result places a package after every package it depends on, which is the order a consumer needs when
+a later contribution has to win over an earlier one. Two packages depending on each other are placed
+in the order they were met.
 
 `resolvedOnGraph` resolves one package's entry the same way, from the root first and then from each
 package on the graph, which finds a package that only a dependency declares.
@@ -165,16 +165,16 @@ package's own subpath from inside that package.
 ## Importing through Vite
 
 `imported` resolves and evaluates a module under the conditions in `loading.conditions`, so a
-workspace package that publishes its source under a condition of its own answers with the source
-rather than with built output Node would pick. With a dev server whose `ssr` environment is
+workspace package that publishes its source under a condition of its own resolves to the source
+rather than to the built output Node would pick. With a dev server whose `ssr` environment is
 runnable, the import goes through that runner and joins the server's module graph, so an edit to any
 file behind the module reaches the plugin as a hot update. Without one, an environment of the
 function's own is built for the one import and closed afterwards. `files` lists every file the
-evaluation read, the module's own first, which is what a plugin hands to `addWatchFile`.
+evaluation read, the module's own first, which is what a plugin passes to `addWatchFile`.
 
-`importer` opens that environment once and hands back an `import` function and a `close`. A plugin
-that loads a statement and every preset behind it imports them all through one importer, because
-building an environment resolves a configuration and starts a module runner, and that is paid once
+`importer` opens that environment once and returns an `import` function and a `close`. A plugin that
+loads a statement and every preset behind it imports them all through one importer, because building
+an environment resolves a configuration and starts a module runner, and that cost is taken once
 rather than once per module. Closing an importer over a dev server leaves the server's environment
 running.
 
@@ -196,7 +196,7 @@ output round a loop. `emptyDir` clears a generated directory before a generator 
 nothing when the directory is absent. `syncDir` makes a directory hold exactly the files of another:
 a file that differs is written, a file the source no longer holds is deleted along with any
 directory that is left empty, and an unchanged file is not touched, so a watcher over the target
-sees the files that changed and no others.
+reports the files that changed and no others.
 
 ## Licence
 

@@ -1,0 +1,59 @@
+import { describe, expect, it } from "vitest";
+
+import { axesOf, defaultsOf, recipeViolations, valuesOf } from "@stealthscale/testing-theme";
+
+import { recipe } from "#input/recipe.ts";
+
+describe("recipe", () => {
+  it("writes no value a theme cannot move", () => {
+    expect(recipeViolations(recipe, { names: ["Input"] })).toStrictEqual([]);
+  });
+
+  it("names its class input", () => {
+    expect(recipe.className).toBe("input");
+  });
+
+  it("offers the two axes a field takes", () => {
+    expect(axesOf(recipe)).toStrictEqual(["size", "variant"]);
+  });
+
+  it("draws an outlined field at the middle size when nothing is asked for", () => {
+    expect(defaultsOf(recipe)).toStrictEqual({ size: "md", variant: "outline" });
+  });
+
+  it("offers the eight sizes every component shares", () => {
+    expect(valuesOf(recipe, "size")).toStrictEqual([
+      "2xl",
+      "3xl",
+      "4xl",
+      "lg",
+      "md",
+      "sm",
+      "xl",
+      "xs",
+    ]);
+  });
+
+  it("offers the three looks an edge is drawn in", () => {
+    expect(valuesOf(recipe, "variant")).toStrictEqual(["flushed", "outline", "subtle"]);
+  });
+
+  it("reads the control scale so a field lines up with a button beside it", () => {
+    expect(recipe.variants?.["size"]?.["md"]).toMatchObject({ height: "control.md" });
+  });
+
+  it("marks a field that is wrong off the attribute a screen reader reads too", () => {
+    expect(recipe.base?.["_invalid"]).toMatchObject({ borderColor: "border.error" });
+  });
+
+  it("draws the focus ring inside the box so a flush field does not clip it", () => {
+    expect(recipe.base).toMatchObject({ focusVisibleRing: "inside" });
+  });
+
+  it("tracks the tag named Input and not the search field", () => {
+    const [pattern] = recipe.jsx ?? [];
+
+    expect(pattern).toStrictEqual(/^Input$/u);
+    expect(pattern instanceof RegExp && pattern.test("SearchInput")).toBe(false);
+  });
+});

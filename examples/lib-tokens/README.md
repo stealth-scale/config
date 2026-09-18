@@ -2,7 +2,7 @@
 
 A build hook writes `dist/tokens.css` from the palette declared in `src/palette.ts`, and a second
 layer adds the subpath that publishes it. The stylesheet appears in no source tree. Those two layers
-are the whole of what a package needs to generate part of what it publishes.
+are all a package needs to generate part of what it publishes.
 
 ## Run it
 

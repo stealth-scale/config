@@ -1,8 +1,79 @@
 /**
- * Writes the motion a thing enters and leaves with, as two animation styles the theme owns.
+ * Writes the motion a thing enters and leaves with, and the `motion` axis a component offers, as
+ * animation styles the theme owns.
  */
 
 import type { SystemStyleObject } from "#generated/types/system.d.mts";
+import { recordOf } from "#record.ts";
+
+/**
+ * Selects one of the motions a component offers: the three a thing enters with, and the four that
+ * run for as long as the thing is there.
+ */
+export type Motion =
+  | "fade"
+  | "float"
+  | "reveal"
+  | "rise"
+  | "shimmer"
+  | "spin"
+  | "sweep"
+  | "twinkle";
+
+/**
+ * Maps each motion to the animation style that draws it.
+ *
+ * @remarks
+ *   A style stated in two directions is named by the direction a component enters in, because a
+ *   component that states `fade` and gets the pair animates nothing.
+ */
+const STYLES: Readonly<Record<Motion, string>> = {
+  fade: "fade.in",
+  float: "float",
+  reveal: "reveal",
+  rise: "rise",
+  shimmer: "shimmer",
+  spin: "spin",
+  sweep: "sweep",
+  twinkle: "twinkle",
+};
+
+/**
+ * Lists the motions in the order a README reads them: the entrances, then the loops.
+ */
+export const MOTIONS: readonly Motion[] = [
+  "fade",
+  "rise",
+  "reveal",
+  "float",
+  "spin",
+  "twinkle",
+  "shimmer",
+  "sweep",
+];
+
+/**
+ * Writes the `motion` axis of a component, each value reading the animation style that draws it.
+ */
+export function motionVariants(): Record<Motion, SystemStyleObject>;
+
+/**
+ * Writes the `motion` axis for the motions a recipe names.
+ *
+ * @typeParam Offered - The motions the recipe offers.
+ */
+export function motionVariants<const Offered extends Motion>(
+  motions: readonly Offered[],
+): Record<Offered, SystemStyleObject>;
+
+/**
+ * Writes one entry per motion, each reading the animation style that draws it.
+ */
+export function motionVariants(
+  motions: readonly Motion[] = MOTIONS,
+): Record<string, SystemStyleObject> {
+  return recordOf(motions, (name) => ({ animationStyle: STYLES[name] }));
+}
 
 /**
  * Writes the open and closed states of a thing that animates, each reading an animation style.

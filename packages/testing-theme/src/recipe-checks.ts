@@ -1,12 +1,17 @@
 /**
- * Checks a recipe for the values it may not write: a color a theme cannot move, a token nothing
- * defines, a condition nothing defines, a pixel length, a color mode, a slot the anatomy does not
- * stamp, and the one ink that clears the boundary ratio and not the text ratio.
+ * Checks a recipe for the values it may not write and the classes it would write with no rule: a
+ * color a theme cannot move, a token nothing defines, a condition nothing defines, a pixel length,
+ * a color mode, a slot the anatomy does not stamp, the one ink that clears the boundary ratio and
+ * not the text ratio, a value or a compound that states no styles, a default or a compound that
+ * names a value no axis offers, and a tag pattern that misses the component's name.
  *
  * @remarks
  *   A recipe reads semantic tokens, compositions and scale steps, so a theme can move every value
  *   it draws. A value the foundation does not define reaches the page as raw CSS without a word
- *   from the compiler, so the token check is what catches a name typed wrongly.
+ *   from the compiler, so the token check is what catches a name typed wrongly. The runtime
+ *   writes a class for every value it is handed, and the compiler emits a rule only for a value
+ *   that states styles, so a value with none, a default the axis does not offer and a compound
+ *   matched on such a value each put a class on the page that no rule reaches.
  */
 
 import { slotClass, variantClass } from "@stealthscale/pandacss-naming";
@@ -15,6 +20,12 @@ import foundation from "@stealthscale/theme/theme";
 
 import { COMPOSITIONS, conditionNames, semanticColorPaths, tokenPaths } from "#categories.ts";
 import { gated } from "#gate.ts";
+import {
+  defaultViolations,
+  emptyViolations,
+  jsxViolations,
+  selectionViolations,
+} from "#reachable.ts";
 import { type Declared } from "#recipe.ts";
 import { walked, type Walked, type Written } from "#walk.ts";
 
@@ -26,8 +37,12 @@ export type RecipeCheck =
   | "recipe.colors"
   | "recipe.compounds"
   | "recipe.conditions"
+  | "recipe.defaults"
+  | "recipe.empty"
+  | "recipe.jsx"
   | "recipe.lengths"
   | "recipe.modes"
+  | "recipe.selections"
   | "recipe.slots"
   | "recipe.subtle"
   | "recipe.tokens"
@@ -41,6 +56,12 @@ export interface RecipeChecks {
    * Property names whose values are allowed a length with a unit.
    */
   lengths?: readonly string[] | undefined;
+
+  /**
+   * The names a consumer writes the component under, `Heading` or `List.Root`, each of which the
+   * recipe's `jsx` patterns have to match.
+   */
+  names?: readonly string[] | undefined;
 
   /**
    * The parts the anatomy stamps, compared against the recipe's slots.
@@ -190,6 +211,23 @@ function ownersOf(recipe: Declared): readonly string[] {
 }
 
 /**
+ * Lists the classes one value writes on: the recipe's own for a recipe that draws one element,
+ * and the slot class of each part the value styles for a slot recipe.
+ *
+ * @remarks
+ *   Two axes of a slot recipe may offer one value where they style different parts, because the
+ *   runtime writes a class per part and the two never meet on one element. A grid offering three
+ *   columns on its root and a span of three on its entry is the case.
+ */
+function stylesOf(recipe: Declared, styles: unknown): readonly string[] {
+  if (recipe.slots === undefined) return [recipe.className];
+
+  return recipe.slots
+    .filter((slot) => isRecord(styles) && isRecord(styles[slot]))
+    .map((slot) => slotClass(recipe.className, slot));
+}
+
+/**
  * Reports every value that writes the class another value or a boolean axis writes.
  *
  * @remarks
@@ -201,17 +239,23 @@ function valueViolations(recipe: Declared): readonly string[] {
   const written = new Map<string, string>();
   const found: string[] = [];
 
-  for (const [axis, values] of axesOf(recipe)) {
-    for (const value of values) {
-      const className = variantClass(recipe.className, axis, value);
+  for (const [axis, values] of Object.entries(recipe.variants ?? {})) {
+    if (!isRecord(values)) continue;
 
-      if (className === "") continue;
+    for (const [value, styles] of Object.entries(values)) {
+      for (const owner of stylesOf(recipe, styles)) {
+        const className = variantClass(owner, axis, value);
 
-      const other = written.get(className);
+        if (className === "") continue;
 
-      if (other === undefined) written.set(className, `${axis} ${value}`);
-      else
-        found.push(`${recipe.className} writes ${className} for ${axis} ${value} and for ${other}`);
+        const other = written.get(className);
+
+        if (other === undefined) written.set(className, `${axis} ${value}`);
+        else
+          found.push(
+            `${recipe.className} writes ${className} for ${axis} ${value} and for ${other}`,
+          );
+      }
     }
   }
 
@@ -441,6 +485,14 @@ const RUNNERS: ReadonlyArray<readonly [RecipeCheck, Runner]> = [
   ],
   ["recipe.values", (recipe) => valueViolations(recipe)],
   ["recipe.compounds", (recipe) => compoundViolations(recipe)],
+  ["recipe.empty", (recipe) => emptyViolations(recipe)],
+  ["recipe.defaults", (recipe) => defaultViolations(recipe)],
+  ["recipe.selections", (recipe) => selectionViolations(recipe)],
+  [
+    "recipe.jsx",
+    (recipe, _found, options) =>
+      options.names === undefined ? [] : jsxViolations(recipe, options.names),
+  ],
   [
     "recipe.colors",
     (recipe, found, _options, preset) =>

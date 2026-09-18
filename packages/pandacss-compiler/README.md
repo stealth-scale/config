@@ -66,17 +66,17 @@ under `js` where the compiler was configured for that. A second run changes noth
 
 ### `renameSelectors(css, config)`
 
-| Step        | Does                                                                                                                                                                                                                                                                |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Rename      | Each class in each selector goes through `rename` of the naming package, with `config.recipes` and `config.separator`, once per class                                                                                                                               |
-| Remove      | A selector that needs the class of a boolean axis at `false` is removed, since no element carries it. Inside `:is()`, `:where()` or `:has()` only that entry goes. `:not()` of it is kept as written, because it matches everything at the specificity of the class |
-| Prune       | A rule or a block the removal leaves empty goes with it                                                                                                                                                                                                             |
-| Collision   | Classes that renamed to one name are reported as `naming/collision`, an error naming each                                                                                                                                                                           |
-| Unreachable | The classes whose rules were removed are reported once as `naming/unreachable`, a warning listing them, since a styled `false` branch is authored CSS that reaches no element                                                                                       |
-| Raw         | The classes kept under a raw selector or at-rule condition, at any depth, are reported once as `naming/raw-condition`, a warning listing them                                                                                                                       |
-| Leave alone | A keyframe step, a rule that names no class, and a layer order statement                                                                                                                                                                                            |
+| Step        | Does                                                                                                                                                                                                                                                                      |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Rename      | Each class in each selector goes through `rename` of the naming package, with `config.recipes` and `config.separator`, once per class                                                                                                                                     |
+| Remove      | A selector that needs the class of a boolean axis at `false` is removed, since no element carries it. Inside `:is()`, `:where()` or `:has()` only that entry is removed. `:not()` of it is kept as written, because it matches everything at the specificity of the class |
+| Prune       | A rule or a block the removal leaves empty is removed too                                                                                                                                                                                                                 |
+| Collision   | Classes that renamed to one name are reported as `naming/collision`, an error naming each                                                                                                                                                                                 |
+| Unreachable | The classes whose rules were removed are reported once as `naming/unreachable`, a warning listing them, since a styled `false` branch is authored CSS that reaches no element                                                                                             |
+| Raw         | The classes kept under a raw selector or at-rule condition, at any depth, are reported once as `naming/raw-condition`, a warning listing them                                                                                                                             |
+| Leave alone | A keyframe step, a rule that names no class, and a layer order statement                                                                                                                                                                                                  |
 
-The diagnostics take the compiler's own `Diagnostic` shape, so a reporter written for the compiler's
+The diagnostics take the compiler's own `Diagnostic` shape, so a reporter written for the compiler
 prints them unchanged.
 
 The scheme reads a class as the compiler writes it with `hash` off and no `prefix`. A hashed class

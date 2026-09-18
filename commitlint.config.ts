@@ -12,8 +12,7 @@
  * whatever it is scoped to. A body line still wraps at 72, where git wraps one.
  */
 
-import { globSync } from "node:fs";
-import { basename, dirname } from "node:path";
+import { globSync, readFileSync } from "node:fs";
 
 /**
  * The kinds of change a commit can be.
@@ -24,13 +23,39 @@ import { basename, dirname } from "node:path";
 const TYPES = ["build", "chore", "ci", "docs", "feat", "fix", "perf", "refactor", "revert", "test"];
 
 /**
+ * The organisation every package here publishes under, which a scope leaves off.
+ */
+const ORG = "@stealthscale/";
+
+/**
+ * Reads the name a manifest declares, without the organisation in front of it.
+ *
+ * The name comes from the manifest rather than from the directory holding it, because a package
+ * nested a level deeper is named for what it is rather than for where it sits.
+ *
+ * @param at - The path of the manifest to read.
+ * @returns The scope a commit writes to name that package.
+ */
+function named(at: string): string {
+  const held: unknown = JSON.parse(readFileSync(at, "utf8"));
+  const name: unknown = typeof held === "object" && held !== null ? Reflect.get(held, "name") : "";
+
+  return typeof name === "string" ? name.replace(ORG, "") : "";
+}
+
+/**
  * The packages a commit can name.
  *
  * Read from the tree rather than listed, so a new package is a scope without anybody remembering to
  * add it here. An example takes no scope, and neither does a change spanning packages.
  */
-const SCOPES = globSync(["foundations/*/package.json", "packages/*/package.json"])
-  .map((at) => basename(dirname(at)))
+const SCOPES = globSync([
+  "components/*/package.json",
+  "foundations/*/package.json",
+  "foundations/providers/*/package.json",
+  "packages/*/package.json",
+])
+  .map((at) => named(at))
   .toSorted();
 
 /**
@@ -72,8 +97,7 @@ export default {
     "body-max-line-length": [2, "always", 80],
     "footer-leading-blank": [2, "always"],
     "header-max-length": [2, "always", 100],
-    "scope-case": [2, "always", "kebab-case"],
-    "scope-enum": [2, "always", SCOPES],
+    "scope-enum": [2, "always", SCOPES.concat(["rfc", "adr", "examples"])],
     "subject-case": [2, "never", ["sentence-case", "start-case", "pascal-case", "upper-case"]],
     "subject-empty": [2, "never"],
     "subject-full-stop": [2, "never", "."],
