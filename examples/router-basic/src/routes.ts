@@ -2,7 +2,13 @@
  * Puts this application's pages at their addresses and builds the tree a router is made from.
  */
 
-import { createRootRoute, createRoute, createRouter, Outlet } from "@tanstack/react-router";
+import {
+  createRootRoute,
+  createRoute,
+  createRouter,
+  Outlet,
+  redirect,
+} from "@tanstack/react-router";
 
 import { Invoice } from "#invoice.tsx";
 import { Invoices } from "#invoices.tsx";
@@ -12,6 +18,19 @@ import { tabOf } from "#tab.ts";
  * The route every page hangs beneath.
  */
 const root = createRootRoute({ component: Outlet });
+
+/**
+ * The site root, which holds no page of its own and sends a visitor to the list.
+ */
+const home = createRoute({
+  beforeLoad: () => {
+    // The library's own redirect, which is a response rather than an Error subclass.
+    // eslint-disable-next-line typescript/only-throw-error -- see above
+    throw redirect({ to: "/invoices" });
+  },
+  getParentRoute: () => root,
+  path: "/",
+});
 
 /**
  * The address the list of invoices is served at.
@@ -35,7 +54,7 @@ const invoice = createRoute({
 /**
  * The tree a router is built from.
  */
-export const routeTree = root.addChildren([invoices.addChildren([invoice])]);
+export const routeTree = root.addChildren([home, invoices.addChildren([invoice])]);
 
 /**
  * The type the library works every path, parameter and search key out from.

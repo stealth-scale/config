@@ -10,6 +10,7 @@ import {
   createRouter,
   namedRoute,
   Outlet,
+  redirect,
   type RouteDeclaration,
   routeMap,
   routerOptions,
@@ -18,6 +19,11 @@ import {
 import { type Condition } from "#catalogue.ts";
 import { LAYOUTS } from "#layouts.ts";
 import { shellOf } from "#shell.tsx";
+
+/**
+ * The path this application mounts everything it draws under.
+ */
+const MOUNTED = "/app";
 
 /**
  * Builds the tree over one set of declarations.
@@ -35,11 +41,20 @@ export function buildTree(declarations: ReadonlyArray<RouteDeclaration<Condition
     ...namedRoute("app.shell"),
     component: shellOf(declarations),
     getParentRoute: () => root,
-    path: "/app",
+    path: MOUNTED,
+  });
+  const home = createRoute({
+    beforeLoad: () => {
+      // The library's own redirect, which is a response rather than an Error subclass.
+      // eslint-disable-next-line typescript/only-throw-error -- see above
+      throw redirect({ to: MOUNTED });
+    },
+    getParentRoute: () => root,
+    path: "/",
   });
   const compiled = compileRoutes(declarations, { layouts: LAYOUTS, parent: shell });
 
-  return root.addChildren([shell.addChildren([...compiled])]);
+  return root.addChildren([home, shell.addChildren([...compiled])]);
 }
 
 /**

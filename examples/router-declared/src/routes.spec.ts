@@ -19,6 +19,15 @@ describe("buildTree", () => {
     ]);
   });
 
+  it("sends the site root to the shell", async () => {
+    const router = routed(await catalogue());
+
+    await router.navigate({ to: "/" });
+    await router.load();
+
+    expect(router.state.location.pathname).toBe("/app");
+  });
+
   it("leaves a layout out of the address", async () => {
     const tree = buildTree(await catalogue());
     const named = routeMap(tree);

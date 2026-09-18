@@ -6,7 +6,7 @@ import { routed } from "#routes.ts";
 /**
  * Every route this application serves, which the library only knows once the router is registered.
  */
-type Served = "__root__" | "/invoices" | "/invoices/$id";
+type Served = "__root__" | "/" | "/invoices" | "/invoices/$id";
 
 describe("routes", () => {
   it("registers this application's router with the library", () => {
@@ -18,9 +18,19 @@ describe("routes", () => {
   it("serves the list and the invoice beneath it", () => {
     expect(Object.keys(routed().routesById)).toStrictEqual([
       "__root__",
+      "/",
       "/invoices",
       "/invoices/$id",
     ]);
+  });
+
+  it("sends the site root to the list", async () => {
+    const router = routed();
+
+    await router.navigate({ to: "/" });
+    await router.load();
+
+    expect(router.state.location.pathname).toBe("/invoices");
   });
 
   it("builds a router of its own each time", () => {
