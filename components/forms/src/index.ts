@@ -8,6 +8,7 @@
  * @packageDocumentation
  */
 
+export * as Field from "#field/index.ts";
 export * as InputGroup from "#input-group/index.ts";
 export * from "#input/index.ts";
 export * from "#search-input/index.ts";

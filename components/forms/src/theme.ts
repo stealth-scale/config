@@ -9,11 +9,12 @@
 
 import { definePreset } from "@stealthscale/theme/authoring";
 
+import { recipe as field } from "#field/recipe.ts";
 import { recipe as inputGroup } from "#input-group/recipe.ts";
 import { recipe as input } from "#input/recipe.ts";
 import { recipe as searchInput } from "#search-input/recipe.ts";
 
 export default definePreset({
   name: "@stealthscale/component-forms",
-  theme: { extend: { recipes: { input, searchInput }, slotRecipes: { inputGroup } } },
+  theme: { extend: { recipes: { input, searchInput }, slotRecipes: { field, inputGroup } } },
 });

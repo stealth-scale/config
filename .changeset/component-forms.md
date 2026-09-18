@@ -2,7 +2,27 @@
 "@stealthscale/component-forms": minor
 ---
 
-component-forms: publish InputGroup
+component-forms: publish Field and InputGroup
+
+- `Field` wraps a control in everything that explains it. Seven parts under one namespace: `Root`,
+  `Label`, `RequiredIndicator`, `Control`, `HelperText`, `Counter` and `ErrorText`.
+- `Field.Root` takes `disabled`, `invalid`, `readOnly` and `required`, and every part reads them.
+  One `invalid` marks the control, draws the message and leaves the two in step, where a prop on
+  each part would let them disagree.
+- The root derives four identifiers from one. The label points at the control with `htmlFor`, and
+  the control is described by the helper text and the message. Both identifiers are listed whether
+  or not either is drawn, because an identifier naming no element is passed over. Watching the
+  document to find out which exists would mean writing state from an effect, which React 19 reports,
+  and a second render before the control is described at all.
+- `ErrorText` renders nothing where the field is not wrong, and states `role="alert"` where it does,
+  so a message raised after a submit reaches a reader who is not looking at the field.
+- `RequiredIndicator` renders nothing where the field is optional and states `aria-hidden` where it
+  does, since the control already carries `required`.
+- `Counter` announces politely and stays out of `aria-describedby`. A description is read when the
+  control takes focus, and a number that changes as a person types would be read stale.
+- The message and the required mark read the palette, which `status` sets. A field defaults to the
+  error palette, so the same part draws a green message for a field reporting something else.
+- Three axes: `size`, `orientation` and `status`.
 
 - `InputGroup` draws a field with a mark at one end or both: a currency symbol, a unit, a glyph, or
   a control. Four parts under one namespace: `Root`, `Field`, `Start` and `End`.

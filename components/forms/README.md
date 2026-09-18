@@ -1,13 +1,13 @@
 # @stealthscale/component-forms
 
-Draws what a person fills in: the text field, the field with a mark at one end or both, and the
-search field with a control that empties it. Every component binds a recipe and draws nothing of its
-own, so a theme restyles all of them by extending the recipe. The preset under `./theme` registers
-the recipes with an application's compiler.
+Draws what a person fills in: the field that explains a control, the text field, the field with a
+mark at one end or both, and the search field with a control that empties it. Every component binds
+a recipe and draws nothing of its own, so a theme restyles all of them by extending the recipe. The
+preset under `./theme` registers the recipes with an application's compiler.
 
 Every value a theme can change on a component is an axis of its recipe, so a caller sets it as a
 prop and writes no style. A caller changes the element a component draws with `as`. A component with
-parts is published as a namespace, `InputGroup.Root`.
+parts is published as a namespace, `Field.Root` and `InputGroup.Root`.
 
 ## Install
 
@@ -17,6 +17,95 @@ pnpm add @stealthscale/component-forms
 
 The package peers on `react`, `@stealthscale/hooks` and `@stealthscale/theme`. An application lists
 the preset under `./theme` among the presets its compiler installs.
+
+## Field
+
+Wraps a control in everything that explains it: a label, the text a person needs in advance, a
+count, and what went wrong. Every control composes into a field, so a form states each of its
+conditions once.
+
+```tsx
+import { Field } from "@stealthscale/component-forms";
+
+<Field.Root invalid={!valid} required>
+  <Field.Label>
+    Email
+    <Field.RequiredIndicator />
+  </Field.Label>
+  <Field.Control type="email" />
+  <Field.HelperText>We only write about invoices.</Field.HelperText>
+  <Field.ErrorText>That address is not one we recognise.</Field.ErrorText>
+</Field.Root>;
+```
+
+| Axis          | Values                                | Default    |
+| ------------- | ------------------------------------- | ---------- |
+| `size`        | `sm`, `md`, `lg`                      | `md`       |
+| `orientation` | `vertical`, `horizontal`              | `vertical` |
+| `status`      | `info`, `success`, `warning`, `error` | `error`    |
+
+`Field.Root` also takes `disabled`, `invalid`, `readOnly` and `required`, which every part reads.
+One `invalid` marks the control, draws the message and leaves the two in step, where a prop on each
+part would let them disagree.
+
+### The parts
+
+| Part                | Element | What it draws                               |
+| ------------------- | ------- | ------------------------------------------- |
+| `Root`              | `div`   | The box, and the state every part reads     |
+| `Label`             | `label` | The words naming the control                |
+| `RequiredIndicator` | `span`  | A mark, where the field has to be filled in |
+| `Control`           | `input` | What a person fills in                      |
+| `HelperText`        | `p`     | What a person needs to know in advance      |
+| `Counter`           | `p`     | How much of an allowance is used            |
+| `ErrorText`         | `p`     | What went wrong, where the field is wrong   |
+
+### What the field wires
+
+The root derives four identifiers from one. State `id` where a label outside the field points at the
+control; React generates one otherwise.
+
+- The label points at the control with `htmlFor`, which is what makes its words the control's name
+  and what moves focus on a press.
+- The control is described by the helper text and the message. Both identifiers are listed whether
+  or not either is drawn, because an identifier naming no element is passed over. Watching the
+  document to find out which exists would mean writing state from an effect, which React 19 reports,
+  and a second render before the control is described at all.
+- The control takes `aria-invalid`, `disabled`, `readOnly` and `required` from the root. A prop a
+  caller states on the control wins.
+
+`Field.Control` binds the text field. Another control goes in its place with `as`.
+
+### The message
+
+`Field.ErrorText` renders nothing where the field is not wrong, so a screen reader moving through
+the form never reaches a message about a fault that is not there.
+
+It states `role="alert"`, so a message raised after a person submits reaches a reader who is not
+looking at the field. The region is mounted with the message in it rather than before it, which some
+screen readers announce late. The alternative is an empty live region on every field of the form,
+read on the way past whether or not it holds anything.
+
+Its ink is the palette's, which `status` sets. A field reporting something other than a fault states
+that status once on the root, and the same part draws a green message.
+
+### The required mark
+
+`Field.RequiredIndicator` renders nothing where the field is optional, and states `aria-hidden`
+where it does. The control already states `required`, which is what a reader is told, and a mark
+read aloud would repeat it as a glyph.
+
+The mark carries no meaning on its own. A form where most fields are required states that above the
+form and marks the optional ones in words instead.
+
+### The counter
+
+`Field.Counter` announces politely and stays out of `aria-describedby`. A description is read when
+the control takes focus, and a number that changes as a person types would be read stale.
+
+It draws the count a caller passes and measures nothing. What counts as a character differs by
+field: an emoji is two UTF-16 units and one grapheme, and a server that truncates at 140 may mean
+either.
 
 ## Input
 
