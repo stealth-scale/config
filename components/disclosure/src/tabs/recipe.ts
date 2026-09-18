@@ -16,6 +16,8 @@ import {
   defineSlotRecipe,
   insetSizes,
   interactive,
+  justifyVariants,
+  onSlot,
   onSlots,
 } from "@stealthscale/theme/authoring";
 
@@ -53,6 +55,16 @@ export const recipe = defineSlotRecipe({
   jsx: [/^Tabs(\.\w+)?$/u],
   slots: ["root", "list", "trigger", "content", "indicator"],
   variants: {
+    /**
+     * Whether the controls share the strip's width between them.
+     */
+    fitted: { true: { trigger: { flex: "1" } } },
+
+    /**
+     * Where the controls sit when they do not fill the strip.
+     */
+    justify: onSlot("list", justifyVariants()),
+
     /**
      * How much room the strip and the panel take.
      */

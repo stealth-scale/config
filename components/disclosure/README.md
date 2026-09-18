@@ -107,10 +107,15 @@ import { Tabs } from "@stealthscale/component-disclosure";
 </Tabs.Root>;
 ```
 
-| Axis      | Values                                            | Default |
-| --------- | ------------------------------------------------- | ------- |
-| `variant` | `line`, `enclosed`, `subtle`, `plain`             | `line`  |
-| `size`    | `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`, `4xl` | `md`    |
+| Axis      | Values                                                  | Default |
+| --------- | ------------------------------------------------------- | ------- |
+| `variant` | `line`, `enclosed`, `subtle`, `plain`                   | `line`  |
+| `size`    | `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`, `4xl`       | `md`    |
+| `justify` | `start`, `center`, `end`, `between`, `around`, `evenly` | none    |
+| `fitted`  | `true`                                                  | off     |
+
+`fitted` shares the strip's width between the controls, which suits a set of two or three filling a
+panel. `justify` decides where they sit when they do not fill it.
 
 Each control names the panel it shows with `value`, and each panel names its control the same way.
 Nothing else here is yours to state, because the machine works the rest out for itself.

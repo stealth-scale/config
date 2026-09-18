@@ -23,8 +23,23 @@ describe("recipe", () => {
     ]);
   });
 
-  it("offers the two axes a set of tabs takes", () => {
-    expect(axesOf(recipe)).toStrictEqual(["size", "variant"]);
+  it("offers the four axes a set of tabs takes", () => {
+    expect(axesOf(recipe)).toStrictEqual(["fitted", "justify", "size", "variant"]);
+  });
+
+  it("offers every way the theme distributes a row", () => {
+    expect(valuesOf(recipe, "justify")).toStrictEqual([
+      "around",
+      "between",
+      "center",
+      "end",
+      "evenly",
+      "start",
+    ]);
+  });
+
+  it("shares the strip's width between the controls where a caller asks", () => {
+    expect(recipe.variants?.["fitted"]?.["true"]).toStrictEqual({ trigger: { flex: "1" } });
   });
 
   it("draws a line of tabs at the middle size by default", () => {
