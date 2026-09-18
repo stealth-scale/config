@@ -3,7 +3,7 @@
  * reads it.
  */
 
-import { type ReactElement, type ReactNode, useEffect, useMemo } from "react";
+import { type ReactElement, type ReactNode, useLayoutEffect, useMemo } from "react";
 
 import { type SettingStore, useSetting } from "@stealthscale/settings";
 import { COLOR_MODE_ATTRIBUTE } from "@stealthscale/theme";
@@ -41,7 +41,7 @@ export interface ColorModeProviderProps {
  *   Removing rather than writing the resolved mode is what lets the stylesheet decide. Its rules
  *   draw a page carrying no attribute by the machine's own setting, so a person following the
  *   machine keeps following it when they change it, without this running again.
- *   The document is read without a guard because this runs from an effect, and an effect runs
+ *   The document is read without a guard because this runs from a layout effect, and one runs
  *   nowhere that has no document.
  */
 function apply(choice: ColorModeChoice): void {
@@ -58,6 +58,9 @@ function apply(choice: ColorModeChoice): void {
  *   The choice is written on the document root rather than on an element of its own, so a portal
  *   drawn at the end of the document is in the same mode as the tree that opened it. A subtree
  *   drawn the other way writes the attribute on its own element and needs nothing from here.
+ *   The attribute is written in a layout effect, which runs before the browser paints the commit,
+ *   so a page whose provider mounts without the inline script is never painted in the wrong mode
+ *   by React itself. What was painted before React mounted is the script's to settle.
  *   The definition is memoised against the store rather than left to the compiler, because a
  *   reader is subscribed by the identity of the definition it was built from. A fresh one each
  *   render would drop and rebuild the subscription each render.
@@ -69,7 +72,7 @@ export function ColorModeProvider({ app, children, store }: ColorModeProviderPro
   const system = useSystemColorMode();
   const colorMode = choice === "system" ? system : choice;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     apply(choice);
   }, [choice]);
 

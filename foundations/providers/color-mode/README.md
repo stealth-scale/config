@@ -48,8 +48,10 @@ resolve to one of the two, such as which image to load.
 
 ## The first paint
 
-A person who has never chosen gets the right first paint from CSS alone. The flash only happens when
-a stored choice disagrees with the machine, because the provider runs after the page has drawn.
+A person who has never chosen gets the right first paint from CSS alone. The provider writes the
+attribute before the browser paints React's first commit, so nothing React draws is painted in the
+wrong mode. The flash only happens when a stored choice disagrees with the machine and the page
+painted something before React mounted, because that paint is one the provider cannot reach.
 
 An application rendered on a server keeps the choice in a cookie and writes the attribute itself:
 

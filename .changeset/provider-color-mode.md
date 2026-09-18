@@ -20,5 +20,7 @@ provider-color-mode: add the provider that puts a colour mode in scope
   alone cannot cover: a stored choice that disagrees with the machine.
 - `colorModeSetting` hands back the definition, for a server or a script reading the same choice
   without React around it.
+- The attribute is written in a layout effect, before the browser paints React's first commit, so
+  nothing React draws is painted in the wrong mode.
 
 The package peers on `@stealthscale/settings`, `@stealthscale/theme` and React.
