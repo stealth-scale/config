@@ -54,6 +54,7 @@ const SCOPES = globSync([
   "foundations/*/package.json",
   "foundations/providers/*/package.json",
   "packages/*/package.json",
+  "themes/*/package.json",
 ])
   .map((at) => named(at))
   .toSorted();
