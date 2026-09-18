@@ -88,6 +88,21 @@ import { Code } from "@stealthscale/component-typography";
 | `size`    | `sm`, `md`                                       | `md`     |
 | `status`  | `info`, `success`, `warning`, `error`            | none     |
 
+## Em
+
+Marks the words a writer stressed. The element is `em`, which a screen reader reads with that
+stress. It offers no axis: a theme changes how stress is drawn by extending the `em` recipe.
+
+```tsx
+import { Em } from "@stealthscale/component-typography";
+
+<Em>never</Em>;
+<Em as="i">Beagle</Em>;
+```
+
+Reach for `as="i"` where a run is set in italic for a reason other than stress, such as a ship's
+name or a term being introduced.
+
 ## Kbd
 
 Draws a key a reader is asked to press, as a keycap in a look, a size and the palette of its status.
@@ -199,6 +214,7 @@ import { Blockquote } from "@stealthscale/component-typography";
 | `TextProps`            | `type`      | The paragraph's variants and everything a `p` takes      |
 | `HeadingProps`         | `type`      | The heading's variants and everything an `h2` takes      |
 | `CodeProps`            | `type`      | The snippet's variants and everything a `code` takes     |
+| `EmProps`              | `type`      | Everything an `em` takes                                 |
 | `KbdProps`             | `type`      | The key's variants and everything a `kbd` takes          |
 | `IconProps`            | `type`      | The icon's variants and everything an `svg` takes        |
 | `List.RootProps`       | `type`      | The list's variants and everything a `ul` takes          |

@@ -11,6 +11,7 @@ import { definePreset } from "@stealthscale/theme/authoring";
 
 import { recipe as blockquote } from "#blockquote/recipe.ts";
 import { recipe as code } from "#code/recipe.ts";
+import { recipe as em } from "#em/recipe.ts";
 import { recipe as heading } from "#heading/recipe.ts";
 import { recipe as icon } from "#icon/recipe.ts";
 import { recipe as kbd } from "#kbd/recipe.ts";
@@ -21,7 +22,7 @@ export default definePreset({
   name: "@stealthscale/component-typography",
   theme: {
     extend: {
-      recipes: { code, heading, icon, kbd, text },
+      recipes: { code, em, heading, icon, kbd, text },
       slotRecipes: { blockquote, list },
     },
   },
