@@ -37,6 +37,7 @@ catalog:
   # Every machine shares @zag-js/core, so the whole set moves at one version together.
   "@zag-js/collapsible": 1.43.3
   "@zag-js/react": 1.43.3
+  "@zag-js/tabs": 1.43.3
   "@zag-js/types": 1.43.3
   "@commitlint/cli": ^21.2.2
   "@vitest/eslint-plugin": ^1.6.27
@@ -48,8 +49,6 @@ catalog:
   eslint-plugin-tsdoc: ^0.5.2
   axe-core: ^4.13.0
   happy-dom: ^20.14.3
-  i18next: ^26.4.2
-  i18next-resources-to-backend: ^1.2.3
   json-schema-library: ^11.6.2
   lefthook: ^2.1.12
   oxc-transform-react: ^0.149.0
@@ -59,7 +58,6 @@ catalog:
   publint: ^0.3.24
   react: ^19.3.0
   react-dom: ^19.3.0
-  react-i18next: ^17.0.13
   spdx-expression-parse: ^5.0.0
   stylelint: ^17.15.0
   stylelint-config-standard: ^40.0.0
