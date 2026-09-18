@@ -5,3 +5,5 @@
  *
  * @packageDocumentation
  */
+
+export * from "#portal/index.ts";
