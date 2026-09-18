@@ -7,6 +7,7 @@ import { compileRoutes } from "#compile.ts";
 import { routeHref, useRouteHref, useRouteMap } from "#href.ts";
 import { type RouteMap, routeMap } from "#map.ts";
 import { routerOptions } from "#options.ts";
+import { quietly } from "#quiet.fixtures.ts";
 import { createAppRootRoute } from "#root.ts";
 import {
   type AnyRoute,
@@ -150,7 +151,7 @@ describe("useRouteMap", () => {
   });
 
   it("throws where the router was built without one", async () => {
-    await mounted(undefined, () => <span>{String(useRouteMap().size)}</span>);
+    await quietly(() => mounted(undefined, () => <span>{String(useRouteMap().size)}</span>));
 
     expect(screen.getByTestId("failed").textContent).toContain(
       "The router context holds no route map",
@@ -168,7 +169,7 @@ describe("useRouteHref", () => {
   });
 
   it("throws where the router context holds no map", async () => {
-    await mounted(undefined, () => <span>{useRouteHref("acme.list")}</span>);
+    await quietly(() => mounted(undefined, () => <span>{useRouteHref("acme.list")}</span>));
 
     expect(screen.getByTestId("failed").textContent).toContain(
       "The router context holds no route map",

@@ -58,3 +58,6 @@ provider-router: add the pieces an application builds a router from
 - Both read the object the route carries rather than a copy of it, and `useRouteParams` selects the
   id and the parameters alone under structural sharing. Measured over three navigations on one
   route, a component reading either hook renders once where it rendered four times before.
+- `routeMap` reads a path with the slashes around it trimmed, as the library reads one, so `home`,
+  `/home` and `home/` under one parent are refused as the one route the library builds from them.
+- A declared route carries `navigation` only where its declaration states one.

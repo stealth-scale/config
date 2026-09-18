@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from "vitest";
 import { compileRoutes } from "#compile.ts";
 import { type LayoutProps, type RouteDeclaration } from "#declaration.ts";
 import { routeMap } from "#map.ts";
+import { quietly } from "#quiet.fixtures.ts";
 import {
   type AnyRoute,
   type AnyRouter,
@@ -441,24 +442,30 @@ describe("compileRoutes", () => {
   });
 
   it("draws the route's own error component where its page fails to load", async () => {
-    await hosted(declared({ component: { load: () => Promise.reject(new Error("down")) } }));
+    await quietly(() =>
+      hosted(declared({ component: { load: () => Promise.reject(new Error("down")) } })),
+    );
 
     expect(screen.getByTestId("failed").textContent).toBe("acme.one");
   });
 
   it("keeps the host's chrome drawn where a plugin's page fails to load", async () => {
-    await hosted(declared({ component: { load: () => Promise.reject(new Error("down")) } }));
+    await quietly(() =>
+      hosted(declared({ component: { load: () => Promise.reject(new Error("down")) } })),
+    );
 
     expect(screen.getByTestId("shell").contains(screen.getByTestId("failed"))).toBe(true);
   });
 
   it("draws the route's own error component where its page throws while rendering", async () => {
-    await hosted(
-      declared({
-        component: () => {
-          throw new Error("the page threw");
-        },
-      }),
+    await quietly(() =>
+      hosted(
+        declared({
+          component: () => {
+            throw new Error("the page threw");
+          },
+        }),
+      ),
     );
 
     expect(screen.getByTestId("failed").textContent).toBe("acme.one");

@@ -106,6 +106,17 @@ describe("routeMap", () => {
     expect(() => routeMap(tree)).toThrow("Two routes serve the path /one under the same parent.");
   });
 
+  it("refuses one path written with and without the slashes around it", () => {
+    const root = createRootRoute({});
+    const tree = root.addChildren([
+      written(root, "app.slashed", "/home"),
+      written(root, "app.bare", "home"),
+      written(root, "app.trailing", "home/"),
+    ]);
+
+    expect(() => routeMap(tree)).toThrow("Two routes serve the path /home under the same parent.");
+  });
+
   it("refuses a path a compilation placed under a layout that a host also wrote", () => {
     const root = createRootRoute({});
     const compiled = compileRoutes(

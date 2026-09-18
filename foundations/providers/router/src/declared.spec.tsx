@@ -7,6 +7,7 @@ import { compileRoutes } from "#compile.ts";
 import { type RouteDeclaration } from "#declaration.ts";
 import { declaredOf, useDeclaredRoute, useRouteParams } from "#declared.ts";
 import { routeMap } from "#map.ts";
+import { quietly } from "#quiet.fixtures.ts";
 import { type RouteRef } from "#reference.ts";
 import {
   createMemoryHistory,
@@ -159,10 +160,12 @@ describe("useRouteParams", () => {
   });
 
   it("throws where the page being drawn is another route", async () => {
-    await opened("/app/other", [
-      { component: Invoice, id: "acme.other", path: "/other" },
-      { component: Page, id: "acme.one", path: "/invoices/$invoice" },
-    ]);
+    await quietly(() =>
+      opened("/app/other", [
+        { component: Invoice, id: "acme.other", path: "/other" },
+        { component: Page, id: "acme.one", path: "/invoices/$invoice" },
+      ]),
+    );
 
     expect(screen.getByTestId("failed").textContent).toContain(
       "The page being drawn is not acme.one",

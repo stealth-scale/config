@@ -4,7 +4,7 @@
 
 import { type DeclaredRoute } from "#declaration.ts";
 import { declaredOf } from "#declared.ts";
-import { type AnyRoute } from "#tanstack.ts";
+import { type AnyRoute, trimPath } from "#tanstack.ts";
 
 /**
  * Every id anything links by, against the route that draws it.
@@ -103,7 +103,22 @@ function identify(route: AnyRoute, named: Map<string, AnyRoute>): void {
 }
 
 /**
- * Lists the paths a route's descendants serve at its own level.
+ * Writes a path the one way the library reads it: the slashes around it trimmed, and one leading
+ * slash put back.
+ *
+ * @remarks
+ *   `home`, `/home` and `home/` are one route to the library, so the check reads all three as
+ *   `/home`.
+ */
+function normalised(path: string): string {
+  const trimmed = trimPath(path);
+
+  return trimmed === "/" ? trimmed : `/${trimmed}`;
+}
+
+/**
+ * Lists the paths a route's descendants serve at its own level, each written the one way the
+ * library reads it.
  *
  * @remarks
  *   A pathless route consumes no segment of a URL, so whatever sits below one is served at the
@@ -119,7 +134,7 @@ function pathsUnder(route: AnyRoute): readonly string[] {
     const options: object = child.options;
     const path: unknown = "path" in options ? options.path : undefined;
 
-    if (typeof path === "string") paths.push(path);
+    if (typeof path === "string") paths.push(normalised(path));
     else paths.push(...pathsUnder(child));
   }
 

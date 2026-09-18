@@ -242,13 +242,13 @@ function routeOf<Condition>(
   under: AnyRoute,
 ): AnyRoute {
   const { errorComponent } = building.options;
-  const when = declaration.when;
+  const { id, navigation, when } = declaration;
 
   return createRoute({
     component: pageOf(declaration.component),
     getParentRoute: () => under,
     path: declaration.path,
-    staticData: { declared: { id: declaration.id, navigation: declaration.navigation } },
+    staticData: { declared: { id, ...(navigation === undefined ? {} : { navigation }) } },
     ...(errorComponent === undefined ? {} : { errorComponent: errorComponent(declaration) }),
     ...(declaration.search === undefined ? {} : { validateSearch: declaration.search }),
     ...(when === undefined ? {} : { beforeLoad: gate(building, declaration, when) }),
