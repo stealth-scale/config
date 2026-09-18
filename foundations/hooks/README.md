@@ -280,6 +280,36 @@ speakable(["Saved", "3 rows selected", "Saved"]);
 
 That returns `Saved. 3 rows selected`.
 
+## createRequiredContext
+
+Makes a context a reader has to be inside, and the hook that reads it.
+
+Use it for a component drawn in parts, where every part needs something the root holds. React
+answers a missing provider with the default value, so a part drawn outside its root draws wrongly
+and says nothing, and the fault surfaces somewhere else entirely. This throws where the part was
+written instead, and names the component so the message says which root is missing.
+
+```tsx
+const [ApiProvider, useCollapsible] = createRequiredContext<CollapsibleApi>("Collapsible");
+
+function Root({ children }: RootProps): ReactElement {
+  const api = collapsible.connect(useMachine(collapsible.machine, { id: useId() }), normalizeProps);
+
+  return <ApiProvider value={api}>{children}</ApiProvider>;
+}
+
+function Trigger(props: TriggerProps): ReactElement {
+  const api = useCollapsible();
+
+  return <Styled {...mergeProps(api.getTriggerProps(), props)} />;
+}
+```
+
+A trigger drawn with no root above it throws
+`A part of Collapsible was drawn outside the root that holds it together.` A reader under two
+providers gets the value of the nearer one, and each call makes a context of its own, so two
+components never read each other's.
+
 ## Types
 
 | Type                        | Declaration               | What it describes                                                  |
@@ -290,6 +320,7 @@ That returns `Saved. 3 rows selected`.
 | `UseMediaQueryOptions`      | `interface`               | The fallback before the window is asked, and which window to ask   |
 | `UseStickyOffsetsOptions`   | `interface`               | Which bands stick, and which custom properties carry their offsets |
 | `AnnouncePoliteness`        | `"assertive" \| "polite"` | How much a message is allowed to interrupt                         |
+| `ProvidedProps`             | `interface`               | The value a provider carries and the tree that reads it            |
 
 ## Licence
 
