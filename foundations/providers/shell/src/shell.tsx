@@ -34,7 +34,7 @@ export interface ShellProps {
   readonly app: string;
 
   /**
-   * The catalogues, which is what `virtual:i18n` exports. No strings are put in scope where this is
+   * The catalogues, which is what `virtual:i18n` exports. Catalogues holding nothing where this is
    * absent, so every key resolves to itself.
    */
   readonly catalogues?: Catalogues | undefined;

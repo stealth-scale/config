@@ -31,7 +31,7 @@ The choice is remembered under `app`, so two applications on one origin keep the
 
 This package's own `I18nProvider` mounts the one from `@stealthscale/provider-i18n` in whichever
 locale is in force, so changing the locale changes every string below. Leave `catalogues` out and it
-renders its children untouched.
+mounts catalogues holding nothing, so every key resolves to itself.
 
 ## Reading it
 

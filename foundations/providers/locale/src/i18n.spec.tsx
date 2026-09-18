@@ -30,6 +30,18 @@ function Worded(): ReactElement {
 }
 
 /**
+ * Records the language of the instance in scope, to show one was mounted at all.
+ *
+ * @param seen - Where to record it.
+ * @returns Nothing rendered.
+ */
+function Instance({ seen }: { readonly seen: string[] }): ReactElement {
+  seen.push(useTranslation("menu").i18n.language);
+
+  return <i />;
+}
+
+/**
  * Mounts a subtree under a locale and the catalogues.
  *
  * @param locale - The locale in force.
@@ -65,9 +77,17 @@ describe("I18nProvider", () => {
     expect(screen.getByText("Commands")).toBeTruthy();
   });
 
-  it("renders the subtree untouched where it is given no catalogues", () => {
-    mounted("en", undefined, <p>{"bare"}</p>);
+  it("resolves a key to itself where it is given no catalogues", () => {
+    mounted("en", undefined, <Worded />);
 
-    expect(screen.getByText("bare")).toBeTruthy();
+    expect(screen.getByText("commands")).toBeTruthy();
+  });
+
+  it("mounts an instance where it is given no catalogues", () => {
+    const seen: string[] = [];
+
+    mounted("en", undefined, <Instance seen={seen} />);
+
+    expect(seen).toEqual(["en"]);
   });
 });

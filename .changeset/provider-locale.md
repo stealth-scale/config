@@ -13,7 +13,9 @@ provider-locale: decide which locale a page is read in
 - Given `locale` and `onLocaleChange` the provider reads in what it is told and remembers nothing,
   so a router that carries the locale in the URL drives it.
 - This package's own `I18nProvider` mounts the one from `@stealthscale/provider-i18n` in the locale
-  in force, so a change of locale changes every string below.
+  in force, so a change of locale changes every string below. An instance is mounted whether or not
+  there are catalogues to mount, because rendering the page with none leaves every `useTranslation`
+  below without one and logs `NO_I18NEXT_INSTANCE` for each.
 - `negotiate` runs ECMA-402's lookup: each requested tag is truncated in turn, so `nl-BE` reaches
   `nl`. Where truncation finds nothing, both sides widen to their likely script and region, so
   `zh-HK` reaches `zh-Hant` and `en-GB` reaches `en-US`.

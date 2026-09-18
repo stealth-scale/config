@@ -1,6 +1,6 @@
 import { type ReactElement, type RefObject } from "react";
 
-import { render } from "@testing-library/react";
+import { act, render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { useIsOverflowing } from "#use-is-overflowing.ts";
@@ -32,6 +32,10 @@ function loose(size: Size): HTMLElement {
 
 function nothing(): void {
   return undefined;
+}
+
+function fontsReady(ready: Promise<void>): void {
+  Object.defineProperty(document, "fonts", { configurable: true, value: { ready } });
 }
 
 function deferred(): { ready: Promise<void>; release: () => void } {
@@ -130,19 +134,24 @@ describe("useIsOverflowing", () => {
   });
 
   it("passes over a measurement queued for an element it no longer watches", async () => {
-    const { ready, release } = deferred();
+    const stale = deferred();
+    const outstanding = deferred();
     const watching: RefObject<HTMLElement | null> = {
       current: loose({ clientWidth: 100, scrollWidth: 140 }),
     };
 
-    Object.defineProperty(document, "fonts", { configurable: true, value: { ready } });
+    fontsReady(stale.ready);
 
     const { getByTestId, rerender } = render(<Box watching={watching} />);
 
+    fontsReady(outstanding.ready);
     watching.current = loose({ clientWidth: 100, scrollWidth: 100 });
     rerender(<Box watching={watching} />);
-    release();
-    await ready;
+
+    await act(async () => {
+      stale.release();
+      await stale.ready;
+    });
 
     expect(getByTestId("read").dataset["across"]).toBe("false");
     Reflect.deleteProperty(document, "fonts");
