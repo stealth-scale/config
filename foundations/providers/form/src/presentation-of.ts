@@ -1,6 +1,7 @@
 /**
  * Reads how a form is drawn out of a schema's own keywords, merges what a caller states beside
- * it, and checks every member against the paths the schema can produce.
+ * it, checks every member against the paths the schema can produce, and reads the members and
+ * steps back out of a presentation.
  */
 
 import {
@@ -34,7 +35,7 @@ export const KEYWORDS = {
 /**
  * The identifier a form has where neither the schema nor the caller states one.
  */
-const UNNAMED = "form";
+export const UNNAMED = "form";
 
 /**
  * Describes the members and the steps of a presentation, whichever source stated them.
@@ -156,26 +157,51 @@ export function presentationOf<Values>(
 }
 
 /**
+ * Lists every path a run of members names, groups walked.
+ *
+ * @typeParam Values - The form's values, or `unknown` for a form without a type.
+ */
+export function memberPaths<Values>(run: ReadonlyArray<Member<Values>>): readonly string[] {
+  return run.flatMap((member) => (isGroup(member) ? memberPaths(member.of) : [member]));
+}
+
+/**
  * Lists every path the members name, groups and steps walked.
+ *
+ * @typeParam Values - The form's values, or `unknown` for a form without a type.
  */
 export function members<Values>(presentation: Presentation<Values>): readonly string[] {
-  const found: string[] = [];
+  return [
+    ...memberPaths(presentation.of ?? []),
+    ...(presentation.steps?.of ?? []).flatMap((step) => memberPaths(step.of)),
+  ];
+}
 
-  /**
-   * Walks one run of members.
-   */
-  const visit = (run: ReadonlyArray<Member<Values>>): void => {
-    for (const member of run) {
-      if (isGroup(member)) visit(member.of);
-      else found.push(member);
-    }
-  };
+/**
+ * Keys a member for React: a path by itself, and a group by its name or by what it holds.
+ *
+ * @typeParam Values - The form's values, or `unknown` for a form without a type.
+ */
+export function memberKey<Values>(member: Member<Values>): string {
+  if (!isGroup(member)) return member;
 
-  visit(presentation.of ?? []);
+  return member.name ?? JSON.stringify(member.of);
+}
 
-  for (const step of presentation.steps?.of ?? []) visit(step.of);
+/**
+ * Reads one step of a presentation by its name.
+ *
+ * @typeParam Values - The form's values, or `unknown` for a form without a type.
+ * @throws {@link Error} When the presentation has no step of that name.
+ */
+export function stepOf<Values>(presentation: Presentation<Values>, name: string): Step<Values> {
+  const step = presentation.steps?.of.find((candidate) => candidate.name === name);
 
-  return found;
+  if (step === undefined) {
+    throw new Error(`The presentation "${presentation.id}" has no step "${name}"`);
+  }
+
+  return step;
 }
 
 /**
@@ -199,7 +225,7 @@ function repeats<Values>(run: ReadonlyArray<Member<Values> | Step<Values>>): rea
  * @remarks
  *   A member the schema cannot produce is a typo, and a typo that drew nothing in silence would be
  *   the mistake the data design refuses in `rowsAt`. A member absent from the resolved schema and
- *   present in the full one is a field this branch does not ask for, which `<Fields>` skips and
+ *   present in the full one is a field this branch does not ask for, which `Fields` skips and
  *   this never sees. The paths are those of every property any branch can produce, from the
  *   engine.
  * @throws {@link Error} When `of` and `steps` are both present, or when a member, a field
@@ -237,6 +263,18 @@ export function validatePresentation<Values>(
  */
 function isLeaf(path: string, paths: readonly string[]): boolean {
   return !paths.some((other) => other.startsWith(`${path}.`) || other.startsWith(`${path}[]`));
+}
+
+/**
+ * Lists the paths a form draws where its presentation states no members: every field outside an
+ * array, in schema order.
+ *
+ * @remarks
+ *   An array's items are left out, because they are drawn by a repeat group and a presentation
+ *   states one.
+ */
+export function leafPaths(paths: readonly string[]): readonly string[] {
+  return paths.filter((path) => !path.includes("[]") && isLeaf(path, paths));
 }
 
 /**

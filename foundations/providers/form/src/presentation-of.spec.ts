@@ -1,7 +1,16 @@
 import { describe, expect, it } from "vitest";
 
-import { members, presentationOf, unplaced, validatePresentation } from "#presentation-of.ts";
-import { type Presentation } from "#presentation.ts";
+import {
+  leafPaths,
+  memberKey,
+  memberPaths,
+  members,
+  presentationOf,
+  stepOf,
+  unplaced,
+  validatePresentation,
+} from "#presentation-of.ts";
+import { type Member, type Presentation } from "#presentation.ts";
 import { type Schema } from "#schema.ts";
 
 interface Checkout {
@@ -142,6 +151,41 @@ describe("members", () => {
     };
 
     expect(members(presentation)).toStrictEqual(["x", "y", "z", "w"]);
+  });
+});
+
+describe("memberPaths", () => {
+  it("lists every path a run of members names with its groups walked", () => {
+    const run: readonly Member[] = ["x", { of: ["y", { of: ["z"] }] }, "w"];
+
+    expect(memberPaths(run)).toStrictEqual(["x", "y", "z", "w"]);
+  });
+});
+
+describe("memberKey", () => {
+  it("keys a path by itself and a group by its name or its members", () => {
+    expect(memberKey("email")).toBe("email");
+    expect(memberKey({ name: "who", of: ["email"] })).toBe("who");
+    expect(memberKey({ of: ["email", "name"] })).toBe('["email","name"]');
+  });
+});
+
+describe("stepOf", () => {
+  const stepped: Presentation = { id: "p", steps: { of: [{ name: "who", of: ["email"] }] } };
+
+  it("returns the step of the name given", () => {
+    expect(stepOf(stepped, "who")).toStrictEqual({ name: "who", of: ["email"] });
+  });
+
+  it("throws when the presentation has no step of that name", () => {
+    expect(() => stepOf(stepped, "pay")).toThrow(/"pay"/u);
+    expect(() => stepOf({ id: "p" }, "pay")).toThrow(/"pay"/u);
+  });
+});
+
+describe("leafPaths", () => {
+  it("lists every field outside an array in order", () => {
+    expect(leafPaths(paths)).toStrictEqual(["billing.city", "billing.line1", "email", "notes"]);
   });
 });
 

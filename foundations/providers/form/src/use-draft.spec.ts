@@ -161,6 +161,33 @@ describe("useDraft", () => {
     expect(stored(store)).toStrictEqual({ hash: HASH, step: "who", values: { name: "Roy K" } });
   });
 
+  it("keeps the draft in the page's local storage where no store is given", () => {
+    const { result } = renderHook(() =>
+      useDraft<Signup>({ app: "docs", id: "signup", schema: signup }),
+    );
+
+    expect(() => {
+      act(() => {
+        result.current.write({ name: "Roy" });
+        result.current.clear();
+      });
+    }).not.toThrow();
+    expect(result.current.restored).toBeUndefined();
+  });
+
+  it("keeps nothing and reports nothing when given no options", () => {
+    const { result } = renderHook(() => useDraft<Signup>());
+
+    act(() => {
+      result.current.write({ name: "Roy" }, "who");
+    });
+
+    expect(result.current.restored).toBeUndefined();
+    expect(() => {
+      result.current.clear();
+    }).not.toThrow();
+  });
+
   it("forgets the draft when cleared", () => {
     const store = memoryStore();
 

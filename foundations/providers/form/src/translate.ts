@@ -1,6 +1,6 @@
 /**
- * Types the translator every word of a form goes through, and writes a path out as words for a
- * form nobody has translated.
+ * Types the translator every word of a form goes through, builds one over words already
+ * translated, and writes a path out as words for a form nobody has translated.
  */
 
 import { collapse } from "#path.ts";
@@ -33,27 +33,51 @@ export interface TranslateOptions {
 export type Translate = (keys: string | string[], options: TranslateOptions) => string;
 
 /**
- * Answers the default for every key, which is what a form has before anybody translates it.
+ * Matches a placeholder in a message, written as i18next writes one under its defaults.
  */
-export const untranslated: Translate = (_keys, { defaultValue }) => defaultValue;
+const PLACEHOLDER = /\{\{(\w+)\}\}/gu;
 
 /**
- * Builds a translator over words already translated, for a specification or a form whose words
- * arrive with it.
+ * Writes one value into a message: a string or a number as it is, and anything else as nothing.
+ */
+function written(value: unknown): string {
+  return typeof value === "string" || typeof value === "number" ? String(value) : "";
+}
+
+/**
+ * Writes the values into the placeholders of a message.
  *
  * @remarks
- *   Nothing is interpolated. A message reading a value belongs in a catalogue an i18n library
- *   serves.
+ *   The placeholder is i18next's `{{name}}`, so a message written for a catalogue an i18n library
+ *   serves reads the same under a translator built here.
+ */
+export function interpolate(text: string, values: Readonly<Record<string, unknown>>): string {
+  return text.replaceAll(PLACEHOLDER, (_, name: string) => written(values[name]));
+}
+
+/**
+ * Returns the default for every key with the values written into it, which is what a form reads
+ * before anybody translates it.
+ */
+export const untranslated: Translate = (_keys, { defaultValue, ...values }) =>
+  interpolate(defaultValue, values);
+
+/**
+ * Builds a translator over words already translated, for a specification or an application
+ * without an i18n library.
+ *
+ * @remarks
+ *   The translator does what i18next's `t` does under its defaults. It tries the keys in order,
+ *   returns the default where the words have none of them, and writes the values into the
+ *   placeholders of whichever it returns.
  */
 export function translateFrom(words: Readonly<Record<string, string>>): Translate {
-  return (keys, { defaultValue }) => {
-    for (const key of typeof keys === "string" ? [keys] : keys) {
-      const found = words[key];
+  return (keys, { defaultValue, ...values }) => {
+    const found = (typeof keys === "string" ? [keys] : keys)
+      .map((key) => words[key])
+      .find((word) => word !== undefined);
 
-      if (found !== undefined) return found;
-    }
-
-    return defaultValue;
+    return interpolate(found ?? defaultValue, values);
   };
 }
 

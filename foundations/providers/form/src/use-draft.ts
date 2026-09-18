@@ -90,6 +90,11 @@ function none(): undefined {
 }
 
 /**
+ * Keeps nothing and reports nothing, for a form that keeps no draft.
+ */
+const IDLE: SettingStore = { clear: none, read: () => null, subscribe: () => none, write: none };
+
+/**
  * Keeps a form across a refresh.
  *
  * @remarks
@@ -99,11 +104,17 @@ function none(): undefined {
  *   library applies to an untouched form when its default values change. The form's own change
  *   listener writes the draft, debounced by the library, and a value at a path the schema marks
  *   `format: "password"` or `x-persist: false` is never written. A draft typed against another
- *   schema is forgotten rather than applied.
+ *   schema is forgotten rather than applied. Given no options, the hook keeps nothing and reports
+ *   nothing, so a hook that may or may not keep a draft calls it on every render.
  * @typeParam Values - The form's values.
  */
-export function useDraft<Values>(options: DraftOptions): DraftHandle<Values> {
-  const { app, id, schema, store = localStore() } = options;
+export function useDraft<Values>(options?: DraftOptions): DraftHandle<Values> {
+  const {
+    app = "",
+    id = "",
+    schema = {},
+    store = options === undefined ? IDLE : localStore(),
+  } = options ?? {};
   const key = draftKey(app, id);
   const hash = schemaHash(schema);
   const sensitive = sensitivePaths(schema);

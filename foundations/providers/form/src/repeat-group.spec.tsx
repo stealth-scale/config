@@ -1,0 +1,134 @@
+import { type ReactElement } from "react";
+
+import { fireEvent, render } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+
+import { FieldMember } from "#field-member.tsx";
+import { useSchemaForm } from "#hooks.fixtures.ts";
+import { type Group } from "#presentation.ts";
+import { RepeatGroup } from "#repeat-group.tsx";
+import { type Schema } from "#schema.ts";
+
+const order: Schema = {
+  properties: {
+    lines: {
+      items: {
+        properties: {
+          amount: { default: 1, type: "number" },
+          tags: { items: { properties: { tag: { type: "string" } } }, type: "array" },
+        },
+      },
+      type: "array",
+    },
+    tags: { type: "array" },
+  },
+  type: "object",
+};
+
+const lines: Group = { legend: true, name: "line", of: ["lines[].amount"], repeat: "lines" };
+
+/**
+ * Builds a form from the schema, starting from the lines given, and draws the group over it.
+ */
+function Page({
+  group = lines,
+  values,
+}: {
+  readonly group?: Group | undefined;
+  readonly values?: Record<string, unknown> | undefined;
+}): ReactElement {
+  const form = useSchemaForm({ schema: order, values });
+
+  return (
+    <form.AppForm>
+      <RepeatGroup
+        draw={(indices) =>
+          group.of.map((member) =>
+            typeof member === "string" ? (
+              <FieldMember indices={indices} key={member} path={member} resolved={order} />
+            ) : (
+              <RepeatGroup
+                draw={(inner) =>
+                  member.of.map((path) =>
+                    typeof path === "string" ? (
+                      <FieldMember indices={inner} key={path} path={path} resolved={order} />
+                    ) : null,
+                  )
+                }
+                group={member}
+                indices={indices}
+                key={member.name}
+                legend={undefined}
+                repeat={member.repeat ?? ""}
+              />
+            ),
+          )
+        }
+        group={group}
+        indices={[]}
+        legend={group.legend === true ? "Lines" : undefined}
+        repeat={group.repeat ?? ""}
+      />
+    </form.AppForm>
+  );
+}
+
+describe("RepeatGroup", () => {
+  it("draws the group once per item the values hold", () => {
+    const { getAllByLabelText, getByText } = render(
+      <Page values={{ lines: [{ amount: 2 }, { amount: 3 }] }} />,
+    );
+
+    expect(getByText("Lines").tagName).toBe("LEGEND");
+    expect(
+      getAllByLabelText("Amount").map((control) => control.getAttribute("name")),
+    ).toStrictEqual(["lines[0].amount", "lines[1].amount"]);
+  });
+
+  it("adds an item from the item schema's defaults and focuses its first field", () => {
+    const { getByLabelText, getByRole } = render(<Page />);
+
+    fireEvent.click(getByRole("button", { name: "Add" }));
+
+    expect(getByLabelText("Amount")).toHaveProperty("value", "1");
+    expect(document.activeElement).toHaveProperty("name", "lines[0].amount");
+  });
+
+  it("adds an empty item without moving focus where the group has no field", () => {
+    const { container, getByRole } = render(<Page group={{ of: [], repeat: "tags" }} />);
+    const button = getByRole("button", { name: "Add" });
+
+    button.focus();
+    fireEvent.click(button);
+
+    expect(document.activeElement).toBe(button);
+    expect(container.querySelectorAll(".item")).toHaveLength(1);
+  });
+
+  it("removes the item whose control is pressed", async () => {
+    const page = render(<Page values={{ lines: [{ amount: 2 }, { amount: 3 }] }} />);
+
+    fireEvent.click(page.getAllByRole("button", { name: "Remove" })[0] ?? page.container);
+
+    await expect(page.findAllByLabelText("Amount")).resolves.toHaveLength(1);
+    expect(page.getByLabelText("Amount")).toHaveProperty("value", "3");
+  });
+
+  it("binds a group inside a repeat group to both indices", () => {
+    const nested: Group = {
+      of: ["lines[].amount", { name: "tags", of: ["lines[].tags[].tag"], repeat: "lines[].tags" }],
+      repeat: "lines",
+    };
+    const { getByLabelText } = render(
+      <Page
+        group={nested}
+        values={{ lines: [{ amount: 1, tags: [{ tag: "" }, { tag: "b" }] }] }}
+      />,
+    );
+
+    expect(getByLabelText("Amount").getAttribute("name")).toBe("lines[0].amount");
+    expect(getByLabelText("Tag", { selector: "[value='b']" }).getAttribute("name")).toBe(
+      "lines[0].tags[1].tag",
+    );
+  });
+});

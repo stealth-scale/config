@@ -12,6 +12,7 @@ describe("identifiers", () => {
     { id: checkout.option("kind", "business"), want: "checkout.fields.kind.options.business" },
     { id: checkout.legend("billing"), want: "checkout.groups.billing.legend" },
     { id: checkout.step("who"), want: "checkout.steps.who.label" },
+    { id: checkout.action("submit"), want: "checkout.actions.submit" },
   ])("derives $want", ({ id, want }) => {
     expect(id).toBe(want);
   });

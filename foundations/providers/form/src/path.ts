@@ -18,22 +18,18 @@ type Key<Values> = Extract<keyof Values, string>;
 type Under<Name extends string, Value, Level extends number> = Value extends Date
   ? never
   : Value extends ReadonlyArray<infer Item>
-    ? `${Name}[]` | (Item extends object ? `${Name}[].${Path<Item, Level>}` : never)
+    ? `${Name}[]` | (Item extends object ? `${Name}[].${Paths<Item, Level>}` : never)
     : Value extends object
-      ? `${Name}.${Path<Value, Level>}`
+      ? `${Name}.${Paths<Value, Level>}`
       : never;
 
 /**
- * Lists every dotted path into a form's values, five levels deep, with `[]` for an array's items.
+ * Lists every dotted path into a form's values down to the level given.
  *
- * @remarks
- *   `unknown` admits any string, which is what a presentation read from a manifest has. A typed
- *   form refuses a path it does not have at compile time. The data design measured the same
- *   construction at 0.28 s on a 12-field, 3-level type.
  * @typeParam Values - The form's values, or `unknown` for a form without a type.
- * @typeParam Level - How many levels remain. Four below the first, which is five in all.
+ * @typeParam Level - How many levels remain.
  */
-export type Path<Values, Level extends number = 4> = [Level] extends [never]
+type Paths<Values, Level extends number> = [Level] extends [never]
   ? never
   : unknown extends Values
     ? string
@@ -42,6 +38,18 @@ export type Path<Values, Level extends number = 4> = [Level] extends [never]
       : Values extends object
         ? { [Name in Key<Values>]: Name | Under<Name, Values[Name], Depth[Level]> }[Key<Values>]
         : never;
+
+/**
+ * Lists every dotted path into a form's values, five levels deep, with `[]` for an array's items.
+ *
+ * @remarks
+ *   `unknown` admits any string, which is what a presentation read from a manifest has. A typed
+ *   form refuses a path it does not have at compile time. The data design measured the same
+ *   construction at 0.28 s on a 12-field, 3-level type. The intersection with `string` lets a
+ *   path into values a function is generic over stand where a string is asked for.
+ * @typeParam Values - The form's values, or `unknown` for a form without a type.
+ */
+export type Path<Values> = Paths<Values, 4> & string;
 
 /**
  * Types one segment of a path, which is a property's name or an index into an array.

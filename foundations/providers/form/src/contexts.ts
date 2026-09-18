@@ -2,7 +2,7 @@
  * The contexts every form in this design system shares.
  */
 
-import { type Context } from "react";
+import { type Context, useContext } from "react";
 
 import { type AnyFieldApi, type AnyFormApi, createFormHookContexts } from "@tanstack/react-form";
 
@@ -46,3 +46,31 @@ export const useFieldContext = contexts.useFieldContext;
  * Reads the form a bound form component is drawing.
  */
 export const useFormContext = contexts.useFormContext;
+
+/**
+ * Reads the form a bound form component is drawing, typed over values of any shape.
+ *
+ * @remarks
+ *   The library types the form it hands a form component over a record with no members, so
+ *   every path into it is `never`. A component that draws a form of any shape, such as one
+ *   generated from a schema, reads the form through this instead.
+ */
+export function useAnyForm(): AnyFormApi {
+  return contexts.useFormContext();
+}
+
+/**
+ * Reads the form in scope, or nothing.
+ *
+ * @remarks
+ *   A form component reads the form it is drawing, and a field component reads the form its
+ *   field belongs to, so a field drawn under `AppField` alone finds its form as well. Outside
+ *   both there is nothing to read, and a caller falls back to what it reads without a form. The
+ *   two contexts are typed as never empty, so each is widened to what it holds at run time.
+ */
+export function useFormInScope(): AnyFormApi | undefined {
+  const form = useContext(formContext) as AnyFormApi | null;
+  const field = useContext(fieldContext) as AnyFieldApi | null;
+
+  return form ?? field?.form ?? undefined;
+}

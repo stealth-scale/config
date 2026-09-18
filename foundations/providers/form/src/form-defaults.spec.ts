@@ -1,7 +1,7 @@
 import { FieldApi, FormApi } from "@tanstack/react-form";
 import { describe, expect, it } from "vitest";
 
-import { focusFirstInvalid, formDefaults, type Invalidated } from "#form-defaults.ts";
+import { focusControl, focusFirstInvalid, formDefaults, type Invalidated } from "#form-defaults.ts";
 
 /**
  * Describes a form the specification can submit.
@@ -70,5 +70,22 @@ describe("formDefaults", () => {
     focusFirstInvalid(form);
 
     expect(document.activeElement).toBe(before);
+  });
+});
+
+describe("focusControl", () => {
+  it("moves focus to the control carrying the name", () => {
+    mounted([]);
+    focusControl("email");
+
+    expect(document.activeElement).toHaveProperty("name", "email");
+  });
+
+  it("leaves focus alone when no control carries the name", () => {
+    mounted([]);
+    focusControl("email");
+    focusControl("gone");
+
+    expect(document.activeElement).toHaveProperty("name", "email");
   });
 });

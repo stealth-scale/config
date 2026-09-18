@@ -1,5 +1,6 @@
 /**
- * Fixes how a form in this design system behaves before an application says otherwise.
+ * Fixes how a form in this design system behaves before an application says otherwise, and moves
+ * focus to a control by the name the bound field writes.
  */
 
 import { revalidateLogic } from "@tanstack/react-form";
@@ -35,10 +36,22 @@ export interface Invalidated {
 }
 
 /**
+ * Moves focus to the control bound to a field.
+ *
+ * @remarks
+ *   The control is found by the `name` attribute the bound field writes, which is the field's
+ *   path. Nothing happens where no control on the page carries the name.
+ */
+export function focusControl(name: string): void {
+  const control = document.querySelector(`[name="${CSS.escape(name)}"]`);
+
+  if (control instanceof HTMLElement) control.focus();
+}
+
+/**
  * Moves focus to the first field with an error, in the order the form met its fields.
  *
  * @remarks
- *   A control is found by the `name` attribute the bound field writes, which is the field's path.
  *   A submit that fails without moving focus leaves a keyboard or screen reader user with no way
  *   to find the problem.
  */
@@ -47,11 +60,7 @@ export function focusFirstInvalid(form: Invalidated): void {
     ([, meta]) => meta !== undefined && meta.errors.length > 0,
   );
 
-  if (found === undefined) return;
-
-  const control = document.querySelector(`[name="${CSS.escape(found[0])}"]`);
-
-  if (control instanceof HTMLElement) control.focus();
+  if (found !== undefined) focusControl(found[0]);
 }
 
 /**

@@ -9,6 +9,12 @@ import { collapse } from "#path.ts";
  */
 export interface Identifiers {
   /**
+   * Derives the identifier of an action the form offers: `submit`, `next`, `back`, `add` or
+   * `remove`.
+   */
+  readonly action: (name: string) => string;
+
+  /**
    * Derives the identifier of a field's help text.
    */
   readonly description: (path: string) => string;
@@ -62,6 +68,7 @@ export function identifiers(id: string): Identifiers {
     `${id}.${kind}.${collapse(path)}.${leaf}`;
 
   return {
+    action: (name) => `${id}.actions.${name}`,
     description: (path) => of("fields", path, "description"),
     error: (path, keyword) => [of("errors", path, keyword), `errors.${keyword}`],
     label: (path) => of("fields", path, "label"),
