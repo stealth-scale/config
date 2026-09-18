@@ -52,6 +52,14 @@ component-disclosure: publish the collapsible
   settings it defaults without `undefined` while its own splitter hands every setting over carrying
   it, and which settings default is different for each machine.
 
+- `Popover` opens a panel beside a control, composed as `Popover.Root` holding the control and the
+  panel, with eleven parts between them. Three looks draw the panel and one size moves its room, its
+  heading and its paragraph together.
+- The machine gives the panel the dialog role, points it at the heading and the paragraph inside it,
+  takes focus as it opens and returns it to the control as it shuts.
+- `Popover.Anchor` positions the panel against something other than the control that opens it, such
+  as a whole row.
+
 The package is the first to take runtime dependencies. It installs the machine, the React adapter
 and the types the adapter's own signatures reach, all pinned together through the workspace catalog,
 because the machines share a core and a core at two versions breaks them.

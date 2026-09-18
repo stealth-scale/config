@@ -154,6 +154,73 @@ The bar that marks the control in force is positioned from measurements the mach
 recipe states its thickness and its colour and never its place. It is hidden until there is
 something to measure, which keeps it from appearing at the start of the strip on the first render.
 
+## Popover
+
+Opens a panel beside a control, composed as `Popover.Root` holding the control and the panel.
+
+```tsx
+import { Popover } from "@stealthscale/component-disclosure";
+
+<Popover.Root>
+  <Popover.Trigger>
+    Filters
+    <Popover.Indicator>
+      <ChevronIcon />
+    </Popover.Indicator>
+  </Popover.Trigger>
+  <Popover.Positioner>
+    <Popover.Content>
+      <Popover.Arrow>
+        <Popover.ArrowTip />
+      </Popover.Arrow>
+      <Popover.Title>Filter the list</Popover.Title>
+      <Popover.Description>Only rows matching all of these are shown.</Popover.Description>
+      <Popover.CloseTrigger>
+        <CloseIcon />
+      </Popover.CloseTrigger>
+    </Popover.Content>
+  </Popover.Positioner>
+</Popover.Root>;
+```
+
+| Axis      | Values                                            | Default   |
+| --------- | ------------------------------------------------- | --------- |
+| `variant` | `surface`, `elevated`, `glass`                    | `surface` |
+| `size`    | `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`, `4xl` | `md`      |
+
+A popover is louder than a tooltip. It holds a heading, a paragraph and often a control, so it reads
+at body text and takes the room a panel needs. The size moves the panel's room, the heading's size
+and the paragraph's together.
+
+`Popover.Anchor` is for a panel positioned against something other than the control that opens it,
+such as a whole row. Draw it around that thing and the machine measures it instead.
+
+### The machine's settings
+
+| Setting                                       | What it does                                                    |
+| --------------------------------------------- | --------------------------------------------------------------- |
+| `open`, `defaultOpen`                         | Drives it from outside, or opens it to begin with               |
+| `onOpenChange`                                | Hears each time the panel opens or shuts                        |
+| `modal`                                       | Traps focus and hides the rest of the page from a screen reader |
+| `autoFocus`, `initialFocusEl`, `finalFocusEl` | Where focus goes on opening and on closing                      |
+| `closeOnEscape`, `closeOnInteractOutside`     | What shuts the panel                                            |
+| `persistentElements`                          | What a click inside does not count as outside                   |
+| `positioning`                                 | Which side it opens on, and how far from the control            |
+| `id`                                          | Names the machine, which builds its ARIA references             |
+
+### The accessibility the machine writes
+
+- **The panel is a dialog.** It carries the dialog role, and the control says whether it is open and
+  which panel it controls.
+- **The panel is announced by its own words.** The heading names it and the paragraph describes it,
+  both wired by the machine, so a panel with a `Title` needs nothing else to be announced properly.
+- **Focus goes in and comes back.** The panel takes focus as it opens and returns it to the control
+  as it shuts, so a keyboard never loses its place.
+- **Escape shuts it**, as does a click outside.
+
+Like the tooltip, nothing here portals. Wrap `Popover.Positioner` in the portal you want where the
+panel is clipped or stacked wrongly.
+
 ## Tooltip
 
 Shows a short label beside whatever a pointer rests on, composed as `Tooltip.Root` holding a control

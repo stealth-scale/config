@@ -36,6 +36,8 @@ catalog:
   "@vitest/coverage-v8": 4.1.11
   # Every machine shares @zag-js/core, so the whole set moves at one version together.
   "@zag-js/collapsible": 1.43.3
+  "@zag-js/focus-visible": 1.43.3
+  "@zag-js/popover": 1.43.3
   "@zag-js/react": 1.43.3
   "@zag-js/tabs": 1.43.3
   "@zag-js/tooltip": 1.43.3

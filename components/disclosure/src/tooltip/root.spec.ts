@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import { setInteractionModality } from "@zag-js/focus-visible";
 import { describe, expect, it, vi } from "vitest";
 
 import { accessibilityViolations, settled } from "@stealthscale/testing-react";
@@ -31,7 +32,7 @@ describe("Root", () => {
 
   it("opens the box when a keyboard reaches the control", async () => {
     render(composed({ openDelay: 0 }));
-    fireEvent.keyDown(document.body, { key: "Tab" });
+    setInteractionModality("keyboard");
     fireEvent.focus(screen.getByRole("button"));
     await settled();
 
@@ -40,7 +41,7 @@ describe("Root", () => {
 
   it("leaves the box shut where a pointer moved the focus rather than a keyboard", async () => {
     render(composed({ openDelay: 0 }));
-    fireEvent.pointerDown(document.body);
+    setInteractionModality("pointer");
     fireEvent.focus(screen.getByRole("button"));
     await settled();
 
@@ -51,7 +52,7 @@ describe("Root", () => {
     const told = vi.fn<(details: { readonly open: boolean }) => void>();
 
     render(composed({ onOpenChange: told, openDelay: 0 }));
-    fireEvent.keyDown(document.body, { key: "Tab" });
+    setInteractionModality("keyboard");
     fireEvent.focus(screen.getByRole("button"));
     await settled();
 
