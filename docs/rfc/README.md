@@ -16,6 +16,7 @@ the decision, and the standards hold the rules that are refined.
 | [0004](0004-the-form-of-a-component.md)               | The form of a component                                 | Accepted |
 | [0005](0005-the-data-foundation.md)                   | The data foundation                                     | Draft    |
 | [0006](0006-routing.md)                               | Routing: the pieces an application builds a router from | Draft    |
+| [0007](0007-forms.md)                                 | Forms: a form built from a schema                       | Draft    |
 
 ## Status
 
