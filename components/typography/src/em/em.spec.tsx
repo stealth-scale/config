@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { accessibilityViolations, violations } from "@stealthscale/testing-react";
@@ -16,6 +16,12 @@ describe("Em", () => {
     await expect(
       accessibilityViolations(Em, { props: { children: "stressed" } }),
     ).resolves.toStrictEqual([]);
+  });
+
+  it("exposes the emphasis role to a screen reader", () => {
+    render(<Em>stressed</Em>);
+
+    expect(screen.getByRole("emphasis").textContent).toBe("stressed");
   });
 
   it("writes the class of every value its recipe offers", () => {

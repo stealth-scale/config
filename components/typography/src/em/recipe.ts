@@ -1,17 +1,16 @@
 /**
- * States what stressed words are: a run set apart from the line around it by its face alone.
+ * Defines the styles an em element is drawn with.
  *
  * @remarks
- *   The style is stated rather than left to the browser's own default for the element, so a theme
- *   has something to extend and a face that ships no italic can be told what to do instead. There
- *   is no axis. Stress is one thing a writer either means or does not, and a caller picking how
- *   loud it is would be picking for the reader.
+ *   The recipe declares `fontStyle` rather than relying on the browser's default for the element.
+ *   A theme can extend only a declaration the recipe makes, and a font family that ships no italic
+ *   face needs an explicit substitute. The recipe offers no variant axis.
  */
 
 import { defineRecipe } from "@stealthscale/theme/authoring";
 
 /**
- * Draws stressed words in the italic of whatever face the line is set in.
+ * Applies the italic style.
  */
 export const recipe = defineRecipe({
   base: { fontStyle: "italic" },

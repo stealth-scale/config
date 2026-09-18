@@ -13,11 +13,11 @@ describe("recipe", () => {
     expect(recipe.className).toBe("em");
   });
 
-  it("offers no axis because stress is one thing a writer either means or does not", () => {
+  it("offers no variant axis", () => {
     expect(axesOf(recipe)).toStrictEqual([]);
   });
 
-  it("states the italic rather than leaving it to the browser", () => {
+  it("declares fontStyle italic", () => {
     expect(recipe.base).toStrictEqual({ fontStyle: "italic" });
   });
 

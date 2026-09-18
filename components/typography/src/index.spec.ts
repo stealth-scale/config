@@ -12,6 +12,7 @@ describe("index", () => {
       "Icon",
       "Kbd",
       "List",
+      "Strong",
       "Text",
     ]);
   });

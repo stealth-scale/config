@@ -1,9 +1,9 @@
 # @stealthscale/component-typography
 
 Draws the components that are text: a heading, a paragraph, a snippet of code, a key a reader is
-asked to press, a mark, a list and a quotation. Every component binds a recipe and draws nothing of
-its own, so a theme restyles all of them by extending the recipe. The preset under `./theme`
-registers the recipes with an application's compiler.
+asked to press, a stressed run, an important run, a mark, a list and a quotation. Every component
+binds a recipe and draws nothing of its own, so a theme restyles all of them by extending the
+recipe. The preset under `./theme` registers the recipes with an application's compiler.
 
 Every value a theme can change on a component is an axis of its recipe, so a caller sets it as a
 prop and writes no style. A caller changes the element a component draws with `as`. A component with
@@ -90,8 +90,8 @@ import { Code } from "@stealthscale/component-typography";
 
 ## Em
 
-Marks the words a writer stressed. The element is `em`, which a screen reader reads with that
-stress. It offers no axis: a theme changes how stress is drawn by extending the `em` recipe.
+Marks a run of words the writer stressed. The element is `em`, and it exposes the `emphasis` role.
+The component offers no axis. A theme changes how stress is drawn by extending the `em` recipe.
 
 ```tsx
 import { Em } from "@stealthscale/component-typography";
@@ -100,8 +100,25 @@ import { Em } from "@stealthscale/component-typography";
 <Em as="i">Beagle</Em>;
 ```
 
-Reach for `as="i"` where a run is set in italic for a reason other than stress, such as a ship's
-name or a term being introduced.
+Set `as="i"` for a run drawn in italic for another reason, such as a ship's name or a term being
+introduced. That element states no stress.
+
+## Strong
+
+Marks a run of words as more important than the words around it. The element is `strong`, and it
+exposes the `strong` role. The component offers no axis. A theme changes how importance is drawn by
+extending the `strong` recipe.
+
+```tsx
+import { Strong } from "@stealthscale/component-typography";
+
+<Strong>Do not</Strong>;
+<Strong as="b">Widget</Strong>;
+```
+
+The recipe declares a step of the foundation's weight scale. The browser's `bolder` keyword resolves
+against the inherited weight and reaches a different step in each context. Set `as="b"` for a run
+drawn heavy for another reason, such as a keyword in a definition.
 
 ## Kbd
 
@@ -215,6 +232,7 @@ import { Blockquote } from "@stealthscale/component-typography";
 | `HeadingProps`         | `type`      | The heading's variants and everything an `h2` takes      |
 | `CodeProps`            | `type`      | The snippet's variants and everything a `code` takes     |
 | `EmProps`              | `type`      | Everything an `em` takes                                 |
+| `StrongProps`          | `type`      | Everything a `strong` takes                              |
 | `KbdProps`             | `type`      | The key's variants and everything a `kbd` takes          |
 | `IconProps`            | `type`      | The icon's variants and everything an `svg` takes        |
 | `List.RootProps`       | `type`      | The list's variants and everything a `ul` takes          |

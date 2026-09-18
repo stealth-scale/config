@@ -1,5 +1,5 @@
 /**
- * Publishes the em: the words a writer stressed.
+ * Publishes the Em component.
  */
 
 export { Em, type EmProps } from "#em/em.ts";

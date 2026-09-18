@@ -1,5 +1,5 @@
 /**
- * Binds the em recipe to the element that draws it.
+ * Binds the strong recipe to the element that draws it.
  *
  * @remarks
  *   Apart from the recipe, because an application's compiler reads the recipe at build time and
@@ -9,9 +9,9 @@
 
 import { createRecipeContext } from "@stealthscale/theme";
 
-import { recipe } from "#em/recipe.ts";
+import { recipe } from "#strong/recipe.ts";
 
 /**
- * Binds the recipe once, for the em element.
+ * Binds the recipe once, for the strong element.
  */
 export const { withContext } = createRecipeContext(recipe);

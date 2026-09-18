@@ -16,13 +16,14 @@ import { recipe as heading } from "#heading/recipe.ts";
 import { recipe as icon } from "#icon/recipe.ts";
 import { recipe as kbd } from "#kbd/recipe.ts";
 import { recipe as list } from "#list/recipe.ts";
+import { recipe as strong } from "#strong/recipe.ts";
 import { recipe as text } from "#text/recipe.ts";
 
 export default definePreset({
   name: "@stealthscale/component-typography",
   theme: {
     extend: {
-      recipes: { code, em, heading, icon, kbd, text },
+      recipes: { code, em, heading, icon, kbd, strong, text },
       slotRecipes: { blockquote, list },
     },
   },
