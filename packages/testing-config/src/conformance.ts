@@ -35,6 +35,8 @@ export type Check =
   | "plugin.named"
   | "plugin.peer"
   | "readme.exports"
+  | "source.declared"
+  | "source.jsx"
   | "source.specs"
   | "tier.composes";
 
@@ -163,6 +165,8 @@ const RUNS: ReadonlyArray<readonly [Check, readonly manifest.Kind[]]> = [
   ["module.factories", ["config"]],
   ["readme.exports", ["config"]],
   ["source.specs", ["config", "library", "plugin"]],
+  ["source.declared", ["config", "library", "plugin"]],
+  ["source.jsx", ["config", "library", "plugin"]],
   ["layer.kind", ["config"]],
   ["layer.named", ["config"]],
   ["layer.reasoned", ["config"]],
@@ -188,6 +192,8 @@ const RUNNERS: Readonly<Record<Check, Runner>> = {
   "plugin.named": ({ stated }) => plugin.named(stated.module, stated.arguments ?? {}),
   "plugin.peer": ({ published }) => plugin.peer(published),
   "readme.exports": ({ stated, walked: barrel }) => readme.exports(stated.at, barrel.namespaces),
+  "source.declared": ({ published, stated }) => source.declared(stated.at, published),
+  "source.jsx": ({ stated }) => source.jsx(stated.at),
   "source.specs": ({ stated }) => source.specs(stated.at, stated.barrels === true),
   "tier.composes": ({ published, stated }) => composes(published, stated.tiers ?? {}, stated.at),
 };

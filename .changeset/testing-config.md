@@ -10,3 +10,15 @@ testing-config: hold a package's barrels to a specification where it asks
   leaks out.
 - The walk into a barrel enters an object once. A React context provider reaches itself through its
   context, and the walk overflowed the stack on a package that published one.
+- `source.specs` leaves a module alone whose every export is an `export interface`, as it already
+  left one exporting types alone. An interface compiles to nothing, so there is no behaviour to
+  write cases against, and the rule asked for a specification that could only assert types.
+- `source.declared` reports a package a file under `src` imports that the manifest lists under
+  neither `dependencies` nor `peerDependencies`. Neither `publint` nor `attw` reads an import, so a
+  package importing something it never declared installs and then fails at run time. A subpath reads
+  as the package that publishes it, a relative path and a `node:` builtin are read past, and so is a
+  specification, which runs in the workspace. An import written inside a template literal is read
+  past too, being code a package generates for somebody else to run.
+- `source.jsx` reports a file suffixed `.tsx` that writes no JSX, which sends a reader looking for
+  markup that was never written. The other way round needs no check, a compiler refusing JSX in a
+  `.ts` file.

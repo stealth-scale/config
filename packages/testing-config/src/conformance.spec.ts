@@ -35,11 +35,12 @@ const BARREL = {
 function checked(
   stated: Omit<Conformance, "at">,
   fields: Record<string, unknown> = {},
+  carried: Record<string, string> = {},
 ): Promise<readonly string[]> {
   const tree = {
     "package.json": JSON.stringify({ engines: { node: ">=26.0.0" }, name: "root" }),
     "pnpm-workspace.yaml": "packages:\n  - packages/*\n",
-    ...packageFiles("packages/leaf", { ...MANIFEST, ...fields }, CARRIED),
+    ...packageFiles("packages/leaf", { ...MANIFEST, ...fields }, { ...CARRIED, ...carried }),
   };
 
   return withScratchWorkspaceAsync(tree, (workspace) =>
@@ -80,6 +81,22 @@ describe("violations", () => {
     expect(flagged).toContain(
       "layer.named: lint.relax returns wrong, which is not named for the call",
     );
+  });
+
+  it("reads what a package's own sources import", async () => {
+    const carried = { "src/held.spec.ts": "", "src/held.ts": 'export { one } from "elsewhere";\n' };
+    const found = await checked({ kind: "library", module: {} }, {}, carried);
+
+    expect(found).toStrictEqual([
+      "source.declared: src/held.ts imports elsewhere, which the manifest does not declare",
+    ]);
+  });
+
+  it("reads what a package's own sources are suffixed", async () => {
+    const carried = { "src/held.spec.ts": "", "src/held.tsx": "export const one = 1;\n" };
+    const found = await checked({ kind: "library", module: {} }, {}, carried);
+
+    expect(found).toStrictEqual(["source.jsx: src/held.tsx writes no JSX, so its suffix is ts"]);
   });
 
   it("runs the checks listed in only and no others", async () => {
