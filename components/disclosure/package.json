@@ -54,6 +54,7 @@
   "dependencies": {
     "@zag-js/collapsible": "catalog:",
     "@zag-js/react": "catalog:",
+    "@zag-js/tabs": "catalog:",
     "@zag-js/types": "catalog:"
   },
   "devDependencies": {

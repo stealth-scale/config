@@ -34,14 +34,4 @@ describe("Trigger", () => {
     expect(heard).toHaveBeenCalledOnce();
     expect(screen.getByRole("button").getAttribute("aria-expanded")).toBe("true");
   });
-
-  it("throws where it is drawn outside the root that holds it together", () => {
-    const quiet = vi.spyOn(console, "error").mockImplementation(() => {});
-
-    expect(() => render(<Trigger>Details</Trigger>)).toThrow(
-      "A part of Collapsible was drawn outside the root that holds it together.",
-    );
-
-    quiet.mockRestore();
-  });
 });

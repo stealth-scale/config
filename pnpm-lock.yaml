@@ -251,6 +251,9 @@ catalogs:
     '@zag-js/react':
       specifier: 1.43.3
       version: 1.43.3
+    '@zag-js/tabs':
+      specifier: 1.43.3
+      version: 1.43.3
     '@zag-js/types':
       specifier: 1.43.3
       version: 1.43.3
@@ -715,6 +718,9 @@ importers:
       '@zag-js/react':
         specifier: 'catalog:'
         version: 1.43.3(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@zag-js/tabs':
+        specifier: 'catalog:'
+        version: 1.43.3
       '@zag-js/types':
         specifier: 'catalog:'
         version: 1.43.3
@@ -5577,6 +5583,9 @@ packages:
   '@zag-js/store@1.43.3':
     resolution: {integrity: sha512-NL3Uxk5Rszjd+X+cPXw0N7Kn5TNMyrS6cTMazlBOcN2+J68mzXhNFvM/0H38m0X+3ybK3sE5Ta6NPlhOQADRqw==}
 
+  '@zag-js/tabs@1.43.3':
+    resolution: {integrity: sha512-uLT5YiQAcDkSi9T1plYQyXAXaqGi1H5iw/PA0yXsWDOoNFU9jlPM5s8SuXbBJzXiufSFekdhzpNhMUhcapnBdA==}
+
   '@zag-js/types@1.43.3':
     resolution: {integrity: sha512-QokzUgkJ7a/TRE8SAXqlm1XfiNDbyM8y+mx0PpmzHa8bvmWXLEe/Zx2TRz8aYoGim75NluYzDy3x+WWileF7uA==}
 
@@ -9077,6 +9086,14 @@ snapshots:
   '@zag-js/store@1.43.3':
     dependencies:
       proxy-compare: 3.0.1
+
+  '@zag-js/tabs@1.43.3':
+    dependencies:
+      '@zag-js/anatomy': 1.43.3
+      '@zag-js/core': 1.43.3
+      '@zag-js/dom-query': 1.43.3
+      '@zag-js/types': 1.43.3
+      '@zag-js/utils': 1.43.3
 
   '@zag-js/types@1.43.3':
     dependencies:

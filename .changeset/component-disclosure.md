@@ -22,6 +22,18 @@ component-disclosure: publish the collapsible
   into a preview.
 - The mark holds still for a reader who asked for less motion, and a block that starts open does not
   animate in.
+- `Tabs` shows one panel at a time, chosen from a strip of controls, composed as `Tabs.Root` holding
+  a list and a panel for each. Each control names the panel it shows with `value` and each panel
+  names its control the same way, which is the only pairing the machine cannot work out.
+- Four looks draw the strip and one size steps the controls and the panels together. Which way the
+  set runs is not an axis: the machine states it and writes it onto every part, and the recipe reads
+  that, so the strip turns into a column and the bar moves to its inline edge without anyone saying
+  it twice.
+- The strip is one tab stop. Only the control in force is reachable by Tab, the arrows move between
+  them, and a panel holding nothing focusable takes a tab stop of its own so tabbing out of the
+  strip moves to what was just chosen.
+- The bar marking the control in force is positioned from measurements the machine takes, so the
+  recipe states its thickness and its colour and never its place.
 
 The package is the first to take runtime dependencies. It installs the machine, the React adapter
 and the types the adapter's own signatures reach, all pinned together through the workspace catalog,

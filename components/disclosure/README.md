@@ -88,6 +88,67 @@ reduced-motion answer once for everything.
 A block that starts open does not animate in. The machine holds its state attribute back on the
 first render for exactly that reason, and writes it from the first animation frame onwards.
 
+## Tabs
+
+Shows one panel at a time, chosen from a strip of controls, composed as `Tabs.Root` holding a list
+and a panel for each control.
+
+```tsx
+import { Tabs } from "@stealthscale/component-disclosure";
+
+<Tabs.Root defaultValue="overview">
+  <Tabs.List>
+    <Tabs.Trigger value="overview">Overview</Tabs.Trigger>
+    <Tabs.Trigger value="activity">Activity</Tabs.Trigger>
+    <Tabs.Indicator />
+  </Tabs.List>
+  <Tabs.Content value="overview">What the account holds.</Tabs.Content>
+  <Tabs.Content value="activity">What has happened lately.</Tabs.Content>
+</Tabs.Root>;
+```
+
+| Axis      | Values                                            | Default |
+| --------- | ------------------------------------------------- | ------- |
+| `variant` | `line`, `enclosed`, `subtle`, `plain`             | `line`  |
+| `size`    | `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`, `4xl` | `md`    |
+
+Each control names the panel it shows with `value`, and each panel names its control the same way.
+Nothing else here is yours to state, because the machine works the rest out for itself.
+
+Which way the set runs is not an axis. The machine states it, writes it onto every part, and the
+recipe reads it, so the strip turns into a column and the bar moves to its inline edge without
+anyone saying it twice.
+
+### The machine's settings
+
+| Setting                 | What it does                                            |
+| ----------------------- | ------------------------------------------------------- |
+| `value`, `defaultValue` | Drives it from outside, or sets which panel opens first |
+| `onValueChange`         | Hears each time the panel changes                       |
+| `orientation`           | Runs the strip across or down                           |
+| `activationMode`        | Chooses a panel on focus, or only on a press            |
+| `loopFocus`             | Joins the ends of the strip up                          |
+| `deselectable`          | Lets a person close the panel they are on               |
+| `id`                    | Names the machine, which builds its ARIA references     |
+
+`activationMode` is worth knowing. It chooses on focus by default, so an arrow key both moves and
+selects. A set whose panels are expensive to draw sets it to `manual`, and then an arrow moves the
+focus and a press chooses.
+
+### The accessibility the machine writes
+
+- **The strip is one set.** It carries the tablist role and says which way it runs, so a screen
+  reader announces the count and the arrows move inside it.
+- **The strip is one tab stop.** Only the control in force is reachable by Tab, and the arrows move
+  between them, so a person tabbing through a page steps over the set rather than through it.
+- **Each panel is reachable.** A panel holding nothing focusable takes a tab stop of its own, so
+  tabbing out of the strip moves to what was just chosen rather than past it.
+- **A panel nobody chose is gone.** It is out of the tab order and out of the accessibility tree.
+
+The bar that marks the control in force is positioned from measurements the machine takes, so the
+recipe states its thickness and its colour and never its place. It is hidden until there is
+something to measure, which keeps it from appearing at the start of the strip on the first render.
+
 ## Licence
 
 MIT. See [LICENSE](LICENSE).

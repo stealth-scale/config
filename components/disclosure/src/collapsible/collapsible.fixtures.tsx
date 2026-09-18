@@ -4,7 +4,9 @@
 
 import { type ReactElement, type ReactNode } from "react";
 
-import { act, fireEvent } from "@testing-library/react";
+import { fireEvent } from "@testing-library/react";
+
+import { settled } from "@stealthscale/testing-react";
 
 import { Content } from "#collapsible/content.tsx";
 import { Indicator } from "#collapsible/indicator.tsx";
@@ -31,10 +33,8 @@ export function disclosed(children: ReactNode): ReactElement {
  * @returns Nothing. The caller reads the screen.
  */
 export async function pressed(control: HTMLElement): Promise<void> {
-  await act(async () => {
-    fireEvent.click(control);
-    await Promise.resolve();
-  });
+  fireEvent.click(control);
+  await settled();
 }
 
 /**

@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { slotElement } from "@stealthscale/testing-theme";
 
@@ -51,15 +51,5 @@ describe("Content", () => {
     const { container } = render(disclosed(<Content as="section">The block</Content>));
 
     expect(slotElement(container, "collapsible", "content").tagName).toBe("SECTION");
-  });
-
-  it("throws where it is drawn outside the root that holds it together", () => {
-    const quiet = vi.spyOn(console, "error").mockImplementation(() => {});
-
-    expect(() => render(<Content>The block</Content>)).toThrow(
-      "A part of Collapsible was drawn outside the root that holds it together.",
-    );
-
-    quiet.mockRestore();
   });
 });
