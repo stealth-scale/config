@@ -39,3 +39,8 @@ the build would stop on into a decision the source records.
 
 The three hooks that wrap the behaviour library and the two that read the viewport provider are not
 here, so the package peers on React alone and a consumer of any hook installs nothing else.
+
+- `createRequiredContext` returns a third reader that answers `undefined` outside a provider. A root
+  that nests inside another of its own kind reads it to find out whether one stands above it, which
+  a menu holding a submenu needs. A part keeps the throwing reader, because a part outside its root
+  is a mistake rather than a case.

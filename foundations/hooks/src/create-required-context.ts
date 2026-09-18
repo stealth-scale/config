@@ -6,6 +6,8 @@
  *   its root has nothing to read. React answers that with the default value, so the part draws
  *   wrongly and says nothing, and the fault surfaces somewhere else entirely. This throws where the
  *   part was written instead, and names the component so the message says which root is missing.
+ *   A second reader answers undefined rather than throwing, for a root that nests inside another of
+ *   its own kind and has to find out whether one stands above it.
  */
 
 import { createContext, createElement, type FunctionComponent, type ReactNode, use } from "react";
@@ -32,11 +34,16 @@ export interface ProvidedProps<Held> {
  *
  * @typeParam Held - The value the context carries.
  * @param name - The component the context belongs to, which the error names.
- * @returns The provider, and the hook that reads what it holds.
+ * @returns The provider, the hook that reads what it holds, and the hook that reads it where a
+ *   provider may be absent.
  */
 export function createRequiredContext<Held>(
   name: string,
-): readonly [provider: FunctionComponent<ProvidedProps<Held>>, use: () => Held] {
+): readonly [
+  provider: FunctionComponent<ProvidedProps<Held>>,
+  use: () => Held,
+  useOptional: () => Held | undefined,
+] {
   const Carried = createContext<Held | undefined>(undefined);
 
   /**
@@ -65,5 +72,18 @@ export function createRequiredContext<Held>(
     return held;
   }
 
-  return [Provider, useHeld];
+  /**
+   * Reads what the provider above holds, where there may be no provider above.
+   *
+   * @remarks
+   *   A root that nests inside another of its own kind reads this to find the root it sits in, and
+   *   gets undefined at the top level. A part reads the throwing hook instead, because a part
+   *   outside its root is a mistake rather than a case.
+   * @returns The value, or undefined where no provider stands above the reader.
+   */
+  function useOptionalHeld(): Held | undefined {
+    return use(Carried);
+  }
+
+  return [Provider, useHeld, useOptionalHeld];
 }
