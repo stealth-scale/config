@@ -132,6 +132,45 @@ await expect(
 ).resolves.toStrictEqual([]);
 ```
 
+## Machines
+
+A component built on a state machine answers two things no plain component does, and both cost a
+specification a case unless the kit handles them.
+
+`settled()` waits for whatever the last interaction started. A machine schedules its own update
+rather than making one during the event, so an assertion straight after `fireEvent` reads the state
+from before the press. Awaiting this flushes it inside `act`, which is also what stops React warning
+about an update it did not see.
+
+```tsx
+import { settled } from "@stealthscale/testing-react";
+
+fireEvent.click(screen.getByRole("tab", { name: "Second" }));
+await settled();
+
+expect(screen.getByRole("tab", { name: "Second" }).getAttribute("aria-selected")).toBe("true");
+```
+
+`rootedViolations(parts, expected)` draws each part on its own and reports the ones that draw rather
+than throw. A part reads its machine through a context the root provides, so one drawn outside its
+root has no api, and answering nothing there gives a part with no behaviour and no complaint. One
+call covers every part of a component.
+
+```tsx
+import { rootedViolations } from "@stealthscale/testing-react";
+
+expect(
+  rootedViolations(
+    { Content, Indicator, Trigger },
+    "A part of Collapsible was drawn outside the root that holds it together.",
+  ),
+).toStrictEqual([]);
+```
+
+The expectation takes a string, matched anywhere in what was thrown, or a pattern. A part that
+throws something else is reported separately from one that drew, because the two are different
+faults.
+
 ## Licence
 
 MIT. See [LICENSE](LICENSE).
