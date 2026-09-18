@@ -9,7 +9,7 @@
  *   which the caller names, because a theme layered on another base resolves against other scales.
  */
 
-import { type Mode, type Preset, type Theme } from "@stealthscale/theme/authoring";
+import { type Mode, oklab, type Preset, type Theme } from "@stealthscale/theme/authoring";
 
 import { type Declared } from "#recipe.ts";
 import { nodeAt } from "#tokens.ts";
@@ -106,6 +106,45 @@ export function resolved(
   }
 
   return follow(value, new Set());
+}
+
+/**
+ * Reads the color a dotted path names in one mode, or undefined where it cannot be resolved.
+ *
+ * @remarks
+ *   A path the theme states is read from the theme, with a group read at its own value. A path
+ *   the theme leaves to the preset beneath it is resolved as a reference, which the resolver
+ *   follows into that preset.
+ */
+export function colorAt(
+  theme: Theme,
+  path: string,
+  mode: Mode,
+  options: Resolving,
+): string | undefined {
+  const node = nodeAt(colorsOf(theme), path);
+  const token =
+    typeof node === "object" && node !== null && !("value" in node)
+      ? nodeAt(node, "DEFAULT")
+      : node;
+
+  return resolved(theme, token ?? { value: `{colors.${path}}` }, mode, options);
+}
+
+/**
+ * Reads the OKLab lightness of the color a dotted path names in one mode.
+ *
+ * @returns The lightness, or undefined where the color cannot be resolved or read.
+ */
+export function lightnessAt(
+  theme: Theme,
+  path: string,
+  mode: Mode,
+  options: Resolving,
+): number | undefined {
+  const color = colorAt(theme, path, mode, options);
+
+  return color === undefined ? undefined : oklab(color)?.l;
 }
 
 /**

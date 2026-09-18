@@ -78,14 +78,53 @@ expect(recipeClasses(container, "button")).toContain(variantClass("button", "var
 | `contrast.text`       | A text pair below 7:1: every ink on every surface, and each palette's `contrast` on its solids and its inks on its fills                                                  |
 | `contrast.boundary`   | A boundary pair below 3:1: the emphasized line and the subtle ink on every surface, and each palette's solid and lines on the page                                        |
 | `contrast.focus`      | A palette's `focusRing` below 3:1 on any surface                                                                                                                          |
+| `distinct.surfaces`   | Two consecutive surfaces, from `bg` to `bg.emphasized`, closer than 0.01 in OKLab lightness in either mode                                                                |
+| `distinct.inks`       | Two consecutive inks, from `fg` to `fg.subtle`, closer than 0.01 in OKLab lightness                                                                                       |
+| `distinct.lines`      | Two consecutive lines, from `border.subtle` to `border.emphasized`, closer than 0.01 in OKLab lightness                                                                   |
+| `distinct.fills`      | Two steps of a palette closer than 0.01 in OKLab lightness: a quiet fill and the next, a solid and its hover, an ink and the muted one, or a line and its hover           |
+| `status.distinct`     | Two status solids closer than 0.05 in OKLab, in either mode                                                                                                               |
+| `ramp.monotonic`      | A ramp under `tokens.colors` whose lightness turns back between two steps, or a step that cannot be read                                                                  |
+| `ramp.hue`            | A step of a ramp whose hue drifts more than 45 degrees from the ramp's median hue, greys left out                                                                         |
 | `fonts.installed`     | A font package the theme names that does not resolve from `at`, and nothing where `at` is not given                                                                       |
 
 `options.recipes` lists the recipe keys the workspace publishes, or maps each key to its recipe,
 which adds the variants check and the compound check. `publishedRecipes(...presets)` builds that map
 out of the presets the component packages publish, so the list is the one an application installs
 rather than one written out by hand. `options.base` names the preset the theme is layered on, which
-the resolver follows a reference into. `options.thresholds` changes any of the three ratios.
-`options.skip` leaves a check out, each with a reason.
+the resolver follows a reference into. `options.thresholds` changes any of the three ratios and the
+three distances (`distinct`, `status`, `hue`). `options.skip` leaves a check out, each with a
+reason.
+
+A ramp is a group under `tokens.colors` with at least three steps keyed by number. A dark ramp
+nested under the light one, as `blue.dark`, is read as a ramp of its own.
+
+### `report(theme, options)`
+
+Measures a theme and returns the numbers rather than a verdict. The options are the ones
+`violations` takes.
+
+| Field      | Holds                                                                                                                                                             |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `margins`  | Per class of pair (`text`, `boundary`, `focus`): the lowest ratio, the median, and the ten tightest pairs lowest first, with a pair that cannot be measured first |
+| `steps`    | Per mode: the OKLab lightness between consecutive surfaces, inks and lines                                                                                        |
+| `statuses` | Per mode and per pair of statuses, on the solid and on the ink: the OKLab distance for typical vision and under protanopia, deuteranopia and tritanopia           |
+| `outside`  | The steps of the theme's ramps outside sRGB, as `blue step 500`                                                                                                   |
+
+`formatReport(report)` writes the numbers as Markdown tables. A theme's specification can write it
+into a snapshot, or a script can print it for a person to read:
+
+```ts
+import { formatReport, report } from "@stealthscale/testing-theme";
+
+console.log(formatReport(report(fathom, { base: foundation, thresholds: { text: 4.5 } })));
+```
+
+The status distances under a color vision deficiency are simulated with the matrices of Machado,
+Oliveira and Fernandes (2009) at full severity. They are reported and not gated: a red and a green
+converge for a reader with deuteranopia whatever the theme does, and a recipe pairs each status with
+an icon for that reader. The steps outside sRGB are reported and not gated either, because the
+foundation's own ramps place 48 steps outside it on purpose. A theme drawn for sRGB alone runs
+`gamut` in its own specification.
 
 ### `recipeViolations(recipe, options)`
 
@@ -163,8 +202,11 @@ expect(
 | `recipeClass`, `variantClass`, `slotClass`, `slotVariantClass`, `compoundClass` | The classes a recipe emits, in the naming scheme of `@stealthscale/pandacss-naming`                                                                                             |
 | `axesOf`, `valuesOf`, `defaultsOf`, `slotsOf`, `scaleOf`, `byStep`              | What a recipe declares, without rendering                                                                                                                                       |
 | `recipeElement`, `slotElement`, `classesOf`, `recipeClasses`, `slotClasses`     | What a rendered component drew, by `data-recipe` on the element a recipe was bound to and on the root of a compound component, and by the slot class or `data-part` on one part |
-| `resolved`, `palettesOf`, `extendedRecipes`, `fontsOf`                          | What a theme states, with every reference followed                                                                                                                              |
+| `resolved`, `colorAt`, `palettesOf`, `extendedRecipes`, `fontsOf`               | What a theme states, with every reference followed                                                                                                                              |
 | `publishedRecipes`                                                              | Every recipe the presets of the component packages register, keyed as they register it, for `options.recipes`                                                                   |
+| `rampsOf`, `outsideGamut`, `gamut`                                              | The ramps a theme draws under `tokens.colors`, and the steps of them outside sRGB                                                                                               |
+| `statusPairs`                                                                   | Every pair of statuses on the solid and on the ink                                                                                                                              |
+| `distance`, `distanceFor`, `simulated`, `written`, `DEFICIENCIES`               | The OKLab distance between two colors, for typical vision and for each dichromacy                                                                                               |
 
 ## Licence
 

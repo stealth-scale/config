@@ -22,32 +22,44 @@ const SURFACE = [
   "boundViolations",
   "byStep",
   "classesOf",
+  "colorAt",
   "compoundClass",
+  "DEFICIENCIES",
   "defaultsOf",
+  "distance",
+  "distanceFor",
   "extendedRecipes",
   "fontsOf",
+  "formatReport",
+  "gamut",
+  "outsideGamut",
   "palettesOf",
   "presetViolations",
   "publishedRecipes",
+  "rampsOf",
   "recipeClass",
   "recipeClasses",
   "recipeElement",
   "recipeViolations",
+  "report",
   "resolved",
   "scaleOf",
+  "simulated",
   "slotClass",
   "slotClasses",
   "slotElement",
   "slotVariantClass",
   "slotsOf",
+  "statusPairs",
   "THRESHOLDS",
   "valuesOf",
   "variantClass",
   "violations",
+  "written",
 ];
 
 describe("testing-theme", () => {
-  it("publishes the three gates and the readers", () => {
+  it("publishes the three gates with the report and the readers", () => {
     expect(Object.keys(published).toSorted()).toStrictEqual(SURFACE.toSorted());
   });
 

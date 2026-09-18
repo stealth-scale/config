@@ -10,11 +10,11 @@
 
 import { contrast, type Mode, MODES, type Theme } from "@stealthscale/theme/authoring";
 
-import { colorsOf, palettesOf, resolved, type Resolving } from "#theme.ts";
-import { nodeAt } from "#tokens.ts";
+import { colorAt, palettesOf, type Resolving } from "#theme.ts";
 
 /**
- * Fixes the ratio each class of pair is held to.
+ * Fixes the ratio each class of pair is held to, and the distance each class of step is held
+ * apart.
  */
 export interface Thresholds {
   /**
@@ -23,9 +23,25 @@ export interface Thresholds {
   boundary: number;
 
   /**
+   * The difference in OKLab lightness two consecutive steps have to keep, so a surface, a fill,
+   * an ink or a line can be told from the one beside it.
+   */
+  distinct: number;
+
+  /**
    * The ratio a focus ring has to clear against every surface.
    */
   focus: number;
+
+  /**
+   * The degrees a step of a ramp may drift from the ramp's median hue.
+   */
+  hue: number;
+
+  /**
+   * The distance in OKLab two status solids have to keep from each other.
+   */
+  status: number;
 
   /**
    * The ratio text has to clear against the surface it is set on.
@@ -34,14 +50,24 @@ export interface Thresholds {
 }
 
 /**
- * Fixes the thresholds WCAG sets: 7:1 for text at AAA, and 3:1 for a boundary or a focus ring.
+ * Fixes the thresholds WCAG sets, 7:1 for text at AAA and 3:1 for a boundary or a focus ring, and
+ * the distances a ramp keeps: a hundredth of the lightness axis between consecutive steps, a
+ * twentieth of the OKLab space between status solids, and forty-five degrees of hue along a
+ * ramp, which is how far an orange or a yellow drifts between its light end and its dark end.
  */
-export const THRESHOLDS: Thresholds = { boundary: 3, focus: 3, text: 7 };
+export const THRESHOLDS: Thresholds = {
+  boundary: 3,
+  distinct: 0.01,
+  focus: 3,
+  hue: 45,
+  status: 0.05,
+  text: 7,
+};
 
 /**
  * Lists the surfaces text and lines are drawn on.
  */
-const SURFACES = ["bg", "bg.subtle", "bg.muted", "bg.emphasized", "bg.panel", "bg.popover"];
+export const SURFACES = ["bg", "bg.subtle", "bg.muted", "bg.emphasized", "bg.panel", "bg.popover"];
 
 /**
  * Lists the inks a page is written in.
@@ -70,7 +96,7 @@ const PALETTE_BOUNDARY = ["solid", "border", "border.hover"];
 /**
  * Describes one pair to measure: what is in front, what is behind, and the ratio it is held to.
  */
-interface Pair {
+export interface Pair {
   /**
    * The token path behind.
    */
@@ -88,42 +114,51 @@ interface Pair {
 }
 
 /**
- * Reads the color a dotted path names in one mode, or undefined where it cannot be resolved.
- *
- * @remarks
- *   A path the theme states is read from the theme, with a group read at its own value. A path
- *   the theme leaves to the preset beneath it is resolved as a reference, which the resolver
- *   follows into that preset.
+ * Describes one pair as measured in one mode.
  */
-function colorAt(theme: Theme, path: string, mode: Mode, options: Resolving): string | undefined {
-  const node = nodeAt(colorsOf(theme), path);
-  const token =
-    typeof node === "object" && node !== null && !("value" in node)
-      ? nodeAt(node, "DEFAULT")
-      : node;
+export interface Measured extends Pair {
+  /**
+   * The mode the pair was measured in.
+   */
+  mode: Mode;
 
-  return resolved(theme, token ?? { value: `{colors.${path}}` }, mode, options);
+  /**
+   * The ratio measured, or `NaN` where a color could not be resolved.
+   */
+  ratio: number;
 }
 
 /**
- * Measures every pair in both modes and reports each one below its ratio, or one that could not
- * be measured.
+ * Measures every pair in both modes.
  */
-function failing(theme: Theme, pairs: readonly Pair[], options: Resolving): readonly string[] {
+export function measured(
+  theme: Theme,
+  pairs: readonly Pair[],
+  options: Resolving,
+): readonly Measured[] {
   return MODES.flatMap((mode) =>
-    pairs.flatMap(({ back, front, minimum }) => {
-      const before = colorAt(theme, front, mode, options);
-      const behind = colorAt(theme, back, mode, options);
+    pairs.map((pair) => {
+      const before = colorAt(theme, pair.front, mode, options);
+      const behind = colorAt(theme, pair.back, mode, options);
       const ratio =
         before === undefined || behind === undefined ? Number.NaN : contrast(before, behind);
 
-      if (ratio >= minimum) return [];
-
-      const measured = Number.isNaN(ratio) ? "cannot be measured" : `measures ${ratio.toFixed(2)}`;
-
-      return [`${theme.name} ${front} on ${back} ${measured} in ${mode}, below ${String(minimum)}`];
+      return { ...pair, mode, ratio };
     }),
   );
+}
+
+/**
+ * Reports each measured pair below its ratio, or one that could not be measured.
+ */
+function failing(theme: Theme, pairs: readonly Pair[], options: Resolving): readonly string[] {
+  return measured(theme, pairs, options).flatMap(({ back, front, minimum, mode, ratio }) => {
+    if (ratio >= minimum) return [];
+
+    const reading = Number.isNaN(ratio) ? "cannot be measured" : `measures ${ratio.toFixed(2)}`;
+
+    return [`${theme.name} ${front} on ${back} ${reading} in ${mode}, below ${String(minimum)}`];
+  });
 }
 
 /**
@@ -151,42 +186,60 @@ function perPalette(
 }
 
 /**
- * Reports every text pair below the text ratio: the inks on the surfaces, and each palette's inks
- * on its fills and on the page.
+ * Lists every text pair: the inks on the surfaces, and each palette's inks on its fills and on
+ * the page.
  */
-export function text(theme: Theme, options: Resolving, thresholds: Thresholds): readonly string[] {
-  const pairs = onSurfaces(INKS, thresholds.text).concat(
+export function textPairs(theme: Theme, thresholds: Thresholds): readonly Pair[] {
+  return onSurfaces(INKS, thresholds.text).concat(
     perPalette(theme, [...PALETTE_TEXT, ["fg", "bg"]], thresholds.text),
   );
-
-  return failing(theme, pairs, options);
 }
 
 /**
- * Reports every boundary pair below the boundary ratio: the emphasized line and the subtle ink on
- * the surfaces, and each palette's solid and lines on the page.
+ * Lists every boundary pair: the emphasized line and the subtle ink on the surfaces, and each
+ * palette's solid and lines on the page.
  */
-export function boundary(
-  theme: Theme,
-  options: Resolving,
-  thresholds: Thresholds,
-): readonly string[] {
-  const pairs = onSurfaces(["border.emphasized", "fg.subtle"], thresholds.boundary).concat(
+export function boundaryPairs(theme: Theme, thresholds: Thresholds): readonly Pair[] {
+  return onSurfaces(["border.emphasized", "fg.subtle"], thresholds.boundary).concat(
     perPalette(
       theme,
       PALETTE_BOUNDARY.map((role) => [role, "bg"] as const),
       thresholds.boundary,
     ),
   );
+}
 
-  return failing(theme, pairs, options);
+/**
+ * Lists every focus pair: each palette's ring on every surface.
+ */
+export function focusPairs(theme: Theme, thresholds: Thresholds): readonly Pair[] {
+  return onSurfaces(
+    palettesOf(theme).map((palette) => `${palette}.focusRing`),
+    thresholds.focus,
+  );
+}
+
+/**
+ * Reports every text pair below the text ratio.
+ */
+export function text(theme: Theme, options: Resolving, thresholds: Thresholds): readonly string[] {
+  return failing(theme, textPairs(theme, thresholds), options);
+}
+
+/**
+ * Reports every boundary pair below the boundary ratio.
+ */
+export function boundary(
+  theme: Theme,
+  options: Resolving,
+  thresholds: Thresholds,
+): readonly string[] {
+  return failing(theme, boundaryPairs(theme, thresholds), options);
 }
 
 /**
  * Reports every palette's focus ring below the focus ratio on any surface.
  */
 export function focus(theme: Theme, options: Resolving, thresholds: Thresholds): readonly string[] {
-  const rings = palettesOf(theme).map((palette) => `${palette}.focusRing`);
-
-  return failing(theme, onSurfaces(rings, thresholds.focus), options);
+  return failing(theme, focusPairs(theme, thresholds), options);
 }

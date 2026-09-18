@@ -10,9 +10,12 @@ import { type Preset, type Theme } from "@stealthscale/theme/authoring";
 
 import * as contract from "#contract.ts";
 import * as contrast from "#contrast.ts";
+import * as distinct from "#distinct.ts";
 import { installed } from "#fonts.ts";
 import { gated } from "#gate.ts";
+import * as ramp from "#ramp.ts";
 import { type Declared } from "#recipe.ts";
+import * as status from "#status.ts";
 
 /**
  * Enumerates every check a theme specification can select or skip.
@@ -29,8 +32,15 @@ export type ThemeCheck =
   | "contrast.boundary"
   | "contrast.focus"
   | "contrast.text"
+  | "distinct.fills"
+  | "distinct.inks"
+  | "distinct.lines"
+  | "distinct.surfaces"
   | "fonts.installed"
-  | "name.attribute";
+  | "name.attribute"
+  | "ramp.hue"
+  | "ramp.monotonic"
+  | "status.distinct";
 
 /**
  * Describes what a theme specification states beside the theme.
@@ -62,7 +72,8 @@ export interface ThemeChecks {
   skip?: Readonly<Partial<Record<ThemeCheck, string>>> | undefined;
 
   /**
-   * The ratio each class of pair is held to, over the defaults from WCAG 1.4.6 and 1.4.11.
+   * The ratio each class of pair is held to and the distance each class of step is held apart,
+   * over the defaults from WCAG 1.4.6 and 1.4.11 and the foundation's own steps.
    */
   thresholds?: Partial<contrast.Thresholds> | undefined;
 }
@@ -138,6 +149,16 @@ const RUNNERS: ReadonlyArray<readonly [ThemeCheck, Runner]> = [
     (theme, options) => contrast.boundary(theme, options, thresholdsOf(options)),
   ],
   ["contrast.focus", (theme, options) => contrast.focus(theme, options, thresholdsOf(options))],
+  [
+    "distinct.surfaces",
+    (theme, options) => distinct.surfaces(theme, options, thresholdsOf(options)),
+  ],
+  ["distinct.inks", (theme, options) => distinct.inks(theme, options, thresholdsOf(options))],
+  ["distinct.lines", (theme, options) => distinct.lines(theme, options, thresholdsOf(options))],
+  ["distinct.fills", (theme, options) => distinct.fills(theme, options, thresholdsOf(options))],
+  ["status.distinct", (theme, options) => status.distinct(theme, options, thresholdsOf(options))],
+  ["ramp.monotonic", (theme) => ramp.monotonic(theme)],
+  ["ramp.hue", (theme, options) => ramp.hue(theme, thresholdsOf(options))],
   ["fonts.installed", (theme, options) => installed(theme, options.at)],
 ];
 
