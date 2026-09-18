@@ -1,9 +1,9 @@
-import { createContext, type ReactElement, use, useState } from "react";
+import { createContext, type ReactElement, use, useEffect, useState } from "react";
 
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
-import { rootedViolations, settled } from "#machine.ts";
+import { drawn, pressed, rootedViolations, settled } from "#machine.ts";
 
 const Held = createContext<string | undefined>(undefined);
 
@@ -21,6 +21,49 @@ function Scheduled(): ReactElement {
         queueMicrotask(() => {
           setHeld("open");
         });
+      }}
+      type="button"
+    >
+      {held}
+    </button>
+  );
+}
+
+/**
+ * Draws a component that commits its first state on a microtask after it mounts, the way a
+ * machine's root does.
+ *
+ * @returns The control, saying what it holds.
+ */
+function Committing(): ReactElement {
+  const [held, setHeld] = useState("starting");
+
+  useEffect(() => {
+    queueMicrotask(() => {
+      setHeld("running");
+    });
+  }, []);
+
+  return <button type="button">{held}</button>;
+}
+
+/**
+ * Draws a control that reports only where the pointer went down on it first, the way a menu row
+ * does.
+ *
+ * @returns The control, saying what it heard.
+ */
+function Sequenced(): ReactElement {
+  const [held, setHeld] = useState("none");
+  const [armed, setArmed] = useState(false);
+
+  return (
+    <button
+      onClick={() => {
+        setHeld(armed ? "chosen" : "none");
+      }}
+      onPointerDown={() => {
+        setArmed(true);
       }}
       type="button"
     >
@@ -85,6 +128,46 @@ describe("settled", () => {
     await settled();
 
     expect(screen.getByRole("button").textContent).toBe("closed");
+  });
+});
+
+describe("drawn", () => {
+  it("waits for the state the machine commits after it mounts", async () => {
+    await drawn(<Committing />);
+
+    expect(screen.getByRole("button").textContent).toBe("running");
+  });
+
+  it("reports no update outside an act scope where a bare render would", async () => {
+    const quiet = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    await drawn(<Committing />);
+
+    expect(quiet).not.toHaveBeenCalled();
+
+    quiet.mockRestore();
+  });
+
+  it("hands back the container the render produced", async () => {
+    const { container } = await drawn(<Committing />);
+
+    expect(container.querySelector("button")).not.toBeNull();
+  });
+});
+
+describe("pressed", () => {
+  it("puts the pointer down before it clicks", async () => {
+    await drawn(<Sequenced />);
+    await pressed(screen.getByRole("button"));
+
+    expect(screen.getByRole("button").textContent).toBe("chosen");
+  });
+
+  it("leaves nothing for the caller to settle afterwards", async () => {
+    await drawn(<Scheduled />);
+    await pressed(screen.getByRole("button"));
+
+    expect(screen.getByRole("button").textContent).toBe("open");
   });
 });
 

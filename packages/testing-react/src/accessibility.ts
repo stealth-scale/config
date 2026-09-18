@@ -6,14 +6,17 @@
  *   is audited inside the root it needs and a component that needs props gets them. A rule axe
  *   cannot decide, which it reports as incomplete, is left out. A layered background is what stops
  *   it deciding a contrast, and a page is where that is measured.
+ *   The render settles before axe reads it, so a component built on a state machine is audited in
+ *   the state it reaches rather than the one it mounts in.
  */
 
 import { createElement, type ElementType } from "react";
 
-import { render } from "@testing-library/react";
+import { act } from "@testing-library/react";
 import axe from "axe-core";
 
 import { type ConformanceOptions } from "#conformance.ts";
+import { drawn } from "#machine.ts";
 
 /**
  * Lists every accessibility rule a rendered component breaks, as the rule's id and its help.
@@ -26,7 +29,7 @@ export async function accessibilityViolations(
   options: ConformanceOptions = {},
 ): Promise<readonly string[]> {
   const element = createElement(Component, options.props ?? {});
-  const { container, unmount } = render(
+  const { container, unmount } = await drawn(
     options.wrapper === undefined ? element : options.wrapper(element),
   );
 
@@ -35,6 +38,8 @@ export async function accessibilityViolations(
 
     return result.violations.map((each) => `${each.id}: ${each.help}`);
   } finally {
-    unmount();
+    act(() => {
+      unmount();
+    });
   }
 }
