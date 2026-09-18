@@ -1,6 +1,6 @@
 {
   "name": "@stealthscale/theme-pebble",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "States Pebble: a web application in plain neutrals with a black primary button, ten-pixel corners and Geist.",
   "keywords": [
     "design-system",

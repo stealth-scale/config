@@ -1,5 +1,24 @@
 # @stealthscale/theme
 
+## 0.4.0
+
+### Minor Changes
+
+- [#32](https://github.com/stealth-scale/config/pull/32) [`8d6817e`](https://github.com/stealth-scale/config/commit/8d6817e34dc94a02b98933c39e2cd6f94cca5c34) Thanks [@stealth-rklopper](https://github.com/stealth-rklopper)! - theme: add role tables for a ramp keyed by its own steps
+  
+  - `paletteRoles(ramp, steps, darkRamp)` takes a table naming a step for each role in each mode, or a
+    color stated outright, and reads the dark steps from a second ramp where a theme draws one.
+    `ROLE_STEPS` is the foundation's own table.
+  - `foregrounds(ramp, steps, darkRamp)` and `borders(ramp, steps, darkRamp)` take a table the same
+    way, with `FOREGROUND_STEPS` and `BORDER_STEPS` as the foundation's.
+  - `surfaces(ramp, steps, darkRamp)` draws the `bg` family from steps of a neutral ramp, for a theme
+    whose surfaces sit on its own scale rather than at a distance from the page.
+  - `ramp(keys, values)` keys a transcribed ramp by its own step names, and
+    `stepped(ramp, light, dark, darkRamp)` writes one color as a reference into a step in each mode.
+  - `contrast()` and `luminance()` read an OKLCH color whose hue is `none`.
+  - `linear(color)` converts a color to linear sRGB and `oklab(color)` to OKLab, unclamped, for a
+    check that measures a distance rather than a ratio.
+
 ## 0.3.0
 
 ### Minor Changes
