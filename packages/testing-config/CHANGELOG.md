@@ -1,5 +1,17 @@
 # @stealthscale/testing-config
 
+## 0.5.0
+
+### Minor Changes
+
+- [#29](https://github.com/stealth-scale/config/pull/29) [`3744ad1`](https://github.com/stealth-scale/config/commit/3744ad13d9e94c9bf1bc3ab9e1f78692d54883f4) Thanks [@stealth-rklopper](https://github.com/stealth-rklopper)! - exclude a specimen from the source checks
+  
+  - `.specimen.tsx` joins the suffixes a file carries when it is not itself a source, beside
+    `.spec.tsx` and `.fixtures.tsx`.
+  - `source.specs` no longer asks a specimen for a specification beside it.
+  - `source.declared` no longer reports what a specimen imports, because a specimen runs in the
+    catalogue and resolves through the workspace root.
+
 ## 0.4.0
 
 ### Minor Changes
