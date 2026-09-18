@@ -42,7 +42,7 @@ Let each part call `connect` for itself, which is what Ark does, so a part is in
 any other part did.
 
 **Why not:** it settles the same question in every part file. The collapsible, the menu, the
-popover, the tabs and the tooltip hold 49 parts between them in the platform we are porting.
+popover, the tabs and the tooltip hold 49 parts between them in the library we are porting from.
 
 ### One file for the whole component
 

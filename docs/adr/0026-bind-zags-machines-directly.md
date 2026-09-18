@@ -23,8 +23,9 @@ box positioned against a trigger, and ARIA attributes held in step across severa
 The component form reserved Ark for that case, on the grounds that Ark's parts carry `asChild`, so a
 trigger wrapping a button of ours honours it without the button knowing. Ark is a shell over Zag. At
 5.39.2 it declares 69 dependencies, 68 of them `@zag-js/*` and the last a date library. Across the
-platform's component packages, 280 Ark imports name its element factory and 81 its anatomy builder
-against 137 that name a machine, and this repository replaced the factory and the anatomy already.
+component packages we are porting from, 280 Ark imports name its element factory and 81 its anatomy
+builder against 137 that name a machine, and this repository replaced the factory and the anatomy
+already.
 
 Zag composes by merging props rather than cloning a child, so the case `asChild` was held for is
 answered without the prop. Its state attributes match conditions the compiler already ships, so a
@@ -42,8 +43,9 @@ additions over Zag are an element factory and an anatomy builder this repository
 Bind Ark's components where a machine is needed. Ark is proven, and its components arrive with the
 machine already wired to an element.
 
-**Why not:** two thirds of the Ark imports in the platform name the factory or the anatomy, both of
-which we replaced. What is left is a machine Ark takes from Zag and we can take from the same place.
+**Why not:** two thirds of the Ark imports in what we are porting name the factory or the anatomy,
+both of which we replaced. What is left is a machine Ark takes from Zag and we can take from the
+same place.
 
 ### A foundation package wrapping Zag
 
