@@ -2,7 +2,17 @@
 "@stealthscale/component-forms": minor
 ---
 
-component-forms: publish Fieldset, Field and InputGroup
+component-forms: publish Fieldset, Field, Textarea and InputGroup
+
+- `Textarea` draws a box a person types several lines into. Set `grows` and it takes its height from
+  the text, measuring nothing: the root is a grid of one cell holding both the control and a hidden
+  copy of its text, and the copy gives the cell its height. The box is right on the frame the text
+  changes, and no layout is read and no state is written from an effect.
+- Five axes: `size`, `variant`, `status`, `grip` and `grows`. `grip` is the CSS `resize` property,
+  named apart from it because a styled element takes every CSS property as a prop and a style prop
+  of the same name shadows an axis.
+- It takes `value` and `defaultValue`, and reports every change through `onValueChange`. Compose it
+  into a field with `<Field.Control as={Textarea} />`.
 
 - `Fieldset` groups fields that belong together and names the group. Four parts under one namespace:
   `Root`, `Legend`, `HelperText` and `ErrorText`.

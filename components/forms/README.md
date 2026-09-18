@@ -1,7 +1,8 @@
 # @stealthscale/component-forms
 
 Draws what a person fills in: the group, the field that explains a control, the text field, the
-field with a mark at one end or both, and the search field with a control that empties it.
+multi-line box, the field with a mark at one end or both, and the search field with a control that
+empties it.
 
 Every value a theme can change is an axis of a component's recipe, so set it as a prop and write no
 style. Change the element a component draws with `as`. A component with parts is published as a
@@ -134,6 +135,41 @@ none of those is announced as `edit text` and nothing more.
 
 State `aria-invalid` on a field that is wrong. There is no separate prop, so the styling and what a
 screen reader reads cannot disagree.
+
+## Textarea
+
+Draws a box a person types several lines into.
+
+```tsx
+import { Textarea } from "@stealthscale/component-forms";
+
+<Textarea aria-label="Notes" grows rows={2} />;
+<Textarea aria-label="Notes" grip="none" onValueChange={setNotes} value={notes} />;
+```
+
+| Axis      | Values                                | Default    |
+| --------- | ------------------------------------- | ---------- |
+| `size`    | `sm`, `md`, `lg`                      | `md`       |
+| `variant` | `outline`, `subtle`, `flushed`        | `outline`  |
+| `status`  | `info`, `success`, `warning`, `error` | none       |
+| `grip`    | `none`, `vertical`, `both`            | `vertical` |
+| `grows`   | `true`                                | off        |
+
+Set `grows` for a box that takes its height from the text. It grows on the frame the text changes
+and measures nothing, so a long paste costs no layout read.
+
+`grip` is the CSS `resize` property. It is named apart from it because a styled element takes every
+CSS property as a prop, and a style prop of the same name shadows an axis.
+
+Takes `value` and `defaultValue`, so it serves a caller that holds the value and one that does not.
+`onValueChange` reports the contents on every change. `rows` sets the height before it grows and
+defaults to three.
+
+Compose it into a `Field` with `as`:
+
+```tsx
+<Field.Control as={Textarea} grows />
+```
 
 ## InputGroup
 

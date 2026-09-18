@@ -14,10 +14,14 @@ import { recipe as fieldset } from "#fieldset/recipe.ts";
 import { recipe as inputGroup } from "#input-group/recipe.ts";
 import { recipe as input } from "#input/recipe.ts";
 import { recipe as searchInput } from "#search-input/recipe.ts";
+import { recipe as textarea } from "#textarea/recipe.ts";
 
 export default definePreset({
   name: "@stealthscale/component-forms",
   theme: {
-    extend: { recipes: { input, searchInput }, slotRecipes: { field, fieldset, inputGroup } },
+    extend: {
+      recipes: { input, searchInput },
+      slotRecipes: { field, fieldset, inputGroup, textarea },
+    },
   },
 });
