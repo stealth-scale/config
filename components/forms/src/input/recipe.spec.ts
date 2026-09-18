@@ -13,8 +13,8 @@ describe("recipe", () => {
     expect(recipe.className).toBe("input");
   });
 
-  it("offers the two axes a field takes", () => {
-    expect(axesOf(recipe)).toStrictEqual(["size", "variant"]);
+  it("offers the three axes a field takes", () => {
+    expect(axesOf(recipe)).toStrictEqual(["size", "status", "variant"]);
   });
 
   it("draws an outlined field at the middle size when nothing is asked for", () => {
@@ -36,6 +36,22 @@ describe("recipe", () => {
 
   it("offers the three looks an edge is drawn in", () => {
     expect(valuesOf(recipe, "variant")).toStrictEqual(["flushed", "outline", "subtle"]);
+  });
+
+  it("offers the four statuses", () => {
+    expect(valuesOf(recipe, "status")).toStrictEqual(["error", "info", "success", "warning"]);
+  });
+
+  it("reads a layer style the theme owns for every look", () => {
+    expect(recipe.variants?.["variant"]).toMatchObject({
+      flushed: { layerStyle: "field.flushed" },
+      outline: { layerStyle: "field.outline" },
+      subtle: { layerStyle: "field.subtle" },
+    });
+  });
+
+  it("drops the inset with the flushed box so its text lines up with the label", () => {
+    expect(recipe.variants?.["variant"]?.["flushed"]).toMatchObject({ paddingInline: "0" });
   });
 
   it("reads the control scale so a field lines up with a button beside it", () => {

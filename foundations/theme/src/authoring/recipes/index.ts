@@ -28,6 +28,9 @@ export {
 } from "#authoring/recipes/flow.ts";
 export { interactive, link, row } from "#authoring/recipes/interactive.ts";
 export {
+  type Field,
+  FIELDS,
+  fieldVariants,
   type Flat,
   FLATS,
   flatVariants,
@@ -51,7 +54,7 @@ export {
   touchTarget,
 } from "#authoring/recipes/sizes.ts";
 export { type Anatomy, onSlot, onSlots, slotsOf } from "#authoring/recipes/slots.ts";
-export { statusVariants } from "#authoring/recipes/status.ts";
+export { fieldStatusVariants, statusVariants } from "#authoring/recipes/status.ts";
 export {
   divider,
   type Elevation,

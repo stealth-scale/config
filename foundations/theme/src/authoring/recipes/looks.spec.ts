@@ -4,6 +4,8 @@ import { recipeViolations } from "@stealthscale/testing-theme";
 
 import { defineRecipe } from "#authoring/recipe.ts";
 import {
+  FIELDS,
+  fieldVariants,
   FLATS,
   flatVariants,
   HIGHLIGHTS,
@@ -67,6 +69,34 @@ describe("flatVariants", () => {
 
   it("reads a layer style the foundation defines for every flat look", () => {
     const recipe = defineRecipe({ className: "x", variants: { variant: flatVariants(FLATS) } });
+
+    expect(recipeViolations(recipe)).toStrictEqual([]);
+  });
+});
+
+describe("fieldVariants", () => {
+  it("lists three looks", () => {
+    expect(FIELDS).toHaveLength(3);
+  });
+
+  it("reads the field layer style of each look's own name", () => {
+    expect(fieldVariants(FIELDS)).toStrictEqual({
+      flushed: { layerStyle: "field.flushed" },
+      outline: { layerStyle: "field.outline" },
+      subtle: { layerStyle: "field.subtle" },
+    });
+  });
+
+  it("reads a layer style for each look it was handed", () => {
+    expect(fieldVariants(["outline"])).toStrictEqual({ outline: { layerStyle: "field.outline" } });
+  });
+
+  it("offers every look where a recipe names none", () => {
+    expect(Object.keys(fieldVariants()).toSorted()).toStrictEqual([...FIELDS].toSorted());
+  });
+
+  it("reads a layer style the foundation defines for every field look", () => {
+    const recipe = defineRecipe({ className: "x", variants: { variant: fieldVariants(FIELDS) } });
 
     expect(recipeViolations(recipe)).toStrictEqual([]);
   });

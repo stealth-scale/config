@@ -2,6 +2,22 @@
 "@stealthscale/theme": minor
 ---
 
+theme: publish the field looks as layer styles and a status axis for a field
+
+- `layerStyles.field` names `outline` on `bg.panel`, `subtle` on `bg.muted`, and `flushed` with its
+  bottom edge alone. A field recipe wrote those colours itself before this, so a theme that restated
+  `fill.subtle` moved every control but a field.
+- `fieldVariants()` writes the `variant` axis from those layer styles, beside `lookVariants()` and
+  `flatVariants()`. It takes the looks a recipe names, or offers all three.
+- `fieldStatusVariants()` writes the `status` axis of a field: the palette of the status, and the
+  edge in the line family's member of the same name. It draws `border.error` for the error status,
+  which is the token `field()`'s `_invalid` already draws, so the axis and the attribute agree.
+- `field()` sets `minBlockSize` to `control.md` under `_touch`. A field is a replaced element and no
+  pseudo-element renders on one, so the coarse-pointer target is the height rather than the box
+  `touchTarget()` grows.
+- `field()` sets the same `transitionProperty`, `transitionDuration` and `transitionTimingFunction`
+  as `interactive()`, so a field and a button in one row settle together rather than one snapping.
+
 theme: add role tables for a ramp keyed by its own steps
 
 - `paletteRoles(ramp, steps, darkRamp)` takes a table naming a step for each role in each mode, or a

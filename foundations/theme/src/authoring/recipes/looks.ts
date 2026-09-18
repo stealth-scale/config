@@ -1,6 +1,6 @@
 /**
- * Writes the axes a recipe offers for how a thing is filled, from the looks it offers and the way
- * it marks a highlighted row, each a layer style the theme owns.
+ * Writes the axes a recipe offers for how a thing is filled, how a field's edge is drawn, and the
+ * way it marks a highlighted row, each a layer style the theme owns.
  *
  * @remarks
  *   A recipe that offers six looks would otherwise write six fills, six inks and six hovers by
@@ -94,6 +94,44 @@ export function flatVariants<const Offered extends Flat>(
  */
 export function flatVariants(looks: readonly Flat[] = FLATS): Record<string, SystemStyleObject> {
   return recordOf(looks, (look) => ({ layerStyle: `flat.${look}` }));
+}
+
+/**
+ * Selects one of the ways the edge of a form field is drawn.
+ */
+export type Field = "flushed" | "outline" | "subtle";
+
+/**
+ * Lists every field look, in the order a documentation page shows them.
+ */
+export const FIELDS: readonly Field[] = ["outline", "subtle", "flushed"];
+
+/**
+ * Writes the `variant` axis of a form field, each look one layer style.
+ *
+ * @remarks
+ *   A field is drawn from a surface and an edge rather than from a fill, because the ink inside it
+ *   is the reader's own and a fill that repaints under a pointer reads as something to press. The
+ *   flushed look keeps its bottom edge alone. It drops the inset with it, which the recipe states,
+ *   because a layer style carries no padding.
+ * @typeParam Offered - The looks the recipe offers, which is every one unless it names them.
+ */
+export function fieldVariants(): Record<Field, SystemStyleObject>;
+
+/**
+ * Writes the `variant` axis for the field looks a recipe names.
+ *
+ * @typeParam Offered - The looks the recipe offers.
+ */
+export function fieldVariants<const Offered extends Field>(
+  looks: readonly Offered[],
+): Record<Offered, SystemStyleObject>;
+
+/**
+ * Writes one entry per look, each reading the field layer style of its name.
+ */
+export function fieldVariants(looks: readonly Field[] = FIELDS): Record<string, SystemStyleObject> {
+  return recordOf(looks, (look) => ({ layerStyle: `field.${look}` }));
 }
 
 /**
