@@ -251,6 +251,9 @@ catalogs:
     '@zag-js/focus-visible':
       specifier: 1.43.3
       version: 1.43.3
+    '@zag-js/menu':
+      specifier: 1.43.3
+      version: 1.43.3
     '@zag-js/popover':
       specifier: 1.43.3
       version: 1.43.3
@@ -731,6 +734,9 @@ importers:
   components/disclosure:
     dependencies:
       '@zag-js/collapsible':
+        specifier: 'catalog:'
+        version: 1.43.3
+      '@zag-js/menu':
         specifier: 'catalog:'
         version: 1.43.3
       '@zag-js/popover':
@@ -2735,6 +2741,63 @@ importers:
         specifier: 'catalog:'
         version: 4.1.11(@types/node@26.5.1)(@vitest/browser-playwright@4.1.11)(@vitest/browser-preview@4.1.11)(@vitest/coverage-v8@4.1.11)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(happy-dom@20.14.5)
 
+  foundations/providers/environment:
+    devDependencies:
+      '@arethetypeswrong/core':
+        specifier: 'catalog:'
+        version: 0.18.5
+      '@rolldown/plugin-babel':
+        specifier: 'catalog:'
+        version: 0.2.4(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@7.29.7)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(rolldown@1.2.7)
+      '@stealthscale/testing-config':
+        specifier: workspace:^
+        version: link:../../../packages/testing-config
+      '@stealthscale/vite-config':
+        specifier: workspace:^
+        version: link:../../../packages/vite-config
+      '@stealthscale/vite-config-react':
+        specifier: workspace:^
+        version: link:../../../packages/vite-config-react
+      '@stealthscale/vite-config-typescript':
+        specifier: workspace:^
+        version: link:../../../packages/vite-config-typescript
+      '@testing-library/react':
+        specifier: 'catalog:'
+        version: 16.3.3(@testing-library/dom@10.4.1)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.3.0
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 19.3.0(@types/react@19.3.0)
+      '@vitest/coverage-v8':
+        specifier: 'catalog:'
+        version: 4.1.11(@vitest/browser@4.1.11)(vitest@4.1.11)
+      babel-plugin-react-compiler:
+        specifier: 'catalog:'
+        version: 1.0.0
+      happy-dom:
+        specifier: 'catalog:'
+        version: 20.14.5
+      oxc-transform-react:
+        specifier: 'catalog:'
+        version: 0.149.0
+      publint:
+        specifier: 'catalog:'
+        version: 0.3.24
+      react:
+        specifier: 'catalog:'
+        version: 19.3.0
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.3.0(react@19.3.0)
+      typescript:
+        specifier: 'catalog:'
+        version: 7.0.2
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.11(@types/node@26.5.1)(@vitest/browser-playwright@4.1.11)(@vitest/browser-preview@4.1.11)(@vitest/coverage-v8@4.1.11)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(happy-dom@20.14.5)
+
   foundations/providers/form:
     dependencies:
       '@standard-schema/spec':
@@ -2938,6 +3001,75 @@ importers:
         specifier: 'catalog:'
         version: 4.1.11(@types/node@26.5.1)(@vitest/browser-playwright@4.1.11)(@vitest/browser-preview@4.1.11)(@vitest/coverage-v8@4.1.11)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(happy-dom@20.14.5)
 
+  foundations/providers/locale:
+    devDependencies:
+      '@arethetypeswrong/core':
+        specifier: 'catalog:'
+        version: 0.18.5
+      '@rolldown/plugin-babel':
+        specifier: 'catalog:'
+        version: 0.2.4(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@7.29.7)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(rolldown@1.2.7)
+      '@stealthscale/hooks':
+        specifier: workspace:^
+        version: link:../../hooks
+      '@stealthscale/provider-environment':
+        specifier: workspace:^
+        version: link:../environment
+      '@stealthscale/provider-i18n':
+        specifier: workspace:^
+        version: link:../i18n
+      '@stealthscale/settings':
+        specifier: workspace:^
+        version: link:../../settings
+      '@stealthscale/testing-config':
+        specifier: workspace:^
+        version: link:../../../packages/testing-config
+      '@stealthscale/vite-config':
+        specifier: workspace:^
+        version: link:../../../packages/vite-config
+      '@stealthscale/vite-config-react':
+        specifier: workspace:^
+        version: link:../../../packages/vite-config-react
+      '@stealthscale/vite-config-typescript':
+        specifier: workspace:^
+        version: link:../../../packages/vite-config-typescript
+      '@testing-library/react':
+        specifier: 'catalog:'
+        version: 16.3.3(@testing-library/dom@10.4.1)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.3.0
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 19.3.0(@types/react@19.3.0)
+      '@vitest/coverage-v8':
+        specifier: 'catalog:'
+        version: 4.1.11(@vitest/browser@4.1.11)(vitest@4.1.11)
+      babel-plugin-react-compiler:
+        specifier: 'catalog:'
+        version: 1.0.0
+      happy-dom:
+        specifier: 'catalog:'
+        version: 20.14.5
+      oxc-transform-react:
+        specifier: 'catalog:'
+        version: 0.149.0
+      publint:
+        specifier: 'catalog:'
+        version: 0.3.24
+      react:
+        specifier: 'catalog:'
+        version: 19.3.0
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.3.0(react@19.3.0)
+      typescript:
+        specifier: 'catalog:'
+        version: 7.0.2
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.11(@types/node@26.5.1)(@vitest/browser-playwright@4.1.11)(@vitest/browser-preview@4.1.11)(@vitest/coverage-v8@4.1.11)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(happy-dom@20.14.5)
+
   foundations/providers/router:
     devDependencies:
       '@arethetypeswrong/core':
@@ -2961,6 +3093,87 @@ importers:
       '@tanstack/react-router':
         specifier: 'catalog:'
         version: 1.170.34(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@testing-library/react':
+        specifier: 'catalog:'
+        version: 16.3.3(@testing-library/dom@10.4.1)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.3.0
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 19.3.0(@types/react@19.3.0)
+      '@vitest/coverage-v8':
+        specifier: 'catalog:'
+        version: 4.1.11(@vitest/browser@4.1.11)(vitest@4.1.11)
+      babel-plugin-react-compiler:
+        specifier: 'catalog:'
+        version: 1.0.0
+      happy-dom:
+        specifier: 'catalog:'
+        version: 20.14.5
+      oxc-transform-react:
+        specifier: 'catalog:'
+        version: 0.149.0
+      publint:
+        specifier: 'catalog:'
+        version: 0.3.24
+      react:
+        specifier: 'catalog:'
+        version: 19.3.0
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.3.0(react@19.3.0)
+      typescript:
+        specifier: 'catalog:'
+        version: 7.0.2
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.11(@types/node@26.5.1)(@vitest/browser-playwright@4.1.11)(@vitest/browser-preview@4.1.11)(@vitest/coverage-v8@4.1.11)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(happy-dom@20.14.5)
+
+  foundations/providers/shell:
+    devDependencies:
+      '@arethetypeswrong/core':
+        specifier: 'catalog:'
+        version: 0.18.5
+      '@rolldown/plugin-babel':
+        specifier: 'catalog:'
+        version: 0.2.4(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@7.29.7)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(rolldown@1.2.7)
+      '@stealthscale/provider-color-mode':
+        specifier: workspace:^
+        version: link:../color-mode
+      '@stealthscale/provider-environment':
+        specifier: workspace:^
+        version: link:../environment
+      '@stealthscale/provider-hotkeys':
+        specifier: workspace:^
+        version: link:../hotkeys
+      '@stealthscale/provider-i18n':
+        specifier: workspace:^
+        version: link:../i18n
+      '@stealthscale/provider-locale':
+        specifier: workspace:^
+        version: link:../locale
+      '@stealthscale/provider-viewport':
+        specifier: workspace:^
+        version: link:../viewport
+      '@stealthscale/settings':
+        specifier: workspace:^
+        version: link:../../settings
+      '@stealthscale/testing-config':
+        specifier: workspace:^
+        version: link:../../../packages/testing-config
+      '@stealthscale/theme':
+        specifier: workspace:^
+        version: link:../../theme
+      '@stealthscale/vite-config':
+        specifier: workspace:^
+        version: link:../../../packages/vite-config
+      '@stealthscale/vite-config-react':
+        specifier: workspace:^
+        version: link:../../../packages/vite-config-react
+      '@stealthscale/vite-config-typescript':
+        specifier: workspace:^
+        version: link:../../../packages/vite-config-typescript
       '@testing-library/react':
         specifier: 'catalog:'
         version: 16.3.3(@testing-library/dom@10.4.1)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -5783,6 +5996,9 @@ packages:
   '@zag-js/interact-outside@1.43.3':
     resolution: {integrity: sha512-qgyAyWELSzFrHUtB6D7IzemI48NjX7E5oIDCXsz/DBPh+ybsK+pKMGsZkduTCK+uEqJcA/w+DAWaDUOxhjqvWA==}
 
+  '@zag-js/menu@1.43.3':
+    resolution: {integrity: sha512-RGCqRv/GeEehBYOB3JV0NUfyfaWW5KBN79RHUUYpxF9DMsPM8igHOzuoOoz+FaYoepjC34oMtmWicF1Dan6apA==}
+
   '@zag-js/popover@1.43.3':
     resolution: {integrity: sha512-kLQIj+9XaaEvSbviG+r8hI1OJxC4P4JTETNcnHV4w4aE5nR2r/LDP3JoJSEQsAvTR/MMYpZQDL5pdVQj0M/Oqg==}
 
@@ -5794,6 +6010,9 @@ packages:
     peerDependencies:
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
+
+  '@zag-js/rect-utils@1.43.3':
+    resolution: {integrity: sha512-xZA5IKUtQeRKdzM+9jGj8R18MXmORDO0smXAAoyFj1Swj/uB17eVwvsWoQLXbb/AaYXEzSIJXNUt21n3GAX24Q==}
 
   '@zag-js/remove-scroll@1.43.3':
     resolution: {integrity: sha512-1bX6IQM7q26uL0476wFqtaebeIeDheyJd8fuje2zXTCg1XDRHJmRsM/tzcmcdi4W5s+hG0cUCfuVzUTXvODM5Q==}
@@ -9359,6 +9578,18 @@ snapshots:
       '@zag-js/dom-query': 1.43.3
       '@zag-js/utils': 1.43.3
 
+  '@zag-js/menu@1.43.3':
+    dependencies:
+      '@zag-js/anatomy': 1.43.3
+      '@zag-js/core': 1.43.3
+      '@zag-js/dismissable': 1.43.3
+      '@zag-js/dom-query': 1.43.3
+      '@zag-js/focus-visible': 1.43.3
+      '@zag-js/popper': 1.43.3
+      '@zag-js/rect-utils': 1.43.3
+      '@zag-js/types': 1.43.3
+      '@zag-js/utils': 1.43.3
+
   '@zag-js/popover@1.43.3':
     dependencies:
       '@zag-js/anatomy': 1.43.3
@@ -9386,6 +9617,8 @@ snapshots:
       '@zag-js/utils': 1.43.3
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
+
+  '@zag-js/rect-utils@1.43.3': {}
 
   '@zag-js/remove-scroll@1.43.3':
     dependencies:

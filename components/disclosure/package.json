@@ -53,6 +53,7 @@
   },
   "dependencies": {
     "@zag-js/collapsible": "catalog:",
+    "@zag-js/menu": "catalog:",
     "@zag-js/popover": "catalog:",
     "@zag-js/react": "catalog:",
     "@zag-js/tabs": "catalog:",
