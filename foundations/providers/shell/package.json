@@ -1,0 +1,89 @@
+{
+  "name": "@stealthscale/provider-shell",
+  "version": "0.0.0",
+  "description": "Composes every provider an application renders, in the order each depends on the one before.",
+  "keywords": [
+    "provider",
+    "react"
+  ],
+  "homepage": "https://github.com/stealth-scale/config/tree/main/foundations/providers/shell#readme",
+  "bugs": "https://github.com/stealth-scale/config/issues",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stealth-scale/config.git",
+    "directory": "foundations/providers/shell"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "imports": {
+    "#*": "./src/*"
+  },
+  "exports": {
+    ".": {
+      "stealth-source": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": "./dist/index.js",
+      "./package.json": "./package.json"
+    },
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vp pack",
+    "check": "vp check",
+    "prepublishOnly": "vp pack",
+    "test": "vp test"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/core": "catalog:",
+    "@rolldown/plugin-babel": "catalog:",
+    "@stealthscale/provider-color-mode": "workspace:^",
+    "@stealthscale/provider-environment": "workspace:^",
+    "@stealthscale/provider-hotkeys": "workspace:^",
+    "@stealthscale/provider-i18n": "workspace:^",
+    "@stealthscale/provider-locale": "workspace:^",
+    "@stealthscale/provider-viewport": "workspace:^",
+    "@stealthscale/settings": "workspace:^",
+    "@stealthscale/testing-config": "workspace:^",
+    "@stealthscale/theme": "workspace:^",
+    "@stealthscale/vite-config": "workspace:^",
+    "@stealthscale/vite-config-react": "workspace:^",
+    "@stealthscale/vite-config-typescript": "workspace:^",
+    "@testing-library/react": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "babel-plugin-react-compiler": "catalog:",
+    "happy-dom": "catalog:",
+    "oxc-transform-react": "catalog:",
+    "publint": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "@stealthscale/provider-color-mode": "workspace:^",
+    "@stealthscale/provider-environment": "workspace:^",
+    "@stealthscale/provider-hotkeys": "workspace:^",
+    "@stealthscale/provider-i18n": "workspace:^",
+    "@stealthscale/provider-locale": "workspace:^",
+    "@stealthscale/provider-viewport": "workspace:^",
+    "@stealthscale/settings": "workspace:^",
+    "@stealthscale/theme": "workspace:^",
+    "react": "catalog:"
+  },
+  "engines": {
+    "node": ">=26.0.0"
+  }
+}
