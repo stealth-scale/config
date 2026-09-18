@@ -17,7 +17,7 @@ the decision, and the standards hold the rules that are refined.
 | 0005                                                  | The data foundation                                            | Unwritten |
 | [0006](0006-routing.md)                               | Routing: the pieces an application builds a router from        | Draft     |
 | [0007](0007-forms.md)                                 | Forms: a form built from a schema                              | Draft     |
-| [0008](0008-specimens.md)                             | Specimens: the page, the index and the props a catalogue draws | Review    |
+| [0008](0008-specimens.md)                             | Specimens: the page, the index and the props a catalogue draws | Accepted  |
 
 ## Status
 

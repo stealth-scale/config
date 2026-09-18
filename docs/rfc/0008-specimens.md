@@ -2,7 +2,7 @@
 rfc: 0008
 title: "Specimens: the page, the index and the props a catalogue draws"
 author: Roy Klopper
-status: Review
+status: Accepted
 created: 2026-09-18
 updated: 2026-09-18
 discussion: https://github.com/stealth-scale/config/pull/29
@@ -366,8 +366,8 @@ consumer would write.
 - A check that a component with axes has a scene per axis is not proposed here.
 - `shapes` records a union's options and a type's members. A recursive type is listed once and a
   type past the depth is named. Both limits are unmeasured against a real page.
-- ADR-0036, ADR-0037 and ADR-0038 are written on acceptance, for parsing instead of evaluating, for
-  classifying on every declaration, and for the virtual module contract.
+- ADR-0036, ADR-0037 and ADR-0038 record the decisions this proposal produces: parsing instead of
+  evaluating, classifying on every declaration, and the virtual module contract.
 
 ## References
 
