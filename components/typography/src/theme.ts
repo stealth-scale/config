@@ -20,6 +20,7 @@ import { recipe as kbd } from "#kbd/recipe.ts";
 import { recipe as list } from "#list/recipe.ts";
 import { recipe as mark } from "#mark/recipe.ts";
 import { recipe as quote } from "#quote/recipe.ts";
+import { recipe as span } from "#span/recipe.ts";
 import { recipe as strong } from "#strong/recipe.ts";
 import { recipe as text } from "#text/recipe.ts";
 
@@ -27,7 +28,7 @@ export default definePreset({
   name: "@stealthscale/component-typography",
   theme: {
     extend: {
-      recipes: { code, em, heading, icon, kbd, mark, quote, strong, text },
+      recipes: { code, em, heading, icon, kbd, mark, quote, span, strong, text },
       slotRecipes: { blockquote, list },
     },
   },

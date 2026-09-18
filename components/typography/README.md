@@ -21,9 +21,7 @@ The package peers on `react` and `@stealthscale/theme`. An application lists the
 ## Text
 
 Draws a paragraph, in a size, an ink, a weight and an alignment, cut to one line where a caller sets
-`truncate`, and animated or masked where a page sets those axes. The element is `p`. A truncated or
-masked paragraph hides words. The full words are the caller's to keep reachable, in a `title` or in
-text nearby.
+`truncate`, and animated or masked where a page sets those axes. The element is `p`.
 
 ```tsx
 import { Text } from "@stealthscale/component-typography";
@@ -31,10 +29,14 @@ import { Text } from "@stealthscale/component-typography";
 <Text size="lg" tone="muted" weight="medium">
   A sentence set large, muted and a little heavier.
 </Text>;
-<Text as="span" truncate>
-  A run of words inside a line, cut at its box.
+<Text align="center" motion="fade">
+  A sentence that fades in, centred.
 </Text>;
 ```
+
+`truncate` hides words and `mask` fades them out, so the full words are the caller's to keep
+reachable, in a `title` or in text nearby. Cutting a run inside a line is `Span` rather than a
+`Text` drawn as one. `overflow` has no effect on a non-replaced inline box.
 
 | Axis       | Values                                                                | Default |
 | ---------- | --------------------------------------------------------------------- | ------- |
@@ -191,6 +193,33 @@ Set `marks="none"` where the text already holds its punctuation, as a quotation 
 does. Use `Blockquote.Root` for a quotation set as its own block, which is a `figure` with its own
 content, caption and icon. State `cite` with the source's address where there is one.
 
+## Span
+
+Draws a run of words inside a line without starting a block. The element is `span`, which carries no
+meaning, so a screen reader reads the words as part of the line around them.
+
+```tsx
+import { Span } from "@stealthscale/component-typography";
+
+<Span data-testid="total">1,024</Span>;
+<Span truncate>a path that would otherwise wrap</Span>;
+```
+
+| Axis       | Values                                                                | Default |
+| ---------- | --------------------------------------------------------------------- | ------- |
+| `tone`     | `default`, `muted`, `inverted`, `info`, `success`, `warning`, `error` | inherit |
+| `weight`   | `normal`, `medium`, `semibold`, `bold`                                | inherit |
+| `truncate` | `true`                                                                | off     |
+| `motion`   | `fade`, `rise`, `reveal`                                              | none    |
+
+A span has no size axis, which is what separates it from a `Text` drawn as one. `Text` defaults its
+size to `md`, so a `Text` with `as="span"` inside a heading resets the run to body size. A span
+states nothing and inherits the line it sits in.
+
+`truncate` turns the run into an inline block, because `overflow` has no effect on a non-replaced
+inline box. Reach for a run that carries meaning instead where there is one: `Em` for stress,
+`Strong` for importance, `Mark` for a highlight, `Quote` for a quotation.
+
 ## Kbd
 
 Draws a key a reader is asked to press, as a keycap in a look, a size and the palette of its status.
@@ -306,6 +335,7 @@ import { Blockquote } from "@stealthscale/component-typography";
 | `StrongProps`          | `type`      | The run's variants and everything a `strong` takes       |
 | `MarkProps`            | `type`      | The highlight's variants and everything a `mark` takes   |
 | `QuoteProps`           | `type`      | The quotation's variants and everything a `q` takes      |
+| `SpanProps`            | `type`      | The run's variants and everything a `span` takes         |
 | `KbdProps`             | `type`      | The key's variants and everything a `kbd` takes          |
 | `IconProps`            | `type`      | The icon's variants and everything an `svg` takes        |
 | `List.RootProps`       | `type`      | The list's variants and everything a `ul` takes          |

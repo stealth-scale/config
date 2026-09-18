@@ -15,6 +15,7 @@ describe("index", () => {
       "Mark",
       "MarkPropsProvider",
       "Quote",
+      "Span",
       "Strong",
       "Text",
     ]);

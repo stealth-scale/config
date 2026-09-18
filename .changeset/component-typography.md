@@ -2,7 +2,7 @@
 "@stealthscale/component-typography": minor
 ---
 
-component-typography: publish Em, Strong, Mark and Quote
+component-typography: publish Em, Strong, Mark, Quote and Span
 
 - `Em` marks a run of words the writer stressed. The element is `em` and it exposes the `emphasis`
   role. The recipe declares `fontStyle: italic` rather than relying on the browser's default, so a
@@ -31,3 +31,10 @@ component-typography: publish Em, Strong, Mark and Quote
   marks from the `quotes` property against the `lang` in force. It offers `marks` at `auto` and
   `none`, defaulting to `auto`, beside `tone` and `motion`. Set `marks="none"` where the text
   already holds its punctuation. `Blockquote.Root` remains the quotation set as its own block.
+- `Span` draws a run inside a line without starting a block. It offers `tone`, `weight`, `truncate`
+  and `motion`, all off until a caller picks them, and no `size`. `Text` defaults its size to `md`,
+  so a `Text` with `as="span"` inside a heading resets the run to body size. A span inherits the
+  line it sits in.
+- The span's `truncate` sets `display: inline-block` beside the properties the `truncate` helper
+  writes. `overflow` has no effect on a non-replaced inline box, so the README's former
+  `<Text as="span" truncate>` example cut nothing. The example is replaced.
