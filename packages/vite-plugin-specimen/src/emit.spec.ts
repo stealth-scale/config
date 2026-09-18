@@ -159,6 +159,44 @@ describe("emit", () => {
     expect(ownerOf("/no-such-tree-for-a-specimen/a.specimen.tsx")).toBe("");
   });
 
+  it("records every manifest directory it walked under the name it found", () => {
+    const owners = new Map<string, string>();
+    const held = withScratchWorkspace(
+      {
+        "packages/actions/package.json": '{ "name": "@kit/actions" }',
+        "packages/actions/src/button.specimen.tsx": "",
+        "packages/actions/src/package.json": '{ "type": "module" }',
+      },
+      (scratch) => [
+        ownerOf(scratch.path("packages/actions/src/button.specimen.tsx"), owners),
+        [scratch.path("packages/actions/src"), scratch.path("packages/actions")],
+      ],
+    );
+
+    expect(held[0]).toBe("@kit/actions");
+    expect([...owners.keys()]).toStrictEqual(held[1]);
+    expect([...owners.values()]).toStrictEqual(["@kit/actions", "@kit/actions"]);
+  });
+
+  it("stops at a directory another file already walked", () => {
+    const owners = new Map<string, string>();
+    const held = withScratchWorkspace(
+      {
+        "packages/actions/package.json": '{ "name": "@kit/actions" }',
+        "packages/actions/src/button.specimen.tsx": "",
+        "packages/actions/src/parts/icon.specimen.tsx": "",
+      },
+      (scratch) => {
+        owners.set(scratch.path("packages/actions"), "@kit/cached");
+
+        return ownerOf(scratch.path("packages/actions/src/parts/icon.specimen.tsx"), owners);
+      },
+    );
+
+    expect(held).toBe("@kit/cached");
+    expect(owners.size).toBe(1);
+  });
+
   it("climbs past a manifest that does not parse", () => {
     const held = withScratchWorkspace(
       {

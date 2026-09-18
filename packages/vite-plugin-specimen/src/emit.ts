@@ -54,22 +54,50 @@ function shown(path: string, root: string): string {
 }
 
 /**
+ * Maps a directory to the name of the package it belongs to, for the files of one index build.
+ *
+ * @remarks
+ *   An index build reads every specimen, and the specimens of one package share every directory
+ *   above them. Each directory is read once per build and never across builds, so a package
+ *   renamed while the server runs is read again on the next build.
+ */
+export type Owners = Map<string, string>;
+
+/**
  * Resolves the name of the package a file belongs to.
  *
  * @remarks
  *   The nearest manifest above the file that declares a name, which is the specifier a reader
  *   imports the page's components from. The search continues past a manifest that declares none,
- *   such as one written only to mark a directory as ESM.
+ *   such as one written only to mark a directory as ESM. Every directory the search walks is
+ *   recorded in `owners` under the name it found, so the next file under any of them stops there.
  * @returns The package name, or an empty string when no manifest above the file declares one.
  */
-export function ownerOf(path: string): string {
+export function ownerOf(path: string, owners: Owners = new Map()): string {
+  const walked: string[] = [];
+  let found = "";
+
   for (let directory = owning(path); directory !== undefined; directory = owning(directory)) {
+    const known = owners.get(directory);
+
+    if (known !== undefined) {
+      found = known;
+      break;
+    }
+
+    walked.push(directory);
+
     const name = text(manifestAt(directory) ?? {}, "name");
 
-    if (name !== undefined && name !== "") return name;
+    if (name !== undefined && name !== "") {
+      found = name;
+      break;
+    }
   }
 
-  return "";
+  for (const directory of walked) owners.set(directory, found);
+
+  return found;
 }
 
 /**
@@ -97,7 +125,7 @@ function loaders(result: Read, propped: boolean): readonly string[] {
 /**
  * Generates the metadata properties of one listing, one property per line.
  */
-function metadata(result: Read, root: string): readonly string[] {
+function metadata(result: Read, root: string, owners: Owners): readonly string[] {
   const path = shown(result.path, root);
   const fields = isRefused(result)
     ? {
@@ -112,7 +140,7 @@ function metadata(result: Read, root: string): readonly string[] {
         about: result.about,
         group: result.group,
         id: result.id,
-        package: ownerOf(result.path),
+        package: ownerOf(result.path, owners),
         path,
         title: result.title,
       };
@@ -127,8 +155,8 @@ function metadata(result: Read, root: string): readonly string[] {
  *   The import specifier stays absolute, because that is what the bundler resolves. Only the
  *   displayed path is made relative to the root.
  */
-function listing(result: Read, root: string, propped: boolean): string {
-  return ["  {", ...metadata(result, root), ...loaders(result, propped), "  }"].join("\n");
+function listing(result: Read, root: string, propped: boolean, owners: Owners): string {
+  return ["  {", ...metadata(result, root, owners), ...loaders(result, propped), "  }"].join("\n");
 }
 
 /**
@@ -148,6 +176,7 @@ export function listings(
 ): ReadonlyMap<string, Listed> {
   const results = read(files);
   const refused = results.filter((result) => isRefused(result));
+  const owners: Owners = new Map();
 
   if (refused.length > 0 && resolved.command !== "serve") {
     const named = refused.map((result) => `  ${result.path}: ${result.wrong}`).join("\n");
@@ -162,7 +191,7 @@ export function listings(
       result.path,
       {
         id: isRefused(result) ? undefined : result.id,
-        listing: listing(result, resolved.root, propped),
+        listing: listing(result, resolved.root, propped, owners),
       },
     ]),
   );
