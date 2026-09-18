@@ -9,7 +9,11 @@
 
 import { definePreset } from "@stealthscale/theme/authoring";
 
+import { recipe as emptyState } from "#empty-state/recipe.ts";
+import { recipe as skeletonText } from "#skeleton-text/recipe.ts";
+import { recipe as skeleton } from "#skeleton/recipe.ts";
+
 export default definePreset({
   name: "@stealthscale/component-feedback",
-  theme: { extend: { recipes: {} } },
+  theme: { extend: { recipes: { skeleton, skeletonText }, slotRecipes: { emptyState } } },
 });
