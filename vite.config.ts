@@ -1,5 +1,6 @@
 import * as css from "@stealthscale/vite-config-css";
 import * as react from "@stealthscale/vite-config-react";
+import * as specimen from "@stealthscale/vite-config-specimen";
 
 import { layers as exampleAppWorker } from "./examples/app-worker/vite.layers.ts";
 import { layers as exampleLibUi } from "./examples/lib-ui/vite.layers.ts";
@@ -10,6 +11,7 @@ export default defineConfig(import.meta.dirname, {
   extends: [
     react.workspace(),
     css.workspace(),
+    specimen.workspace(),
 
     fmt.skip({
       because:
