@@ -26,11 +26,14 @@ export {
   spanCounts,
   widthSizes,
 } from "#authoring/recipes/flow.ts";
-export { interactive, link } from "#authoring/recipes/interactive.ts";
+export { interactive, link, row } from "#authoring/recipes/interactive.ts";
 export {
   type Flat,
   FLATS,
   flatVariants,
+  type Highlight,
+  HIGHLIGHTS,
+  highlightVariants,
   type Look,
   LOOKS,
   lookVariants,

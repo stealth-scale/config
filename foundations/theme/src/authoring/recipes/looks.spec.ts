@@ -3,7 +3,14 @@ import { describe, expect, it } from "vitest";
 import { recipeViolations } from "@stealthscale/testing-theme";
 
 import { defineRecipe } from "#authoring/recipe.ts";
-import { FLATS, flatVariants, LOOKS, lookVariants } from "#authoring/recipes/looks.ts";
+import {
+  FLATS,
+  flatVariants,
+  HIGHLIGHTS,
+  highlightVariants,
+  LOOKS,
+  lookVariants,
+} from "#authoring/recipes/looks.ts";
 
 describe("lookVariants", () => {
   it("lists six looks", () => {
@@ -60,6 +67,38 @@ describe("flatVariants", () => {
 
   it("reads a layer style the foundation defines for every flat look", () => {
     const recipe = defineRecipe({ className: "x", variants: { variant: flatVariants(FLATS) } });
+
+    expect(recipeViolations(recipe)).toStrictEqual([]);
+  });
+});
+
+describe("highlightVariants", () => {
+  it("lists three marks", () => {
+    expect(HIGHLIGHTS).toHaveLength(3);
+  });
+
+  it("puts every mark under the highlighted condition", () => {
+    expect(highlightVariants(["tint", "fill"])).toStrictEqual({
+      fill: { _highlighted: { layerStyle: "fill.solid" } },
+      tint: { _highlighted: { layerStyle: "fill.subtle" } },
+    });
+  });
+
+  it("tints the row behind the bar so the mark is carried twice over", () => {
+    expect(highlightVariants(["bar"])).toStrictEqual({
+      bar: { _highlighted: { background: "colorPalette.subtle", layerStyle: "indicator.start" } },
+    });
+  });
+
+  it("offers every mark where a recipe names none", () => {
+    expect(Object.keys(highlightVariants()).toSorted()).toStrictEqual([...HIGHLIGHTS].toSorted());
+  });
+
+  it("reads a layer style the foundation defines for every mark", () => {
+    const recipe = defineRecipe({
+      className: "x",
+      variants: { highlight: highlightVariants(HIGHLIGHTS) },
+    });
 
     expect(recipeViolations(recipe)).toStrictEqual([]);
   });

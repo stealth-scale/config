@@ -61,3 +61,11 @@ theme: keep no value's class on a slot for a compound
 - `onSlots` lifts one axis onto several parts at once, each part reading its own scale. A size axis
   moving four parts together is otherwise one object per step holding one entry per part, which is
   the shape a recipe author should never have to type.
+- `row` writes the base of a row in a list the reader chooses from: a full-width line holding a
+  mark, a label and a hint side by side. It carries no focus ring and no press, because such a list
+  keeps focus on the container and moves a highlight over its rows, and it draws the arrow pointer
+  rather than the hand, which is what the menu pattern asks for.
+- `highlightVariants` writes the `highlight` axis of a list: `tint`, `fill` and `bar`, each a layer
+  style under the highlighted condition. `bar` draws a line down the leading edge and tints the row
+  behind it, so the row the reader is on is marked twice over. A menu, a select and a combobox all
+  mark one row the same three ways, so a theme moves all of them by moving the layer styles.

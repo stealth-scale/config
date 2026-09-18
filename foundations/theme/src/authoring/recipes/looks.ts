@@ -1,6 +1,6 @@
 /**
- * Writes the `variant` axis of a recipe from the looks it offers, each a layer style the theme
- * owns.
+ * Writes the axes a recipe offers for how a thing is filled, from the looks it offers and the way
+ * it marks a highlighted row, each a layer style the theme owns.
  *
  * @remarks
  *   A recipe that offers six looks would otherwise write six fills, six inks and six hovers by
@@ -94,4 +94,59 @@ export function flatVariants<const Offered extends Flat>(
  */
 export function flatVariants(looks: readonly Flat[] = FLATS): Record<string, SystemStyleObject> {
   return recordOf(looks, (look) => ({ layerStyle: `flat.${look}` }));
+}
+
+/**
+ * Selects how the row a list has moved its highlight onto is marked.
+ */
+export type Highlight = "bar" | "fill" | "tint";
+
+/**
+ * Lists the highlights in the order a documentation page shows them, quietest first.
+ */
+export const HIGHLIGHTS: readonly Highlight[] = ["tint", "fill", "bar"];
+
+/**
+ * Maps each highlight to the layer style that draws it.
+ */
+const MARKS: Readonly<Record<Highlight, string>> = {
+  bar: "indicator.start",
+  fill: "fill.solid",
+  tint: "fill.subtle",
+};
+
+/**
+ * Writes the `highlight` axis of a list: how the one row the reader is on is marked.
+ *
+ * @remarks
+ *   A menu, a select and a combobox all move one highlight over their rows, and each of them marks
+ *   it in the same three ways. The styles sit under the highlighted condition rather than on the
+ *   row, because the row is drawn plain until the list reaches it. The bar draws a line down the
+ *   leading edge and tints the row behind it, so the row the reader is on is marked twice over and
+ *   a reader who cannot separate the two colors still has the line.
+ * @typeParam Offered - The highlights the recipe offers, which is every one unless it names them.
+ */
+export function highlightVariants(): Record<Highlight, SystemStyleObject>;
+
+/**
+ * Writes the `highlight` axis for the marks a recipe names.
+ *
+ * @typeParam Offered - The highlights the recipe offers.
+ */
+export function highlightVariants<const Offered extends Highlight>(
+  highlights: readonly Offered[],
+): Record<Offered, SystemStyleObject>;
+
+/**
+ * Writes one entry per highlight, each reading its layer style under the highlighted condition.
+ */
+export function highlightVariants(
+  highlights: readonly Highlight[] = HIGHLIGHTS,
+): Record<string, SystemStyleObject> {
+  return recordOf(highlights, (highlight) => ({
+    _highlighted:
+      highlight === "bar"
+        ? { background: "colorPalette.subtle", layerStyle: MARKS[highlight] }
+        : { layerStyle: MARKS[highlight] },
+  }));
 }
