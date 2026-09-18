@@ -1,0 +1,28 @@
+---
+"@stealthscale/component-surfaces": minor
+---
+
+component-surfaces: publish Card
+
+- `Card` draws a panel a reader takes in on its own. Nine parts under one namespace: `Root`,
+  `Media`, `Header`, `Indicator`, `Title`, `Description`, `Aside`, `Content` and `Footer`.
+- The root is an `article`, which a screen reader announces and lets a reader move between. It
+  carries no name of its own, so point `aria-labelledby` at the title's `id` or state `aria-label`.
+  A card that is part of its surroundings takes `as="div"`.
+- The header is a grid of three columns rather than a row of stacks. The indicator spans both lines
+  of the title block, the title and the description take the middle column, and the aside sits
+  against the end. A column with nothing in it is zero wide, so a card with no indicator needs no
+  other arrangement.
+- `Media` takes back the room the root leaves, so a picture meets the card's edges and the root
+  clips its corners. Which edges it meets follows `orientation`.
+- The root states its own inset as `--card-inset`, which the media reads back as a negative margin
+  and the divided bands read as the room between a rule and the words. Both would otherwise be a
+  length per step, which is a compound for every pair of `size` and the axis beside it.
+- Nine axes: `variant` over `elevated`, `outline`, `subtle` and `glass`; `size` over four steps;
+  `orientation`; `radius`; `justify` for the footer's spread; `status`; `motion`; `divided`; and
+  `interactive`.
+- `interactive` draws the root's focus ring from `:focus-within`, so the whole card shows the focus
+  while the thing a keyboard reaches is the link in the title. A press handler on the root would
+  leave the card reachable by pointer alone.
+- Two named compounds: `toned` draws the palette edge where a status meets a look that shows one,
+  and `lifted` deepens the shadow where an interactive card is elevated.
