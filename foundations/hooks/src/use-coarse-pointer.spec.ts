@@ -26,6 +26,7 @@ describe("useCoarsePointer", () => {
     const { result } = renderHook(() => useCoarsePointer());
 
     expect(result.current).toBe(true);
+
     restore();
   });
 
@@ -34,6 +35,7 @@ describe("useCoarsePointer", () => {
     const { result } = renderHook(() => useCoarsePointer());
 
     expect(result.current).toBe(false);
+
     restore();
   });
 
@@ -43,6 +45,7 @@ describe("useCoarsePointer", () => {
     renderHook(() => useCoarsePointer());
 
     expect(spy).toHaveBeenCalledWith("(pointer: coarse)");
+
     spy.mockRestore();
   });
 });

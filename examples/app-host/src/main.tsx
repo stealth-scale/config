@@ -11,7 +11,7 @@
 import { Suspense } from "react";
 import { createRoot } from "react-dom/client";
 
-import { Dashboard } from "#dashboard.tsx";
+import { Dashboard } from "#dashboard.ts";
 import { endpoints, join } from "#endpoints.ts";
 import { Shell } from "#shell.tsx";
 import { watching } from "#stale.ts";

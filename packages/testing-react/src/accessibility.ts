@@ -13,7 +13,7 @@ import { createElement, type ElementType } from "react";
 import { render } from "@testing-library/react";
 import axe from "axe-core";
 
-import { type ConformanceOptions } from "#conformance.tsx";
+import { type ConformanceOptions } from "#conformance.ts";
 
 /**
  * Lists every accessibility rule a rendered component breaks, as the rule's id and its help.

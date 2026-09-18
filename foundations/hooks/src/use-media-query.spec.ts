@@ -140,6 +140,7 @@ describe("useMediaQuery", () => {
     renderHook(() => useMediaQuery(["(min-width: 40rem)"]));
 
     expect(asked).toHaveBeenCalledWith("(min-width: 40rem)");
+
     asked.mockRestore();
   });
 
@@ -149,6 +150,7 @@ describe("useMediaQuery", () => {
     renderHook(() => useMediaQuery(["(min-width: 40rem)"], { ssr: false }));
 
     expect(asked).toHaveBeenCalledWith("(min-width: 40rem)");
+
     asked.mockRestore();
   });
 

@@ -3,7 +3,7 @@ import { type ReactElement, Suspense } from "react";
 import { render, waitFor } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
 
-import { Dashboard } from "#dashboard.tsx";
+import { Dashboard } from "#dashboard.ts";
 
 /**
  * Renders into a fresh element and waits until whatever suspended has arrived.

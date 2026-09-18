@@ -9,7 +9,7 @@ import {
 
 import { describe, expect, it } from "vitest";
 
-import { violations } from "#conformance.tsx";
+import { violations } from "#conformance.ts";
 import { part } from "#part.ts";
 
 interface ProbeProps {

@@ -4,7 +4,7 @@
 
 import { type ReactElement, Suspense } from "react";
 
-import { Dashboard } from "#dashboard.tsx";
+import { Dashboard } from "#dashboard.ts";
 
 /**
  * Draws the remote dashboard, and a line of text until it arrives.
