@@ -45,6 +45,8 @@ export { motion, type Motion, MOTIONS, motionVariants } from "#authoring/recipes
 export { cornerVariants, ratioVariants } from "#authoring/recipes/shape.ts";
 export {
   below,
+  CONTROL_INSET_END,
+  CONTROL_INSET_START,
   controlSizes,
   iconOnly,
   iconSizes,

@@ -5,9 +5,11 @@
  *   Four parts. The root is the box the rest sit in, the field takes the typing, and the start and
  *   the end hold a mark each. The marks are drawn over the field rather than beside it, and the
  *   field reserves room for them, so the typing never runs underneath.
- *   The room is one custom property. The size axis writes it on the root as the control height of
- *   that step, and the marks axis reads it on whichever side a mark sits. Stating the room as a
- *   length per side and per step would be a compound for every pair of the two axes.
+ *   The group writes no padding. The size axis states the room a mark takes on the root, and the
+ *   marks axis hands it to the control's own inset property on the side a mark sits. The control's
+ *   recipe is the one rule writing its padding either way, so the two never race for the property
+ *   and a theme that restyles the control keeps the room. Any control reading `controlSizes` goes
+ *   in the field, not the text field alone.
  *   A mark takes no pointer, so a press over one reaches the field behind it, and whatever the
  *   mark holds takes the pointer back. A decorative glyph that swallowed a press would leave part
  *   of the field dead to a pointer and working to a keyboard.
@@ -15,12 +17,19 @@
  *   a mark centred against the whole box floats in the middle of it.
  */
 
-import { defineSlotRecipe, onSlots, sizeVariants } from "@stealthscale/theme/authoring";
+import {
+  CONTROL_INSET_END,
+  CONTROL_INSET_START,
+  defineSlotRecipe,
+  onSlots,
+  sizeVariants,
+} from "@stealthscale/theme/authoring";
 
 /**
- * The custom property the field reads the room for a mark from.
+ * The property the group states the room a mark takes in, which every step of the size axis
+ * writes and the marks axis hands to one side or both.
  */
-const INSET = "--input-group-inset";
+const ROOM = "--input-group-room";
 
 /**
  * Writes what both marks share, since the two differ only in the end they sit at.
@@ -69,15 +78,15 @@ export const recipe = defineSlotRecipe({
      */
     marks: {
       both: {
-        field: { paddingInlineEnd: `var(${INSET})`, paddingInlineStart: `var(${INSET})` },
+        root: { [CONTROL_INSET_END]: `var(${ROOM})`, [CONTROL_INSET_START]: `var(${ROOM})` },
       },
-      end: { field: { paddingInlineEnd: `var(${INSET})` } },
-      start: { field: { paddingInlineStart: `var(${INSET})` } },
+      end: { root: { [CONTROL_INSET_END]: `var(${ROOM})` } },
+      start: { root: { [CONTROL_INSET_START]: `var(${ROOM})` } },
     },
 
     size: onSlots({
       end: sizeVariants((size) => ({ inlineSize: `control.${size}` })),
-      root: sizeVariants((size) => ({ [INSET]: `{sizes.control.${size}}` })),
+      root: sizeVariants((size) => ({ [ROOM]: `{sizes.control.${size}}` })),
       start: sizeVariants((size) => ({ inlineSize: `control.${size}` })),
     }),
   },

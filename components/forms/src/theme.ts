@@ -15,5 +15,5 @@ import { recipe as searchInput } from "#search-input/recipe.ts";
 
 export default definePreset({
   name: "@stealthscale/component-forms",
-  theme: { extend: { recipes: { input }, slotRecipes: { inputGroup, searchInput } } },
+  theme: { extend: { recipes: { input, searchInput }, slotRecipes: { inputGroup } } },
 });

@@ -13,8 +13,8 @@ describe("recipe", () => {
     expect(recipe.className).toBe("search-input");
   });
 
-  it("draws the three parts a search field is composed of", () => {
-    expect([...recipe.slots].toSorted()).toStrictEqual(["clear", "field", "root"]);
+  it("draws the control as something a person presses", () => {
+    expect(recipe.base).toMatchObject({ cursor: "button", focusVisibleRing: "outside" });
   });
 
   it("offers the one axis a search field takes", () => {
@@ -38,15 +38,8 @@ describe("recipe", () => {
     ]);
   });
 
-  it("leaves the field room at its end for exactly what the control occupies", () => {
-    expect(recipe.variants?.["size"]?.["md"]).toStrictEqual({
-      clear: { boxSize: "control.md", padding: "0" },
-      field: { paddingInlineEnd: "{sizes.control.md}" },
-    });
-  });
-
-  it("states none of the field's own surface because the text field's recipe owns it", () => {
-    expect(recipe.base?.["field"]).toBeUndefined();
+  it("fills the mark the group sizes off the control scale", () => {
+    expect(recipe.base).toMatchObject({ blockSize: "full", inlineSize: "full" });
   });
 
   it("tracks the tag named SearchInput", () => {

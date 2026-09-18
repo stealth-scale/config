@@ -4,7 +4,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { accessibilityViolations } from "@stealthscale/testing-react";
-import { slotElement } from "@stealthscale/testing-theme";
+import { slotElement, variantClass } from "@stealthscale/testing-theme";
 
 import { SearchInput } from "#search-input/search-input.tsx";
 
@@ -27,9 +27,17 @@ describe("SearchInput", () => {
   });
 
   it("draws a field of type search", () => {
+    render(<SearchInput aria-label="Search" />);
+
+    expect(screen.getByRole("searchbox").getAttribute("type")).toBe("search");
+  });
+
+  it("reserves room at the end of the field for the control alone", () => {
     const { container } = render(<SearchInput aria-label="Search" />);
 
-    expect(slotElement(container, "search-input", "field").getAttribute("type")).toBe("search");
+    expect([...slotElement(container, "input-group", "root").classList]).toContain(
+      variantClass("input-group__root", "marks", "end"),
+    );
   });
 
   it("hands the size a caller states to the field and to the control alike", () => {
@@ -37,8 +45,15 @@ describe("SearchInput", () => {
       <SearchInput aria-label="Search" clearIndicator="x" defaultValue="invoices" size="lg" />,
     );
 
-    expect(slotElement(container, "search-input", "field").className).toContain("lg");
-    expect(slotElement(container, "search-input", "clear").className).toContain("lg");
+    expect([...screen.getByRole("searchbox").classList]).toContain(
+      variantClass("input", "size", "lg"),
+    );
+    expect([...slotElement(container, "input-group", "root").classList]).toContain(
+      variantClass("input-group__root", "size", "lg"),
+    );
+    expect([...screen.getByRole("button", { name: "Clear search" }).classList]).toContain(
+      variantClass("search-input", "size", "lg"),
+    );
   });
 
   it("draws no control where it holds nothing", () => {

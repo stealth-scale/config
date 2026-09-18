@@ -3,25 +3,24 @@ import { createElement } from "react";
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { slotClasses, slotVariantClass } from "@stealthscale/testing-theme";
+import { recipeClasses, variantClass } from "@stealthscale/testing-theme";
 
-import { withContext, withProvider } from "#search-input/context.ts";
+import { withContext } from "#search-input/context.ts";
 
 describe("context", () => {
-  it("draws the root's slot class on the element it binds", () => {
-    const Root = withProvider("div", "root");
-    const { container } = render(createElement(Root));
+  it("draws the recipe's class on an element it binds", () => {
+    const Probe = withContext("button");
+    const { container } = render(createElement(Probe));
 
-    expect(slotClasses(container, "search-input", "root")).toContain("search-input__root");
+    expect(recipeClasses(container, "search-input")).toContain("search-input");
   });
 
-  it("hands the root's size to a part below it", () => {
-    const Root = withProvider("div", "root");
-    const Clear = withContext("button", "clear");
-    const { container } = render(createElement(Root, { size: "lg" }, createElement(Clear)));
+  it("writes the class of a size a caller picks", () => {
+    const Probe = withContext("button");
+    const { container } = render(createElement(Probe, { size: "lg" }));
 
-    expect(slotClasses(container, "search-input", "clear")).toContain(
-      slotVariantClass("search-input", "clear", "size", "lg"),
+    expect(recipeClasses(container, "search-input")).toContain(
+      variantClass("search-input", "size", "lg"),
     );
   });
 });

@@ -1,16 +1,17 @@
 /**
- * Binds the search field's recipe to the elements that draw its parts.
+ * Binds the search control's recipe to the element that draws it.
  *
  * @remarks
  *   Apart from the recipe, because an application's compiler reads the recipe at build time and
- *   the binding needs the runtime.
+ *   the binding needs the runtime. A recipe file that also bound one would put the runtime behind
+ *   every compiler configuration that reads it.
  */
 
-import { createSlotRecipeContext } from "@stealthscale/theme";
+import { createRecipeContext } from "@stealthscale/theme";
 
 import { recipe } from "#search-input/recipe.ts";
 
 /**
- * Binds the recipe once. The root provides the size and the other parts read it.
+ * Binds the recipe once, for the control that empties the field.
  */
-export const { withContext, withProvider } = createSlotRecipeContext(recipe);
+export const { withContext } = createRecipeContext(recipe);

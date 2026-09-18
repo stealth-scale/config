@@ -7,9 +7,12 @@ component-forms: publish InputGroup
 - `InputGroup` draws a field with a mark at one end or both: a currency symbol, a unit, a glyph, or
   a control. Four parts under one namespace: `Root`, `Field`, `Start` and `End`.
 - The marks are drawn over the field and the field reserves room for them, so the typing never runs
-  underneath. The room is one custom property. `size` writes it on the root as the control height of
-  that step, and `marks` reads it on the side a mark sits, which is one axis pair rather than a
-  compound for every size and side.
+  underneath. The group writes no padding: `size` states the room on the root and `marks` hands it
+  to `--control-inset-start` or `--control-inset-end`, which every recipe built on `controlSizes`
+  reads with its own step as the fallback. The control's recipe stays the one rule writing its
+  padding, so restyling the control never races the group for the property.
+- `SearchInput` is drawn on the group with `marks="end"`, so the two write one mechanism between
+  them. Its own recipe is now the control that empties the field and nothing else.
 - `marks` takes `start`, `end` or `both`, defaulting to `both`. `size` reads the control scale, so a
   mark and the field step together and a group lines up with a button beside it.
 - `InputGroup.Field` binds the text field, so a group holding one needs no `as`. Another control

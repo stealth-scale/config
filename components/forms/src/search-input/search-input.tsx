@@ -2,9 +2,10 @@
  * Draws a search field: a text field that empties itself from a control at its end.
  *
  * @remarks
- *   The field is the text field's own component, so a theme that moves every field moves this one
- *   and neither recipe restates the other. The control is a part of this recipe rather than a
- *   button from elsewhere, which keeps this package off every other component package.
+ *   The box, the field and the room the field leaves at its end are the input group's, so a theme
+ *   that moves every grouped field moves this one and neither recipe restates the other. The
+ *   control is a part of this recipe rather than a button from elsewhere, which keeps this package
+ *   off every other component package.
  *   The control is drawn only where there is something to clear. A control that is always there
  *   and does nothing half the time is a control a reader learns to pass over, and a keyboard
  *   reaches it either way. Clearing puts focus back in the field, because a person who has just
@@ -15,23 +16,15 @@ import { type ComponentProps, type ReactElement, type ReactNode, useCallback, us
 
 import { useControllableState } from "@stealthscale/hooks";
 
-import { Input } from "#input/input.ts";
-import { withContext, withProvider } from "#search-input/context.ts";
-
-/**
- * Draws the box the field and its control sit in.
- */
-const Root = withProvider("div", "root");
-
-/**
- * Draws the field, which the text field's own recipe styles beside this one.
- */
-const Field = withContext(Input, "field");
+import { End } from "#input-group/end.ts";
+import { Field } from "#input-group/field.ts";
+import { Root } from "#input-group/root.ts";
+import { withContext } from "#search-input/context.ts";
 
 /**
  * Draws the control that empties the field.
  */
-const Clear = withContext("button", "clear", { defaultProps: { type: "button" } });
+const Clear = withContext("button", { defaultProps: { type: "button" } });
 
 /**
  * Describes what a search field takes.
@@ -94,9 +87,10 @@ export function SearchInput({
   }, [setHeld]);
 
   const sized = size === undefined ? {} : { size };
+  const shown = held !== "" && clearIndicator !== undefined;
 
   return (
-    <Root {...sized}>
+    <Root {...sized} marks="end">
       <Field
         {...rest}
         {...sized}
@@ -107,11 +101,13 @@ export function SearchInput({
         type="search"
         value={held}
       />
-      {held === "" || clearIndicator === undefined ? undefined : (
-        <Clear aria-label={clearLabel} onClick={clear}>
-          {clearIndicator}
-        </Clear>
-      )}
+      {shown ? (
+        <End {...sized}>
+          <Clear {...sized} aria-label={clearLabel} onClick={clear}>
+            {clearIndicator}
+          </Clear>
+        </End>
+      ) : undefined}
     </Root>
   );
 }

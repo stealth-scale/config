@@ -47,20 +47,31 @@ describe("recipe", () => {
     ]);
   });
 
-  it("writes the room on the root and reads it on the field", () => {
+  it("states the room on the root as the control height of the step", () => {
     expect(recipe.variants?.["size"]?.["md"]?.["root"]).toStrictEqual({
-      "--input-group-inset": "{sizes.control.md}",
-    });
-    expect(recipe.variants?.["marks"]?.["both"]?.["field"]).toStrictEqual({
-      paddingInlineEnd: "var(--input-group-inset)",
-      paddingInlineStart: "var(--input-group-inset)",
+      "--input-group-room": "{sizes.control.md}",
     });
   });
 
-  it("reserves one side only where a mark sits at one end", () => {
-    expect(recipe.variants?.["marks"]?.["start"]?.["field"]).toStrictEqual({
-      paddingInlineStart: "var(--input-group-inset)",
+  it("hands the room to the control's own inset property rather than writing padding", () => {
+    expect(recipe.variants?.["marks"]?.["both"]?.["root"]).toStrictEqual({
+      "--control-inset-end": "var(--input-group-room)",
+      "--control-inset-start": "var(--input-group-room)",
     });
+  });
+
+  it("opens one side only where a mark sits at one end", () => {
+    expect(recipe.variants?.["marks"]?.["start"]?.["root"]).toStrictEqual({
+      "--control-inset-start": "var(--input-group-room)",
+    });
+  });
+
+  it("writes nothing on the field slot", () => {
+    expect.hasAssertions();
+
+    for (const value of Object.values(recipe.variants?.["marks"] ?? {})) {
+      expect(value).not.toHaveProperty("field");
+    }
   });
 
   it("lets a press over a mark reach the field behind it", () => {

@@ -2,7 +2,7 @@
 "@stealthscale/theme": minor
 ---
 
-theme: publish the field looks as layer styles and a status axis for a field
+theme: publish the field looks as layer styles and open a control's insets
 
 - `layerStyles.field` names `outline` on `bg.panel`, `subtle` on `bg.muted`, and `flushed` with its
   bottom edge alone. A field recipe wrote those colours itself before this, so a theme that restated
@@ -17,6 +17,15 @@ theme: publish the field looks as layer styles and a status axis for a field
   `touchTarget()` grows.
 - `field()` sets the same `transitionProperty`, `transitionDuration` and `transitionTimingFunction`
   as `interactive()`, so a field and a button in one row settle together rather than one snapping.
+- `controlSizes()` writes each inline inset through a custom property with the step as the fallback:
+  `paddingInlineStart: var(--control-inset-start, {spacing.inset.<size>})`, and the same for the
+  end. `CONTROL_INSET_START` and `CONTROL_INSET_END` name the two.
+- A component that places something inside a control opens the side it needs by setting a property
+  rather than by writing padding of its own. The control's own recipe stays the one rule writing its
+  padding, so the two never race for the property and a theme that restyles the control keeps the
+  room. Every recipe reading `controlSizes()` is groupable through this.
+- Nothing moves for a control outside such a component. The property is unset and the fallback is
+  the step the helper wrote before.
 
 theme: add role tables for a ramp keyed by its own steps
 

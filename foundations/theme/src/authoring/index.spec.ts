@@ -24,6 +24,8 @@ const SURFACE = [
   "compoundSelection",
   "contract",
   "contrast",
+  "CONTROL_INSET_END",
+  "CONTROL_INSET_START",
   "controls",
   "controlSizes",
   "CORNERS",

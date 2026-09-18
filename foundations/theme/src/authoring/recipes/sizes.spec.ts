@@ -5,6 +5,8 @@ import { recipeViolations } from "@stealthscale/testing-theme";
 import { defineRecipe } from "#authoring/recipe.ts";
 import {
   below,
+  CONTROL_INSET_END,
+  CONTROL_INSET_START,
   controlSizes,
   iconOnly,
   iconSizes,
@@ -19,8 +21,24 @@ const SIZES = ["xs", "sm", "md", "lg", "xl"] as const;
 describe("sizes", () => {
   it("reads the four semantic scales for each control size", () => {
     expect(controlSizes(["md"])).toMatchObject({
-      md: { gap: "gap.md", height: "control.md", paddingInline: "inset.md", textStyle: "label.md" },
+      md: { gap: "gap.md", height: "control.md", textStyle: "label.md" },
     });
+  });
+
+  it("reads each inset through a property with the step as the fallback", () => {
+    expect(controlSizes(["md"])).toMatchObject({
+      md: {
+        paddingInlineEnd: "var(--control-inset-end, {spacing.inset.md})",
+        paddingInlineStart: "var(--control-inset-start, {spacing.inset.md})",
+      },
+    });
+  });
+
+  it("names the two properties a component opens a side of a control with", () => {
+    expect([CONTROL_INSET_START, CONTROL_INSET_END]).toStrictEqual([
+      "--control-inset-start",
+      "--control-inset-end",
+    ]);
   });
 
   it("leads with one step less inset where a mark opens the control", () => {

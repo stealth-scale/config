@@ -78,6 +78,8 @@ export {
   type Anatomy,
   below,
   columnCounts,
+  CONTROL_INSET_END,
+  CONTROL_INSET_START,
   controlSizes,
   cornerVariants,
   type Count,
