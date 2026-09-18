@@ -6,14 +6,24 @@
 export {
   alphaScale,
   backgrounds,
+  BORDER_STEPS,
   borders,
   colorScale,
+  FOREGROUND_STEPS,
   foregrounds,
   neutralFills,
   oklch,
   type PageLightness,
   paletteAlias,
   paletteRoles,
+  ramp,
+  ROLE_STEPS,
+  type RoleSteps,
+  type Step,
+  stepped,
+  type Steps,
+  surfaces,
+  type SurfaceSteps,
 } from "#scales/color.ts";
 export { radii, shadows } from "#scales/depth.ts";
 export {

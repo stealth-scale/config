@@ -176,15 +176,26 @@ A hue palette states every role in both modes. A semantic palette states one val
 `paletteAlias(hue)` writes as references. Each family adds `info`, `success`, `warning` and `error`
 as references into the status palettes.
 
+A theme transcribed from another design system keeps that system's steps. It keys each ramp with
+`ramp(keys, values)`, nests a dark ramp under the light one where the system draws one, and places
+the roles with a table: `paletteRoles("blue", STEPS, "blue.dark")`, where `STEPS` names a step for
+each role in each mode, or states a role outright. `ROLE_STEPS`, `FOREGROUND_STEPS` and
+`BORDER_STEPS` are the foundation's own tables, and a theme spreads over them for the roles it
+moves.
+
 ### Scales
 
 | Export                                              | Draws                                                                                                               |
 | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | `colorScale(hue, chroma)`                           | Eleven OKLCH steps, `50` to `950`                                                                                   |
 | `alphaScale("white" \| "black")`                    | Eleven steps of an overlay                                                                                          |
+| `ramp(keys, values)`                                | A ramp transcribed from a source, keyed as the source keys it                                                       |
 | `backgrounds(pages, hue, chroma)`                   | The `bg` family from the page's lightness in each mode                                                              |
-| `foregrounds(ramp)`, `borders(ramp)`                | The `fg` and `border` families from a grey ramp                                                                     |
-| `paletteRoles(ramp)`                                | The twelve roles of a hue palette                                                                                   |
+| `surfaces(ramp, steps, darkRamp?)`                  | The `bg` family from the steps a table names on a neutral ramp                                                      |
+| `foregrounds(ramp, steps?, darkRamp?)`              | The `fg` family from a grey ramp, at the foundation's steps or a table's                                            |
+| `borders(ramp, steps?, darkRamp?)`                  | The `border` family from a grey ramp, at the foundation's steps or a table's                                        |
+| `stepped(ramp, light, dark, darkRamp?)`             | One color as a reference to a step in each mode                                                                     |
+| `paletteRoles(ramp, steps?, darkRamp?)`             | The twelve roles of a hue palette, at `ROLE_STEPS` or a table's, from one ramp or one per mode                      |
 | `paletteAlias(hue)`                                 | The twelve roles of a semantic palette, by reference                                                                |
 | `neutralFills()`                                    | The neutral palette's quiet fills, pointed at the page's surfaces                                                   |
 | `families(pages, hue, chroma)`                      | The three families in one call                                                                                      |

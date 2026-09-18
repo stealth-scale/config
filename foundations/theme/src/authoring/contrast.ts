@@ -30,9 +30,11 @@ interface Linear {
 }
 
 /**
- * Matches an OKLCH color, whether the lightness carries a percentage or runs 0 to 1.
+ * Matches an OKLCH color, whether the lightness carries a percentage or runs 0 to 1, and whether
+ * the hue is a number or `none`.
  */
-const OKLCH = /^oklch\(\s*(?<lightness>[\d.]+)(?<percent>%)?\s+(?<chroma>[\d.]+)\s+(?<hue>[\d.]+)/u;
+const OKLCH =
+  /^oklch\(\s*(?<lightness>[\d.]+)(?<percent>%)?\s+(?<chroma>[\d.]+)\s+(?<hue>[\d.]+|none)/u;
 
 /**
  * Matches a hex color of three, four, six or eight digits.
@@ -72,7 +74,8 @@ function decoded(channel: number): number {
  * @remarks
  *   A channel outside 0 to 1 is a color outside the display's gamut, and clamping it here would
  *   report a contrast the reader never sees. The matrices are Björn Ottosson's. A percentage runs
- *   to a hundred and a bare number runs to one, and CSS accepts both.
+ *   to a hundred and a bare number runs to one, and CSS accepts both. A hue of `none` is a grey,
+ *   and reads as zero.
  * @returns The color in linear sRGB, or undefined where the value is not OKLCH.
  */
 function fromOklch(color: string): Linear | undefined {
@@ -82,7 +85,7 @@ function fromOklch(color: string): Linear | undefined {
 
   const lightness = Number(read["lightness"]) / (read["percent"] === undefined ? 1 : 100);
   const chroma = Number(read["chroma"]);
-  const radians = (Number(read["hue"]) * Math.PI) / 180;
+  const radians = read["hue"] === "none" ? 0 : (Number(read["hue"]) * Math.PI) / 180;
   const a = chroma * Math.cos(radians);
   const b = chroma * Math.sin(radians);
   const long = (lightness + 0.396_337_777_4 * a + 0.215_803_757_3 * b) ** 3;

@@ -18,6 +18,7 @@ describe("contrast", () => {
   it.each([
     "oklch(100.0% 0.0000 0.0)",
     "oklch(1 0 0)",
+    "oklch(100% 0 none)",
     "#ffffff",
     "#fff",
     "rgb(255, 255, 255)",

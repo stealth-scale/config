@@ -4,17 +4,35 @@ import { HUES, ROLES } from "#authoring/contract.ts";
 import {
   alphaScale,
   backgrounds,
+  BORDER_STEPS,
   borders,
   colorScale,
+  FOREGROUND_STEPS,
   foregrounds,
   neutralFills,
   oklch,
   paletteAlias,
   paletteRoles,
+  ramp,
+  ROLE_STEPS,
+  stepped,
+  surfaces,
+  type SurfaceSteps,
 } from "#scales/color.ts";
 import { modedAt, tokenAt } from "#tokens.fixtures.ts";
 
 const STEPS = ["50", "100", "200", "300", "400", "500", "600", "700", "800", "900", "950"];
+
+const SURFACE_STEPS: SurfaceSteps = {
+  DEFAULT: [0, 1],
+  disabled: [2, 3],
+  emphasized: [3, 4],
+  inverted: [12, 12],
+  muted: [2, 3],
+  panel: [0, 2],
+  popover: [0, 2],
+  subtle: [1, 2],
+};
 
 function chromaOf(color: string): number {
   return Number(/oklch\([\d.]+% (?<chroma>[\d.]+) /u.exec(color)?.groups?.["chroma"]);
@@ -78,31 +96,31 @@ describe("color", () => {
   });
 
   it("draws the page at the lightness it was given in each mode", () => {
-    const surfaces = backgrounds({ dark: 13, light: 97 }, 262, 0.006);
+    const drawn = backgrounds({ dark: 13, light: 97 }, 262, 0.006);
 
-    expect(modedAt(surfaces, "DEFAULT", "base")).toContain("97.0%");
-    expect(modedAt(surfaces, "DEFAULT", "_dark")).toContain("13.0%");
+    expect(modedAt(drawn, "DEFAULT", "base")).toContain("97.0%");
+    expect(modedAt(drawn, "DEFAULT", "_dark")).toContain("13.0%");
   });
 
   it("draws a surface away from the page in both modes", () => {
-    const surfaces = backgrounds({ dark: 13, light: 97 }, 262, 0.006);
+    const drawn = backgrounds({ dark: 13, light: 97 }, 262, 0.006);
 
-    expect(modedAt(surfaces, "muted", "_dark")).toContain("20.0%");
-    expect(modedAt(surfaces, "muted", "base")).toContain("90.0%");
+    expect(modedAt(drawn, "muted", "_dark")).toContain("20.0%");
+    expect(modedAt(drawn, "muted", "base")).toContain("90.0%");
   });
 
   it("draws the inverted surface at the other mode's page", () => {
-    const surfaces = backgrounds({ dark: 13, light: 97 }, 262, 0.006);
+    const drawn = backgrounds({ dark: 13, light: 97 }, 262, 0.006);
 
-    expect(modedAt(surfaces, "inverted", "base")).toContain("13.0%");
-    expect(modedAt(surfaces, "inverted", "_dark")).toContain("97.0%");
+    expect(modedAt(drawn, "inverted", "base")).toContain("13.0%");
+    expect(modedAt(drawn, "inverted", "_dark")).toContain("97.0%");
   });
 
   it("stops at white or black rather than wrapping", () => {
-    const surfaces = backgrounds({ dark: 2, light: 99 }, 262, 0.006);
+    const drawn = backgrounds({ dark: 2, light: 99 }, 262, 0.006);
 
-    expect(modedAt(surfaces, "emphasized", "base")).toContain("88.0%");
-    expect(modedAt(surfaces, "emphasized", "_dark")).toContain("13.0%");
+    expect(modedAt(drawn, "emphasized", "base")).toContain("88.0%");
+    expect(modedAt(drawn, "emphasized", "_dark")).toContain("13.0%");
   });
 
   it("references the status palettes for the status surfaces", () => {
@@ -200,5 +218,67 @@ describe("color", () => {
     expect(HUES.map((hue) => Object.keys(paletteRoles(hue)).length)).toStrictEqual(
       HUES.map(() => 9),
     );
+  });
+
+  it("keys a transcribed ramp by the steps it was given", () => {
+    expect(ramp([0, "tint10"], ["#ffffff", "#000000"])).toStrictEqual({
+      0: { value: "#ffffff" },
+      tint10: { value: "#000000" },
+    });
+  });
+
+  it("throws when a ramp names more steps than it has colors", () => {
+    expect(() => ramp([0, 1], ["#ffffff"])).toThrow("2 steps were named for 1 colors");
+  });
+
+  it("references the dark step from the dark ramp when one is named", () => {
+    expect(stepped("blue", 5, 4, "blue.dark")).toStrictEqual({
+      value: { _dark: "{colors.blue.dark.4}", base: "{colors.blue.5}" },
+    });
+  });
+
+  it("places each role where a table puts it", () => {
+    const palette = paletteRoles("blue", { ...ROLE_STEPS, solid: [6, 4] }, "blue.dark");
+
+    expect(modedAt(palette, "solid.DEFAULT", "base")).toBe("{colors.blue.6}");
+    expect(modedAt(palette, "solid.DEFAULT", "_dark")).toBe("{colors.blue.dark.4}");
+    expect(modedAt(palette, "subtle", "_dark")).toBe("{colors.blue.dark.900}");
+  });
+
+  it("keeps a role a table states outright", () => {
+    const contrast = { value: { _dark: "{colors.white}", base: "{colors.white}" } };
+
+    expect(paletteRoles("blue", { ...ROLE_STEPS, contrast }).contrast).toStrictEqual(contrast);
+  });
+
+  it("draws the surfaces from the steps a table names", () => {
+    const drawn = surfaces("gray", SURFACE_STEPS, "gray.dark");
+
+    expect(modedAt(drawn, "DEFAULT", "base")).toBe("{colors.gray.0}");
+    expect(modedAt(drawn, "panel", "_dark")).toBe("{colors.gray.dark.2}");
+    expect(modedAt(drawn, "backdrop", "base")).toBe("oklch(0% 0 0 / 0.44)");
+    expect(tokenAt(drawn, "info")).toBe("{colors.info.subtle}");
+  });
+
+  it("keeps a backdrop the table states", () => {
+    const backdrop = { value: "{colors.blackAlpha.700}" };
+
+    expect(surfaces("gray", { ...SURFACE_STEPS, backdrop }).backdrop).toStrictEqual(backdrop);
+  });
+
+  it("places the inks and the lines where a table puts them", () => {
+    const inks = foregrounds("gray", { ...FOREGROUND_STEPS, muted: [10, 9] }, "gray.dark");
+    const lines = borders("gray", { ...BORDER_STEPS, emphasized: [9, 8] });
+
+    expect(modedAt(inks, "muted", "_dark")).toBe("{colors.gray.dark.9}");
+    expect(tokenAt(inks, "link")).toBe("{colors.primary.fg}");
+    expect(modedAt(lines, "emphasized", "base")).toBe("{colors.gray.9}");
+    expect(tokenAt(lines, "focus")).toBe("{colors.primary.focusRing}");
+  });
+
+  it("keeps an ink a table states outright", () => {
+    const subtle = { value: "{colors.gray.500}" };
+
+    expect(foregrounds("gray", { ...FOREGROUND_STEPS, subtle }).subtle).toStrictEqual(subtle);
   });
 });

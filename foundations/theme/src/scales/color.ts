@@ -109,13 +109,37 @@ const ALPHAS: ReadonlyArray<readonly [step: number, alpha: number]> = [
 ];
 
 /**
+ * Selects one step of a ramp: a number for a ramp keyed by number, or a string for a ramp keyed
+ * the way its source keys it.
+ */
+export type Step = number | string;
+
+/**
+ * Places each member of a group on a ramp, as a step for light mode and a step for dark mode, or
+ * fills it with a color stated outright.
+ *
+ * @typeParam Member - The members the group names.
+ * @typeParam Leaf - The shape a color stated outright takes.
+ */
+export type Steps<Member extends string, Leaf extends Filled = Filled> = Readonly<
+  Record<Member, Leaf | readonly [light: Step, dark: Step]>
+>;
+
+/**
+ * Places each of the twelve roles on a ramp. A role stated outright carries both modes, because
+ * a hue palette states every role in both.
+ */
+export type RoleSteps = Steps<Role, Moded>;
+
+/**
  * Places each role on the ramp, in light mode and then in dark mode.
  *
  * @remarks
- *   The steps are the ones the accessibility gate accepts: every ink clears 7:1 on every fill it
- *   is drawn on, and every border and ring clears 3:1 on the page.
+ *   The steps are the ones the accessibility gate accepts on a ramp the foundation draws: every
+ *   ink clears 7:1 on every fill it is drawn on, and every border and ring clears 3:1 on the
+ *   page. A theme on a ramp of another shape states its own table.
  */
-const ROLE_STEPS: Readonly<Record<Role, readonly [light: number, dark: number]>> = {
+export const ROLE_STEPS: RoleSteps = {
   bg: [50, 950],
   border: [500, 500],
   "border.hover": [600, 400],
@@ -129,6 +153,41 @@ const ROLE_STEPS: Readonly<Record<Role, readonly [light: number, dark: number]>>
   "solid.hover": [800, 300],
   subtle: [100, 900],
 };
+
+/**
+ * Places each ink on the grey ramp, in light mode and then in dark mode.
+ *
+ * @remarks
+ *   `muted` clears 7:1 on every surface and `subtle` clears 3:1, which is the boundary ratio and
+ *   not the text ratio, so a recipe never writes `subtle` as a text color.
+ */
+export const FOREGROUND_STEPS: Steps<"DEFAULT" | "inverted" | "muted" | "subtle"> = {
+  DEFAULT: [950, 50],
+  inverted: [50, 950],
+  muted: [800, 300],
+  subtle: [600, 500],
+};
+
+/**
+ * Places each line on the grey ramp, one step further from the page at each weight.
+ *
+ * @remarks
+ *   `emphasized` clears 3:1 on every surface, which is what 1.4.11 asks of a control's edge.
+ */
+export const BORDER_STEPS: Steps<"DEFAULT" | "emphasized" | "inverted" | "muted" | "subtle"> = {
+  DEFAULT: [300, 700],
+  emphasized: [600, 500],
+  inverted: [700, 300],
+  muted: [200, 800],
+  subtle: [100, 900],
+};
+
+/**
+ * Reports whether a table entry is a pair of steps rather than a color stated outright.
+ */
+function isSteps(entry: Filled | readonly [Step, Step]): entry is readonly [Step, Step] {
+  return Array.isArray(entry);
+}
 
 /**
  * Fixes the chroma at which a hue reads as a color rather than as a tinted grey.
@@ -206,13 +265,69 @@ export function alphaScale(base: "black" | "white"): Colors {
 }
 
 /**
- * Writes a reference to one step of a ramp in light mode and another in dark mode.
+ * Keys a ramp a theme transcribes from its source, step by step.
+ *
+ * @remarks
+ *   The keys are the source's own, so a role table reads in the source's vocabulary and a reader
+ *   can check a value against the source by its name.
+ * @param keys - The step names, from the lightest to the darkest.
+ * @param values - One color per step, as CSS reads it.
+ * @throws {@link Error} When the two lists differ in length.
  */
-function stepped(name: string, light: number, dark: number): Moded {
+export function ramp(keys: readonly Step[], values: readonly string[]): Colors {
+  if (keys.length !== values.length) {
+    throw new Error(`${String(keys.length)} steps were named for ${String(values.length)} colors`);
+  }
+
+  return Object.fromEntries(values.map((value, index) => [String(keys[index]), { value }]));
+}
+
+/**
+ * Writes a reference to one step of a ramp in light mode and another in dark mode.
+ *
+ * @remarks
+ *   The dark step is read from the same ramp unless another is named, which a theme does where
+ *   its source draws its dark mode as a ramp of its own.
+ */
+export function stepped(name: string, light: Step, dark: Step, darkName = name): Moded {
   return {
-    value: { _dark: `{colors.${name}.${String(dark)}}`, base: `{colors.${name}.${String(light)}}` },
+    value: {
+      _dark: `{colors.${darkName}.${String(dark)}}`,
+      base: `{colors.${name}.${String(light)}}`,
+    },
   };
 }
+
+/**
+ * Fills each member of a group from its table entry: a pair of steps as references into the
+ * ramp, or a color stated outright as it is.
+ */
+function tabled<Member extends string>(
+  name: string,
+  steps: Steps<Member>,
+  darkName: string,
+): Record<Member, Filled> {
+  const filled = Object.fromEntries(
+    Object.entries<Filled | readonly [Step, Step]>(steps).map(([member, entry]) => [
+      member,
+      isSteps(entry) ? stepped(name, entry[0], entry[1], darkName) : entry,
+    ]),
+  );
+
+  // eslint-disable-next-line typescript/no-unsafe-type-assertion -- fromEntries widens the keys the table already narrows
+  return filled as Record<Member, Filled>;
+}
+
+/**
+ * Places each surface of a page on a ramp, with the backdrop stated outright where a source
+ * names one.
+ */
+export type SurfaceSteps = {
+  /**
+   * The overlay behind a dialog, or the foundation's where the source names none.
+   */
+  backdrop?: Filled | undefined;
+} & Steps<Exclude<keyof Backgrounds, "backdrop" | Status>>;
 
 /**
  * Writes a reference to a color token that carries both modes itself.
@@ -281,22 +396,43 @@ export function backgrounds(pages: PageLightness, hue: number, chroma: number): 
 }
 
 /**
+ * Draws the surfaces a page is built from as steps of a ramp, for a theme whose source states
+ * its surfaces on its neutral scale rather than at a distance from the page.
+ *
+ * @remarks
+ *   The backdrop is the foundation's overlay unless the table states one, because few sources
+ *   name a step for it. The status members reference the status palettes' quiet fills.
+ * @param name - The ramp the surfaces are read from.
+ * @param steps - Where each surface sits on the ramp in each mode.
+ * @param darkName - The ramp the dark steps are read from, where the source draws one.
+ */
+export function surfaces(name: string, steps: SurfaceSteps, darkName = name): Backgrounds {
+  const { backdrop, ...rest } = steps;
+
+  return {
+    backdrop: backdrop ?? {
+      value: { _dark: "oklch(0% 0 0 / 0.64)", base: "oklch(0% 0 0 / 0.44)" },
+    },
+    ...tabled(name, rest, darkName),
+    ...statuses("subtle"),
+  };
+}
+
+/**
  * Draws the inks a page is written in, against the grey ramp it was built from.
  *
  * @remarks
- *   `muted` clears 7:1 on every surface and `subtle` clears 3:1, which is the boundary ratio and
- *   not the text ratio, so a recipe never writes `subtle` as a text color. The link ink and the
- *   status inks reference the palettes that own them.
+ *   The link ink and the status inks reference the palettes that own them, and the disabled ink
+ *   references the subtle one. A theme on another neutral scale states where each ink sits.
  * @param name - The ramp to read, which is the theme's grey unless it says otherwise.
+ * @param steps - Where each ink sits on the ramp in each mode.
+ * @param darkName - The ramp the dark steps are read from, where the source draws one.
  */
-export function foregrounds(name = "gray"): Foregrounds {
+export function foregrounds(name = "gray", steps = FOREGROUND_STEPS, darkName = name): Foregrounds {
   return {
-    DEFAULT: stepped(name, 950, 50),
     disabled: referenced("fg.subtle"),
-    inverted: stepped(name, 50, 950),
     link: referenced("primary.fg"),
-    muted: stepped(name, 800, 300),
-    subtle: stepped(name, 600, 500),
+    ...tabled(name, steps, darkName),
     ...statuses("fg"),
   };
 }
@@ -305,19 +441,16 @@ export function foregrounds(name = "gray"): Foregrounds {
  * Draws the lines between things, one step further from the page at each weight.
  *
  * @remarks
- *   `emphasized` clears 3:1 on every surface, which is what 1.4.11 asks of a control's edge. The
- *   focus line references the primary palette's ring, and the status lines the palettes that own
- *   them.
+ *   The focus line references the primary palette's ring, and the status lines the palettes that
+ *   own them. A theme on another neutral scale states where each line sits.
  * @param name - The ramp to read.
+ * @param steps - Where each line sits on the ramp in each mode.
+ * @param darkName - The ramp the dark steps are read from, where the source draws one.
  */
-export function borders(name = "gray"): Borders {
+export function borders(name = "gray", steps = BORDER_STEPS, darkName = name): Borders {
   return {
-    DEFAULT: stepped(name, 300, 700),
-    emphasized: stepped(name, 600, 500),
     focus: referenced("primary.focusRing"),
-    inverted: stepped(name, 700, 300),
-    muted: stepped(name, 200, 800),
-    subtle: stepped(name, 100, 900),
+    ...tabled(name, steps, darkName),
     ...statuses("border"),
   };
 }
@@ -346,14 +479,18 @@ function roles<Leaf>(fill: (role: Role) => Leaf): PaletteRoles<Leaf> {
  *
  * @remarks
  *   A recipe never names a step of a ramp. It names a role, and the ramp decides which step fills
- *   it, which is what lets one recipe draw in every palette an application installs.
+ *   it, which is what lets one recipe draw in every palette an application installs. The table
+ *   is the foundation's unless the theme states one, and a theme whose source draws its dark
+ *   mode as a second ramp names that ramp.
  * @param name - The ramp the roles are drawn from.
+ * @param steps - Where each role sits on the ramp in each mode.
+ * @param darkName - The ramp the dark steps are read from.
  */
-export function paletteRoles(name: string): HuePalette {
+export function paletteRoles(name: string, steps = ROLE_STEPS, darkName = name): HuePalette {
   return roles((role) => {
-    const [light, dark] = ROLE_STEPS[role];
+    const entry = steps[role];
 
-    return stepped(name, light, dark);
+    return isSteps(entry) ? stepped(name, entry[0], entry[1], darkName) : entry;
   });
 }
 
