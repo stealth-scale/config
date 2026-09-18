@@ -2,7 +2,17 @@
 "@stealthscale/component-forms": minor
 ---
 
-component-forms: publish Field and InputGroup
+component-forms: publish Fieldset, Field and InputGroup
+
+- `Fieldset` groups fields that belong together and names the group. Four parts under one namespace:
+  `Root`, `Legend`, `HelperText` and `ErrorText`.
+- `Fieldset.Root` is a `fieldset` and `disabled` is the element's own attribute, so a browser takes
+  every control in the group out of reach, out of the tab order and out of what the form submits,
+  and leaves the first legend alone. The state also goes down a context, so the labels beside those
+  controls draw as unreachable. A field states its own `disabled` to override it.
+- The root is described by both of its texts and carries `aria-invalid`. It clears the minimum
+  inline size a `fieldset` defaults to, so one inside a flex or grid parent shrinks.
+- Three axes: `size`, `orientation` and `status`.
 
 - `Field` wraps a control in everything that explains it. Seven parts under one namespace: `Root`,
   `Label`, `RequiredIndicator`, `Control`, `HelperText`, `Counter` and `ErrorText`.

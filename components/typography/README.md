@@ -34,9 +34,8 @@ import { Text } from "@stealthscale/component-typography";
 </Text>;
 ```
 
-`truncate` hides words and `mask` fades them out, so the full words are the caller's to keep
-reachable, in a `title` or in text nearby. Cutting a run inside a line is `Span` rather than a
-`Text` drawn as one. `overflow` has no effect on a non-replaced inline box.
+`truncate` hides words and `mask` fades them out. Keep the full words reachable, in a `title` or in
+text nearby. Use `Span` to cut a run inside a line.
 
 | Axis       | Values                                                                | Default |
 | ---------- | --------------------------------------------------------------------- | ------- |
@@ -93,8 +92,6 @@ import { Code } from "@stealthscale/component-typography";
 ## Em
 
 Marks a run of words the writer stressed. The element is `em`, and it exposes the `emphasis` role.
-The italic is a declaration of the recipe rather than the browser's default, so a theme reaches it
-and a face with no italic can be given a substitute.
 
 ```tsx
 import { Em } from "@stealthscale/component-typography";
@@ -132,16 +129,14 @@ import { Strong } from "@stealthscale/component-typography";
 | `tone`   | `default`, `muted`, `inverted`, `info`, `success`, `warning`, `error` | inherit    |
 | `motion` | `fade`, `rise`, `reveal`                                              | none       |
 
-The weight scale's `normal` step is left out. A run at the same weight as the text around it reads
-as ordinary text, so the value would draw no distinction. The browser's `bolder` keyword is not
-read, because it resolves against the inherited weight and reaches a different step in each context.
-Set `as="b"` for a run drawn heavy for another reason, such as a keyword in a definition.
+Set `as="b"` for a run drawn heavy for another reason, such as a keyword in a definition. That
+element states no importance.
 
 ## Mark
 
 Picks a run of words out of the text around it, for a search hit or a term a page wants noticed. The
 element is `mark`, and it exposes the `mark` role. `MarkPropsProvider` sets the variants of every
-mark below it, which is how a list of results draws its hits alike.
+mark below it.
 
 ```tsx
 import { Mark, MarkPropsProvider } from "@stealthscale/component-typography";
@@ -161,20 +156,14 @@ import { Mark, MarkPropsProvider } from "@stealthscale/component-typography";
 | `motion`  | `fade`, `rise`, `reveal`                                 | none     |
 | `effect`  | `glow`, `shine`                                          | none     |
 
-A screen reader announces the run's boundaries only where the reader has turned that on, so a
-highlight that carries meaning needs a second cue. The `text` variant supplies one in weight. Where
-the meaning has to be spoken, put it in a `VisuallyHidden` beside the run. WCAG 1.4.1 fails a
-distinction drawn in colour alone.
-
-The base clones the box decoration, so a highlight that runs onto a second line carries its inset
-and its corners onto both. The inset opens the inline axis alone: block padding on an inline box
-overflows into the line above rather than opening the line.
+Give a highlight that carries meaning a second cue. Take the `text` variant for one in weight, or
+put the meaning in a `VisuallyHidden` beside the run. Most screen readers announce a `mark` only
+where the reader has turned that on, and WCAG 1.4.1 fails a distinction drawn in colour alone.
 
 ## Quote
 
-Quotes a run of words inside the line around it. The element is `q`. The browser draws the marks
-from the `quotes` property, which resolves against the `lang` in force on the element or an
-ancestor. A German page is therefore marked with German quotation marks, and the caller writes none.
+Quotes a run of words inside the line around it. The element is `q`, and the browser draws the marks
+for the `lang` in force. Write none yourself.
 
 ```tsx
 import { Quote } from "@stealthscale/component-typography";
@@ -212,13 +201,11 @@ import { Span } from "@stealthscale/component-typography";
 | `truncate` | `true`                                                                | off     |
 | `motion`   | `fade`, `rise`, `reveal`                                              | none    |
 
-A span has no size axis, which is what separates it from a `Text` drawn as one. `Text` defaults its
-size to `md`, so a `Text` with `as="span"` inside a heading resets the run to body size. A span
-states nothing and inherits the line it sits in.
+A span takes no size and inherits the surrounding line's. Use it over a `Text` drawn as one wherever
+the run has to keep that size, such as inside a heading.
 
-`truncate` turns the run into an inline block, because `overflow` has no effect on a non-replaced
-inline box. Reach for a run that carries meaning instead where there is one: `Em` for stress,
-`Strong` for importance, `Mark` for a highlight, `Quote` for a quotation.
+Use a run that carries meaning where there is one: `Em` for stress, `Strong` for importance, `Mark`
+for a highlight, `Quote` for a quotation.
 
 ## Kbd
 

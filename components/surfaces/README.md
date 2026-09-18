@@ -1,13 +1,10 @@
 # @stealthscale/component-surfaces
 
-Draws the surfaces a page is built from: the card, a panel holding a picture, a header, a content
-band and a footer. Every component binds a recipe and draws nothing of its own, so a theme restyles
-all of them by extending the recipe. The preset under `./theme` registers the recipes with an
-application's compiler.
+Draws the surfaces a page is built from.
 
-Every value a theme can change on a component is an axis of its recipe, so a caller sets it as a
-prop and writes no style. A caller changes the element a component draws with `as`. A component with
-parts is published as a namespace, `Card.Root`.
+Every value a theme can change is an axis of a component's recipe, so set it as a prop and write no
+style. Change the element a component draws with `as`. A component with parts is published as a
+namespace, `Card.Root`.
 
 ## Install
 
@@ -15,8 +12,8 @@ parts is published as a namespace, `Card.Root`.
 pnpm add @stealthscale/component-surfaces
 ```
 
-The package peers on `react` and `@stealthscale/theme`. An application lists the preset under
-`./theme` among the presets its compiler installs.
+The package peers on `react` and `@stealthscale/theme`. List the preset under `./theme` among the
+presets your compiler installs.
 
 ## Card
 
@@ -57,8 +54,6 @@ import { Card } from "@stealthscale/component-surfaces";
 | `divided`     | `true`                                                  | off        |
 | `interactive` | `true`                                                  | off        |
 
-### The parts
-
 | Part          | Element   | What it draws                                   |
 | ------------- | --------- | ----------------------------------------------- |
 | `Root`        | `article` | The panel, and the variants every band reads    |
@@ -71,28 +66,15 @@ import { Card } from "@stealthscale/component-surfaces";
 | `Content`     | `div`     | The substance, which takes the room left over   |
 | `Footer`      | `div`     | Whatever a reader acts on                       |
 
-The header is a grid, not a row of stacks. The indicator takes the first column and spans both
-lines, the title and the description take the middle column on one line each, and the aside takes
-the last column. A card with no indicator or no aside leaves that column at zero width.
+Name a card that stands on the page. Point `aria-labelledby` at the title's `id`, or state
+`aria-label`. Take `as="div"` for a card that is part of its surroundings and needs no name.
 
-### Naming a card
+Put the indicator, the title, the description and the aside directly in the header. It lays them out
+on a grid, so a card with no indicator or no aside needs no other arrangement.
 
-An `article` carries no name of its own, and an unnamed one is announced as `article` and nothing
-more. Point `aria-labelledby` at the title's `id`, or state `aria-label`. A card that is part of its
-surroundings rather than a composition of its own takes `as="div"` and needs no name.
+Alternative text stays on the picture inside `Card.Media`. A decorative picture states `alt=""`.
 
-### The picture
-
-`Card.Media` takes back the room the root leaves, so the picture meets the card's edges and the root
-clips its corners. Which edges it meets follows `orientation`: the top and both sides of a card
-running down the page, the leading side of one running across it.
-
-The band names nothing. Alternative text stays on the picture inside it, and a decorative picture
-states `alt=""`.
-
-### A card a reader presses
-
-Set `interactive` and put a real link in the title:
+Set `interactive` and put a real link in the title for a card a reader presses:
 
 ```tsx
 <Card.Root interactive>
@@ -104,11 +86,11 @@ Set `interactive` and put a real link in the title:
 </Card.Root>
 ```
 
-The root draws its focus ring from `:focus-within`, so the whole card shows the focus while the
-thing a keyboard reaches is the link. A press handler on the root would leave the card reachable by
-pointer alone, and a `tabindex` on it would announce a control that says nothing.
+The whole card shows the focus while the link carries the behaviour. Do not put a press handler or a
+`tabindex` on the root.
 
-### Rules between the bands
+Set `divided` to rule the header and the footer apart from the band between them.
 
-Set `divided` for a card whose header and footer are separated from the band between them. The rule
-reads the root's own inset, so the room between a rule and the words steps with `size`.
+## Licence
+
+MIT. See [LICENSE](LICENSE).
