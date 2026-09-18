@@ -8,12 +8,14 @@ alternative.
 An RFC is not edited once it is accepted, except to change its status. The record it produces holds
 the decision, and the standards hold the rules that are refined.
 
-| RFC                                                   | Title                                               | Status   |
-| ----------------------------------------------------- | --------------------------------------------------- | -------- |
-| [0001](0001-one-grammar-for-config-packages.md)       | One grammar for config and plugin packages          | Accepted |
-| [0002](0002-conformance-suite-for-config-packages.md) | A conformance suite for config and plugin packages  | Accepted |
-| [0003](0003-theming.md)                               | Theming: the vocabulary, recipes, themes and scopes | Accepted |
-| [0004](0004-the-form-of-a-component.md)               | The form of a component                             | Accepted |
+| RFC                                                   | Title                                                   | Status   |
+| ----------------------------------------------------- | ------------------------------------------------------- | -------- |
+| [0001](0001-one-grammar-for-config-packages.md)       | One grammar for config and plugin packages              | Accepted |
+| [0002](0002-conformance-suite-for-config-packages.md) | A conformance suite for config and plugin packages      | Accepted |
+| [0003](0003-theming.md)                               | Theming: the vocabulary, recipes, themes and scopes     | Accepted |
+| [0004](0004-the-form-of-a-component.md)               | The form of a component                                 | Accepted |
+| [0005](0005-the-data-foundation.md)                   | The data foundation                                     | Draft    |
+| [0006](0006-routing.md)                               | Routing: the pieces an application builds a router from | Draft    |
 
 ## Status
 
