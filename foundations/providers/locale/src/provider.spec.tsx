@@ -155,7 +155,13 @@ describe("LocaleProvider", () => {
 
   it("reports that a change is under way when it is told one is", () => {
     render(
-      <LocaleProvider app="probe" isPending locale="en" locales={["en", "nl"]}>
+      <LocaleProvider
+        app="probe"
+        isPending
+        locale="en"
+        locales={["en", "nl"]}
+        store={memoryStore()}
+      >
         <Pending />
       </LocaleProvider>,
     );

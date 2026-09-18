@@ -199,17 +199,35 @@ describe("useDraft", () => {
   });
 
   it("keeps the draft in the page's local storage where no store is given", () => {
+    const items = new Map<string, string>();
+
+    vi.stubGlobal("localStorage", {
+      getItem: (key: string) => items.get(key) ?? null,
+      removeItem: (key: string) => {
+        items.delete(key);
+      },
+      setItem: (key: string, value: string) => {
+        items.set(key, value);
+      },
+    });
+
     const { result } = renderHook(() =>
       useDraft<Signup>({ app: "docs", id: "signup", schema: signup }),
     );
 
-    expect(() => {
-      act(() => {
-        result.current.write({ name: "Roy" });
-        result.current.clear();
-      });
-    }).not.toThrow();
-    expect(result.current.restored).toBeUndefined();
+    act(() => {
+      result.current.write({ name: "Roy" });
+    });
+
+    expect(items.get(KEY)).toContain("Roy");
+
+    act(() => {
+      result.current.clear();
+    });
+
+    expect(items.has(KEY)).toBe(false);
+
+    vi.unstubAllGlobals();
   });
 
   it("keeps nothing and reports nothing when given no options", () => {
