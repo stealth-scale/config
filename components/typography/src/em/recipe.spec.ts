@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { axesOf, recipeViolations } from "@stealthscale/testing-theme";
+import { axesOf, recipeViolations, valuesOf } from "@stealthscale/testing-theme";
 
 import { recipe } from "#em/recipe.ts";
 
@@ -13,8 +13,24 @@ describe("recipe", () => {
     expect(recipe.className).toBe("em");
   });
 
-  it("offers no variant axis", () => {
-    expect(axesOf(recipe)).toStrictEqual([]);
+  it("offers an ink axis and an entrance axis", () => {
+    expect(axesOf(recipe)).toStrictEqual(["motion", "tone"]);
+  });
+
+  it("offers the seven inks", () => {
+    expect(valuesOf(recipe, "tone")).toStrictEqual([
+      "default",
+      "error",
+      "info",
+      "inverted",
+      "muted",
+      "success",
+      "warning",
+    ]);
+  });
+
+  it("offers the three entrances", () => {
+    expect(valuesOf(recipe, "motion")).toStrictEqual(["fade", "reveal", "rise"]);
   });
 
   it("declares fontStyle italic", () => {

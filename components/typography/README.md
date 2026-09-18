@@ -91,14 +91,21 @@ import { Code } from "@stealthscale/component-typography";
 ## Em
 
 Marks a run of words the writer stressed. The element is `em`, and it exposes the `emphasis` role.
-The component offers no axis. A theme changes how stress is drawn by extending the `em` recipe.
+The italic is a declaration of the recipe rather than the browser's default, so a theme reaches it
+and a face with no italic can be given a substitute.
 
 ```tsx
 import { Em } from "@stealthscale/component-typography";
 
 <Em>never</Em>;
+<Em tone="error">deleted</Em>;
 <Em as="i">Beagle</Em>;
 ```
+
+| Axis     | Values                                                                | Default |
+| -------- | --------------------------------------------------------------------- | ------- |
+| `tone`   | `default`, `muted`, `inverted`, `info`, `success`, `warning`, `error` | inherit |
+| `motion` | `fade`, `rise`, `reveal`                                              | none    |
 
 Set `as="i"` for a run drawn in italic for another reason, such as a ship's name or a term being
 introduced. That element states no stress.
@@ -106,19 +113,60 @@ introduced. That element states no stress.
 ## Strong
 
 Marks a run of words as more important than the words around it. The element is `strong`, and it
-exposes the `strong` role. The component offers no axis. A theme changes how importance is drawn by
-extending the `strong` recipe.
+exposes the `strong` role.
 
 ```tsx
 import { Strong } from "@stealthscale/component-typography";
 
 <Strong>Do not</Strong>;
-<Strong as="b">Widget</Strong>;
+<Strong weight="bold" tone="error">
+  Deleting is permanent
+</Strong>;
 ```
 
-The recipe declares a step of the foundation's weight scale. The browser's `bolder` keyword resolves
-against the inherited weight and reaches a different step in each context. Set `as="b"` for a run
-drawn heavy for another reason, such as a keyword in a definition.
+| Axis     | Values                                                                | Default    |
+| -------- | --------------------------------------------------------------------- | ---------- |
+| `weight` | `medium`, `semibold`, `bold`                                          | `semibold` |
+| `tone`   | `default`, `muted`, `inverted`, `info`, `success`, `warning`, `error` | inherit    |
+| `motion` | `fade`, `rise`, `reveal`                                              | none       |
+
+The weight scale's `normal` step is left out. A run at the same weight as the text around it reads
+as ordinary text, so the value would draw no distinction. The browser's `bolder` keyword is not
+read, because it resolves against the inherited weight and reaches a different step in each context.
+Set `as="b"` for a run drawn heavy for another reason, such as a keyword in a definition.
+
+## Mark
+
+Picks a run of words out of the text around it, for a search hit or a term a page wants noticed. The
+element is `mark`, and it exposes the `mark` role. `MarkPropsProvider` sets the variants of every
+mark below it, which is how a list of results draws its hits alike.
+
+```tsx
+import { Mark, MarkPropsProvider } from "@stealthscale/component-typography";
+
+<Mark>chassis</Mark>;
+<MarkPropsProvider value={{ radius: "l1", status: "warning", variant: "solid" }}>
+  <Results />
+</MarkPropsProvider>;
+```
+
+| Axis      | Values                                                   | Default  |
+| --------- | -------------------------------------------------------- | -------- |
+| `variant` | `solid`, `subtle`, `surface`, `outline`, `plain`, `text` | `subtle` |
+| `status`  | `info`, `success`, `warning`, `error`                    | none     |
+| `radius`  | `l1`, `l2`, `l3`, `full`                                 | none     |
+| `inset`   | `xs`, `sm`, `md`                                         | none     |
+| `motion`  | `fade`, `rise`, `reveal`                                 | none     |
+| `effect`  | `glow`, `shine`                                          | none     |
+
+A screen reader announces the run's boundaries only where the reader has turned that on, so a
+highlight that carries meaning needs a second cue. The `text` variant supplies one in weight. Where
+the meaning has to be spoken, put it in a `VisuallyHidden` beside the run. WCAG 1.4.1 fails a
+distinction drawn in colour alone.
+
+The base clones the box decoration, so a highlight that runs onto a second line carries its inset
+and its corners onto both. The inset opens the inline axis alone: block padding on an inline box
+overflows into the line above rather than opening the line.
 
 ## Kbd
 
@@ -231,8 +279,9 @@ import { Blockquote } from "@stealthscale/component-typography";
 | `TextProps`            | `type`      | The paragraph's variants and everything a `p` takes      |
 | `HeadingProps`         | `type`      | The heading's variants and everything an `h2` takes      |
 | `CodeProps`            | `type`      | The snippet's variants and everything a `code` takes     |
-| `EmProps`              | `type`      | Everything an `em` takes                                 |
-| `StrongProps`          | `type`      | Everything a `strong` takes                              |
+| `EmProps`              | `type`      | The run's variants and everything an `em` takes          |
+| `StrongProps`          | `type`      | The run's variants and everything a `strong` takes       |
+| `MarkProps`            | `type`      | The highlight's variants and everything a `mark` takes   |
 | `KbdProps`             | `type`      | The key's variants and everything a `kbd` takes          |
 | `IconProps`            | `type`      | The icon's variants and everything an `svg` takes        |
 | `List.RootProps`       | `type`      | The list's variants and everything a `ul` takes          |

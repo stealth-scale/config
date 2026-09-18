@@ -12,6 +12,8 @@ describe("index", () => {
       "Icon",
       "Kbd",
       "List",
+      "Mark",
+      "MarkPropsProvider",
       "Strong",
       "Text",
     ]);
