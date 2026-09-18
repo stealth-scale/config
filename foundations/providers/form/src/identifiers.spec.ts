@@ -1,0 +1,32 @@
+import { describe, expect, it } from "vitest";
+
+import { identifiers } from "#identifiers.ts";
+
+const checkout = identifiers("checkout");
+
+describe("identifiers", () => {
+  it.each([
+    { id: checkout.label("billing.vat"), want: "checkout.fields.billing.vat.label" },
+    { id: checkout.description("billing.vat"), want: "checkout.fields.billing.vat.description" },
+    { id: checkout.placeholder("email"), want: "checkout.fields.email.placeholder" },
+    { id: checkout.option("kind", "business"), want: "checkout.fields.kind.options.business" },
+    { id: checkout.legend("billing"), want: "checkout.groups.billing.legend" },
+    { id: checkout.step("who"), want: "checkout.steps.who.label" },
+  ])("derives $want", ({ id, want }) => {
+    expect(id).toBe(want);
+  });
+
+  it("derives a failure's own identifier and the one the product shares", () => {
+    expect(checkout.error("billing.vat", "minLength")).toStrictEqual([
+      "checkout.errors.billing.vat.minLength",
+      "errors.minLength",
+    ]);
+  });
+
+  it("collapses an index so one identifier covers every row", () => {
+    expect(checkout.label("lines[3].amount")).toBe("checkout.fields.lines[].amount.label");
+    expect(checkout.error("lines[0].amount", "minimum")[0]).toBe(
+      "checkout.errors.lines[].amount.minimum",
+    );
+  });
+});
