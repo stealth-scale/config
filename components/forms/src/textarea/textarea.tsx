@@ -16,6 +16,7 @@ import { type ComponentProps, type ReactElement } from "react";
 
 import { useControllableState } from "@stealthscale/hooks";
 
+import { stated } from "#stated.ts";
 import { withContext, withProvider } from "#textarea/context.ts";
 import { VALUE } from "#textarea/recipe.ts";
 
@@ -85,26 +86,6 @@ export interface TextareaProps
 }
 
 /**
- * Describes the variants a caller stated, each without the absent case.
- */
-type Stated = { readonly [Axis in keyof Variants]?: Exclude<Variants[Axis], undefined> };
-
-/**
- * Drops the variants a caller left unstated.
- *
- * @remarks
- *   A variant the compiler generates is optional and does not take `undefined`, so a prop passed as
- *   `undefined` is rejected where an absent one is accepted.
- * @param variants - The variants as the component received them.
- * @returns The ones a caller stated.
- */
-function picked(variants: Variants): Stated {
-  // Every entry kept is one whose value is not undefined, which is what Stated says.
-  // eslint-disable-next-line typescript/no-unsafe-type-assertion -- see above
-  return Object.fromEntries(Object.entries(variants).filter(([, value]) => value !== undefined));
-}
-
-/**
  * Draws the box, growing with its text where a caller asks.
  *
  * @param props - The recipe's variants, the value, and everything a styled textarea takes.
@@ -127,10 +108,10 @@ export function Textarea({
     onChange: onValueChange,
     value,
   });
-  const stated = picked({ grip, grows, size, status, variant });
+  const variants = stated({ grip, grows, size, status, variant });
 
   return (
-    <Sized {...{ [VALUE]: held }} {...stated}>
+    <Sized {...{ [VALUE]: held }} {...variants}>
       <Typed
         {...rest}
         onChange={(event) => {

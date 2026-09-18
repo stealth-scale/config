@@ -9,6 +9,7 @@
 
 import { definePreset } from "@stealthscale/theme/authoring";
 
+import { recipe as checkbox } from "#checkbox/recipe.ts";
 import { recipe as field } from "#field/recipe.ts";
 import { recipe as fieldset } from "#fieldset/recipe.ts";
 import { recipe as inputGroup } from "#input-group/recipe.ts";
@@ -21,7 +22,7 @@ export default definePreset({
   theme: {
     extend: {
       recipes: { input, searchInput },
-      slotRecipes: { field, fieldset, inputGroup, textarea },
+      slotRecipes: { checkbox, field, fieldset, inputGroup, textarea },
     },
   },
 });

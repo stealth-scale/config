@@ -1,8 +1,8 @@
 # @stealthscale/component-forms
 
-Draws what a person fills in: the group, the field that explains a control, the text field, the
-multi-line box, the field with a mark at one end or both, and the search field with a control that
-empties it.
+Draws what a person fills in: the group, the field that explains a control, the checkbox, the text
+field, the multi-line box, the field with a mark at one end or both, and the search field with a
+control that empties it.
 
 Every value a theme can change is an axis of a component's recipe, so set it as a prop and write no
 style. Change the element a component draws with `as`. A component with parts is published as a
@@ -110,6 +110,71 @@ on the control overrides the field's.
 sets, which defaults to the error one.
 
 `Field.Counter` draws the count you pass and measures nothing.
+
+## Checkbox
+
+Draws a box a person turns on and off, and the words that name it.
+
+```tsx
+import { Checkbox } from "@stealthscale/component-forms";
+
+<Checkbox.Root name="terms" onCheckedChange={({ checked }) => setAccepted(checked)}>
+  <Checkbox.Control>
+    <Checkbox.Indicator>
+      <TickIcon />
+    </Checkbox.Indicator>
+    <Checkbox.Indicator indeterminate>
+      <DashIcon />
+    </Checkbox.Indicator>
+  </Checkbox.Control>
+  <Checkbox.Label>Accept the terms</Checkbox.Label>
+</Checkbox.Root>;
+```
+
+| Axis      | Values                                | Default  |
+| --------- | ------------------------------------- | -------- |
+| `size`    | `sm`, `md`, `lg`                      | `md`     |
+| `variant` | `solid`, `subtle`, `outline`          | `solid`  |
+| `status`  | `info`, `success`, `warning`, `error` | none     |
+| `radius`  | `l1`, `l2`, `full`                    | `l1`     |
+| `align`   | `center`, `start`                     | `center` |
+| `spread`  | `true`                                | off      |
+| `motion`  | `fade`, `rise`, `reveal`              | none     |
+
+| Part        | Element | What it draws                    |
+| ----------- | ------- | -------------------------------- |
+| `Root`      | `label` | The row, and the checkbox itself |
+| `Control`   | `div`   | The box the state is seen in     |
+| `Indicator` | `span`  | A mark, for one of the states    |
+| `Label`     | `span`  | The words naming the checkbox    |
+
+`Checkbox.Root` also takes `checked`, `defaultChecked`, `disabled`, `form`, `invalid`, `name`,
+`onCheckedChange`, `readOnly`, `required` and `value`.
+
+`checked` takes `true`, `false` or `"indeterminate"`, so it serves a box that goes partly on. Set
+`indeterminate` on the indicator that draws the partly-on mark. Write a second indicator without it
+for the on mark. A box that never goes partly on needs one indicator.
+
+The root draws the checkbox a form submits. Do not add an input of your own.
+
+Name the checkbox. Write `Checkbox.Label`, or state `aria-label` on the root for a box that carries
+no words.
+
+A label that runs to more than one line takes `align="start"`, which puts the box on the first line
+rather than halfway down the block.
+
+Set `spread` for a settings row. The row takes the width it is given, the label keeps the start, and
+the box goes to the far end.
+
+Put the checkbox inside a `Field` and it takes the field's `disabled`, `invalid`, `readOnly` and
+`required`, and is described by the field's texts:
+
+```tsx
+<Field.Root invalid={!accepted}>
+  <Checkbox.Root>…</Checkbox.Root>
+  <Field.ErrorText>Accept the terms to go on.</Field.ErrorText>
+</Field.Root>
+```
 
 ## Input
 

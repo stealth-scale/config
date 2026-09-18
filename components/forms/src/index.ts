@@ -8,6 +8,7 @@
  * @packageDocumentation
  */
 
+export * as Checkbox from "#checkbox/index.ts";
 export * as Field from "#field/index.ts";
 export * as Fieldset from "#fieldset/index.ts";
 export * as InputGroup from "#input-group/index.ts";

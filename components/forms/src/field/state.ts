@@ -38,5 +38,11 @@ export interface FieldState {
 
 /**
  * Hands the field's state to every part, and reads it back.
+ *
+ * @remarks
+ *   A part reads the throwing hook, because a part outside its field is a mistake. A control that
+ *   stands on its own and is also composable into a field reads the optional one, so it takes the
+ *   field's state where there is one and works where there is not.
  */
-export const [FieldProvider, useField] = createRequiredContext<FieldState>("Field");
+export const [FieldProvider, useField, useOptionalField] =
+  createRequiredContext<FieldState>("Field");

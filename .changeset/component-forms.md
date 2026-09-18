@@ -2,7 +2,27 @@
 "@stealthscale/component-forms": minor
 ---
 
-component-forms: publish Fieldset, Field, Textarea and InputGroup
+component-forms: publish Fieldset, Field, Checkbox, Textarea and InputGroup
+
+- `Checkbox` draws a box a person turns on and off. Four parts under one namespace: `Root`,
+  `Control`, `Indicator` and `Label`. It binds Zag's checkbox machine.
+- `Checkbox.Root` draws the input a form submits as well as the label around it, so the element
+  carrying the value and the role is never left out. Ark publishes that input as a fifth part a
+  caller has to remember.
+- The partly-on state is written onto the input on every commit. Zag writes it from a `track` on the
+  checked value, which runs on a change and not on a mount, so a checkbox drawn partly on was
+  announced as unchecked. It is the `indeterminate` property rather than `aria-checked="mixed"`,
+  because axe reports the attribute on a native checkbox as `aria-conditional-attr`.
+- A checkbox inside a `Field` takes that field's `disabled`, `invalid`, `readOnly` and `required`,
+  and its input is described by the field's helper text and error message. A checkbox that states
+  one of them overrides the field.
+- `Indicator` takes `indeterminate`, which states which of the two marked states the mark belongs
+  to. A checkbox that never goes partly on draws one indicator and no flag.
+- Seven axes: `size`, `variant`, `status`, `radius`, `align`, `spread` and `motion`. No value of
+  `variant` writes a border color, so a status always reaches the edge.
+- The box reads the theme's field fragment, so its edge and its states match every text field in the
+  same form. The ring is drawn outside, the coarse-pointer height is dropped, and `touchTarget`
+  widens the target to a `control.md` square instead of stretching the box.
 
 - `Textarea` draws a box a person types several lines into. Set `grows` and it takes its height from
   the text, measuring nothing: the root is a grid of one cell holding both the control and a hidden
