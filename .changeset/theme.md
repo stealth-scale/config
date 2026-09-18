@@ -17,3 +17,5 @@ theme: add role tables for a ramp keyed by its own steps
 - `linear(color)` converts a color to linear sRGB and `oklab(color)` to OKLab, unclamped, for a
   check that measures a distance rather than a ratio.
 - `Application.themes` is optional. An application that states no theme draws the foundation alone.
+- A bound element carries `data-recipe` only where `process.env.NODE_ENV` is not `production`, so a
+  production page carries no attribute the testing kit alone reads.

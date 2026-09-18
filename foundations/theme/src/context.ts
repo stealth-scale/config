@@ -329,13 +329,44 @@ function pruned<Slots extends string, Variants extends SlotRecipeVariantRecord<S
   return Object.assign(pruning, runtime);
 }
 
+declare global {
+  // eslint-disable-next-line typescript/no-namespace -- the node types declare the environment under this namespace, and an augmentation has to name it
+  namespace NodeJS {
+    /**
+     * Describes the environment a bundler writes into a build as literals.
+     */
+    interface ProcessEnv {
+      /**
+       * The mode an application is built or served in. A bundler replaces the read with a
+       * literal, so the name has to be read as a property rather than through a string.
+       */
+      readonly NODE_ENV?: string | undefined;
+    }
+  }
+}
+
+/**
+ * Reports whether a bound element carries the recipe's name as `data-recipe`, which is the handle
+ * a specification finds it by.
+ *
+ * @remarks
+ *   Read from `process.env.NODE_ENV` the way the rendering library reads its own development
+ *   checks. A bundler replaces the read with a literal when it builds or serves an application,
+ *   so a production page carries no attribute and the check folds away, while a test runner and a
+ *   dev server keep the attribute. Read when a recipe is bound rather than once, so a
+ *   specification can set the environment before it binds.
+ */
+function stamping(): boolean {
+  return process.env.NODE_ENV !== "production";
+}
+
 /**
  * Binds a recipe that draws one element and returns the element factory and the provider that
  * sets variants from above.
  *
  * @remarks
- *   Every bound element carries the recipe's name as `data-recipe`, which is the handle a
- *   specification finds it by.
+ *   Every bound element carries the recipe's name as `data-recipe` outside a production build,
+ *   which is the handle a specification finds it by.
  * @typeParam Variants - Each axis the recipe offers, against the values it takes.
  */
 export function createRecipeContext<const Variants extends RecipeVariantRecord>(
@@ -348,12 +379,13 @@ export function createRecipeContext<const Variants extends RecipeVariantRecord>(
   return {
     ...bound,
     withContext: (Component, options) =>
-      bound.withContext(Component, { dataAttr: true, ...options }),
+      bound.withContext(Component, { dataAttr: stamping(), ...options }),
   };
 }
 
 /**
- * Writes the recipe's name into the props a part starts from, keeping anything the caller stated.
+ * Writes the recipe's name into the props a part starts from outside a production build, keeping
+ * anything the caller stated.
  *
  * @typeParam Props - The props of the element the part is bound to.
  */
@@ -361,7 +393,7 @@ function stamped<Props>(
   className: string,
   given?: DataAttrs & Partial<Props>,
 ): DataAttrs & Partial<Props> {
-  const props: unknown = { "data-recipe": className, ...given };
+  const props: unknown = stamping() ? { "data-recipe": className, ...given } : { ...given };
 
   // eslint-disable-next-line typescript/no-unsafe-type-assertion -- every prop of an element is optional here, so a data attribute beside them satisfies the type, which the checker cannot settle while the element is a type parameter
   return props as DataAttrs & Partial<Props>;
@@ -372,8 +404,9 @@ function stamped<Props>(
  * is built from.
  *
  * @remarks
- *   The part that provides the variants carries the recipe's name as `data-recipe`, so a compound
- *   component is found by the same handle as one that draws a single element. Every part carries
+ *   The part that provides the variants carries the recipe's name as `data-recipe` outside a
+ *   production build, so a compound component is found by the same handle as one that draws a
+ *   single element. Every part carries
  *   its slot class, `card__header`, which the generated factories write and which names the
  *   recipe and the slot. The compiler's own `dataAttr` option does nothing here, because it reads
  *   a name off the recipe a part is styled with and a part is styled with the slot's styles alone.

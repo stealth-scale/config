@@ -28,6 +28,10 @@ const { withContext } = createRecipeContext(recipe);
 export const Button = withContext("button");
 ```
 
+A bound element carries the recipe's name as `data-recipe`, which is the handle the testing kit
+finds it by. The attribute is written where `process.env.NODE_ENV` is not `production`, so a test
+runner and a dev server see it and a production page does not.
+
 A recipe states what a component is. The helpers read semantic tokens, layer styles and text styles,
 so no value in the recipe is a color, a pixel length or a color mode:
 
