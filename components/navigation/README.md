@@ -1,10 +1,11 @@
 # @stealthscale/component-navigation
 
-Draws the ways a person moves between places: links, tabs, breadcrumbs and rails. Every component
-binds a recipe and draws nothing of its own, so a theme moves all of them by extending the recipe.
-The preset under `./theme` registers the recipes with an application's compiler.
+Draws the ways a person moves between places: the link, and the trail of crumbs from the front of a
+site. Every component binds a recipe and draws nothing of its own, so a theme restyles all of them
+by extending the recipe. The preset under `./theme` registers the recipes with an application's
+compiler.
 
-Every value a theme can move on a component is an axis of its recipe, so a caller reaches it as a
+Every value a theme can change on a component is an axis of its recipe, so a caller sets it as a
 prop and writes no style. A caller changes the element a component draws with `as`.
 
 ## Install
@@ -83,10 +84,10 @@ the page around it rather than as a heading.
 The last crumb is `Breadcrumb.CurrentLink` and not a link. It draws a `span` carrying
 `aria-current="page"`, which is what tells a screen reader which crumb is where the reader is, and a
 link to the page already open would be a control that does nothing. It is the one crumb at full
-strength, the crumbs above it being muted, because the crumb naming where you are is the one worth
+strength and the crumbs above it are muted, because the crumb naming where you are is the one worth
 reading first.
 
-The rest of what the trail does for accessibility is easy to miss:
+The trail does four more things for accessibility:
 
 - **The landmark is named.** The root is a `nav` carrying `aria-label="Breadcrumb"` by default,
   because a page usually holds more than one navigation landmark and an unnamed one is announced
@@ -96,8 +97,8 @@ The rest of what the trail does for accessibility is easy to miss:
   which one they are on.
 - **The separator is a row, not a crumb.** It sits between two items as a row of the list rather
   than inside one, so a screen reader counting the list counts the crumbs.
-- **The separator is silent.** It carries `aria-hidden` and a presentation role, the order being
-  already in the list and a mark read out between every pair being noise.
+- **The separator is silent.** It carries `aria-hidden` and a presentation role, because the list
+  already carries the order and a mark read out between every pair adds nothing.
 
 The separator turns around where the line runs right to left, so a chevron pointing forwards keeps
 pointing forwards.

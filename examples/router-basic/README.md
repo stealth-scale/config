@@ -1,11 +1,14 @@
 # @stealthscale/example-router-basic
 
-Routes an application whose every address is known when it is built. Two pages, one nested under the
-other, with the invoice's number in its path and the open tab in its search string.
+Routes an application whose every address is known when it is built. It serves two pages, one nested
+under the other, with the invoice's number in its path and the open tab in its search string.
 
 ```bash
 pnpm --filter @stealthscale/example-router-basic dev
 ```
+
+The server listens on <http://localhost:4940>. The site root serves no page of its own and redirects
+to `/invoices`, so opening the application opens the list.
 
 ## It uses TanStack Router and nothing else
 
@@ -43,7 +46,7 @@ of `Link` or `RouterProvider` then fails to resolve, which is noisy and quick to
 
 The quiet failure is the file dropping out of the program. Nothing imports it at run time, so `Link`
 falls back to accepting any string and no error is reported anywhere. `routes.spec.ts` asserts the
-registered route ids, and that assertion stops compiling if the registration goes.
+registered route ids, and that assertion stops compiling if the registration is dropped.
 
 ```ts
 type Served = "__root__" | "/invoices" | "/invoices/$id";
@@ -58,5 +61,5 @@ declares, pages a condition decides, pages a host mounts under a path it chooses
 None of those can be typed from a route tree, because the tree is not known until the application
 runs. Each is shown by another `router-*` example.
 
-Use the foundation when an address is decided at run time. Until then `routes.ts` is the whole of
-what routing costs.
+Use the foundation when an address is decided at run time. Otherwise `routes.ts` is all the routing
+an application needs.

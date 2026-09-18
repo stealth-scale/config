@@ -6,10 +6,10 @@
 [![node](https://img.shields.io/node/v/@stealthscale/theme)](https://nodejs.org)
 [![license](https://img.shields.io/github/license/stealth-scale/config)](LICENSE)
 
-`@stealthscale/scale` holds the building blocks a stealthscale application is built from. That is
-the design system every interface is drawn from, the component libraries drawn with it, and the
-providers an application renders. It is also the configuration tiers every package here is built and
-released through, and the testing kits that check each of them against its contract.
+`@stealthscale/scale` publishes the packages a stealthscale application is built from: the design
+system every interface is drawn with, the component libraries built on it, and the providers an
+application renders. It also publishes the configuration tiers that build and release every package
+here, and the testing kits that check each package against its contract.
 
 ## What is here
 
@@ -56,7 +56,7 @@ configures. `import.meta.dirname` names the directory from there and nothing els
 | [`vite-plugin-base`](packages/vite-plugin-base)             | Supplies the typed plugin and the module-graph readers every bundler plugin here is built on               |
 | [`vite-plugin-sbom`](packages/vite-plugin-sbom)             | Writes a CycloneDX bill of materials from the modules a build reached                                      |
 | [`vite-plugin-theme`](packages/vite-plugin-theme)           | Generates the styling runtime of a design system and compiles the stylesheet of an application             |
-| [`vite-plugin-i18n`](packages/vite-plugin-i18n)             | Finds every catalogue an application can reach, types their keys and answers the module that loads them    |
+| [`vite-plugin-i18n`](packages/vite-plugin-i18n)             | Finds every catalogue an application can reach, types their keys and returns the module that loads them    |
 | [`pandacss-naming`](packages/pandacss-naming)               | Writes the class names of a design system in one readable scheme, for the stylesheet and the browser alike |
 | [`pandacss-compiler`](packages/pandacss-compiler)           | Renames a compiled stylesheet and its generated runtime into that scheme                                   |
 | [`testing`](packages/testing)                               | Builds the scratch workspaces and manifests a specification runs a tree from                               |
@@ -70,14 +70,14 @@ configures. `import.meta.dirname` names the directory from there and nothing els
 | Package                            | What it does                                                                                                                               |
 | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
 | [`theme`](foundations/theme)       | Publishes the foundation every recipe is written against, the runtime every component binds with, and the vocabulary a theme is written in |
-| [`hooks`](foundations/hooks)       | Answers a question about the page a component draws into: how it is read, what it measures, and what it held a render ago                  |
-| [`settings`](foundations/settings) | Remembers one named setting a person made, held to the values it may take and kept where the reader chooses                                |
+| [`hooks`](foundations/hooks)       | Reads the page a component draws into: how the page is read, what it measures, and what a value was on the previous render                 |
+| [`settings`](foundations/settings) | Stores one named setting, restricted to the values it may take and kept in the store the reader chooses                                    |
 
-A recipe is written against the foundation's vocabulary alone. That vocabulary reads the same in a
-browser and in node, so a component and a configuration take their values from one place. Filling
-the contract takes two calls, and a theme moves whatever it wants from there. The build plugin
-compiles one stylesheet from every preset and theme in the dependency graph and scopes each theme
-under `data-theme`. It renames the classes into the naming scheme, so `button--lg` reaches the page
+A recipe is written against the foundation's vocabulary alone. That vocabulary resolves to the same
+values in a browser and in node, so a component and a configuration read one source. Two calls fill
+the contract, and a theme overrides whichever values it chooses. The build plugin compiles one
+stylesheet from every preset and theme in the dependency graph, and scopes each theme under
+`data-theme`. It renames the classes into the naming scheme, so the page receives `button--lg`
 rather than the compiler's own name.
 
 ### The providers
@@ -86,32 +86,32 @@ rather than the compiler's own name.
 | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | [`provider-shell`](foundations/providers/shell)             | Every provider below it, each rendered in the order it depends on the one before                                            |
 | [`provider-router`](foundations/providers/router)           | The routes an application navigates by, and the options every router starts from                                            |
-| [`provider-color-mode`](foundations/providers/color-mode)   | A colour mode, remembered, with the first paint settled before the page draws                                               |
-| [`provider-locale`](foundations/providers/locale)           | The locale a page is read in, remembered, with the direction that follows it                                                |
+| [`provider-color-mode`](foundations/providers/color-mode)   | The colour mode, kept across visits, with the first paint settled before the page draws                                     |
+| [`provider-locale`](foundations/providers/locale)           | The locale a page is read in, kept across visits, with the text direction that follows from it                              |
 | [`provider-i18n`](foundations/providers/i18n)               | The words an application is read in, in the locale it is given                                                              |
 | [`provider-form`](foundations/providers/form)               | The contexts a bound field and a bound form share, the engine that reads a JSON Schema, and the draft kept across a refresh |
-| [`provider-hotkeys`](foundations/providers/hotkeys)         | The keyboard shortcuts a page answers to                                                                                    |
+| [`provider-hotkeys`](foundations/providers/hotkeys)         | The keyboard shortcuts a page responds to                                                                                   |
 | [`provider-viewport`](foundations/providers/viewport)       | A stated width for a subtree rather than the window's, and which breakpoint it is at                                        |
-| [`provider-environment`](foundations/providers/environment) | The document a subtree lives in, which a portal attaches to and a measurement is taken against                              |
+| [`provider-environment`](foundations/providers/environment) | The document a subtree belongs to, which a portal attaches to and a measurement is taken against                            |
 
 ### The components
 
-Every component binds a recipe and draws nothing of its own. A theme moves them all by extending the
-recipe. Each package publishes a preset under `./theme` that registers its recipes with an
-application's compiler.
+Every component binds a recipe and draws nothing of its own. A theme restyles every component by
+extending its recipe. Each package publishes a preset under `./theme` that registers its recipes
+with an application's compiler.
 
-| Package                               | What it draws                                                                                                |
-| ------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| [`typography`](components/typography) | `Heading`, `Text`, `Blockquote`, `Code`, `Kbd`, `List` and `Icon`: the components that are text              |
-| [`layout`](components/layout)         | `Container`, `Stack`, `Grid`, `Frame`, `Divider` and `Spacer`: arranging what is already there               |
-| [`actions`](components/actions)       | `Button` and `IconButton`: what a person presses                                                             |
-| [`disclosure`](components/disclosure) | `Collapsible`, `Tabs`, `Tooltip`, `Popover` and `Menu`: what is shown and hidden on the reader's say-so      |
-| [`navigation`](components/navigation) | `Link` and `Breadcrumb`: the ways a person moves between places                                              |
-| [`forms`](components/forms)           | `Input` and `SearchInput`: the controls a person fills in                                                    |
-| [`feedback`](components/feedback)     | `Skeleton`, `SkeletonText` and `EmptyState`: the system reporting on itself                                  |
-| [`data`](components/data)             | `Badge`: one value drawn for reading                                                                         |
-| [`a11y`](components/a11y)             | `SkipNav`, `RovingFocus` and `VisuallyHidden`: what a keyboard and a screen reader need, and an eye does not |
-| [`primitives`](components/primitives) | `Portal`: what is drawn and where, drawing nothing itself                                                    |
+| Package                               | What it draws                                                                                           |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| [`typography`](components/typography) | `Heading`, `Text`, `Blockquote`, `Code`, `Kbd`, `List` and `Icon`: the components that are text         |
+| [`layout`](components/layout)         | `Container`, `Stack`, `Grid`, `Frame`, `Divider` and `Spacer`: arranging what is already there          |
+| [`actions`](components/actions)       | `Button` and `IconButton`: what a person presses                                                        |
+| [`disclosure`](components/disclosure) | `Collapsible`, `Tabs`, `Tooltip`, `Popover` and `Menu`: what is shown and hidden on the reader's say-so |
+| [`navigation`](components/navigation) | `Link` and `Breadcrumb`: the ways a person moves between places                                         |
+| [`forms`](components/forms)           | `Input` and `SearchInput`: the controls a person fills in                                               |
+| [`feedback`](components/feedback)     | `Skeleton`, `SkeletonText` and `EmptyState`: the system reporting on itself                             |
+| [`data`](components/data)             | `Badge`: a single value drawn for reading                                                               |
+| [`a11y`](components/a11y)             | `SkipNav`, `RovingFocus` and `VisuallyHidden`: what a keyboard and a screen reader need                 |
+| [`primitives`](components/primitives) | `Portal`: where a subtree is drawn, drawing nothing itself                                              |
 
 `collections`, `content`, `modals`, `screen` and `surfaces` are declared and still empty.
 
@@ -129,7 +129,7 @@ application's compiler.
 
 An add-on configuration package exports `layers()` for a package and `workspace()` for a root. A
 package that renders adds `react.layers()` beside its tier. A package with stylesheets adds
-`css.layers()`. A design-system package and an application that wears one add `theme.layers()`.
+`css.layers()`. A design-system package and an application that uses one add `theme.layers()`.
 
 The tiers build on the kernel and the two bundler plugins. All three pack under
 `@stealthscale/vite-config-plain` rather than extending a tier.
@@ -140,7 +140,7 @@ The tiers build on the kernel and the two bundler plugins. All three pack under
 | ------------ | ------------------------------------ | ------------------------------------ |
 | `preset`     | Sets configuration keys outright     | First, ordered by `enforce`          |
 | `contribute` | Appends one item to a list at a path | After every preset, in written order |
-| `remove`     | Takes a layer back by name           | Reaches the nearest match above it   |
+| `remove`     | Takes a layer back by name           | Matches the nearest layer above it   |
 | `override`   | Rewrites the merged configuration    | Last                                 |
 
 A layer takes the name of the call that made it. `server.port(4200)` returns a layer named

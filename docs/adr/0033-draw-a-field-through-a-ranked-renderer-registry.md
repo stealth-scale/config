@@ -26,12 +26,11 @@ text, the error and the wiring between them are ours.
 
 ## Decision
 
-We will draw a field through a registry of renderers, each answering how well it suits a field. The
-highest answer draws. `RANK` fixes the four ranks. A type alone is 1, a format 2, a constraint 3,
-and a field naming the renderer by `control` 10. Two renderers at one rank are settled by
-registration order. The later one draws. A component package gives its renderers to
-`createSchemaForm` and an application gives its own to `FormProvider`. The provider's come after the
-package's.
+We will draw a field through a registry of renderers, each reporting how well it suits a field. The
+highest score draws. `RANK` fixes the four ranks. A type alone is 1, a format 2, a constraint 3, and
+a field naming the renderer by `control` 10. Two renderers at one rank are settled by registration
+order. The later one draws. A component package gives its renderers to `createSchemaForm` and an
+application gives its own to `FormProvider`. The provider's come after the package's.
 
 A renderer is a field component. It reads its field through the library's context and composes the
 package's frame, which draws the label, the help text and the error once and writes `htmlFor`,
@@ -45,7 +44,7 @@ the control and composes no frame.
 A map from `type` and `format` to a component, written once.
 
 **Why not:** a package cannot add a control the foundation has never heard of, and a plugin cannot
-override one for a host. A renderer answering a rank lets a package add a control and a later
+override one for a host. A renderer reporting a rank lets a package add a control and a later
 registration override a default.
 
 ### Each renderer drawing its own label
@@ -73,7 +72,8 @@ appends in. Drawing the first would make an override a removal.
 
 - A renderer that ships in a package imports the form library, unlike a declaration, which names no
   library. A renderer is a component the host mounts and runs, so the import costs nothing new.
-- `options` reaches a renderer unchecked. A renderer parses it as it would a prop from a stranger.
+- `options` reaches a renderer unchecked. A renderer parses it as it would a prop from any other
+  package.
 
 **Neutral:**
 

@@ -4,7 +4,7 @@
  * component binds a recipe a theme can extend. The recipes reach an application's compiler
  * through the preset under `./theme`, and the components reach its bundle through here.
  *
- * A layout answers to the room it is in rather than to the width of the window: a grid fits as
+ * A layout responds to the room it is in rather than to the width of the window: a grid fits as
  * many columns of one measure as it has space for, and a stack wraps when its children will not
  * sit in a row. Nothing here reads a breakpoint, and no page states one.
  *

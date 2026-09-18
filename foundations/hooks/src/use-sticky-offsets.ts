@@ -1,11 +1,11 @@
 /**
- * Tells each sticky band of a column how much sticks above it.
+ * Sets on each sticky band of a column the height of what sticks above it.
  */
 
 import { type RefObject, useLayoutEffect } from "react";
 
 /**
- * Describes what {@link useStickyOffsets} is told.
+ * Describes what {@link useStickyOffsets} takes.
  */
 export interface UseStickyOffsetsOptions {
   /**
@@ -14,12 +14,12 @@ export interface UseStickyOffsetsOptions {
   bands: string;
 
   /**
-   * The custom property each band is told: how much sticks above it, in pixels.
+   * The custom property set on each band, holding the height of what sticks above it, in pixels.
    */
   offset: string;
 
   /**
-   * The custom property the column is told: how much sticks in all, in pixels.
+   * The custom property set on the column, holding the height of every band, in pixels.
    */
   total: string;
 }

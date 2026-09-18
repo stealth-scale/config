@@ -30,7 +30,7 @@ be a component chosen by search state.
 ## Decision
 
 We will draw one page per matched route and refuse a declaration that states an outlet, because the
-route decides what the page shows and a pane beside it has no route to be.
+route decides what the page shows and a pane beside it has no route of its own.
 
 ## Alternatives Considered
 
@@ -67,4 +67,4 @@ notices until a person reports it.
 **Neutral:**
 
 - `RouteDeclaration` keeps the `outlet` field so the refusal can name it. Removing the field would
-  make an outlet an unknown member, ignored in silence.
+  make an outlet an unknown member, ignored without a report.

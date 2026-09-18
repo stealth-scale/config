@@ -4,7 +4,7 @@
 is given. A package keeps its words under `locales/<language>/<namespace>.json` beside its code and
 reads them with `useTranslation("<namespace>")`, its keys typed from its own fallback file.
 
-i18next underneath, under this design system's own names, so a component imports it nowhere.
+i18next runs underneath, under this design system's own names, so a component never imports it.
 
 ## Install
 
@@ -16,8 +16,8 @@ The package peers on `i18next`, `react-i18next` and `react`. Install all three.
 
 ## Putting the words in scope
 
-`@stealthscale/vite-plugin-i18n` finds every catalogue the application can reach and answers
-`virtual:i18n`. Hand what it found to the provider.
+`@stealthscale/vite-plugin-i18n` finds every catalogue the application can reach and serves
+`virtual:i18n`. Pass what it found to the provider.
 
 ```tsx
 import { I18nProvider } from "@stealthscale/provider-i18n";
@@ -52,20 +52,20 @@ reads as the key rather than as nothing, so a component renders a string either 
 
 ## The first paint
 
-The fallback language's words are bundled, so `t` answers as soon as the provider is made and
+The fallback language's words are bundled, so `t` returns as soon as the provider is built and
 nothing is fetched before the first paint. Every other language's namespace is fetched the first
 time a component reads it, and that component suspends until it arrives. A locale such as `en-US`
 over catalogues in `en` is bundled empty, so it paints from the fallback rather than suspending on a
-fetch that would answer nothing.
+fetch that would return nothing.
 
 A key missing in one language falls back down the tag, `nl-BE` to `nl` to the fallback, key by key,
 so a half-translated package shows what it has.
 
 ## i18next options
 
-Every option i18next states is still the application's. `options` is laid over the house's one level
-deep, `plugins` are used in order before the catalogues' own backend, and `configure` runs on the
-initialised instance.
+Every option i18next states is still the application's. `options` is merged over the house's, one
+level deep. `plugins` are used in order before the catalogues' own backend, and `configure` runs on
+the initialised instance.
 
 ```tsx
 <I18nProvider
@@ -82,11 +82,11 @@ The resources, the namespaces and the language come from the catalogues whatever
 ## In a specification
 
 `@stealthscale/provider-i18n/testing` is a setup file that puts the fallback language in scope for
-every specification, so a component rendered without a provider still says what it says.
+every specification, so a component rendered without a provider still renders its words.
 `@stealthscale/vite-config-i18n` adds it.
 
 ## A changed word does not reload the page
 
 On a dev server the catalogue plugin sends a changed catalogue as an `i18n:catalogue` event carrying
-the pair merged afresh. The provider hears it and swaps the words in place, so the page keeps its
-state. The two spell the event name the same by contract, because neither imports the other.
+the pair merged afresh. The provider listens for it and replaces the words in place, so the page
+keeps its state. Both use the same event name by contract, because neither imports the other.

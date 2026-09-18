@@ -154,7 +154,7 @@ it is configured, so without that check the package would build clean and memois
 
 The layer raises the compiler's `panicThreshold` from `none` to `critical_errors`. A critical error
 is the compiler failing one of its own invariants, and an unrecognised one is a case it has no
-reading for. Both mean the compiler is wrong rather than the code, and the build stops on either.
+handling for. Both mean the compiler is wrong rather than the code, and the build stops on either.
 
 A function the compiler declines on purpose is left as written and reported nowhere, which covers
 every pattern it cannot prove safe to memoise. Mark such a function with the `"use no memo"`
@@ -169,8 +169,8 @@ is what proves the compiled form, and it fails on any error the compiler raises.
 
 Warning: the compiler asks a Babel node path whether it is an `LVal`. Babel 8 took
 `AssignmentPattern` out of that alias, so under Babel 8 the compiler refuses every
-`const { a = 1 } = b` and leaves the whole function uncompiled without a word. The bridge accepts
-either major. A repository states an override to hold the peer at 7:
+`const { a = 1 } = b` and leaves the whole function uncompiled without reporting it. The bridge
+accepts either major. A repository states an override to hold the peer at 7:
 
 ```yaml
 overrides:
@@ -250,7 +250,7 @@ and from an installed copy.
 
 Warning: a package that calls `act` without this setup file loads no such global. React then logs
 `The current testing environment is not configured to support act(...)` on every update inside an
-`act` scope, and the warning that reports an update outside `act` never fires at all.
+`act` scope, and the warning that reports an update outside `act` is never raised at all.
 
 ## Federated applications
 

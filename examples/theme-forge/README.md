@@ -1,9 +1,9 @@
 # @stealthscale/example-theme-forge
 
-`@stealthscale/example-theme-forge` states Forge: a warm, quick product for an operations console.
-Cream surfaces and an amber brand, cast flatter than the foundation, with every button's label set
-in capitals. It is a root theme that also extends a recipe, which is the one thing Fathom and Folio
-leave out.
+`@stealthscale/example-theme-forge` states Forge, a warm and quick product for an operations
+console. It draws cream surfaces and an amber brand, casts its shadows flatter than the foundation,
+and sets every button's label in capitals. It is a root theme that also extends a recipe, which is
+the one thing Fathom and Folio leave out.
 
 ## Run it
 
@@ -26,9 +26,9 @@ report is pinned.
   dark mode, the primary palette points at the amber, and warnings point at the yellow to stay apart
   from it. Every shadow is cast with half the default ink, because a dense screen draws many
   surfaces at once.
-- `src/recipes/button.ts` extends the button: labels in capitals, tracked wide. The type refuses
-  `className` and `slots` in an extension, because the recipe file in the component package decides
-  both.
+- `src/recipes/button.ts` extends the button, setting its labels in capitals with wide tracking. The
+  type refuses `className` and `slots` in an extension, because the recipe file in the component
+  package decides both.
 - `src/index.ts` defines the theme and lists the extension under the key `button`.
 
 ## The configuration

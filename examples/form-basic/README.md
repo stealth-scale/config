@@ -12,7 +12,7 @@ pnpm --filter @stealthscale/example-form-basic dev
 pnpm --filter @stealthscale/example-form-basic test
 ```
 
-The development server answers on port 4900. `vp test` renders the page into a happy-dom document,
+The development server listens on port 4900. `vp test` renders the page into a happy-dom document,
 submits the empty form, reads the refusals back in English, switches to Dutch, and submits a filled
 form.
 
@@ -60,8 +60,8 @@ identifiers. The form's identifier is `contact`. A field at `email` reads:
 
 A form in another package reads its words under its own identifier. One catalogue therefore holds
 every form of an application without a clash. The English `errors.format` entry has no `contact`
-twin. The email format refusal reads the shared words instead, which is what a product-wide message
-is.
+counterpart. The email format refusal reads the shared words instead, which is what a product-wide
+message is.
 
 `translateFrom(catalogue)` builds a translator with i18next's signature: a key or a list of keys, a
 `defaultValue`, and the values a message interpolates with `{{name}}`. An application over i18next

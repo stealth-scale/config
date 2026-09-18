@@ -28,8 +28,8 @@ about what a condition may say.
 
 ## Decision
 
-We will throw `notFound()` from `beforeLoad` where the evaluator answers false, because a route
-nobody may reach does not exist.
+We will throw `notFound()` from `beforeLoad` where the evaluator returns false, because a route
+nobody may reach should resolve to nothing.
 
 An evaluator wanting anything else throws the library's own `redirect` itself. Sending an
 unauthenticated person to sign in is the case that needs it.

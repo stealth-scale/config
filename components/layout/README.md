@@ -2,10 +2,10 @@
 
 Arranges what is already there and draws nothing of its own: a stack, a grid, the measure a page is
 read at, a frame round a picture, a line between things and the room left over. Every component
-binds a recipe and draws no surface, ink or border, so a theme moves all of them by extending the
+binds a recipe and draws no surface, ink or border, so a theme restyles all of them by extending the
 recipe. The preset under `./theme` registers the recipes with an application's compiler.
 
-A layout answers to the room it is in rather than to the width of the window. A grid fits as many
+A layout responds to the room it is in rather than to the width of the window. A grid fits as many
 columns of one measure as it has space for, and a stack wraps when its children will not sit in a
 row. Nothing here reads a breakpoint and no page states one.
 
@@ -124,8 +124,8 @@ import { Frame } from "@stealthscale/component-layout";
 ## Divider
 
 Draws one line between things. The element is `hr`, which a browser gives the separator role, so a
-reader is told that what follows is apart from what came before. A divider standing up in a row
-states `aria-orientation="vertical"` beside its variant.
+screen reader announces that what follows is apart from what came before. A divider standing up in a
+row states `aria-orientation="vertical"` beside its variant.
 
 ```tsx
 import { Divider } from "@stealthscale/component-layout";
@@ -141,7 +141,7 @@ import { Divider } from "@stealthscale/component-layout";
 ## Spacer
 
 Takes the room a stack has left over, which pushes what follows it to the far end. It holds nothing
-and is hidden from assistive technology, because empty room is not something a reader is told about.
+and is hidden from assistive technology, because empty room is not announced.
 
 ## Licence
 

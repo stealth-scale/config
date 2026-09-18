@@ -100,15 +100,19 @@ export default { presets: [own], themes: [fathom, abyss] } satisfies Application
 ```
 
 A page switches its theme and its color mode with two attributes, on the document root or on any
-element for a subtree. The element carrying an attribute switches its own tokens, so everything
-drawn from a token follows, and the rules a theme or a recipe writes for that theme or mode reach
-the elements below it, because the compiler scopes them to descendants. A subtree switched to a
-theme is drawn from that theme and the foundation alone: every token the theme leaves unstated takes
-the foundation's value there, not the value of the theme around it. A component whose own rules must
-switch is put inside the element that carries the attribute. Where neither is written, the first
-theme draws the page and the reader's operating system decides the mode. A subtree switched to light
-inside a page drawn dark keeps the dark values, because the unconditioned values are declared on the
-root alone. Dark inside light works.
+element for a subtree. Five rules decide what a switch covers:
+
+- The element carrying an attribute switches its own tokens, so everything drawn from a token
+  follows. The rules a theme or a recipe writes for that theme or mode apply to the elements below
+  it, because the compiler scopes them to descendants.
+- A subtree switched to a theme is drawn from that theme and the foundation alone. Every token the
+  theme leaves unstated takes the foundation's value there, not the value of the theme around it.
+- A component whose own rules must switch goes inside the element that carries the attribute.
+- Where neither attribute is written, the first theme draws the page and the reader's operating
+  system decides the mode.
+- A subtree switched to light inside a page drawn dark keeps the dark values, because the
+  unconditioned values are declared on the root alone. Switching to dark inside a light page does
+  work.
 
 ```html
 <html data-theme="fathom" data-color-mode="dark"></html>
@@ -131,7 +135,7 @@ import { ThemeProvider } from "@stealthscale/theme";
 | `.`            | A component                                      | `css`, `cx`, `styled` and `token` from the generated runtime, the runtime types, `createRecipeContext`, `createSlotRecipeContext`, `ThemeProvider`, `useTheme`, `breakpointKeys`, `THEME_ATTRIBUTE` and `COLOR_MODE_ATTRIBUTE` |
 | `./authoring`  | A recipe, a theme, an application, a testing kit | The definitions, the contract, the scales, the recipe helpers, the patterns, the contrast measurement, every authoring type, and the two attributes a page is switched with                                                    |
 | `./theme`      | The build plugin                                 | The foundation, as a default export                                                                                                                                                                                            |
-| `./styles.css` | An application                                   | The cascade order, which the build plugin answers for with the compiled stylesheet                                                                                                                                             |
+| `./styles.css` | An application                                   | The cascade order, which the build plugin fills with the compiled stylesheet                                                                                                                                                   |
 
 A recipe file imports `./authoring` and never `.`. The compiler's configuration reaches this package
 through every theme, and a recipe that imported the runtime would put every generated file behind
@@ -223,7 +227,7 @@ them: `stack`, `hstack`, `vstack`, `flex`, `center`, `grid`, `simpleGrid`, `visu
 
 A recipe picks a look with `layerStyle` and a motion with `animationStyle`. The looks read the
 virtual palette, so each draws in whichever palette the recipe points at, and the motions are turned
-off for a reader who asked for less.
+off for a reader who asked for reduced motion.
 
 | Look                                            | Draws                                                                                                       |
 | ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
@@ -266,9 +270,9 @@ off for a reader who asked for less.
 The gradients `brand`, `shine` and `aurora` are semantic tokens, so a theme moves them per mode, and
 `--angle` is registered as an angle so a browser interpolates the sweep. The scrolled motions read
 the scroll position rather than the clock, and a browser without scroll-driven animations leaves the
-element at rest. A component that ripples from the pointer or lights a spotlight under it writes the
-custom properties the look reads. A backdrop is a background image, so a recipe that pairs one with
-a fill writes `backgroundColor`, because the `background` shorthand resets the image.
+element at rest. A component that ripples from the pointer, or draws a spotlight under it, writes
+the custom properties the look reads. A backdrop is a background image, so a recipe that pairs one
+with a fill writes `backgroundColor`, because the `background` shorthand resets the image.
 
 ### Contrast
 

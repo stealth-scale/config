@@ -18,9 +18,9 @@ The package peers on `react` and nothing else.
 
 ## Defining a setting
 
-A setting states its name, the values it may take, and what it answers until a person chooses. The
+A setting states its name, the values it may take, and what it returns until a person chooses. The
 fallback is stated apart from the values, so a colour mode that follows the machine until somebody
-overrides it says both without repeating either.
+overrides it states both without repeating either.
 
 ```ts
 import { defineSetting } from "@stealthscale/settings";
@@ -50,7 +50,7 @@ inline script have to name the same application and neither of those has React a
 ## Reading it without React
 
 `readSetting`, `writeSetting` and `clearSetting` take the same definition and no hook. A server
-answering a request uses them, and so does the script an application inlines to settle its first
+handling a request uses them, and so does the script an application inlines to settle its first
 paint.
 
 ```ts
@@ -61,7 +61,7 @@ const mode = readSetting("docs", colorMode);
 
 ## The three stores
 
-| Store           | Kept in            | Seen by the server | Reaches another tab                                   |
+| Store           | Kept in            | Read by the server | Visible in another tab                                |
 | --------------- | ------------------ | ------------------ | ----------------------------------------------------- |
 | `localStore()`  | The page's storage | No                 | At once, through `storage`                            |
 | `cookieStore()` | A cookie           | Yes                | At once, where the browser ships the Cookie Store API |
@@ -80,11 +80,11 @@ const store = cookieStore({ header: request.headers.get("cookie") ?? "" });
 export const theme = defineSetting({ fallback: "fathom", name: "theme", store, values: THEMES });
 ```
 
-The cost is that a cookie rides on every request and shares a four-kilobyte budget per origin.
+The cost is that a cookie is sent on every request and shares a four-kilobyte budget per origin.
 Reading is synchronous, through `document.cookie`, because a snapshot is read during a render. The
-Cookie Store API reports a change, so another tab reaches this one where the browser has shipped
-that interface. It reached Baseline in June 2025 and needs a secure context. Where it is absent, a
-cookie changed elsewhere arrives on the next load.
+Cookie Store API reports a change, so a write in another tab updates this one where the browser has
+shipped that interface. It reached Baseline in June 2025 and needs a secure context. Where it is
+absent, a cookie changed elsewhere arrives on the next load.
 
 `memoryStore()` holds settings for as long as the process runs. Each call builds a store of its own,
 which is what makes it right for a specification: one case never reads what another wrote.
@@ -118,8 +118,8 @@ package.
 ## Writing a store
 
 A store is read, written, cleared and subscribed to. The browser's own `Storage` interface has no
-notification, which is why a setting built on it alone cannot tell one tab what another chose.
-Asking every store for `subscribe` makes that part of the contract.
+notification, which is why a setting built on it alone cannot report one tab's choice to another.
+Requiring `subscribe` on every store makes notification part of the contract.
 
 ```ts
 export interface SettingStore {
@@ -130,9 +130,9 @@ export interface SettingStore {
 }
 ```
 
-`watchers()` builds the set of callbacks a store tells when one of its keys changes. A store needs
-one because no browser event fires in the document that made the change, so a write would otherwise
-reach every other tab and not the one the person is looking at.
+`watchers()` builds the set of callbacks a store calls when one of its keys changes. A store needs
+one because the browser raises no event in the document that made the change, so a write would
+otherwise update every other tab and not the one the person is looking at.
 
 ## Licence
 

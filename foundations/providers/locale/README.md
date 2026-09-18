@@ -26,8 +26,9 @@ import { catalogues } from "virtual:i18n";
 ```
 
 `locales` lists what the application offers, the first being its fallback. The locale in force is
-what a person chose, else the best of those offers for what their browser asks for, else the first.
-The choice is remembered under `app`, so two applications on one origin keep their own.
+what a person chose. Where they chose nothing, it is the best match for what their browser asks for,
+and where nothing matches, the first in the list. The choice is remembered under `app`, so two
+applications on one origin keep their own.
 
 This package's own `I18nProvider` mounts the one from `@stealthscale/provider-i18n` in whichever
 locale is in force, so changing the locale changes every string below. Leave `catalogues` out and it
@@ -47,13 +48,13 @@ script: `rtl` for Arabic, Hebrew, Persian, Urdu and Divehi, `ltr` for everything
 reader's voice and the browser's own controls all read them there. Inside an iframe or a shadow root
 they go onto whichever document `@stealthscale/provider-environment` names.
 
-A component that positions itself by direction reads `useLocale().direction` and hands `dir` to its
+A component that positions itself by direction reads `useLocale().direction` and passes `dir` to its
 machine.
 
 ## Letting something else drive
 
-Pass `locale` and `onLocaleChange` and the provider reads in what it is told, remembering nothing
-itself. A router that carries the locale in the URL drives it this way, and `isPending` shows a
+Pass `locale` and `onLocaleChange` and the provider uses the locale it is given, remembering nothing
+itself. A router that carries the locale in the URL drives it this way, and `isPending` reports to a
 switcher that a transition is under way.
 
 ```tsx
@@ -79,9 +80,9 @@ const locale = negotiate(
 );
 ```
 
-Matching is ECMA-402's lookup: each requested tag is truncated in turn, so `nl-BE` reaches `nl`.
+Matching is ECMA-402's lookup: each requested tag is truncated in turn, so `nl-BE` matches `nl`.
 Where truncation finds nothing, both sides widen to their likely script and region, so `zh-HK`
-reaches `zh-Hant` and `en-GB` reaches `en-US`.
+matches `zh-Hant` and `en-GB` matches `en-US`.
 
 ## Reading a tag
 

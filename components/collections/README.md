@@ -1,8 +1,8 @@
 # @stealthscale/component-collections
 
-Draws many of a thing: the lists, tables and grids that render a set of records. Every component
-binds a recipe and draws nothing of its own, so a theme moves all of them by extending the recipe.
-The preset under `./theme` registers the recipes with an application's compiler.
+Draws a set of records: the lists, tables and grids that render many of one thing. Every component
+binds a recipe and draws nothing of its own, so a theme restyles all of them by extending the
+recipe. The preset under `./theme` registers the recipes with an application's compiler.
 
 ## Install
 

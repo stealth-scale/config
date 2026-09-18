@@ -58,9 +58,9 @@ const tree = buildTree(await loadManifests());
 const router = createRouter({ ...routerOptions({ routes: routeMap(tree) }), routeTree: tree });
 ```
 
-`compileRoutes` creates routes and never touches the parent you hand it. Build the tree as a
+`compileRoutes` creates routes and never touches the parent you pass it. Build the tree as a
 function of the declarations and call it once per declaration set. Compile every contributor's
-declarations in one call, because two calls under one parent cannot see each other's paths.
+declarations in one call, because two calls under one parent cannot read each other's paths.
 
 Use `createAppRootRoute` rather than `createRootRoute`. It types the router context so the route map
 fits, and the alternative reports the mismatch at `createRouter` rather than at the root.
@@ -74,7 +74,7 @@ development.
 
 `routeMap` walks the assembled tree and reads the id off every route that carries one. The compiler
 writes that id for a declared route. `namedRoute` writes it for one you wrote yourself. Both kinds
-reach the map the same way, so you carry one value rather than a pair.
+enter the map the same way, so you pass one value rather than a pair.
 
 ```tsx
 const settings = createRoute({
@@ -84,8 +84,8 @@ const settings = createRoute({
 });
 ```
 
-The walk refuses two routes carrying one id, because two routes under one id means a link goes
-somewhere different for a change nobody made to the link.
+The walk refuses two routes carrying one id. Two routes under one id would send a link somewhere
+different without the link itself changing.
 
 ### A path only one route may serve
 
@@ -94,12 +94,12 @@ placed yourself as well as the ones it compiled. A pathless layout consumes no p
 `/app/_yours/settings` and `/app/settings` are one URL however many layouts stand between.
 
 A development build of the library reports that pair as a duplicate route. A production build keeps
-the first and drops the rest in silence. The refusal is here as well so that both builds fail the
-same way.
+the first and drops the rest without reporting it. The refusal is here as well so that both builds
+fail the same way.
 
 ## Linking by id
 
-Pass the reference the plugin SDK handed you, not a string. A reference carries the id and, in its
+Pass the reference the plugin SDK returned, not a string. A reference carries the id and, in its
 type alone, the parameters the route's path names.
 
 ```tsx
@@ -120,7 +120,7 @@ path names. A bare id string works too, and gives up that check.
 // 'id' does not exist in type '{ invoice: string }'
 ```
 
-`RouteRef` is stated structurally, so a plugin SDK's own reference type satisfies it without this
+`RouteRef` is declared structurally, so a plugin SDK's own reference type satisfies it without this
 package depending on that SDK. Anything carrying an `id` fits.
 
 The same resolution serves `navigate` and a `redirect` thrown in a loader, because both take the
@@ -142,7 +142,7 @@ Both read the map through the router's own context, so nothing extra is mounted.
 than resolve a path that is wrong: an unknown id, a missing parameter, and a tree no router has
 processed each fail where you wrote them.
 
-### The active state comes for free
+### The active state needs no configuration
 
 `RouteLink` takes everything the library's own `Link` takes, so an active link is marked without you
 configuring anything. On the page it names, the anchor carries `data-status="active"`,
@@ -192,8 +192,8 @@ export function Invoice() {
 }
 ```
 
-It checks at run time that the page really is the route the reference names before it makes the
-claim, so a reference copied from another page throws rather than mistyping what it returns.
+It checks at run time that the page is the route the reference names before it makes the claim, so a
+reference copied from another page throws rather than mistyping what it returns.
 
 Search parameters have no equivalent. A reference carries no search type, so read them with
 `useSearch({ strict: false })` and validate at the edge.
@@ -223,19 +223,19 @@ is a function and nothing at run time separates one from an importer.
 
 The export name is optional, and the module's default export is used without one. Both go straight
 to the library's `lazyRouteComponent`. The page's chunk loads on the first navigation to it, and a
-chunk the deployment has replaced is reported rather than swallowed.
+chunk the deployment has replaced is reported rather than ignored.
 
 `layout` names layouts outermost first. Two declarations naming the same layouts with the same
 options share one pathless parent. Naming a layout a route above already draws is refused, because
 the frame would otherwise be drawn twice.
 
 A condition is whatever language your host writes one in, and the `evaluate` you pass reads it. A
-condition that fails makes the route a 404. A route nobody may reach does not exist. An evaluator
-wanting anything else, such as sending an unauthenticated person to sign in, throws the library's
-`redirect` itself.
+condition that fails makes the route a 404, so a route nobody may reach resolves to nothing. An
+evaluator wanting anything else, such as sending an unauthenticated person to sign in, throws the
+library's `redirect` itself.
 
 `compileRoutes` refuses a declaration stating `outlet`. A screen maps to a route and the route
-decides the whole screen, so a page drawn beside another as a pane has no route to be.
+decides the whole screen, so a page drawn beside another as a pane has no route of its own.
 
 Draw a detail beside a list by declaring it as a child, which is what an outlet is for. The parent
 lays out its own content beside `<Outlet />`, and the pane gets a real URL, the back button and
@@ -260,7 +260,7 @@ const { result } = await mountRoute(buildTree(await declarations()), "/app/invoi
 
 ## Registering the type
 
-The library works paths, params and search out from one declared router type. An application whose
+The library derives paths, params and search from one declared router type. An application whose
 routes are all in the build declares it and gets a checked `Link`.
 
 Put it in a declaration file beside the tree. The statement is type-only and erases to nothing.

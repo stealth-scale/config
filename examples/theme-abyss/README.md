@@ -1,9 +1,8 @@
 # @stealthscale/example-theme-abyss
 
-`@stealthscale/example-theme-abyss` states Abyss: Fathom taken into deep water. It is a derived
-theme. It names Fathom as the theme it extends, states the pages, two palettes, the corners and one
-button extension, and inherits everything else, the inks, the shadows and the other palettes
-included.
+`@stealthscale/example-theme-abyss` states Abyss, a darker variant of Fathom. It is a derived theme.
+It names Fathom as the theme it extends, states the pages, two palettes, the corners and one button
+extension, and inherits everything else, the inks, the shadows and the other palettes included.
 
 ## Run it
 
@@ -23,7 +22,7 @@ Abyss states and what it inherits.
 - `src/semantic-tokens.ts` places the page at 93% lightness in light mode and 6% in dark mode,
   points the primary palette at the indigo and the accent at the teal, and draws the corners from
   half a rem.
-- `src/recipes/button.ts` tracks every button's label wide.
+- `src/recipes/button.ts` widens the tracking of every button's label.
 - `src/index.ts` defines the theme with `extends: fathom`, which nests Fathom's preset beneath
   Abyss's own so the compiler composes the lineage, and lists the extension under the key `button`.
 

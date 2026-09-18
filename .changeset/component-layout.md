@@ -8,7 +8,7 @@ component-layout: publish the six components that arrange a page
   out in columns as `Grid.Root` holding `Grid.Item`, `Container` holds a page to one measure,
   `Frame` holds a picture to one shape, `Divider` draws one line between things and `Spacer` takes
   the room a stack has left over.
-- A layout answers to the room it is in rather than to the width of the window. A grid's
+- A layout responds to the room it is in rather than to the width of the window. A grid's
   `columns="fit-sm"` draws as many columns of that measure as there is space for and wraps the rest,
   and a column narrows rather than overflowing where the grid is narrower than the measure. Nothing
   here reads a breakpoint.

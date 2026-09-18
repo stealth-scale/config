@@ -3,11 +3,11 @@
  *
  * @remarks
  *   A component drawn in parts hands its parts something they all need, and a part drawn outside
- *   its root has nothing to read. React answers that with the default value, so the part draws
- *   wrongly and says nothing, and the fault surfaces somewhere else entirely. This throws where the
- *   part was written instead, and names the component so the message says which root is missing.
- *   A second reader answers undefined rather than throwing, for a root that nests inside another of
- *   its own kind and has to find out whether one stands above it.
+ *   its root has nothing to read. React returns the default value, so the part draws wrongly,
+ *   reports nothing, and fails somewhere else. This throws where the part was written instead, and
+ *   names the component so the message says which root is missing. A second hook returns undefined
+ *   rather than throwing, for a root that nests inside another of its own kind and has to find out
+ *   whether one stands above it.
  */
 
 import { createContext, createElement, type FunctionComponent, type ReactNode, use } from "react";

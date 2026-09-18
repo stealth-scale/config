@@ -2,10 +2,10 @@
 
 Draws the components that are text: a heading, a paragraph, a snippet of code, a key a reader is
 asked to press, a mark, a list and a quotation. Every component binds a recipe and draws nothing of
-its own, so a theme moves all of them by extending the recipe. The preset under `./theme` registers
-the recipes with an application's compiler.
+its own, so a theme restyles all of them by extending the recipe. The preset under `./theme`
+registers the recipes with an application's compiler.
 
-Every value a theme can move on a component is an axis of its recipe, so a caller reaches it as a
+Every value a theme can change on a component is an axis of its recipe, so a caller sets it as a
 prop and writes no style. A caller changes the element a component draws with `as`. A component with
 parts is published as a namespace, `List.Root` and `Blockquote.Content`.
 
@@ -20,9 +20,10 @@ The package peers on `react` and `@stealthscale/theme`. An application lists the
 
 ## Text
 
-Draws a paragraph, in a size, an ink, a weight and an alignment, cut to one line where a caller
-asks, and moved or masked where a page wants it. The element is `p`. A truncated or masked paragraph
-hides words. The full words are the caller's to keep reachable, in a `title` or in text nearby.
+Draws a paragraph, in a size, an ink, a weight and an alignment, cut to one line where a caller sets
+`truncate`, and animated or masked where a page sets those axes. The element is `p`. A truncated or
+masked paragraph hides words. The full words are the caller's to keep reachable, in a `title` or in
+text nearby.
 
 ```tsx
 import { Text } from "@stealthscale/component-typography";
@@ -48,7 +49,7 @@ import { Text } from "@stealthscale/component-typography";
 ## Heading
 
 Draws a heading, in a heading role, an ink, an effect and a motion, at the level `as` names. The
-element is `h2`, and the size states how loud the heading is rather than which level it is.
+element is `h2`, and the size states the heading's prominence rather than its level.
 
 ```tsx
 import { Heading } from "@stealthscale/component-typography";
@@ -109,8 +110,8 @@ import { Kbd } from "@stealthscale/component-typography";
 
 ## Icon
 
-Draws the artwork a caller hands in, at a size, in an ink and with a motion, and ships no mark of
-its own. The element is `svg` in the `img` role, hidden from assistive technology unless a caller
+Draws the artwork a caller passes in, at a size, in an ink and with a motion, and ships no artwork
+of its own. The element is `svg` in the `img` role, hidden from assistive technology unless a caller
 labels it with `aria-hidden={false}` and `aria-label`. A mark that points is `mirrored`, so it flips
 in a right-to-left page.
 

@@ -1,10 +1,10 @@
 # @stealthscale/component-data
 
 Draws one value for reading: a figure, an instant, a label, a state. Every component binds a recipe
-and draws nothing of its own, so a theme moves all of them by extending the recipe. The preset under
-`./theme` registers the recipes with an application's compiler.
+and draws nothing of its own, so a theme restyles all of them by extending the recipe. The preset
+under `./theme` registers the recipes with an application's compiler.
 
-Every value a theme can move on a component is an axis of its recipe, so a caller reaches it as a
+Every value a theme can change on a component is an axis of its recipe, so a caller sets it as a
 prop and writes no style. A caller changes the element a component draws with `as`.
 
 ## Install
@@ -19,12 +19,12 @@ The package peers on `react` and `@stealthscale/theme`. An application lists the
 ## Badge
 
 Labels something with one short word or a count, set off from what it labels. Its look is flat, so
-it repaints under no pointer. Put a badge inside a row that hovers and the pointer crosses the badge
-whenever it crosses the row, and a badge that lights up on its own reads as a control a reader can
-press and then cannot. Numbers are tabular, so a column of counts holds its width as the counts
-change.
+it does not repaint under a pointer. Put a badge inside a row that hovers and the pointer crosses
+the badge whenever it crosses the row, and a badge that changed under the pointer would read as a
+control a reader can press and then cannot. Numbers are tabular, so a column of counts holds its
+width as the counts change.
 
-A badge is read beside a control of its own name and drawn at half its height. Its inset, its gap
+A badge is read beside a control of its own size and drawn at half its height. Its inset, its gap
 and its label all come from the smaller step of the scale, so a medium badge beside a medium button
 reads at the small label rather than the medium one.
 

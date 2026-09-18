@@ -14,12 +14,13 @@ pnpm --filter @stealthscale/example-lib-surfaces test
 pnpm --filter @stealthscale/example-lib-surfaces build
 ```
 
-`vp test` runs three specifications. The recipe's asserts that no value in it is a color, a pixel
-length or a color mode, through `recipeViolations` from `@stealthscale/testing-theme`. The preset's
-asserts that every `*.recipe.ts` file under `src/` is registered under its class name, and a recipe
-with slots under `slotRecipes`, through `presetViolations`. The component's renders the composition
-into a happy-dom document, reads the classes each part was given, and checks the root against the
-conformance contract of `@stealthscale/testing-react`.
+`vp test` runs three specifications. The recipe's specification asserts that no value in it is a
+color, a pixel length or a color mode, through `recipeViolations` from
+`@stealthscale/testing-theme`. The preset's asserts that every `*.recipe.ts` file under `src/` is
+registered under its class name, and a recipe with slots under `slotRecipes`, through
+`presetViolations`. The component's renders the composition into a happy-dom document, reads the
+classes each part was given, and checks the root against the conformance contract of
+`@stealthscale/testing-react`.
 
 ## The recipe
 
@@ -27,7 +28,7 @@ conformance contract of `@stealthscale/testing-react`.
 `@stealthscale/theme/authoring`. It names four slots, `root`, `header`, `content` and `footer`, and
 two axes. The look axis sets the root's shadow, edge and surface. The size axis sets the root's
 inset and gap and the header's heading, so the header carries a size class of its own. Every value
-is a semantic token, a layer style or a text style, so a theme moves all.
+is a semantic token, a layer style or a text style, so a theme can change all of them.
 
 ## The classes
 
@@ -50,7 +51,7 @@ by its slot class.
 
 `src/card/card.context.ts` binds the recipe once with `createSlotRecipeContext` from
 `@stealthscale/theme`. `src/card/root.ts` draws an `article` through `withProvider`, which takes the
-variants and hands them down. Each band draws its element through `withContext`, which reads them
+variants and passes them down. Each band draws its element through `withContext`, which reads them
 and writes its own slot class. `src/card/namespace.ts` composes the four, and `src/index.ts`
 publishes the namespace as `Card`, so a page writes `Card.Root`, `Card.Header`, `Card.Content` and
 `Card.Footer`.

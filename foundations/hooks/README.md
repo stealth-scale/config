@@ -1,9 +1,9 @@
 # @stealthscale/hooks
 
-`@stealthscale/hooks` answers a question about the page a component draws into. Some of the hooks
-measure the document, some hold a value across renders without making the component render again,
-and one speaks to a screen reader. Each of them reads React and the document and names nothing else,
-so a package that draws no component installs React alone to use them.
+`@stealthscale/hooks` publishes the React hooks a component uses to read the page it draws into.
+Some measure the document. Some keep a value across renders without causing another render. One
+writes a message to a screen reader. Every hook depends on React and on the document and on nothing
+else, so a package that draws no component installs only React to use them.
 
 ## Install
 
@@ -19,8 +19,8 @@ Builds a value on the first render and returns that same value on every render a
 
 Use it when the identity of a value matters and building it costs something: a collator, an
 observer, an object used as a map key. `useMemo` is a cache the runtime may drop and rebuild, so a
-caller that compares by identity cannot use it. A function passed here is called once, so wrap a
-value that is itself a function in one that returns it.
+caller that compares by identity cannot use it. The factory runs on the first render only. To hold a
+value that is itself a function, return it from the factory.
 
 ```tsx
 const collator = useConst(() => new Intl.Collator(locale, { sensitivity: "base" }));
@@ -32,10 +32,10 @@ const sorted = useMemo(() => [...names].sort(collator.compare), [collator, names
 
 Points a ref at the value this render was given, and returns the ref.
 
-Use it when a callback or an effect has to read the current value without naming it as a dependency.
-A resize handler that named the width it compares against would detach and reattach its observer on
-every render. The write happens during the render rather than in an effect, so a reader that runs
-before the effects do still sees this render's value.
+Use it when a callback or an effect has to read the current value without listing it as a
+dependency. A resize handler that listed the width it compares against would detach and reattach its
+observer on every render. The ref is written during the render rather than in an effect, so code
+that runs before the effects reads this render's value.
 
 ```tsx
 const latest = useLiveRef(onResize);
@@ -53,10 +53,10 @@ useEffect(() => {
 
 Returns a stable function that calls whichever callback the latest render passed.
 
-Use it when you are about to put a handler in a dependency array. Anything written inline is a new
-closure every render, so the effect would re-run every render. Name this instead and the effect
-re-runs when its own dependencies say to. Where you want the returned function to change identity,
-state the dependencies yourself in the second argument.
+Use it when you are about to put a handler in a dependency array. A handler written inline is a new
+closure on every render, so the effect re-runs on every render. List the function this hook returns
+instead, and the effect re-runs only when its other dependencies change. To make the returned
+function change identity, pass those dependencies as the second argument.
 
 ```tsx
 export function useDismiss(onDismiss?: () => void) {
@@ -78,10 +78,11 @@ export function useDismiss(onDismiss?: () => void) {
 
 Measures and writes before the browser paints, and does nothing on a server.
 
-Use it instead of `useLayoutEffect` in any component that renders on a server. A layout effect is
-what stops a component that positions itself from being seen in the wrong place first. On a server
-there is nothing to measure, and React warns about the call rather than skipping it, so what is
-named there is the effect that never runs.
+Use it instead of `useLayoutEffect` in any component that renders on a server. A layout effect runs
+before the paint, so a component that positions itself is never drawn in the wrong place first. A
+server has nothing to measure and nothing to paint, and React logs a warning for `useLayoutEffect`
+there rather than skipping the call. This hook falls back to `useEffect` on a server, and React runs
+no effects there.
 
 ```tsx
 useSafeLayoutEffect(() => {
@@ -93,13 +94,13 @@ useSafeLayoutEffect(() => {
 
 ## useControllableState
 
-Returns the value and a setter, taking the value from the caller where the caller states one.
+Returns the value and a setter, and takes the value from the caller when the caller passes one.
 
 Use it for any piece of state a caller might want to own: an open flag, a selected value, a search
-term. One component then serves a caller that drives it and a caller that wants it to look after
-itself. Stating `value` at all is what makes the state controlled, so a caller that passes
-`undefined` does not own it. Which of the two is in force is decided on every render, so a caller
-that starts driving partway through is followed.
+term. One component then serves a caller that sets the value and a caller that leaves the component
+to hold it. Passing `value` is what makes the state controlled, so a caller that passes `undefined`
+leaves the component in control. The hook re-reads `value` on every render, so a caller that starts
+setting it partway through takes over from that render.
 
 ```tsx
 export function Disclosure(props: DisclosureProps) {
@@ -113,17 +114,17 @@ export function Disclosure(props: DisclosureProps) {
 }
 ```
 
-`onChange` is told whenever the value changes, controlled or not. Setting the value it already holds
-is passed over, so a caller listening for changes hears about changes.
+`onChange` is called whenever the value changes, controlled or not. A set to the value already held
+is dropped, so a caller listening for changes receives only changes.
 
 ## useMediaQuery
 
 Reads whether each query matches, and re-reads them whenever any of them changes.
 
-Use it when a decision depends on the page rather than on a prop. CSS cannot express one whose
-answer changes what is rendered rather than how it looks. The queries are asked of one window and
-answered in the order given, so a ladder of `min-width` queries reads as a ladder. A change re-reads
-all of them, because one list changing can change what another answers.
+Use it when a decision depends on the page rather than on a prop. CSS cannot express a decision that
+changes what is rendered rather than how it looks. Every query is read from one window, and the
+results come back in the order the queries were written, so a caller can index the result by its own
+query. A change re-reads every query, because one match changing can change another.
 
 ```tsx
 const [wide, dark] = useMediaQuery(["(min-width: 60rem)", "(prefers-color-scheme: dark)"]);
@@ -131,17 +132,17 @@ const [wide, dark] = useMediaQuery(["(min-width: 60rem)", "(prefers-color-scheme
 return wide ? <Sidebar /> : <Drawer />;
 ```
 
-The first render reports the fallback rather than asking the window, so a server's markup and the
-client's first paint agree. Pass `ssr: false` to ask the window on that first render. Pass
-`fallback` to say what each query answers until the window has been asked.
+The first render returns the fallback rather than reading the window, so a server's markup and the
+client's first paint agree. Pass `ssr: false` to read the window on that first render. Pass
+`fallback` to set what each query returns until the window has been read.
 
 ## useCoarsePointer
 
 Reads whether the reader's main pointer is a finger rather than a mouse or a pen.
 
-Use it where a fine pointer is what an interaction assumes. A finger cannot rest on an element, so
-anything that appears on hover alone never appears, and it cannot aim at a hairline, so a small
-target needs to grow.
+Use it where an interaction assumes a fine pointer. A finger cannot rest on an element, so anything
+that appears on hover alone never appears. A finger cannot aim at a hairline, so a small target has
+to grow.
 
 ```tsx
 const touch = useCoarsePointer();
@@ -155,11 +156,11 @@ return (
 
 ## useIsOverflowing
 
-Watches an element and returns whether what is inside it is cut off.
+Watches an element and returns whether the content inside it is cut off.
 
-Use it when the text not fitting is what decides whether to draw something else. A tooltip with the
-full label, a read-more control and a fade at the edge all need that answer. CSS can truncate the
-text without telling you that it did.
+Use it when text that does not fit is what decides whether to draw something else. A tooltip
+carrying the full label, a read-more control and a fade at the edge all need that result. CSS
+truncates the text and reports nothing.
 
 The element is measured again on four occasions:
 
@@ -179,8 +180,8 @@ return (
 );
 ```
 
-The answer keeps one identity while it stands, so the component renders again only when the element
-crosses between fitting and not.
+The returned object keeps one identity while the result stands, so the component renders again only
+when the element crosses between fitting and not.
 
 ## useStickyOffsets
 
@@ -189,7 +190,7 @@ column holding the height of all of them.
 
 Use it when more than one band sticks in the same scroll container. A page header above a toolbar
 above a table head is three of them. The second band has to sit below the first, and
-`position: sticky` gives it no way to learn how tall the first is.
+`position: sticky` gives it no way to read how tall the first is.
 
 ```tsx
 useStickyOffsets(column, stuck, {
@@ -211,14 +212,17 @@ its own.
 
 ## useMatrixCrosshair
 
-Returns the ref to hang on a grid and the two handlers that light a row and a column as the pointer
-crosses them.
+Returns the ref to put on a grid and the two handlers that mark the row and the column under the
+pointer.
 
 Use it in a grid wide enough that "row 14, column 9" is a counting exercise. Column headers in such
-a grid carry short names, because rotated text is unreadable and most magnifiers cannot show it, and
-this turns a short name back into a row somebody can read. The lights are written through the DOM
-rather than through state, because a matrix of a few hundred items either way is tens of thousands
-of cells.
+a grid carry short names, because rotated text is unreadable and most magnifiers cannot show it.
+This hook turns a short name back into a row somebody can read. The marks are written through the
+DOM rather than through state, because a matrix of a few hundred items either way is tens of
+thousands of cells.
+
+Mark the cells and the headers of a row with `data-row` and those of a column with `data-column`.
+The hook sets `data-lit` on both sets while the pointer is over them.
 
 ```tsx
 const { clear, ref, track } = useMatrixCrosshair<HTMLTableElement>();
@@ -236,17 +240,17 @@ td[data-lit] {
 }
 ```
 
-An element may carry both markings, which is what lets a matrix of one set against itself light the
+An element may carry both attributes, which is what lets a matrix of one set against itself mark the
 row a hovered column stands for.
 
 ## useAnnounce
 
-Returns a function that says a message to a screen reader.
+Returns a function that announces a message to a screen reader.
 
 Use it when something changes that the page shows without words: "5 results", "copied", "row
-removed". What happened is plain on screen and silent to anything reading it aloud. `polite` waits
-for a gap and suits nearly everything. `assertive` interrupts whatever is being read mid-word, which
-suits an error that invalidates what somebody is doing and nothing else.
+removed". The change is plain on screen and silent to anything reading the page aloud. `polite`
+waits for a gap and suits nearly everything. `assertive` interrupts whatever is being read mid-word,
+which suits an error that invalidates what somebody is doing and nothing else.
 
 ```tsx
 const announce = useAnnounce();
@@ -261,18 +265,18 @@ const onFail = (error: Error) => {
 };
 ```
 
-Messages queued in one frame are joined into a single utterance, because a live region says one
+Messages queued in one frame are joined into a single utterance, because a live region announces one
 thing per change. One component announcing twice is correcting itself, so its later message replaces
-its earlier one. Where two components announce, both facts are read. The same message twice is said
-twice, since "copied" pressed twice is two events somebody wants confirmed.
+its earlier one. Where two components announce, both messages are read. The same message twice is
+announced twice, because "copied" pressed twice is two events somebody wants confirmed.
 
 ## speakable
 
-Joins a frame's messages into the one thing the region says.
+Joins a frame's messages into the one string the region announces.
 
-`useAnnounce` calls this itself. Use it directly only when you write into a live region of your own
+`useAnnounce` calls this itself. Call it directly only when you write into a live region of your own
 and want the same joining rule. A full stop is added only where the message before it ends in none,
-and anything said twice is said once.
+and a message repeated in the same frame appears once.
 
 ```ts
 speakable(["Saved", "3 rows selected", "Saved"]);
@@ -282,12 +286,12 @@ That returns `Saved. 3 rows selected`.
 
 ## createRequiredContext
 
-Makes a context a reader has to be inside, and the hook that reads it.
+Makes a context a reader has to be inside, and the two hooks that read it.
 
 Use it for a component drawn in parts, where every part needs something the root holds. React
-answers a missing provider with the default value, so a part drawn outside its root draws wrongly
-and says nothing, and the fault surfaces somewhere else entirely. This throws where the part was
-written instead, and names the component so the message says which root is missing.
+returns the default value for a missing provider, so a part drawn outside its root draws wrongly,
+reports nothing, and fails somewhere else. This throws where the part was written instead, and names
+the component so the message says which root is missing.
 
 ```tsx
 const [ApiProvider, useCollapsible] = createRequiredContext<CollapsibleApi>("Collapsible");
@@ -307,20 +311,24 @@ function Trigger(props: TriggerProps): ReactElement {
 
 A trigger drawn with no root above it throws
 `A part of Collapsible was drawn outside the root that holds it together.` A reader under two
-providers gets the value of the nearer one, and each call makes a context of its own, so two
-components never read each other's.
+providers gets the value of the nearer one. Each call makes a context of its own, so two components
+never read each other's.
+
+The third member of the tuple reads the same context and returns `undefined` where no provider
+stands above it. A root that nests inside another of its own kind reads that hook to find out
+whether it is the outermost.
 
 ## Types
 
-| Type                        | Declaration               | What it describes                                                  |
-| --------------------------- | ------------------------- | ------------------------------------------------------------------ |
-| `Overflow`                  | `interface`               | Whether content is cut off across, down, or on either axis         |
-| `MatrixCrosshair`           | `interface`               | The ref and the two handlers a grid hangs on itself                |
-| `UseControllableStateProps` | `interface`               | The value, the default and what to tell when either changes        |
-| `UseMediaQueryOptions`      | `interface`               | The fallback before the window is asked, and which window to ask   |
-| `UseStickyOffsetsOptions`   | `interface`               | Which bands stick, and which custom properties carry their offsets |
-| `AnnouncePoliteness`        | `"assertive" \| "polite"` | How much a message is allowed to interrupt                         |
-| `ProvidedProps`             | `interface`               | The value a provider carries and the tree that reads it            |
+| Type                        | Declaration               | What it describes                                                           |
+| --------------------------- | ------------------------- | --------------------------------------------------------------------------- |
+| `Overflow`                  | `interface`               | Whether content is cut off across, down, or on either axis                  |
+| `MatrixCrosshair`           | `interface`               | The ref and the two pointer handlers a grid attaches                        |
+| `UseControllableStateProps` | `interface`               | The value, the default, and the callback run on every change                |
+| `UseMediaQueryOptions`      | `interface`               | What each query returns before the window is read, and which window to read |
+| `UseStickyOffsetsOptions`   | `interface`               | Which bands stick, and which custom properties carry their offsets          |
+| `AnnouncePoliteness`        | `"assertive" \| "polite"` | How much a message is allowed to interrupt                                  |
+| `ProvidedProps`             | `interface`               | The value a provider carries and the tree that reads it                     |
 
 ## Licence
 

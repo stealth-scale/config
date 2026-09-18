@@ -1,5 +1,5 @@
 /**
- * Answers whether each of a set of media queries matches, and follows them as they change.
+ * Reports whether each of a set of media queries matches, and re-reads them as they change.
  */
 
 import { useEffect, useState } from "react";
@@ -11,30 +11,29 @@ import { useCallbackRef } from "#use-callback-ref.ts";
  */
 export interface UseMediaQueryOptions {
   /**
-   * The answer for each query before the window has been asked. A query with no entry answers
-   * `false`.
+   * The result for each query before the window is read. A query with no entry returns `false`.
    */
   fallback?: readonly boolean[] | undefined;
 
   /**
-   * Finds the window to ask, for a tree drawn in another document. The page's own window is asked
-   * where this is absent.
+   * Returns the window to read, for a tree drawn in another document. The page's own window is
+   * read where this is absent.
    */
   getWindow?: (() => typeof window) | undefined;
 
   /**
-   * Whether to answer the fallback on the first render and ask the window after it, which keeps a
-   * server's markup and the client's first paint the same. Asking the window on the first render
-   * needs this set to `false`.
+   * Whether to return the fallback on the first render and read the window after it, which keeps a
+   * server's markup and the client's first paint the same. Set this to `false` to read the window
+   * on the first render.
    */
   ssr?: boolean | undefined;
 }
 
 /**
- * Asks a window whether each query matches.
+ * Reads from a window whether each query matches.
  *
- * @param window - The window whose `matchMedia` is asked.
- * @returns Whether each query matches, in the order asked.
+ * @param window - The window whose `matchMedia` is called.
+ * @returns Whether each query matches, in the order given.
  */
 function matching(window: Window, queries: readonly string[]): boolean[] {
   return queries.map((query) => window.matchMedia(query).matches);
@@ -44,15 +43,16 @@ function matching(window: Window, queries: readonly string[]): boolean[] {
  * Reads whether each query matches, and re-reads them whenever any of them changes.
  *
  * @remarks
- *   Every query is asked of one window and answered in the order given, so a caller comparing a
- *   ladder of `min-width` queries reads it as a ladder. One list changing can change what another
- *   answers, so a change re-reads all of them rather than the one that fired. The effect depends
- *   on the queries encoded rather than on the array, because a caller writing the array inline
- *   passes a new one every render and the listeners would be torn down and rebuilt each time. A
- *   media query list is itself comma-separated, so the encoding is JSON rather than a join.
- * @param queries - The queries to ask, in the order the answers come back.
- * @param options - The fallback to answer before the window is asked, and which window to ask.
- * @returns Whether each query matches, in the order asked.
+ *   Every query is read from one window, and the results come back in the order the queries were
+ *   given, so a caller can index the result by its own query. One match changing can change
+ *   another, so a change re-reads every query rather than the one that reported it. The effect
+ *   depends on the queries encoded rather than on the array, because a caller writing the array
+ *   inline passes a new one every render and the listeners would be torn down and rebuilt each
+ *   time. A media query list is itself comma-separated, so the encoding is JSON rather than a
+ *   join.
+ * @param queries - The queries to read, in the order the results come back.
+ * @param options - The fallback returned before the window is read, and which window to read.
+ * @returns Whether each query matches, in the order given.
  */
 export function useMediaQuery(
   queries: readonly string[],
@@ -76,7 +76,7 @@ export function useMediaQuery(
     const lists = list.map((query) => window.matchMedia(query));
 
     /**
-     * Reads every query again and reports the answers.
+     * Reads every query again and stores the results.
      */
     function read(): void {
       setMatches(matching(window, list));

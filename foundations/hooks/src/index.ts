@@ -1,8 +1,8 @@
 /**
- * Publishes the hooks that answer a question about the page a component draws into: how it is
- * read, what it measures, and what it held a render ago. It publishes the plumbing a component
- * drawn in parts needs beside them. Each one reads React and the document and names nothing else,
- * so a package that draws no component still installs only React to use them.
+ * Publishes the React hooks a component uses to read the page it draws into: how the page is read,
+ * what it measures, and what a value was on the previous render. It also publishes the context
+ * factory a component drawn in parts needs. Every hook depends on React and on the document and on
+ * nothing else, so a package that draws no component installs only React to use them.
  *
  * @packageDocumentation
  */

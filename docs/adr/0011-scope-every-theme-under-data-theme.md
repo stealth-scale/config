@@ -32,7 +32,7 @@ satisfies neither requirement, so both pull against shipping it unchanged.
 ## Decision
 
 We will scope every theme under `data-theme` and compile the first theme an application lists both
-unscoped and scoped, because a subtree can then wear any theme including the default, and no page
+unscoped and scoped, because a subtree can then take any theme including the default, and no page
 reads the compiler's name.
 
 The arrangement has four parts:
@@ -66,7 +66,7 @@ Keep the compiler's own arrangement, where the built theme is unscoped and the o
 attributes. It is one fewer copy of the default theme's tokens in the stylesheet.
 
 **Why not:** a subtree inside another theme then has no selector that returns it to the default,
-which is the gap we measured. The extra copy is the price of a page being able to switch back.
+which is the gap we measured. The extra copy is what it costs for a page to switch back.
 
 ### Carry the colour mode on a class
 
@@ -81,7 +81,7 @@ rather than by the absence of a class.
 
 **Positive:**
 
-- A subtree wears any theme the application lists, the default included.
+- A subtree takes any theme the application lists, the default included.
 - Nothing in a page's markup or in the stylesheet names the compiler.
 - The theme and the colour mode compose on one element or on either side of it, in either order.
 

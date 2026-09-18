@@ -1,9 +1,9 @@
 # @stealthscale/component-a11y
 
-Draws what a keyboard and a screen reader need, and an eye does not: words read out and drawn
-nowhere, a way past the navigation, and one tab stop over a set of controls. Every component binds a
-recipe and draws nothing of its own, so a theme moves all of them by extending the recipe. The
-preset under `./theme` registers the recipes with an application's compiler.
+Draws what a keyboard and a screen reader need: words read out and drawn nowhere, a way past the
+navigation, and one tab stop over a set of controls. Every component binds a recipe and draws
+nothing of its own, so a theme restyles all of them by extending the recipe. The preset under
+`./theme` registers the recipes with an application's compiler.
 
 ## Install
 
@@ -16,10 +16,10 @@ the preset under `./theme` among the presets its compiler installs.
 
 ## VisuallyHidden
 
-Reads its words to a screen reader and draws them nowhere. The words stay in the accessibility tree,
-which `display: none` and `visibility: hidden` both take them out of. A control a keyboard can reach
-is `focusable`, so it comes into view while focus is on it and a sighted reader tabbing through the
-page keeps their place.
+Exposes its words to a screen reader and draws them nowhere. The words stay in the accessibility
+tree, which `display: none` and `visibility: hidden` both take them out of. A control a keyboard can
+reach is `focusable`, so it comes into view while focus is on it and a sighted reader tabbing
+through the page keeps their place.
 
 ```tsx
 import { VisuallyHidden } from "@stealthscale/component-a11y";
@@ -49,8 +49,8 @@ import { SkipNav } from "@stealthscale/component-a11y";
 <SkipNav.Target as="main">…</SkipNav.Target>;
 ```
 
-The link points at `#content` and the target answers to it, so neither states the other. A page with
-more than one landing place names its own: `<SkipNav.Link href="#search">` beside
+The link points at `#content` and the target carries that id, so neither states the other. A page
+with more than one landing place names its own: `<SkipNav.Link href="#search">` beside
 `<SkipNav.Target id="search">`.
 
 ## RovingFocus
@@ -74,16 +74,16 @@ import { Button } from "@stealthscale/component-actions";
 </RovingFocus.Root>;
 ```
 
-The root carries no role of its own, because what a set of controls is called is the caller's. It
-tells a screen reader which way the set runs only where the caller gave it a role, since
+The root carries no role of its own, because naming a set of controls is the caller's decision. It
+reports the orientation to a screen reader only where the caller gave it a role, since
 `aria-orientation` means nothing on a plain element.
 
 | Axis          | Values                           | Default      |
 | ------------- | -------------------------------- | ------------ |
 | `orientation` | `horizontal`, `vertical`, `both` | `horizontal` |
 
-`wrap` joins the ends up, `activeId` drives which item holds the stop from outside, and
-`onActiveIdChange` reports it moving.
+`wrap` joins the ends together. `activeId` sets which item holds the stop from outside, and
+`onActiveIdChange` reports the stop moving.
 
 ## Licence
 

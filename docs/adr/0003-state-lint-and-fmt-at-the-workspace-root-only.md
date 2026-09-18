@@ -27,7 +27,7 @@ Accepted
 ## Decision
 
 We state the `lint` and `fmt` blocks only in the workspace root's config. A package expresses its
-own answer as the glob that selects its files. The linter and the formatter never open a package's
+own rules as the glob that selects its files. The linter and the formatter never open a package's
 own config.
 
 ## Alternatives Considered

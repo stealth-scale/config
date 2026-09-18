@@ -1,10 +1,10 @@
 # @stealthscale/component-disclosure
 
 Draws what is shown and hidden on the reader's say-so. Every component binds a recipe and draws
-nothing of its own, so a theme moves all of them by extending the recipe. The preset under `./theme`
-registers the recipes with an application's compiler.
+nothing of its own, so a theme restyles all of them by extending the recipe. The preset under
+`./theme` registers the recipes with an application's compiler.
 
-Every value a theme can move on a component is an axis of its recipe, so a caller reaches it as a
+Every value a theme can change on a component is an axis of its recipe, so a caller sets it as a
 prop and writes no style. A caller changes the element a component draws with `as`.
 
 ## Install
@@ -42,8 +42,8 @@ import { Collapsible } from "@stealthscale/component-disclosure";
 | `size`    | `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`, `4xl` | `md`    |
 | `motion`  | `slide`, `fade`, `none`                           | `slide` |
 
-The size steps the trigger, the block and the mark together at one name. The trigger reads the
-control scale, so a collapsible lines up with a button of the same name beside it.
+The size sets the trigger, the block and the mark from one step of the scale. The trigger reads the
+control scale, so a collapsible lines up with a button of the same size beside it.
 
 ### The machine's settings
 
@@ -51,13 +51,13 @@ Beside the axes, the root takes the settings the machine reads. None of them is 
 
 | Setting               | What it does                                           |
 | --------------------- | ------------------------------------------------------ |
-| `open`, `defaultOpen` | Drives it from outside, or sets where it starts        |
-| `onOpenChange`        | Hears each time it opens or closes                     |
+| `open`, `defaultOpen` | Sets the state from outside, or sets where it starts   |
+| `onOpenChange`        | Called each time it opens or closes                    |
 | `disabled`            | Stops the control opening it                           |
 | `collapsedHeight`     | Leaves a strip of the block showing while it is closed |
-| `onExitComplete`      | Fires once the closing animation has finished          |
+| `onExitComplete`      | Runs once the closing animation has finished           |
 | `id`                  | Names the machine, which builds its ARIA references    |
-| `dir`                 | Says which way the line runs                           |
+| `dir`                 | Sets which way the line runs                           |
 
 `collapsedHeight` is what turns a disclosure into a preview. The block keeps the height you name
 while closed, so a reader still sees the first line or two and the control reveals the rest.
@@ -74,16 +74,16 @@ control and the block from it. The root takes no element `id` or `dir` for that 
 
 None of this is a prop you can forget, because the machine writes all of it:
 
-- **The control says what it does.** It carries `aria-expanded` and points at the block with
+- **The control reports its state.** It carries `aria-expanded` and points at the block with
   `aria-controls`.
 - **A closed block is out of reach.** It is hidden from a screen reader and from the tab order, so a
   keyboard passes over any control inside one.
-- **The mark says nothing.** The control already says whether the block is expanded, so the
+- **The mark is not announced.** The control already reports whether the block is expanded, so the
   indicator is kept out of the accessibility tree and turns on the state alone.
 
-The mark turns half a revolution as the block opens, and holds still for a reader who asked for less
-motion. Both motions read animation styles the theme owns, so a theme decides the pace and the
-reduced-motion answer once for everything.
+The mark turns half a revolution as the block opens, and holds still for a reader who asked for
+reduced motion. Both motions read animation styles the theme owns, so a theme decides the pace and
+the reduced-motion behaviour once for everything.
 
 A block that starts open does not animate in. The machine holds its state attribute back on the
 first render for exactly that reason, and writes it from the first animation frame onwards.
@@ -118,37 +118,37 @@ import { Tabs } from "@stealthscale/component-disclosure";
 panel. `justify` decides where they sit when they do not fill it.
 
 Each control names the panel it shows with `value`, and each panel names its control the same way.
-Nothing else here is yours to state, because the machine works the rest out for itself.
+Nothing else here is yours to state, because the machine derives the rest.
 
 Which way the set runs is not an axis. The machine states it, writes it onto every part, and the
-recipe reads it, so the strip turns into a column and the bar moves to its inline edge without
-anyone saying it twice.
+recipe reads it, so the strip turns into a column and the bar moves to its inline edge without being
+stated twice.
 
 ### The machine's settings
 
 | Setting                 | What it does                                            |
 | ----------------------- | ------------------------------------------------------- |
-| `value`, `defaultValue` | Drives it from outside, or sets which panel opens first |
-| `onValueChange`         | Hears each time the panel changes                       |
+| `value`, `defaultValue` | Sets the panel from outside, or which panel opens first |
+| `onValueChange`         | Called each time the panel changes                      |
 | `orientation`           | Runs the strip across or down                           |
 | `activationMode`        | Chooses a panel on focus, or only on a press            |
 | `loopFocus`             | Joins the ends of the strip up                          |
 | `deselectable`          | Lets a person close the panel they are on               |
 | `id`                    | Names the machine, which builds its ARIA references     |
 
-`activationMode` is worth knowing. It chooses on focus by default, so an arrow key both moves and
-selects. A set whose panels are expensive to draw sets it to `manual`, and then an arrow moves the
-focus and a press chooses.
+`activationMode` decides when a panel is chosen. It chooses on focus by default, so an arrow key
+both moves and selects. A set whose panels are expensive to draw sets it to `manual`, and then an
+arrow moves the focus and a press chooses.
 
 ### The accessibility the machine writes
 
-- **The strip is one set.** It carries the tablist role and says which way it runs, so a screen
+- **The strip is one set.** It carries the tablist role and reports which way it runs, so a screen
   reader announces the count and the arrows move inside it.
 - **The strip is one tab stop.** Only the control in force is reachable by Tab, and the arrows move
   between them, so a person tabbing through a page steps over the set rather than through it.
 - **Each panel is reachable.** A panel holding nothing focusable takes a tab stop of its own, so
   tabbing out of the strip moves to what was just chosen rather than past it.
-- **A panel nobody chose is gone.** It is out of the tab order and out of the accessibility tree.
+- **A panel nobody chose is removed.** It is out of the tab order and out of the accessibility tree.
 
 The bar that marks the control in force is positioned from measurements the machine takes, so the
 recipe states its thickness and its colour and never its place. It is hidden until there is
@@ -188,9 +188,9 @@ import { Popover } from "@stealthscale/component-disclosure";
 | `variant` | `surface`, `elevated`, `glass`                    | `surface` |
 | `size`    | `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`, `4xl` | `md`      |
 
-A popover is louder than a tooltip. It holds a heading, a paragraph and often a control, so it reads
-at body text and takes the room a panel needs. The size moves the panel's room, the heading's size
-and the paragraph's together.
+A popover carries more than a tooltip. It holds a heading, a paragraph and often a control, so it
+reads at body text and takes the room a panel needs. The size sets the panel's room, the heading's
+size and the paragraph's together.
 
 `Popover.Anchor` is for a panel positioned against something other than the control that opens it,
 such as a whole row. Draw it around that thing and the machine measures it instead.
@@ -199,8 +199,8 @@ such as a whole row. Draw it around that thing and the machine measures it inste
 
 | Setting                                       | What it does                                                    |
 | --------------------------------------------- | --------------------------------------------------------------- |
-| `open`, `defaultOpen`                         | Drives it from outside, or opens it to begin with               |
-| `onOpenChange`                                | Hears each time the panel opens or shuts                        |
+| `open`, `defaultOpen`                         | Sets the state from outside, or opens it to begin with          |
+| `onOpenChange`                                | Called each time the panel opens or shuts                       |
 | `modal`                                       | Traps focus and hides the rest of the page from a screen reader |
 | `autoFocus`, `initialFocusEl`, `finalFocusEl` | Where focus goes on opening and on closing                      |
 | `closeOnEscape`, `closeOnInteractOutside`     | What shuts the panel                                            |
@@ -213,10 +213,10 @@ such as a whole row. Draw it around that thing and the machine measures it inste
 - **The panel is a dialog.** It carries the dialog role, and the control says whether it is open and
   which panel it controls.
 - **The panel is announced by its own words.** The heading names it and the paragraph describes it,
-  both wired by the machine, so a panel with a `Title` needs nothing else to be announced properly.
+  both wired by the machine, so a panel with a `Title` needs nothing else to be announced.
 - **Focus goes in and comes back.** The panel takes focus as it opens and returns it to the control
   as it shuts, so a keyboard never loses its place.
-- **Escape shuts it**, as does a click outside.
+- **Escape shuts it.** So does a click outside.
 
 Like the tooltip, nothing here portals. Wrap `Popover.Positioner` in the portal you want where the
 panel is clipped or stacked wrongly.
@@ -250,7 +250,7 @@ import { Tooltip } from "@stealthscale/component-disclosure";
 | `size`    | `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`, `4xl` | `md`       |
 
 The root draws an element, which the machine has no part for, because the control and the box are
-siblings and the recipe hands its variants down from above them both. It is drawn with
+siblings and the recipe passes its variants down from above them both. It is drawn with
 `display: contents`, so it takes part in no layout and a tooltip attached to a control inside a row
 leaves that row as it was.
 
@@ -259,19 +259,19 @@ are never filled in different colours whichever look is picked.
 
 ### The machine's settings
 
-| Setting                                                                | What it does                                         |
-| ---------------------------------------------------------------------- | ---------------------------------------------------- |
-| `open`, `defaultOpen`                                                  | Drives it from outside, or opens it to begin with    |
-| `onOpenChange`                                                         | Hears each time the box opens or shuts               |
-| `openDelay`, `closeDelay`                                              | How long a pointer rests before it opens, and after  |
-| `disabled`                                                             | Stops it opening at all                              |
-| `interactive`                                                          | Keeps it open while a pointer is inside the box      |
-| `closeOnClick`, `closeOnEscape`, `closeOnScroll`, `closeOnPointerDown` | What shuts it                                        |
-| `positioning`                                                          | Which side it opens on, and how far from the control |
-| `id`                                                                   | Names the machine, which builds its ARIA references  |
+| Setting                                                                | What it does                                           |
+| ---------------------------------------------------------------------- | ------------------------------------------------------ |
+| `open`, `defaultOpen`                                                  | Sets the state from outside, or opens it to begin with |
+| `onOpenChange`                                                         | Called each time the box opens or shuts                |
+| `openDelay`, `closeDelay`                                              | How long a pointer rests before it opens, and after    |
+| `disabled`                                                             | Stops it opening at all                                |
+| `interactive`                                                          | Keeps it open while a pointer is inside the box        |
+| `closeOnClick`, `closeOnEscape`, `closeOnScroll`, `closeOnPointerDown` | What shuts it                                          |
+| `positioning`                                                          | Which side it opens on, and how far from the control   |
+| `id`                                                                   | Names the machine, which builds its ARIA references    |
 
-`interactive` is the one to reach for where the box holds a link. It is off by default, because a
-tooltip held open under a pointer is a tooltip covering whatever is behind it.
+Set `interactive` where the box holds a link. It is off by default, because a tooltip held open
+under a pointer covers whatever is behind it.
 
 ### Putting the box somewhere else
 
@@ -297,8 +297,8 @@ package peers on no other component package.
   clicking a control does not leave a tooltip hanging over the page.
 - **Escape shuts it.** So does scrolling, and pressing the control.
 
-The default element for the control is `button`, because a tooltip attached to something a browser
-does not focus is a tooltip a keyboard never sees. Pass `as` for a control you have already built.
+The default element for the control is `button`, because a keyboard never reaches a tooltip attached
+to something a browser does not focus. Pass `as` for a control you have already built.
 
 ## Menu
 
@@ -343,8 +343,8 @@ two colours still sees.
 row that carries a mark is inset whatever the axis says, so a list of options does not step sideways
 as the marks appear.
 
-The panel states no width of its own, so it is as wide as its widest row. Ask the machine for the
-control's width instead with `positioning: { sameWidth: true }`.
+The panel states no width of its own, so it is as wide as its widest row. Set
+`positioning: { sameWidth: true }` to match the control's width instead.
 
 ### Rows that carry a choice
 
@@ -361,7 +361,7 @@ That is how one radio set clears the rest.
 </Menu.OptionItem>
 ```
 
-The row hands its value down. `Menu.ItemText` and `Menu.ItemIndicator` take no props of their own.
+The row passes its value down. `Menu.ItemText` and `Menu.ItemIndicator` take no props of their own.
 Group rows with `Menu.ItemGroup` and `Menu.ItemGroupLabel`. The two share one `value`.
 
 ### Submenus
@@ -390,17 +390,17 @@ belongs to opens from no other menu.
 ### Right-click menus
 
 `Menu.ContextTrigger` opens the menu at the point the pointer is at rather than beside a control. It
-answers a long press as well as a right-click, and it stops the browser drawing its own menu over
-ours. Use it in place of `Menu.Trigger`.
+responds to a long press as well as a right-click, and it stops the browser drawing its own menu
+over this one. Use it in place of `Menu.Trigger`.
 
 ### The machine's settings
 
 | Setting                                 | What it does                                           |
 | --------------------------------------- | ------------------------------------------------------ |
-| `open`, `defaultOpen`                   | Drives it from outside, or opens it to begin with      |
-| `onOpenChange`                          | Hears each time the rows open or shut                  |
-| `onSelect`                              | Hears which row the reader chose                       |
-| `highlightedValue`, `onHighlightChange` | Drives the row the reader is on, or hears it change    |
+| `open`, `defaultOpen`                   | Sets the state from outside, or opens it to begin with |
+| `onOpenChange`                          | Called each time the rows open or shut                 |
+| `onSelect`                              | Called with the row the reader chose                   |
+| `highlightedValue`, `onHighlightChange` | Sets the row the reader is on, or reports it changing  |
 | `closeOnSelect`                         | Whether choosing a row shuts the menu                  |
 | `typeahead`, `loopFocus`                | Whether typing jumps to a row, and whether arrows wrap |
 | `navigate`                              | Follows a row drawn as a link through a router         |
@@ -415,7 +415,7 @@ ours. Use it in place of `Menu.Trigger`.
   which panel it opens.
 - **The focus stays on the panel.** The machine moves a highlight over the rows and points a screen
   reader at it with `aria-activedescendant`, which is what the menu pattern asks for.
-- **Every row answers the keyboard.** The arrows move the highlight. The arrow towards a submenu
+- **Every row responds to the keyboard.** The arrows move the highlight. The arrow towards a submenu
   opens it and the arrow back closes it. Typing jumps to a row by its words, and Escape shuts the
   menu and returns focus to the control.
 - **A row that carries a choice reports it.** The checkbox and radio menu item roles carry

@@ -11,7 +11,7 @@ provider-router: add the pieces an application builds a router from
 - `compileRoutes` turns the route declarations a host read out of a manifest into routes it places
   in its own tree. It creates routes and never mutates the parent it is given, so a second call
   returns a second set sharing no object with the first. Compile every contributor's declarations in
-  one call, because two calls under one parent cannot see each other's paths.
+  one call, because two calls under one parent cannot read each other's paths.
 - Grafting into a tree a router has already been built from is why the compiler is pure.
   `addChildren` replaces a route's children on the object it is called on, and the library caches a
   processed tree on a server keyed by that object and written once per process. A second router
@@ -25,11 +25,12 @@ provider-router: add the pieces an application builds a router from
 - The walk refuses two routes carrying one id, and two serving one path under a shared parent. A
   pathless layout consumes no path segment, so a declared `/settings` and a host's own `/settings`
   inside a layout of its own are one URL. A development build of the library reports that as a
-  duplicate route and a production build keeps the first and drops the rest in silence.
+  duplicate route and a production build keeps the first and drops the rest without reporting it.
 - A link is specified by a reference rather than a path or a bare string. `RouteRef` states the
   shape structurally, so a plugin SDK's own reference type satisfies it without this package
-  depending on that SDK, and the parameters the route's path names ride in the reference's type.
-  Filling the wrong parameter is a compile error. A bare id still works and gives up that check.
+  depending on that SDK, and the parameters the route's path names are carried in the reference's
+  type. Filling the wrong parameter is a compile error. A bare id still works and gives up that
+  check.
 - `useRouteParams` returns a page its own parameters, under the names the reference carries. A
   compiled route is outside the tree an application registered, so the library types its parameters
   as a loose record. The hook checks at run time that the page is the route the reference names
@@ -47,7 +48,7 @@ provider-router: add the pieces an application builds a router from
   options share one pathless parent. Naming a layout a route above already draws is refused, because
   the frame would otherwise be drawn twice.
 - A condition is whatever language a host writes one in, and one that fails makes the route a 404,
-  because a route nobody may reach does not exist.
+  because a route nobody may reach should resolve to nothing.
 - A declaration stating `outlet` is refused. This package draws no panes, and a page that asked to
   be a pane and was drawn as the whole content is wrong in a way nobody notices.
 - `createAppRootRoute` types the router context the other pieces expect, so the mismatch is reported

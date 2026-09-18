@@ -59,7 +59,7 @@ the package with its scope stripped, so an install would put `example-lib-cli` o
 The manifest declares two subpaths. `.` reaches `src/index.ts`, which re-exports `tally`.
 `./bin/tally` reaches `src/bin/tally.ts`, which reads `process.argv`, calls `tally` and chooses the
 exit code. Importing the package never runs the argument parsing, so a consumer importing the
-function alone pays nothing for the command.
+function alone does not load the command.
 
 ```ts
 import { tally } from "@stealthscale/example-lib-cli";

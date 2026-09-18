@@ -54,11 +54,11 @@ schema's English beside each.
 A form that states a literal somewhere is a form somebody has to find again when the product is
 translated.
 
-### A translator of our own, answering nothing for a missing key
+### A translator of our own, returning nothing for a missing key
 
 `(id, values) => string | undefined`, with the fallback chain in the foundation.
 
-**Why not:** i18next's `t` never answers nothing, and an adapter would stand between every
+**Why not:** i18next's `t` never returns nothing, and an adapter would stand between every
 application and its own `t`. The library's `defaultValue` and key list are the chain already.
 
 ### Message values renamed to names of our own

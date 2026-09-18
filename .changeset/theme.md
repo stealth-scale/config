@@ -21,9 +21,9 @@ theme: keep no value's class on a slot for a compound
 - The type scale gains `8xl` and `9xl`, and the heading role steps over two sizes above `2xl`: `3xl`
   reads at the `6xl` size and `4xl` at the `8xl`. A document heading and a hero heading are
   different things, and the size between them read as neither.
-- A control reads as pressed. `interactive` squeezes the box to 98 percent, held still for a reader
-  who asked for less motion. A fill presses to the palette's `emphasized`, a solid fill to the ink
-  it hovers to, and a plain one to the palette's solid. An outline fills in as it is hovered and
+- A control reads as pressed. `interactive` scales the box to 98 percent, held still for a reader
+  who asked for reduced motion. A fill presses to the palette's `emphasized`, a solid fill to the
+  ink it hovers to, and a plain one to the palette's solid. An outline fills in as it is hovered and
   further as it is pressed, rather than changing its line, which is the change a hover already
   makes.
 - An outline and a surface clip their background to the padding box, so a rounded corner is drawn as
@@ -49,7 +49,7 @@ theme: keep no value's class on a slot for a compound
 - `flatVariants` writes a `variant` axis that holds still, reading the `flat` layer styles: a look
   with a background and an ink and nothing a pointer changes. A badge drawn in a fill repaints
   whenever a pointer crosses it, which reads as a control a reader can press and then cannot. There
-  is no flat ghost, a look that never repaints leaving it identical to plain.
+  is no flat ghost, because a look that never repaints is identical to plain.
 - `tagSizes` writes the `size` axis of a tag, its height on the tag scale and its inset, its gap and
   its label one step down, and `below` reads the step under the one it is given so a recipe drawing
   something lighter than a control states no order of its own.

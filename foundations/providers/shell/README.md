@@ -28,7 +28,7 @@ import { catalogues } from "virtual:i18n";
 applications on one origin keep their own.
 
 An application renders its router and its data clients as children, so one without either bundles
-neither. Routes and data stay its own.
+neither. Routes and data remain the application's own.
 
 ## The order
 
@@ -46,15 +46,22 @@ neither. Routes and data stay its own.
 
 `ColorModeProvider` and `ThemeProvider` both own `data-color-mode` on the document root, and
 `ThemeProvider` removes it where it is given no mode. `Themed` sits between them, reads the choice,
-and passes it on, so the two write the same thing rather than undoing each other. A person following
-the machine is passed nothing, which is how both of them spell that.
+and passes it on, so the two write the same value rather than undoing each other. A person following
+the machine is passed nothing, which is how both providers represent that choice.
 
 `Themed` is exported for an application that composes the providers itself and wants the same
 bridge.
 
 ## The props
 
-`catalogues` and `i18n` reach the i18n provider. `locales` reaches the locale provider. `theme`
-reaches the theme provider. `sizes` reaches the viewport. `hotkeys` reaches the shortcuts.
-`rootNode` reaches the environment. `store` reaches every setting, so a specification hands one
-memory store and the page's local storage is left alone.
+| Prop                 | Goes to               |
+| -------------------- | --------------------- |
+| `catalogues`, `i18n` | `I18nProvider`        |
+| `locales`            | `LocaleProvider`      |
+| `theme`              | `ThemeProvider`       |
+| `sizes`              | `ViewportProvider`    |
+| `hotkeys`            | `HotkeysProvider`     |
+| `rootNode`           | `EnvironmentProvider` |
+| `store`              | Every setting         |
+
+A specification passes one memory store through `store`, and the page's local storage is left alone.

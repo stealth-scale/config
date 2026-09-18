@@ -14,7 +14,7 @@ pnpm --filter @stealthscale/example-app-remote build
 pnpm --filter @stealthscale/example-app-remote preview
 ```
 
-The preview server answers on port 4403 and serves `remoteEntry.js` from its root. The development
+The preview server listens on port 4403 and serves `remoteEntry.js` from its root. The development
 server runs the same application as an ordinary page on port 4402:
 
 ```bash
@@ -58,5 +58,5 @@ never pinned to one build of this application.
 
 `mount` in `src/mount.ts` draws the dashboard into an element and returns the React root.
 `src/main.tsx` calls it against `#root`, which is what lets you run and specify this application
-with no host in the picture. The element is emptied on the first render, so a caller that passes one
-with markup already in it loses that markup.
+with no host involved. The element is emptied on the first render, so a caller that passes one with
+markup already in it loses that markup.

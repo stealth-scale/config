@@ -62,8 +62,8 @@ formats registered, and a `format: "vat-number"` in a supergraph type would pass
 **Positive:**
 
 - A format or a keyword is registered once and applies to every schema on the page.
-- A typo in a schema's `format` throws where the form is built rather than passing every value in
-  silence.
+- A typo in a schema's `format` throws where the form is built rather than passing every value
+  without a report.
 - Swapping the library is a change to one file, because nothing outside it reads a library error.
 
 **Negative:**

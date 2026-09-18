@@ -1,7 +1,7 @@
 # @stealthscale/vite-plugin-i18n
 
 `@stealthscale/vite-plugin-i18n` finds every catalogue an application can reach, types their keys,
-and answers the module it loads them from. A package keeps its words beside its code and ships them.
+and serves the module it loads them from. A package keeps its words beside its code and ships them.
 The application reaches every catalogue without listing one.
 
 ## Install
@@ -69,15 +69,23 @@ write none.
 
 ## The build gate
 
-A build fails on a key the fallback does not define. It fails on a placeholder a translation drops.
-It fails on one owner declaring a key in two files. A dev server reports all three and keeps
-serving.
+A build fails on any of three faults:
+
+- A key the fallback does not define.
+- A placeholder a translation drops.
+- One owner declaring a key in two files.
+
+A dev server reports all three and keeps serving.
 
 A plural form is checked against any form of the same key, and may write the count out in words:
-`één pagina` is accepted against `{{count}} page`. Every other placeholder is still wanted.
+`één pagina` is accepted against `{{count}} page`. Every other placeholder is still required.
 
 ## Hot updates
 
 On a dev server a changed catalogue is sent to the page as an `i18n:catalogue` event carrying the
-pair merged afresh. The foundation swaps the words in place, so the page keeps its state. A
+pair merged afresh. The foundation replaces the words in place, so the page keeps its state. A
 catalogue appearing or disappearing regenerates the types as well.
+
+## Licence
+
+MIT. See [LICENSE](LICENSE).

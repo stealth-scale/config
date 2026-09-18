@@ -14,7 +14,7 @@ pnpm add -D @stealthscale/vite-config-css
 
 The package peers on `@stealthscale/vite-config-core`, `stylelint`, `stylelint-config-standard`,
 `stylelint-order`, `stylelint-use-nesting`, `stylelint-high-performance-animation`,
-`vite-plugin-stylelint`, `vite` and `vitest`. Install all nine. Stylelint is handed an absolute path
+`vite-plugin-stylelint`, `vite` and `vitest`. Install all nine. Stylelint receives an absolute path
 to the shared guide and to each plugin, resolved while this module loads, so a peer nobody installed
 fails the configuration rather than the check.
 
@@ -56,7 +56,7 @@ about what gets checked.
 
 `Checked` states what the check reads and how hard it fails. Every field is optional. `Warned` takes
 the same four and adds a required `because`, which is recorded against the removal and read back
-when somebody asks what took the check away.
+when somebody looks up what removed the check.
 
 | Field    | Type                                | What it does                              |
 | -------- | ----------------------------------- | ----------------------------------------- |
@@ -72,7 +72,7 @@ means the check reads those globs and no others, in place of the default
 
 A name in `rules` that one of the four sets already declares takes the value given here. Nothing is
 cached between runs, so a rule you change applies on the next run rather than after a cache is
-thrown away.
+cleared.
 
 ### Blocks
 
@@ -82,7 +82,7 @@ thrown away.
 
 ## Rules
 
-`rules.all()` merges the four sets into the record the check hands Stylelint.
+`rules.all()` merges the four sets into the record the check passes to Stylelint.
 
 | Rule                                             | Set         | What it refuses                             |
 | ------------------------------------------------ | ----------- | ------------------------------------------- |

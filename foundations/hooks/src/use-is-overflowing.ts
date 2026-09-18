@@ -1,5 +1,5 @@
 /**
- * Answers whether what is inside an element is larger than the box drawn for it.
+ * Reports whether the content of an element is larger than the box drawn for it.
  */
 
 import { type RefObject, useEffect, useRef, useState } from "react";
@@ -26,7 +26,7 @@ export interface Overflow {
 }
 
 /**
- * Answers for an element that fits, and for one nothing has measured yet.
+ * The result for an element that fits, and for one nothing has measured yet.
  */
 const FITS: Overflow = { horizontal: false, overflows: false, vertical: false };
 
@@ -50,10 +50,11 @@ function overflowOf(element: HTMLElement): Overflow {
  *
  * @remarks
  *   Measured again whenever the element resizes, whenever its content changes, whenever the parent
- *   resizes, and once more after the fonts have loaded. The answer keeps its identity while it
- *   holds, so a component reading it renders again only when the element crosses between fitting
- *   and not. The wiring effect names no dependencies, because a ref changing is not a render and
- *   nothing else would notice a new element. It rewires only when the element differs from the one
+ *   resizes, and once more after the fonts have loaded. The returned object keeps one identity
+ *   while the result stands, so a component reading it renders again only when the element crosses
+ *   between fitting and not. The wiring effect lists no dependencies, because a ref changing is not
+ *   a render and nothing else would detect a new element. It rewires only when the element differs
+ *   from the one
  *   it is already watching, so running on every render costs one comparison. The teardown is held
  *   in a ref and run by a second effect, because the wiring effect returning it would disconnect
  *   the observers on every render.
@@ -78,7 +79,7 @@ export function useIsOverflowing(ref: RefObject<HTMLElement | null>): Overflow {
     if (element === null) return;
 
     /**
-     * Measures the element again, and reports the answer only where it changed.
+     * Measures the element again, and stores the result only where it changed.
      */
     const measure = (): void => {
       if (watched.current !== element) return;

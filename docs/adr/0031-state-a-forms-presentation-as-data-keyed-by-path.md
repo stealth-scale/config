@@ -91,8 +91,9 @@ place and the order in the list.
 
 **Negative:**
 
-- `options` is a hole in the styling limit. A renderer reads it as it would a prop from a stranger.
-- A `oneOf` nobody has answered yet resolves to nothing, so `resolve` draws the schema with its
+- `options` is a hole in the styling limit. A renderer reads it as it would a prop from any other
+  package.
+- A `oneOf` nobody has matched yet resolves to nothing, so `resolve` draws the schema with its
   `oneOf` removed until a branch matches. Our own schemas prefer `if`, `then` and `else`.
 
 **Neutral:**

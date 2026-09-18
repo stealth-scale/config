@@ -21,8 +21,8 @@ pnpm --filter @stealthscale/example-app-host build
 pnpm --filter @stealthscale/example-app-host preview
 ```
 
-The host answers on port 4401, and `public/remotes.json` sends it to the remote on port 4403. The
-development server answers on port 4400.
+The host listens on port 4401, and `public/remotes.json` sends it to the remote on port 4403. The
+development server listens on port 4400.
 
 Note: the remote admits `http://localhost:4401` and `https://host.stealthscale.dev` as origins, so a
 page served by the development server on port 4400 is refused the remote's entry module.
@@ -53,7 +53,7 @@ rendered it.
 The test runner cannot resolve `remote/Dashboard`, because the federation plugin invents that
 specifier during a build and a development server. The `stubs` argument aliases it to
 `src/remote.fixtures.tsx` under `test.alias` alone, which is also the only place to fix what the
-remote answers with.
+remote returns.
 
 ## The manifest
 
@@ -65,13 +65,13 @@ remote answers with.
 
 `src/endpoints.ts` fetches that file and drops any entry missing a name or a URL. It registers what
 is left with `force: true`, over whatever address the build defaulted to. Any status but a success
-raises, which separates a deployment that fails to serve the file from one whose file names nothing.
+throws, which separates a deployment that fails to serve the file from one whose file names nothing.
 
 `src/main.tsx` awaits registration before the first render. An import that runs earlier is fetched
 from the placeholder address, which on a deployment is a machine that is not there.
 
-Each chunk is named for its contents, so a deployment hands out names the previous build never used.
-A page left open across one requests a file that has gone. `src/main.tsx` subscribes the listener
-from `src/stale.ts` to `vite:preloadError` before anything else runs. That listener fetches the page
-again on the first such failure of a session and stands aside on the next, which keeps one bad
+Each chunk is named for its contents, so a deployment serves names the previous build never used. A
+page left open across one requests a file that has gone. `src/main.tsx` subscribes the listener from
+`src/stale.ts` to `vite:preloadError` before anything else runs. That listener fetches the page
+again on the first such failure of a session and does nothing on the next, which keeps one bad
 release from turning every open page into a load test.

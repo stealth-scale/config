@@ -1,10 +1,10 @@
 # @stealthscale/component-actions
 
-Draws what a person presses: a button, a toggle, and the triggers that carry an action. Every
-component binds a recipe and draws nothing of its own, so a theme moves all of them by extending the
+Draws what a person presses: the button, and the square button that holds one glyph. Every component
+binds a recipe and draws nothing of its own, so a theme restyles all of them by extending the
 recipe. The preset under `./theme` registers the recipes with an application's compiler.
 
-Every value a theme can move on a component is an axis of its recipe, so a caller reaches it as a
+Every value a theme can change on a component is an axis of its recipe, so a caller sets it as a
 prop and writes no style. A caller changes the element a component draws with `as`.
 
 ## Install
@@ -19,11 +19,11 @@ The package peers on `react` and `@stealthscale/theme`. An application lists the
 ## Button
 
 Draws the element a person presses, in a look, a size and a status, raised off the page and glowing
-or rippling where a page asks. Under a press the look fills to its pressed colour, the box squeezes
-to 98 percent, and an elevated button drops towards the page. A button that opens with a mark leads
-with one step less inset, so the room before the mark is the width of the gap after it rather than a
-word's worth. The element is `button`, and `type` defaults to `button` so one inside a form does not
-send it.
+or rippling where a page sets that effect. Under a press the look fills to its pressed colour, the
+box scales to 98 percent, and an elevated button drops towards the page. A button that opens with a
+mark leads with one step less inset, so the room before the mark is the width of the gap after it
+rather than a word's worth. The element is `button`, and `type` defaults to `button` so one inside a
+form does not send it.
 
 ```tsx
 import { Button, ButtonPropsProvider } from "@stealthscale/component-actions";

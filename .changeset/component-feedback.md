@@ -8,8 +8,8 @@ component-feedback: publish the skeleton and the empty state
   it, so the stand-in comes out the size of the thing it stands in for without anybody stating a
   width, and it hides everything inside it until the content fades in. It takes a motion and a
   corner, each an axis of its recipe.
-- Every motion reads an animation style the theme states, so a reader who asked for less motion is
-  answered once in the theme rather than in every recipe.
+- Every motion reads an animation style the theme states, so a reader who asked for reduced motion
+  is served once in the theme rather than in every recipe.
 - `SkeletonText` stands in for a paragraph. A bar is one line tall and the space between two is half
   a line, both read off the line the bars stand in for, so a paragraph of stand-ins occupies what
   the real paragraph will and the page does not jump. The last bar of several is short.

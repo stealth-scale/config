@@ -60,7 +60,7 @@ const [width, setWidth] = useState<number | undefined>(390);
 
 ## Reading the breakpoint
 
-`useBreakpoint` answers the widest breakpoint that starts at or under the width. Name the ones that
+`useBreakpoint` returns the widest breakpoint that starts at or under the width. Name the ones that
 count, because only those are matched. A name is a `Breakpoint`, which is `base` or one the design
 system's vocabulary states, so a misspelt one is refused where it is written.
 
@@ -77,19 +77,19 @@ const columns = useBreakpointValue({ base: 1, md: 2, xl: 4 });
 const gap = useBreakpointValue([2, null, 4]);
 ```
 
-The window is asked the way the styling engine asks it, one `min-width` query per breakpoint, so a
-component and its stylesheet switch at the same pixel. Both hooks answer the fallback on a server
-and ask the window after the first render, which keeps a server's markup and the client's first
-paint the same. Pass `ssr: false` to ask on the first render instead.
+The window is read the way the styling engine reads it, one `min-width` query per breakpoint, so a
+component and its stylesheet switch at the same pixel. Both hooks return the fallback on a server
+and read the window after the first render, which keeps a server's markup and the client's first
+paint the same. Pass `ssr: false` to read the window on the first render instead.
 
 Warning: a style prop such as `{ base: 1, md: 2 }` compiles to a media query, and a browser matches
-that query against the window. The stated width never reaches it. Switch a block that has to follow
+that query against the window. The stated width never affects it. Switch a block that has to follow
 the provider with `useBreakpointValue` rather than with a style prop.
 
 ## Measuring an element
 
-`useNarrow` measures the element rather than the window, so a page beside an open sidebar answers
-for its own width.
+`useNarrow` measures the element rather than the window, so a page beside an open sidebar reports
+its own width.
 
 ```tsx
 const ref = useRef<HTMLElement>(null);
@@ -98,8 +98,9 @@ const narrow = useNarrow(ref, 600);
 
 The element is measured once it is laid out and again whenever its size changes, and an element that
 arrives after the first layout is measured when it arrives. Before it is measured, and while the ref
-holds nothing, the answer comes from the viewport: narrow under `md`, which is what a phone is, so a
-phone never lays out wide first. Pass a third argument to guess under a different breakpoint.
+holds nothing, the result comes from the viewport: narrow under `md`, which is what a phone is, so a
+phone never lays out wide first. Pass a third argument to assume narrow under a different
+breakpoint.
 
 ## Reference
 

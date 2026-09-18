@@ -13,7 +13,7 @@ pnpm --filter @stealthscale/example-form-presentation dev
 pnpm --filter @stealthscale/example-form-presentation test
 ```
 
-The development server answers on port 4930. `vp test` renders the page into a happy-dom document,
+The development server listens on port 4930. `vp test` renders the page into a happy-dom document,
 reads the fieldsets and the controls back, switches the kind to a business, adds and removes a line,
 and submits a filled order.
 
@@ -33,7 +33,7 @@ resolved schema by its hash. A keystroke re-renders the field that received it a
   with a three-column grid inside it, a `line` fieldset with `repeat: "lines"`, and the lone `notes`
   field.
 - `x-control` on `notes` names the renderer. `x-span` on `billing.city` takes two of the three
-  columns. `x-options` on `lines[].amount` hands the renderer a currency.
+  columns. `x-options` on `lines[].amount` passes the renderer a currency.
 - `vat` exists only under the condition that `kind` is `business`. It is listed in the `who`
   fieldset. The fields skip it while the resolved schema lacks it. When it appears, the field starts
   from the property's own default, because the values built from the schema never had it.
@@ -52,5 +52,5 @@ names by `control`, at the highest rank. `FormProvider` puts them after the libr
 `rendererFor` picks the highest rank, and the later registration on a tie.
 
 A renderer is a field component. It reads its field through the contexts, as every component of
-`@stealthscale/example-form-fields` does, and it is handed the field's presentation, whether the
+`@stealthscale/example-form-fields` does, and it is given the field's presentation, whether the
 resolved schema requires it, and the property's schema.

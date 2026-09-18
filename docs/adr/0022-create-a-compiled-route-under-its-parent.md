@@ -27,7 +27,7 @@ Three library behaviours make grafting unsafe.
   by the tree object and written only where the cache is undefined.
 - A route's parent comes from its own `getParentRoute` closure, not from the traversal.
 
-A second router built from a mutated tree therefore answers from the cache. Measured with one route
+A second router built from a mutated tree therefore reads from the cache. Measured with one route
 grafted between two routers:
 
 | `NODE_ENV`    | What the second router listed                              |

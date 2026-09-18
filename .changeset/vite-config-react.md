@@ -15,7 +15,7 @@ react: run the React Compiler over everything a package renders
   preset during a transform, so a package missing `babel-plugin-react-compiler` or
   `@rolldown/plugin-babel` would otherwise build clean and memoise none of it.
 - `panicThreshold` is raised from `none` to `critical_errors`. The compiler failing one of its own
-  invariants now stops the build rather than leaving a function uncompiled in silence.
+  invariants now stops the build rather than leaving a function uncompiled without a report.
 - Neither layer applies where the mode is `test`. Each memo cache is a branch nobody wrote and
   coverage counts it, so a package held to full branch coverage would be asked to exercise a
   compiler's caching rather than its own code.

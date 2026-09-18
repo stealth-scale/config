@@ -35,10 +35,10 @@ const compiled = compileRoutes(declarations, { parent: root });
 ```
 
 `federation.host` already names the remote without giving an address. It reads where the remote is
-deployed from a document fetched at run time. The page's address was the last part still hardcoded,
-and it was hardcoded in the wrong application.
+deployed from a document fetched at run time. The page's address was the last part still written
+into this application, which is not the application that owns the page.
 
-## A deployment that is missing costs one page
+## A missing deployment costs one page
 
 `declarations.ts` returns an empty list where the import fails. The host still routes everything it
 owns, and reports once that the other deployment declared nothing.

@@ -16,8 +16,8 @@ Accepted
 
 ## Context
 
-Five components this library owes a consumer hold state a person drives: a collapsible, a menu, a
-popover, tabs and a tooltip. Each needs focus moved on a key, a layer dismissed from outside it, a
+Five components this library owes a consumer hold state that a person drives: a collapsible, a menu,
+a popover, tabs and a tooltip. Each needs focus moved on a key, a layer dismissed from outside it, a
 box positioned against a trigger, and ARIA attributes held in step across several elements.
 
 The component form reserved Ark for that case, on the grounds that Ark's parts carry `asChild`, so a
@@ -28,7 +28,7 @@ builder against 137 that name a machine, and this repository replaced the factor
 already.
 
 Zag composes by merging props rather than cloning a child, so the case `asChild` was held for is
-answered without the prop. Its state attributes match conditions the compiler already ships, so a
+covered without the prop. Its state attributes match conditions the compiler already ships, so a
 recipe styles a machine's state with nothing added to the foundation.
 
 ## Decision
@@ -68,7 +68,7 @@ one argument was pinning the versions together, which the catalog does for nine 
 **Negative:**
 
 - No `asChild` on a machine's parts. A caller putting a component of ours inside a trigger merges
-  the props themselves or reaches for `as`.
+  the props themselves or uses `as`.
 - We write the wiring Ark did for us, per part and per component.
 - A component package gains runtime dependencies, which none had before.
 

@@ -51,7 +51,7 @@ resolve to one of the two, such as which image to load.
 A person who has never chosen gets the right first paint from CSS alone. The provider writes the
 attribute before the browser paints React's first commit, so nothing React draws is painted in the
 wrong mode. The flash only happens when a stored choice disagrees with the machine and the page
-painted something before React mounted, because that paint is one the provider cannot reach.
+painted something before React mounted, because the provider cannot affect that paint.
 
 An application rendered on a server keeps the choice in a cookie and writes the attribute itself:
 
@@ -89,14 +89,14 @@ cookie needs none of it.
 | `COLOR_MODES`        | `readonly ColorMode[]`                                         |
 | `DARK_SCHEME_QUERY`  | `"(prefers-color-scheme: dark)"`                               |
 
-`useSystemColorMode` reads the machine's own setting and follows it as it changes. It answers
+`useSystemColorMode` reads the machine's own setting and follows it as it changes. It returns
 `light` on a server, which nothing about the first paint rests on, because the stylesheet decides
 that for a page carrying no attribute.
 
-`colorModeSetting` hands back the definition the provider uses, for a server or a script that has to
+`colorModeSetting` returns the definition the provider uses, for a server or a script that has to
 read the same choice without React around it.
 
-Warning: `useColorMode` throws where there is no provider above it. A hook that answered a default
+Warning: `useColorMode` throws where there is no provider above it. A hook that returned a default
 instead would let a subtree draw in a mode nothing is writing.
 
 ## The attribute

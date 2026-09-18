@@ -15,8 +15,8 @@ testing-react: check that a component honours as
   update it did not see.
 - `rootedViolations` draws each part of a component on its own and reports the ones that draw rather
   than throw. A part reads its machine through a context the root provides, so one drawn outside its
-  root has no api, and answering nothing there gives a part with no behaviour and no complaint. A
-  part that throws something other than what was expected is reported apart from one that drew.
+  root has no api, and returning nothing there gives a part with no behaviour and no error. A part
+  that throws something other than what was expected is reported apart from one that drew.
 - `drawn` renders a component built on a state machine and waits for the machine to commit. The
   machine commits its first state on a microtask after mounting, so a bare render leaves an update
   outside the act scope React checks. Measured on the tabs fixture: a bare render, a render followed

@@ -11,7 +11,7 @@ pnpm --filter @stealthscale/example-app-web build
 pnpm --filter @stealthscale/example-app-web preview
 ```
 
-The development server answers on port 4200 and forwards `/api` to port 8787. That port is free in
+The development server listens on port 4200 and forwards `/api` to port 8787. That port is free in
 this repository, so a request through the proxy fails at the connection rather than in the browser.
 `preview` serves the built output once `build` has written it.
 
@@ -34,5 +34,5 @@ three layers beside it, and every module under `src/` is plain TypeScript.
 
 A page served from port 4200 requests `/api` on its own origin. The browser treats that as a
 same-origin request and skips the preflight. The development server forwards the request to
-port 8787. The service there answers without CORS headers of its own. Vite reads the same proxy
+port 8787. The service there responds without CORS headers of its own. Vite reads the same proxy
 table in a preview server, so the built output gets the route as well.

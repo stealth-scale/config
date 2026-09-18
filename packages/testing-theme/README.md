@@ -84,27 +84,27 @@ expect(recipeClasses(container, "button")).toContain(variantClass("button", "var
 which adds the variants check and the compound check. `publishedRecipes(...presets)` builds that map
 out of the presets the component packages publish, so the list is the one an application installs
 rather than one written out by hand. `options.base` names the preset the theme is layered on, which
-the resolver follows a reference into. `options.thresholds` moves any of the three ratios.
+the resolver follows a reference into. `options.thresholds` changes any of the three ratios.
 `options.skip` leaves a check out, each with a reason.
 
 ### `recipeViolations(recipe, options)`
 
-| Check               | Reports                                                                                                                                                                                                                       |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `recipe.className`  | A class name outside `[a-z][a-z0-9-]*`                                                                                                                                                                                        |
-| `recipe.values`     | A value that writes the class another value writes, across the recipe's axes, or that a boolean axis writes at `true`                                                                                                         |
-| `recipe.compounds`  | A compound without a name, two compounds under one name, and a compound whose name writes the class of a variant                                                                                                              |
-| `recipe.empty`      | A value or a compound that states no styles, whose class the runtime writes and no rule reaches                                                                                                                               |
-| `recipe.defaults`   | A default naming an axis the recipe does not offer, or a value the axis does not offer                                                                                                                                        |
-| `recipe.selections` | A compound matched on an axis the recipe does not offer, or on a value the axis does not offer                                                                                                                                |
-| `recipe.jsx`        | A name in `options.names` that no `jsx` pattern matches, and a pattern that matches no name, where `names` lists what a consumer writes the component under                                                                   |
-| `recipe.colors`     | A color written outright, a ramp step, a reference, a hue, a palette role that does not exist, or `colorPalette` pointed at a hue                                                                                             |
-| `recipe.tokens`     | A token the preset does not define, named by one word or by a path, in any category a property reads, and any composition name it does not define. A CSS-wide keyword and a size a box takes from its content are passed over |
-| `recipe.conditions` | A condition neither the compiler's base preset nor the preset defines                                                                                                                                                         |
-| `recipe.lengths`    | A length in `px`, `rem` or `pt` on a property outside `options.lengths`, the compiler's token function and a custom property's fallback left out                                                                              |
-| `recipe.modes`      | `_dark`, `_light`, `_osDark` or `_osLight` anywhere in the recipe                                                                                                                                                             |
-| `recipe.slots`      | A slot `options.parts` stamps no part for, and a part no slot styles                                                                                                                                                          |
-| `recipe.subtle`     | `fg.subtle` as a text color                                                                                                                                                                                                   |
+| Check               | Reports                                                                                                                                                                                                                   |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `recipe.className`  | A class name outside `[a-z][a-z0-9-]*`                                                                                                                                                                                    |
+| `recipe.values`     | A value that writes the class another value writes, across the recipe's axes, or that a boolean axis writes at `true`                                                                                                     |
+| `recipe.compounds`  | A compound without a name, two compounds under one name, and a compound whose name writes the class of a variant                                                                                                          |
+| `recipe.empty`      | A value or a compound that states no styles, whose class the runtime writes and no rule reaches                                                                                                                           |
+| `recipe.defaults`   | A default naming an axis the recipe does not offer, or a value the axis does not offer                                                                                                                                    |
+| `recipe.selections` | A compound matched on an axis the recipe does not offer, or on a value the axis does not offer                                                                                                                            |
+| `recipe.jsx`        | A name in `options.names` that no `jsx` pattern matches, and a pattern that matches no name, where `names` lists what a consumer writes the component under                                                               |
+| `recipe.colors`     | A color written outright, a ramp step, a reference, a hue, a palette role that does not exist, or `colorPalette` pointed at a hue                                                                                         |
+| `recipe.tokens`     | A token the preset does not define, named by one word or by a path, in any category a property reads, and any composition name it does not define. A CSS-wide keyword and a size a box takes from its content are ignored |
+| `recipe.conditions` | A condition neither the compiler's base preset nor the preset defines                                                                                                                                                     |
+| `recipe.lengths`    | A length in `px`, `rem` or `pt` on a property outside `options.lengths`, the compiler's token function and a custom property's fallback left out                                                                          |
+| `recipe.modes`      | `_dark`, `_light`, `_osDark` or `_osLight` anywhere in the recipe                                                                                                                                                         |
+| `recipe.slots`      | A slot `options.parts` stamps no part for, and a part no slot styles                                                                                                                                                      |
+| `recipe.subtle`     | `fg.subtle` as a text color                                                                                                                                                                                               |
 
 The color properties and the category each property reads are taken from the compiler's base preset
 at run time. The tokens and conditions are read from `options.preset`, which is the foundation

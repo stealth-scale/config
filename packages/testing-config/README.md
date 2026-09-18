@@ -89,8 +89,8 @@ never stops another, so one run reports the whole set.
 
 Each factory is called once before the first check, so the four layer checks agree on what it
 returned and a factory with a side effect performs it once. The layer names a factory returns are
-measured against the prefix the package name yields: `@stealthscale/vite-config-react` asks for
-`react`, and `@stealthscale/vite-config` asks for no prefix at all.
+measured against the prefix the package name yields: `@stealthscale/vite-config-react` requires
+`react`, and `@stealthscale/vite-config` requires no prefix at all.
 
 Note: `manifest.engines` finds the workspace root by walking up for a `pnpm-workspace.yaml`. A
 package checked outside a workspace states its range and is compared against nothing.
@@ -111,7 +111,7 @@ The barrel publishes six functions and fourteen types.
 | Type            | What it describes                                                                                             |
 | --------------- | ------------------------------------------------------------------------------------------------------------- |
 | `Arguments`     | The arguments each factory is called with, keyed by its dotted path in the barrel                             |
-| `Check`         | The thirteen check names, one of which opens every violation a check reports                                  |
+| `Check`         | The sixteen check names, one of which opens every violation a check reports                                   |
 | `Conformance`   | The request: `at`, `kind` and `module`, beside the optional `arguments`, `only`, `skip` and `tiers`           |
 | `Engines`       | The `engines` field as the checks read it. Only `node` is read                                                |
 | `Factory`       | A callable export, as the `call` to make and the `path` it sits at                                            |

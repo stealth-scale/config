@@ -33,7 +33,7 @@ Every plugin option passes through. `layers({ fallback: "nl" })` defines the key
 ## The two layers
 
 `catalogued()` appends the plugin to `plugins`. The plugin walks the dependency graph, reads every
-`locales/<language>/<namespace>.json` it finds, answers `virtual:i18n`, and writes
+`locales/<language>/<namespace>.json` it finds, serves `virtual:i18n`, and writes
 `src/i18n.gen.d.ts` with the keys typed.
 
 `worded()` appends `@stealthscale/provider-i18n/testing` to `test.setupFiles`. That file assigns the
@@ -41,3 +41,7 @@ global i18next instance from the catalogues the plugin found, in the fallback la
 specification rendering a component outside a provider then reads real strings rather than the key.
 
 Add either contribution on its own when a package wants only one of them.
+
+## Licence
+
+MIT. See [LICENSE](LICENSE).

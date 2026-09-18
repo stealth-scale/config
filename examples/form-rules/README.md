@@ -18,7 +18,7 @@ pnpm --filter @stealthscale/example-form-rules dev
 pnpm --filter @stealthscale/example-form-rules test
 ```
 
-The development server answers on port 4910. `vp test` renders the page into a happy-dom document
+The development server listens on port 4910. `vp test` renders the page into a happy-dom document
 and drives each rule: a bad VAT number, a confirmation that differs, a taken name after a blur, a
 password holding the name, and a form that passes.
 
@@ -52,7 +52,7 @@ conditional against the whole value.
 ## The rule that needs a request
 
 `src/accounts.ts` replaces the accounts service in this example. The field's `onBlurAsync` awaits it
-with the `signal` the library hands over, which the library aborts when the value changes again, and
+with the `signal` the library passes in, which the library aborts when the value changes again, and
 `onBlurAsyncDebounceMs` waits for typing to stop. The library does not run the request while the
 schema refuses the field: after a submit, a username shorter than three characters is refused by the
-schema and the service is never asked.
+schema and the service is never called.

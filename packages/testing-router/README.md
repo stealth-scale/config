@@ -51,3 +51,7 @@ resolved paths rather than a screen.
 A router loads its matches before anything renders them. Rendering first draws the page the router
 was on rather than the page the path names, and no error is reported. Each helper does the three
 steps in that order.
+
+## Licence
+
+MIT. See [LICENSE](LICENSE).

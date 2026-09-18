@@ -31,8 +31,8 @@ it reads. A schema that is the source supplies all three once.
 
 We will make a JSON Schema document the source of every form, because three of the four places a
 form comes from produce nothing else, and everything a form needs derives from the document.
-`schemaOf` reads a document through and converts a library object through its own converter.
-`defaultsOf`, `standardOf`, `presentationOf` and `identifiers` derive the rest.
+`schemaOf` passes a document through unchanged and converts a library object with that library's own
+converter. `defaultsOf`, `standardOf`, `presentationOf` and `identifiers` derive the rest.
 
 The draft is 2020-12. It is what zod emits and what the engine assumes where `$schema` is absent.
 

@@ -16,7 +16,7 @@ The package peers on `react` and `react-dom`.
 
 Draws what it holds somewhere else in the document rather than where it is written. A box positioned
 against the viewport inside a page that clips or stacks is clipped or stacked with it, which is the
-reason to reach for a portal at all.
+reason to use a portal at all.
 
 ```tsx
 import { Portal } from "@stealthscale/component-primitives";

@@ -1,14 +1,14 @@
 /**
- * Says something to a screen reader that the page shows without words.
+ * Announces to a screen reader a change the page shows without words.
  *
  * @remarks
- *   For the changes that have no visual home of their own, such as "5 results", "copied" or "row
- *   removed", where what happened is plain on screen and silent to anything reading it aloud. The
- *   live region the behaviour library ships names its element the same whatever politeness it was
- *   asked for and removes whichever it finds before announcing, so a polite message takes an
- *   assertive one off the page. It also sets no `aria-atomic`, which lets "3 results" after "13
- *   results" be read as "3". A second caller in the same tick removes the first caller's region
- *   before its timer fires, which is the ordinary case here rather than an unusual one.
+ *   Written for changes with no visual element of their own, such as "5 results", "copied" or "row
+ *   removed". The change is plain on screen and silent to anything reading the page aloud. The live
+ *   region the behaviour library ships uses one element name for every politeness, and removes
+ *   whichever region it finds before announcing, so a polite message takes an assertive one off the
+ *   page. It also sets no `aria-atomic`, which lets "3 results" after "13 results" be read as "3".
+ *   A second caller in the same tick removes the first caller's region before its timer runs, which
+ *   is the ordinary case here rather than an unusual one.
  */
 
 import { useCallback, useRef } from "react";
@@ -23,7 +23,7 @@ export type AnnouncePoliteness = "assertive" | "polite";
  *
  * @remarks
  *   A hook that mounted a region per component would leave a page holding a dozen of them, and a
- *   screen reader announcing into whichever it happened to see.
+ *   screen reader would read whichever one it found.
  */
 const regions = new Map<AnnouncePoliteness, HTMLElement>();
 
@@ -46,14 +46,14 @@ const HIDDEN =
   "overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0";
 
 /**
- * Joins a frame's messages into the one thing the region says.
+ * Joins a frame's messages into the one string the region announces.
  *
  * @remarks
- *   A live region says one thing per change, so the choice is between speaking every message and
- *   dropping all but one. A full stop is added only where the message before it ends in none, so
- *   "Saved" and "3 rows selected" become "Saved. 3 rows selected" while "Saved!" is left alone.
+ *   A live region announces one string per change, so the choice is between joining every message
+ *   and dropping all but one. A full stop is added only where the message before it ends in none,
+ *   so "Saved" and "3 rows selected" become "Saved. 3 rows selected" while "Saved!" is left alone.
  * @param messages - The messages queued this frame, in the order they were queued.
- * @returns The one utterance, with anything said twice said once.
+ * @returns The joined utterance, with a message repeated in the frame appearing once.
  */
 export function speakable(messages: Iterable<string>): string {
   return [...new Set(messages)].reduce(
@@ -93,17 +93,17 @@ function regionFor(politeness: AnnouncePoliteness): HTMLElement {
 }
 
 /**
- * Returns a function that says a message to a screen reader.
+ * Returns a function that announces a message to a screen reader.
  *
  * @remarks
- *   `polite` waits for a gap and is right for nearly everything. `assertive` interrupts whatever
- *   is being read mid-word, which suits an error that invalidates what somebody is doing and
- *   nothing else. The same message twice is said twice: a screen reader announces a change to a
- *   region, so writing identical text is no change and is dropped, and "copied" pressed twice is
- *   two events somebody wants confirmed. Each call empties the region and writes on the next
- *   frame, which is what makes a repeat speak again. The caller is identified by an object held
- *   for the life of the component, which is never read and only used as a key.
- * @returns The function that says a message, stable for the life of the component.
+ *   `polite` waits for a gap and suits nearly everything. `assertive` interrupts whatever is being
+ *   read mid-word, which suits an error that invalidates what somebody is doing and nothing else.
+ *   The same message twice is announced twice. A screen reader announces a change to a region, so
+ *   writing identical text is no change and is dropped, and "copied" pressed twice is two events
+ *   somebody wants confirmed. Each call empties the region and writes on the next frame, which is
+ *   what makes a repeat announce again. The caller is identified by an object held for the life of
+ *   the component, which is never read and serves only as a key.
+ * @returns The function that announces a message, stable for the life of the component.
  */
 export function useAnnounce(): (message: string, politeness?: AnnouncePoliteness) => void {
   const caller = useRef({}).current;

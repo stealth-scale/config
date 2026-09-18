@@ -45,7 +45,7 @@ Three parts follow from that:
   `effect` from the text layer styles, and `truncate`. A control takes `variant` from the looks,
   `size` from the control scale and `status` from the statuses.
 - A heading's size axis names the heading roles and not the steps of the type scale. A heading
-  states how loud it is, and which level it is stays with the element.
+  states its prominence, and which level it is stays with the element.
 - A value the helpers do not cover is written as a role by hand, and a value no role carries is
   added to the foundation rather than written in the recipe.
 

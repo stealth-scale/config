@@ -11,7 +11,7 @@ pnpm --filter @stealthscale/example-form-draft dev
 pnpm --filter @stealthscale/example-form-draft test
 ```
 
-The development server answers on port 4920. Type into the form, refresh the page, and the form
+The development server listens on port 4920. Type into the form, refresh the page, and the form
 opens where you left it. `vp test` renders the page over a memory store, plants a draft, reads the
 step and the values back, advances the debounce, and reads what the store holds.
 
@@ -48,15 +48,15 @@ draft left out, so every control starts controlled. This example does not detect
 changes on the server while a draft is open. An application that needs that puts the record's
 version into the draft's identifier. A draft of the old version is then never found.
 
-The hook writes the draft through the library's own change listener, debounced by 300 ms, and
-forgets it once the submit handler returns. Leaving a step writes the step at once, and the form
-opens on the step the draft was left on.
+The hook writes the draft through the library's own change listener, debounced by 300 ms, and clears
+it once the submit handler returns. Leaving a step writes the step at once, and the form opens on
+the step the draft was left on.
 
 ## The steps
 
 The schema's `x-form` lists the two steps of a wizard. `form.Fields` draws the step a person is on
-through the `Step` layout of `@stealthscale/example-form-fields`, which draws the way back, the way
-forward and, on the last step, the submit.
+through the `Step` layout of `@stealthscale/example-form-fields`, which draws the back control, the
+next control and, on the last step, the submit.
 
 Leaving the first step marks its fields touched, calls `validateField` once with the cause `submit`,
 which runs every form-level validator, and reads the errors of that step's fields alone. A refused
