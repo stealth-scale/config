@@ -1,7 +1,9 @@
 import { type ReactElement } from "react";
 
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+
+import { drawn } from "@stealthscale/testing-react";
 
 import {
   ApiProvider,
@@ -56,32 +58,32 @@ describe("splitTabsProps", () => {
 });
 
 describe("useTabsMachine", () => {
-  it("answers a running machine a part can read", () => {
-    render(<Running defaultValue="first" />);
+  it("answers a running machine a part can read", async () => {
+    await drawn(<Running defaultValue="first" />);
 
     expect(screen.getByTestId("state").textContent).toBe("first horizontal");
   });
 
-  it("runs across where a caller says nothing", () => {
-    render(<Running />);
+  it("runs across where a caller says nothing", async () => {
+    await drawn(<Running />);
 
     expect(screen.getByTestId("state").textContent).toBe("none horizontal");
   });
 
-  it("takes the way the set runs from a caller that names one", () => {
-    render(<Running defaultValue="first" orientation="vertical" />);
+  it("takes the way the set runs from a caller that names one", async () => {
+    await drawn(<Running defaultValue="first" orientation="vertical" />);
 
     expect(screen.getByTestId("state").textContent).toBe("first vertical");
   });
 
-  it("keeps the machine's own default where a caller hands over nothing for it", () => {
-    render(<Running defaultValue="first" orientation={undefined} />);
+  it("keeps the machine's own default where a caller hands over nothing for it", async () => {
+    await drawn(<Running defaultValue="first" orientation={undefined} />);
 
     expect(screen.getByTestId("state").textContent).toBe("first horizontal");
   });
 
-  it("passes every setting the machine defaults through where a caller names them", () => {
-    render(
+  it("passes every setting the machine defaults through where a caller names them", async () => {
+    await drawn(
       <Running activationMode="manual" defaultValue="first" loopFocus orientation="vertical" />,
     );
 

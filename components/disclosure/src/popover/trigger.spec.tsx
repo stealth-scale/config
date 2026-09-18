@@ -1,21 +1,21 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import { settled } from "@stealthscale/testing-react";
+import { drawn, settled } from "@stealthscale/testing-react";
 import { slotElement } from "@stealthscale/testing-theme";
 
-import { composed, opened } from "#popover/popover.fixtures.tsx";
+import { composed, handled, opened } from "#popover/popover.fixtures.tsx";
 import { Trigger } from "#popover/trigger.tsx";
 
 describe("Trigger", () => {
-  it("draws a button inside the root it needs above it", () => {
-    const { container } = render(opened(<Trigger>Filters</Trigger>));
+  it("draws a button inside the root it needs above it", async () => {
+    const { container } = await drawn(opened(<Trigger>Filters</Trigger>));
 
     expect(slotElement(container, "popover", "trigger").tagName).toBe("BUTTON");
   });
 
   it("says whether the panel is open", async () => {
-    render(composed());
+    await drawn(composed());
 
     const control = screen.getByRole("button", { name: /Filters/u });
 
@@ -28,8 +28,8 @@ describe("Trigger", () => {
     );
   });
 
-  it("names the panel it controls", () => {
-    render(composed({ defaultOpen: true }));
+  it("names the panel it controls", async () => {
+    await drawn(composed({ defaultOpen: true }));
 
     expect(screen.getByRole("button", { name: /Filters/u }).getAttribute("aria-controls")).toBe(
       screen.getByRole("dialog").id,
@@ -39,8 +39,8 @@ describe("Trigger", () => {
   it("keeps a handler a caller hands it beside the machine's own", async () => {
     const heard = vi.fn<() => void>();
 
-    render(opened(<Trigger onClick={heard}>Filters</Trigger>));
-    fireEvent.click(screen.getByRole("button"));
+    await drawn(handled(heard));
+    fireEvent.click(screen.getByRole("button", { name: "Filters" }));
     await settled();
 
     expect(heard).toHaveBeenCalledOnce();

@@ -1,8 +1,8 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import { accessibilityViolations, settled } from "@stealthscale/testing-react";
-import { boundViolations, slotElement } from "@stealthscale/testing-theme";
+import { accessibilityViolations, drawn, settled } from "@stealthscale/testing-react";
+import { boundMachineViolations, slotElement } from "@stealthscale/testing-theme";
 
 import { composed } from "#popover/popover.fixtures.tsx";
 import { recipe } from "#popover/recipe.ts";
@@ -15,30 +15,32 @@ describe("Root", () => {
     ).resolves.toStrictEqual([]);
   });
 
-  it("writes the class of every value its recipe offers", () => {
-    expect(
-      boundViolations(recipe, (props: RootProps) => render(composed(props)).container, {
-        slot: "root",
-      }),
-    ).toStrictEqual([]);
+  it("writes the class of every value its recipe offers", async () => {
+    await expect(
+      boundMachineViolations(
+        recipe,
+        async (props: RootProps) => (await drawn(composed(props))).container,
+        { slot: "root" },
+      ),
+    ).resolves.toStrictEqual([]);
   });
 
-  it("keeps the panel shut until the control is pressed", () => {
-    render(composed());
+  it("keeps the panel shut until the control is pressed", async () => {
+    await drawn(composed());
 
     expect(screen.queryByRole("dialog")).toBeNull();
   });
 
   it("opens the panel when the control is pressed", async () => {
-    render(composed());
+    await drawn(composed());
     fireEvent.click(screen.getByRole("button", { name: /Filters/u }));
     await settled();
 
     expect(screen.getByRole("dialog")).toBeDefined();
   });
 
-  it("opens the panel where a caller says it starts open", () => {
-    render(composed({ defaultOpen: true }));
+  it("opens the panel where a caller says it starts open", async () => {
+    await drawn(composed({ defaultOpen: true }));
 
     expect(screen.getByRole("dialog")).toBeDefined();
   });
@@ -46,7 +48,7 @@ describe("Root", () => {
   it("tells a caller each time the panel opens and shuts", async () => {
     const told = vi.fn<(details: { readonly open: boolean }) => void>();
 
-    render(composed({ onOpenChange: told }));
+    await drawn(composed({ onOpenChange: told }));
     fireEvent.click(screen.getByRole("button", { name: /Filters/u }));
     await settled();
 
@@ -54,15 +56,15 @@ describe("Root", () => {
   });
 
   it("follows a caller that drives it", async () => {
-    render(composed({ open: true }));
+    await drawn(composed({ open: true }));
     fireEvent.click(screen.getByRole("button", { name: /Filters/u }));
     await settled();
 
     expect(screen.getByRole("dialog")).toBeDefined();
   });
 
-  it("takes part in no layout of its own", () => {
-    const { container } = render(composed());
+  it("takes part in no layout of its own", async () => {
+    const { container } = await drawn(composed());
 
     expect(slotElement(container, "popover", "root").tagName).toBe("DIV");
   });

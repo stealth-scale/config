@@ -1,7 +1,9 @@
 import { type ReactElement } from "react";
 
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+
+import { drawn } from "@stealthscale/testing-react";
 
 import {
   ApiProvider,
@@ -22,7 +24,11 @@ function Running(props: PopoverOptions): ReactElement {
 
   return (
     <ApiProvider value={api}>
-      <Reader />
+      <div {...api.getPositionerProps()}>
+        <div {...api.getContentProps()}>
+          <Reader />
+        </div>
+      </div>
     </ApiProvider>
   );
 }
@@ -53,20 +59,20 @@ describe("splitPopoverProps", () => {
 });
 
 describe("usePopoverMachine", () => {
-  it("answers a running machine a part can read", () => {
-    render(<Running defaultOpen />);
+  it("answers a running machine a part can read", async () => {
+    await drawn(<Running defaultOpen />);
 
     expect(screen.getByTestId("state").textContent).toBe("open");
   });
 
-  it("starts shut where a caller says nothing", () => {
-    render(<Running />);
+  it("starts shut where a caller says nothing", async () => {
+    await drawn(<Running />);
 
     expect(screen.getByTestId("state").textContent).toBe("shut");
   });
 
-  it("keeps the machine's own default where a caller hands over nothing for it", () => {
-    render(<Running closeOnEscape={undefined} defaultOpen />);
+  it("keeps the machine's own default where a caller hands over nothing for it", async () => {
+    await drawn(<Running closeOnEscape={undefined} defaultOpen />);
 
     expect(screen.getByTestId("state").textContent).toBe("open");
   });

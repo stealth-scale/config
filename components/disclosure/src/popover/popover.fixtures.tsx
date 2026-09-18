@@ -29,6 +29,26 @@ export function opened(children: ReactNode): ReactElement {
 }
 
 /**
+ * Draws a whole popover whose control carries a handler of the caller's own.
+ *
+ * @param onClick - Told each time the control is pressed.
+ * @param props - Whatever the case sets on the root.
+ * @returns The parts composed the way a caller composes them.
+ */
+export function handled(onClick: () => void, props: RootProps = {}): ReactElement {
+  return (
+    <Root {...props}>
+      <Trigger onClick={onClick}>Filters</Trigger>
+      <Positioner>
+        <Content>
+          <Title>Filter the list</Title>
+        </Content>
+      </Positioner>
+    </Root>
+  );
+}
+
+/**
  * Draws a whole popover, so a case can press the control and read what the panel does.
  *
  * @param props - Whatever the case sets on the root.
