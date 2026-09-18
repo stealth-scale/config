@@ -9,7 +9,10 @@
 
 import { definePreset } from "@stealthscale/theme/authoring";
 
+import { recipe as breadcrumb } from "#breadcrumb/recipe.ts";
+import { recipe as link } from "#link/recipe.ts";
+
 export default definePreset({
   name: "@stealthscale/component-navigation",
-  theme: { extend: { recipes: {} } },
+  theme: { extend: { recipes: { link }, slotRecipes: { breadcrumb } } },
 });

@@ -6,3 +6,6 @@
  *
  * @packageDocumentation
  */
+
+export * as Breadcrumb from "#breadcrumb/index.ts";
+export * from "#link/index.ts";
