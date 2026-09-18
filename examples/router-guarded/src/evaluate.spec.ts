@@ -12,22 +12,35 @@ const AUDITOR: Session = { permissions: ["audit"], signedIn: true };
 
 describe("evaluator", () => {
   it("returns true where the condition holds", () => {
-    expect(evaluator(AUDITOR)({ kind: "permission", permission: "audit" })).toBe(true);
+    expect(evaluator(() => AUDITOR)({ kind: "permission", permission: "audit" })).toBe(true);
   });
 
   it("returns false where the condition fails", () => {
-    expect(evaluator(AUDITOR)({ kind: "permission", permission: "publish" })).toBe(false);
+    expect(evaluator(() => AUDITOR)({ kind: "permission", permission: "publish" })).toBe(false);
   });
 
   it("throws a redirect for somebody who has not signed in", () => {
     let thrown: unknown;
 
     try {
-      evaluator(ANONYMOUS)({ kind: "signedIn" });
+      evaluator(() => ANONYMOUS)({ kind: "signedIn" });
     } catch (error: unknown) {
       thrown = error;
     }
 
     expect(isRedirect(thrown)).toBe(true);
+  });
+
+  it("asks who is reading each time rather than once", () => {
+    let reading: Session = ANONYMOUS;
+    const evaluate = evaluator(() => reading);
+    const before = evaluate({ kind: "permission", permission: "audit" });
+
+    reading = AUDITOR;
+
+    expect([before, evaluate({ kind: "permission", permission: "audit" })]).toStrictEqual([
+      false,
+      true,
+    ]);
   });
 });

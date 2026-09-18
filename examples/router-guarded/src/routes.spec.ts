@@ -4,7 +4,7 @@ import { isNotFound, isRedirect } from "@stealthscale/provider-router";
 
 import { audit, mine, summary } from "#catalogue.ts";
 import { routed } from "#routes.ts";
-import { ANONYMOUS, type Session } from "#session.ts";
+import { ANONYMOUS, type Session, signedInAs } from "#session.ts";
 
 /**
  * Somebody who has signed in and may read nothing in particular.
@@ -19,15 +19,17 @@ const AUDITOR: Session = { permissions: ["audit"], signedIn: true };
 /**
  * Opens a page for one session and reports what the router made of it.
  *
- * @param session - Who is reading.
+ * @param reading - Who is reading.
  * @param at - The address to open.
  * @returns Where the router ended up, and whatever any match refused with.
  */
 async function opened(
-  session: Session,
+  reading: Session,
   at: string,
 ): Promise<{ readonly errors: unknown[]; readonly pathname: string }> {
-  const router = routed(session);
+  signedInAs(reading);
+
+  const router = routed();
 
   await router.navigate({ to: at });
   await router.load();
@@ -40,11 +42,17 @@ async function opened(
 
 describe("routed", () => {
   it("compiles every page whoever is reading", () => {
-    const built = Object.keys(routed(ANONYMOUS).routesById);
+    const built = Object.keys(routed().routesById);
 
     for (const id of [summary.id, mine.id, audit.id]) {
       expect(built.some((one) => one.endsWith(id.split(".")[1] ?? ""))).toBe(true);
     }
+  });
+
+  it("sends the site root to the page anybody may read", async () => {
+    const { pathname } = await opened(ANONYMOUS, "/");
+
+    expect(pathname).toBe("/summary");
   });
 
   it("routes a page that asks nothing", async () => {

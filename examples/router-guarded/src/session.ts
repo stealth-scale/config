@@ -57,14 +57,61 @@ export interface Session {
 export const ANONYMOUS: Session = { permissions: [], signedIn: false };
 
 /**
+ * Who is reading now.
+ */
+let reader: Session = ANONYMOUS;
+
+/**
+ * The callbacks drawing the session, each called when it changes.
+ */
+const watchers = new Set<() => void>();
+
+/**
+ * Returns who is reading now.
+ *
+ * @remarks
+ *   A call rather than a value, because the evaluator asks on every navigation and a value read
+ *   while the tree was built would answer for whoever was reading then.
+ * @returns The session every condition is asked about.
+ */
+export function session(): Session {
+  return reader;
+}
+
+/**
+ * Records who is reading now and tells whatever is drawing it.
+ *
+ * @param next - The session every condition is asked about from now on.
+ */
+export function signedInAs(next: Session): void {
+  reader = next;
+
+  for (const watcher of watchers) watcher();
+}
+
+/**
+ * Subscribes to the session changing, in the shape `useSyncExternalStore` takes.
+ *
+ * @param watcher - Called each time the session changes.
+ * @returns The call that withdraws the subscription.
+ */
+export function watchSession(watcher: () => void): () => void {
+  watchers.add(watcher);
+
+  return () => {
+    watchers.delete(watcher);
+  };
+}
+
+/**
  * Reports whether a condition holds for one session.
  *
- * @param session - Who is reading.
+ * @param reading - Who is reading.
  * @param when - The question the route asked.
  * @returns Whether the route is routed for them.
  */
-export function holds(session: Session, when: Condition): boolean {
+export function holds(reading: Session, when: Condition): boolean {
   return when.kind === "signedIn"
-    ? session.signedIn
-    : session.permissions.includes(when.permission);
+    ? reading.signedIn
+    : reading.permissions.includes(when.permission);
 }

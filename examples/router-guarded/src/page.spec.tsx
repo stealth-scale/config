@@ -6,11 +6,13 @@ import { mountRoute, mountRouter } from "@stealthscale/testing-router";
 import { summary } from "#catalogue.ts";
 import { Page } from "#page.tsx";
 import { routed } from "#routes.ts";
-import { ANONYMOUS } from "#session.ts";
+import { ANONYMOUS, signedInAs } from "#session.ts";
 
 describe("Page", () => {
   it("names the declaration it was compiled from", async () => {
-    const { result } = await mountRouter(routed(ANONYMOUS), "/summary");
+    signedInAs(ANONYMOUS);
+
+    const { result } = await mountRouter(routed(), "/summary");
 
     expect(result.getByRole("article").textContent).toBe(summary.id);
   });

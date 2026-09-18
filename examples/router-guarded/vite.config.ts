@@ -7,5 +7,5 @@ import * as react from "@stealthscale/vite-config-react";
 import { defineConfig } from "@stealthscale/vite-config/preset/app";
 
 export default defineConfig(import.meta.dirname, {
-  extends: [react.layers(), server.port(4940)],
+  extends: [react.layers(), server.port(4942)],
 });

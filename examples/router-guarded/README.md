@@ -8,7 +8,7 @@ pnpm --filter @stealthscale/example-router-guarded dev
 ```
 
 The server listens on <http://localhost:4942>. The site root redirects to the page anybody may read,
-resolved through the route map rather than written down as a path. The shell above every page holds
+resolved through the route map rather than written down as a path. The shell above every page draws
 a link to each report and a control that switches between three readers, so the refusals are visible
 without signing anything in.
 
@@ -57,11 +57,11 @@ every check again for the page a person is already on.
 Every page is in the tree whoever the reader is. The evaluator runs when somebody opens one, so a
 session that changes needs no rebuild.
 
-The menu therefore lists every page, including the ones the reader would be refused. This example
-leaves them all in so that a refusal is something you can click on. An application that should show
-fewer filters the declarations itself with `holds`, not with the evaluator, because the evaluator
-throws a redirect rather than returning a result. The foundation does neither, because which entries
-a person should be offered is a question about an application rather than about routing.
+The menu lists every page, including the ones the reader would be refused. This example leaves them
+all in so that a refusal is something you can click on. An application that should show fewer
+filters the declarations itself with `holds`, not with the evaluator, because the evaluator throws a
+redirect rather than returning a result. The foundation does neither, because which entries a person
+should be offered is a question about an application rather than about routing.
 
 ## Reading which page you are on
 

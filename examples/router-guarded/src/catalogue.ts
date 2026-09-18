@@ -22,6 +22,20 @@ export const mine: RouteRef = { id: "reports.mine" };
 export const audit: RouteRef = { id: "reports.audit" };
 
 /**
+ * Reads the text a menu draws a declaration under.
+ *
+ * @remarks
+ *   The compiler writes `navigation` onto the route without reading it, so its shape is this
+ *   application's to decide and this application's to check. This one states plain text, and a
+ *   declaration carrying anything else is drawn under its id.
+ * @param declaration - The declaration a menu is drawing.
+ * @returns The text for the link.
+ */
+export function labelOf(declaration: RouteDeclaration<Condition>): string {
+  return typeof declaration.navigation === "string" ? declaration.navigation : declaration.id;
+}
+
+/**
  * Returns the pages this application draws.
  *
  * @returns One declaration per page.
