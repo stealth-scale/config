@@ -35,7 +35,7 @@ export default defineConfig(import.meta.dirname, {
     react.layers(),
 
     federation.remote({
-      exposes: { "./Dashboard": "./src/dashboard.tsx" },
+      exposes: { "./Dashboard": "./src/dashboard.tsx", "./routes": "./src/routes.ts" },
       name: "remote",
       shared: react.federation.shared(),
     }),

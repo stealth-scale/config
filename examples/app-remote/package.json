@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@stealthscale/example-lib-ui": "workspace:^",
+    "@stealthscale/provider-router": "workspace:^",
     "react": "catalog:",
     "react-dom": "catalog:"
   },

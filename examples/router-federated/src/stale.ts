@@ -18,14 +18,14 @@ const RELOADED = "stealth.stale";
  */
 export interface Staleness {
   /**
-   * Where the mark outlives the reload. A session store scopes it to the one tab.
-   */
-  held: Pick<Storage, "getItem" | "setItem">;
-
-  /**
    * Fetches the page again.
    */
   reload: () => void;
+
+  /**
+   * Where the mark outlives the reload. A session store scopes it to the one tab.
+   */
+  store: Pick<Storage, "getItem" | "setItem">;
 }
 
 /**
@@ -35,15 +35,16 @@ export interface Staleness {
  *   A page reloads at most once per session. Leaving the second failure to propagate means a
  *   visitor sees the bundler's error, where reloading on every failure would spin against a
  *   deployment that is broken rather than merely newer.
+ * @param staleness - Where the mark is kept, and what fetches the page again.
  * @returns A listener that cancels the first failure it is given and lets every later one through.
  */
-export function stale(stated: Staleness): (event: Event) => void {
+export function stale(staleness: Staleness): (event: Event) => void {
   return (event) => {
-    if (stated.held.getItem(RELOADED) !== null) return;
+    if (staleness.store.getItem(RELOADED) !== null) return;
 
     event.preventDefault();
-    stated.held.setItem(RELOADED, "1");
-    stated.reload();
+    staleness.store.setItem(RELOADED, "1");
+    staleness.reload();
   };
 }
 
@@ -53,7 +54,8 @@ export function stale(stated: Staleness): (event: Event) => void {
  * @remarks
  *   The listener stays on the window for as long as the page lives, and the page it belongs to is
  *   the one being replaced, so nothing removes it.
+ * @param staleness - Where the mark is kept, and what fetches the page again.
  */
-export function watching(stated: Staleness): void {
-  window.addEventListener("vite:preloadError", stale(stated));
+export function watching(staleness: Staleness): void {
+  window.addEventListener("vite:preloadError", stale(staleness));
 }

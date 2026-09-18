@@ -1,21 +1,40 @@
 import { describe, expect, it } from "vitest";
 
-import { PATHS, routed } from "#routes.ts";
+import { routeHref, routeMap } from "@stealthscale/provider-router";
+import { routerOver } from "@stealthscale/testing-router";
 
-describe("routes", () => {
-  it("answers its own address and the one the other application's module sits at", () => {
-    expect([...PATHS]).toStrictEqual(["/", "/reports"]);
+import { declarations } from "#declarations.ts";
+import { buildTree, routed } from "#routes.ts";
+
+describe("buildTree", () => {
+  it("routes its own page and the one the other deployment declared", async () => {
+    const router = routed(await declarations());
+
+    expect(Object.keys(router.routesById)).toStrictEqual(["__root__", "/", "/reports"]);
   });
 
-  it("builds a router holding every path it names", () => {
-    const held = Object.keys(routed().routesById);
+  it("mounts the other deployment's page where that deployment asked", async () => {
+    const tree = buildTree(await declarations());
 
-    for (const path of PATHS) {
-      expect(held).toContain(path);
-    }
+    routerOver(tree);
+
+    expect(routeHref(routeMap(tree), "remote.dashboard")).toBe("/reports");
   });
 
-  it("builds a router of its own each time", () => {
-    expect(routed()).not.toBe(routed());
+  it("names its own page beside the one that arrived", async () => {
+    expect([...routeMap(buildTree(await declarations())).keys()].toSorted()).toStrictEqual([
+      "app.home",
+      "remote.dashboard",
+    ]);
+  });
+
+  it("routes its own page where the other deployment declares nothing", () => {
+    expect(Object.keys(routed([]).routesById)).toStrictEqual(["__root__", "/"]);
+  });
+
+  it("builds a router of its own each time", async () => {
+    const found = await declarations();
+
+    expect(routed(found)).not.toBe(routed(found));
   });
 });

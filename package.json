@@ -18,6 +18,7 @@
     "@stealthscale/testing": "workspace:^",
     "@stealthscale/testing-config": "workspace:^",
     "@stealthscale/testing-react": "workspace:^",
+    "@stealthscale/testing-router": "workspace:^",
     "@stealthscale/testing-theme": "workspace:^",
     "@stealthscale/vite-config": "workspace:^",
     "@stealthscale/vite-config-css": "workspace:^",

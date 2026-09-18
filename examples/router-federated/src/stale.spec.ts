@@ -4,76 +4,76 @@ import { stale, type Staleness, watching } from "#stale.ts";
 
 function standing(already = false): {
   asked: number[];
-  held: Staleness["held"];
   reload: () => void;
+  store: Staleness["store"];
 } {
-  const store = new Map<string, string>(already ? [["stealth.stale", "1"]] : []);
+  const kept = new Map<string, string>(already ? [["stealth.stale", "1"]] : []);
   const asked: number[] = [];
 
   return {
     asked,
-    held: {
-      getItem: (key: string) => store.get(key) ?? null,
-      setItem: (key: string, value: string) => {
-        store.set(key, value);
-      },
-    },
     reload: () => {
       asked.push(1);
+    },
+    store: {
+      getItem: (key: string) => kept.get(key) ?? null,
+      setItem: (key: string, value: string) => {
+        kept.set(key, value);
+      },
     },
   };
 }
 
 describe("stale", () => {
   it("fetches the page again when a chunk it was told about has gone", () => {
-    const held = standing();
+    const staleness = standing();
 
-    stale(held)(new Event("vite:preloadError", { cancelable: true }));
+    stale(staleness)(new Event("vite:preloadError", { cancelable: true }));
 
-    expect(held.asked).toHaveLength(1);
+    expect(staleness.asked).toHaveLength(1);
   });
 
   it("stops the bundler error propagating", () => {
-    const held = standing();
+    const staleness = standing();
     const event = new Event("vite:preloadError", { cancelable: true });
 
-    stale(held)(event);
+    stale(staleness)(event);
 
     expect(event.defaultPrevented).toBe(true);
   });
 
   it("fetches once", () => {
-    const held = standing(true);
+    const staleness = standing(true);
 
-    stale(held)(new Event("vite:preloadError", { cancelable: true }));
+    stale(staleness)(new Event("vite:preloadError", { cancelable: true }));
 
-    expect(held.asked).toStrictEqual([]);
+    expect(staleness.asked).toStrictEqual([]);
   });
 
   it("lets the second failure throw", () => {
-    const held = standing(true);
+    const staleness = standing(true);
     const event = new Event("vite:preloadError", { cancelable: true });
 
-    stale(held)(event);
+    stale(staleness)(event);
 
     expect(event.defaultPrevented).toBe(false);
   });
 
   it("records the attempt", () => {
-    const held = standing();
+    const staleness = standing();
 
-    stale(held)(new Event("vite:preloadError", { cancelable: true }));
-    stale(held)(new Event("vite:preloadError", { cancelable: true }));
+    stale(staleness)(new Event("vite:preloadError", { cancelable: true }));
+    stale(staleness)(new Event("vite:preloadError", { cancelable: true }));
 
-    expect(held.asked).toHaveLength(1);
+    expect(staleness.asked).toHaveLength(1);
   });
 
   it("listens for the bundler reporting a missing chunk", () => {
-    const held = standing();
+    const staleness = standing();
 
-    watching(held);
+    watching(staleness);
     window.dispatchEvent(new Event("vite:preloadError", { cancelable: true }));
 
-    expect(held.asked).toHaveLength(1);
+    expect(staleness.asked).toHaveLength(1);
   });
 });

@@ -1,59 +1,66 @@
-# @stealthscale/example-app-tanstack
+# @stealthscale/example-router-federated
 
-TanStack Router draws `/` from this application's own bundle and `/reports` from `remote/Dashboard`,
-a module `@stealthscale/example-app-remote` serves. `@stealthscale/example-app-host` mounts that
-same module straight onto a page rather than under a route, because a remote decides nothing about
-where a host puts it.
-
-## Run it
-
-Run the routed application on its own:
+Routes to pages another deployment declares, at the addresses that deployment states. This
+application owns one page and reads the rest when it starts.
 
 ```bash
-pnpm --filter @stealthscale/example-app-tanstack dev
+pnpm --filter @stealthscale/example-router-federated dev
 ```
 
-The development server answers on port 4404 and the preview server on port 4405. Both admit
-`app2.stealthscale.dev` beside loopback, and `STEALTH_HOSTS` replaces that list on a machine that
-has arranged something else.
+The other deployment is `@stealthscale/example-app-remote`. Run both, and the host serves its own
+page at `/` and the remote's at wherever the remote said.
 
-## The configuration
+## The address belongs to whoever owns the page
 
-`extends` composes four calls, over the layers `preset/app` already supplies.
+The remote states where its pages belong, beside the module that draws them.
 
-| Call                         | What it configures                                          |
-| ---------------------------- | ----------------------------------------------------------- |
-| `react.layers()`             | The JSX transform, and the document a test renders into     |
-| `federation.host(...)`       | The federation plugins, the remotes named, and the stand-in |
-| `server.address(4404, ...)`  | The development server's port, host names and bind address  |
-| `preview.address(4405, ...)` | The same three settings for the preview server              |
+```ts
+export function routes(): readonly RouteDeclaration[] {
+  return [
+    {
+      component: { export: "Reports", load: () => import("#reports.tsx") },
+      id: "remote.dashboard",
+      navigation: { label: "Reports" },
+      path: "/reports",
+    },
+  ];
+}
+```
 
-`react.layers()` contributes the React plugin and two settings the test runner reads, and a package
-drops any one of the three by name.
+The host reads that at boot and compiles it. No path for the remote's page appears anywhere in this
+application, so redeploying the remote under a different one does not rebuild this application.
 
-`federation.host` records the name `remote` and no address for it. The name starts out pointed at
-`https://federation.invalid`, a reserved domain that resolves nowhere, so the real address has to be
-registered at run time before a route imports from a remote. `react.federation.shared()` supplies
-the `shared` argument, marking `react` and `react-dom` as singletons at the range of the installed
-major version.
+```ts
+const compiled = compileRoutes(declarations, { parent: root });
+```
 
-The test runner has no second deployment to fetch from, so `stubs` aliases `remote/Dashboard` to
-`src/remote.fixtures.tsx` under `test.alias` and nowhere else. Both `src/reports.spec.tsx` and
-`src/routes.spec.tsx` reach a module that imports the specifier. `src/remotes.d.ts` declares the
-same module for the type checker, which is all the compiler ever learns about what the other
-deployment exposes.
+`federation.host` already names the remote without giving an address. It reads where the remote is
+deployed from a document fetched at run time. The page's address was the last part still hardcoded,
+and it was hardcoded in the wrong application.
 
-## The routes
+## A deployment that is missing costs one page
 
-`src/routes.tsx` puts each page at an address and builds the router over the tree. The root route
-renders `Outlet` and nothing else, so the matched page renders straight into the document body and a
-remote module draws its own frame.
+`declarations.ts` returns an empty list where the import fails. The host still routes everything it
+owns, and reports once that the other deployment declared nothing.
 
-`routed()` hands back a new router on every call, with its own history and its own matched route.
-One test cannot move another between routes.
+```ts
+try {
+  const remote = await import("remote/routes");
 
-`src/main.tsx` subscribes to `vite:preloadError` before the router exists, because the route a
-visitor reaches first can be the one whose chunk has gone. The listener in `src/stale.ts` reloads
-the page once per session and lets every later failure through. A deployment that is broken rather
-than merely newer puts its error in front of somebody instead of drawing reloads from every open
-page.
+  return remote.routes();
+} catch (error: unknown) {
+  globalThis.console.warn("The other deployment declared no pages.", error);
+
+  return [];
+}
+```
+
+Declarations are read before the router is built, because the tree is a function of them. The
+importer in each declaration keeps that cheap: a page's own chunk still loads on the first
+navigation to it rather than at boot.
+
+## Under test
+
+The runner has no second deployment to fetch from. The federation layer aliases `remote/routes` to
+`remote.fixtures.ts`, the same way it aliased the component before, so a case checks that this
+application mounts the page where the declaration asked rather than where this application chose.
