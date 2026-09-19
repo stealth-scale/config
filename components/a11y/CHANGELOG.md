@@ -1,5 +1,19 @@
 # @stealthscale/component-a11y
 
+## 0.1.1
+
+### Patch Changes
+
+- [#35](https://github.com/stealth-scale/config/pull/35) [`a4b1d24`](https://github.com/stealth-scale/config/commit/a4b1d2460ded2afebd340ccdce38a79b1d880fdf) Thanks [@stealth-rklopper](https://github.com/stealth-rklopper)! - component-a11y: let a roving focus item hold a ref to any element
+  
+  - `RovingFocus.Item` typed its `ref` as `HTMLDivElement`, which is what the item draws when nothing
+    else is asked for. An item drawn as a button or a link could not be given a ref of its own
+    element, so a caller who needed one wrote an assertion or dropped the ref.
+  - The type is now `Ref<HTMLElement>`, which every element the item can draw satisfies.
+- Updated dependencies [[`8d6817e`](https://github.com/stealth-scale/config/commit/8d6817e34dc94a02b98933c39e2cd6f94cca5c34)]:
+  - @stealthscale/theme@0.4.0
+  - @stealthscale/hooks@0.1.0
+
 ## 0.1.0
 
 ### Minor Changes

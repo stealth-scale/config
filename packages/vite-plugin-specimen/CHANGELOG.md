@@ -1,5 +1,19 @@
 # @stealthscale/vite-plugin-specimen
 
+## 0.2.0
+
+### Minor Changes
+
+- [#34](https://github.com/stealth-scale/config/pull/34) [`e94c22a`](https://github.com/stealth-scale/config/commit/e94c22a6c39e1c13d8f99b46334ae8ecc7b65192) Thanks [@stealth-rklopper](https://github.com/stealth-rklopper)! - vite-plugin-specimen: classify a dependency's declaration as an option
+  
+  - A property declared by a package the component's package depends on at run time is an option, the
+    transitive dependencies included. A menu root keeps 31 properties instead of five: its four
+    variants, and the 27 options the state machine and the packages it depends on declare.
+  - A peer is not walked, so the rendering library's attributes and the foundation's style props stay
+    under `dropped.foreign`.
+  - The index build reads each package directory's manifest once per build when it names the package a
+    specimen belongs to.
+
 ## 0.1.0
 
 ### Minor Changes

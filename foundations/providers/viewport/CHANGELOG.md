@@ -1,5 +1,24 @@
 # @stealthscale/provider-viewport
 
+## 0.2.0
+
+### Minor Changes
+
+- [#35](https://github.com/stealth-scale/config/pull/35) [`a4b1d24`](https://github.com/stealth-scale/config/commit/a4b1d2460ded2afebd340ccdce38a79b1d880fdf) Thanks [@stealth-rklopper](https://github.com/stealth-rklopper)! - provider-viewport: publish widthOf
+  
+  - `widthOf(breakpoint)` reads the width a breakpoint starts at, in pixels, so a component measuring
+    its own element compares against the vocabulary rather than against a number a caller invented.
+    Every screen component now folds at `useNarrow(ref, widthOf("md"), "md")`.
+  - It answers a number rather than a condition, and the README says so. A component that reads it
+    measures its own element and folds on that. A component that wants the window folds on a style
+    prop or a media query, which is what the breakpoints are for.
+
+### Patch Changes
+
+- Updated dependencies [[`8d6817e`](https://github.com/stealth-scale/config/commit/8d6817e34dc94a02b98933c39e2cd6f94cca5c34)]:
+  - @stealthscale/theme@0.4.0
+  - @stealthscale/hooks@0.1.0
+
 ## 0.1.0
 
 ### Minor Changes

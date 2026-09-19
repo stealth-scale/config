@@ -1,5 +1,13 @@
 # @stealthscale/vite-config-specimen
 
+## 0.1.1
+
+### Patch Changes
+
+- Updated dependencies [[`b588ff3`](https://github.com/stealth-scale/config/commit/b588ff39d85f40125c2665be19124d208d485ae9), [`808c86b`](https://github.com/stealth-scale/config/commit/808c86be6484d08a16b059d7d31680c5929257b4), [`e94c22a`](https://github.com/stealth-scale/config/commit/e94c22a6c39e1c13d8f99b46334ae8ecc7b65192)]:
+  - @stealthscale/vite-config@0.7.0
+  - @stealthscale/vite-plugin-specimen@0.2.0
+
 ## 0.1.0
 
 ### Minor Changes

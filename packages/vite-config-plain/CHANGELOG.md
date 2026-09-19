@@ -1,5 +1,16 @@
 # @stealthscale/vite-config-plain
 
+## 0.2.1
+
+### Patch Changes
+
+- [#34](https://github.com/stealth-scale/config/pull/34) [`808c86b`](https://github.com/stealth-scale/config/commit/808c86be6484d08a16b059d7d31680c5929257b4) Thanks [@stealth-rklopper](https://github.com/stealth-rklopper)! - walk past the worktrees an agent session checks out
+  
+  `.claude` holds a worktree per session, each a second copy of the repository. A run from the root
+  descended into them, counting every file twice and running every specification again: 2090 of 3016
+  files in one root coverage report came from a worktree, which put the report at 32% against a
+  threshold of 100%.
+
 ## 0.2.0
 
 ### Minor Changes

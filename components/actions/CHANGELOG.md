@@ -1,5 +1,26 @@
 # @stealthscale/component-actions
 
+## 0.1.1
+
+### Patch Changes
+
+- [#35](https://github.com/stealth-scale/config/pull/35) [`a4b1d24`](https://github.com/stealth-scale/config/commit/a4b1d2460ded2afebd340ccdce38a79b1d880fdf) Thanks [@stealth-rklopper](https://github.com/stealth-rklopper)! - components: emit a rule for every status a component can be handed
+  
+  - Every recipe with a `status` axis now carries `statusEmitted()` under `staticCss`: `Button`,
+    `Badge`, `Alert`, `Checkbox`, `Field`, `Fieldset`, `Input`, `Switch`, `Textarea`, `Card`,
+    `Blockquote`, `Code`, `Kbd` and `Mark`.
+  - The compiler emits a rule for a value it reads from a literal in an application's source. An
+    application writes `status={row.status}` rather than `status="error"`, so the compiler read a name
+    it could not follow. The runtime still wrote the class, and the component drew in its default
+    palette while reporting an error.
+  - Measured on the single-theme example, which writes `status="error"` and the other three nowhere:
+    the stylesheet held a rule for `error` alone before, and for all four after, at 0.19 kB over the
+    wire.
+  - `recipe.emitted` in the theme's test kit reports a recipe that offers a status and lists none, so
+    a new one cannot be written without it.
+- Updated dependencies [[`8d6817e`](https://github.com/stealth-scale/config/commit/8d6817e34dc94a02b98933c39e2cd6f94cca5c34)]:
+  - @stealthscale/theme@0.4.0
+
 ## 0.1.0
 
 ### Minor Changes

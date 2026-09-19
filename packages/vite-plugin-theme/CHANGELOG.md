@@ -1,5 +1,20 @@
 # @stealthscale/vite-plugin-theme
 
+## 0.2.0
+
+### Minor Changes
+
+- [#34](https://github.com/stealth-scale/config/pull/34) [`35ed1e2`](https://github.com/stealth-scale/config/commit/35ed1e20a3ba344ad15a13b716123b04f6db88d6) Thanks [@stealth-rklopper](https://github.com/stealth-rklopper)! - vite-plugin-theme: watch the workspace packages and draw the foundation without a theme
+  
+  - `theme.stylesheet()` hands the source directory of every workspace package the compiler scans to
+    the dev server's watcher, so a file added to a package beside the application reaches the compiler
+    without a restart.
+  - An application whose statement names no theme compiles the foundation and the published presets
+    alone. `Application.themes` is optional.
+  - The compiler's base preset is installed without its patterns in both rendered configurations, so
+    the runtime carries no pattern module and the compiler reports no conflict between a recipe named
+    `stack`, `grid`, `container`, `divider` or `spacer` and a pattern of the same name.
+
 ## 0.1.3
 
 ### Patch Changes

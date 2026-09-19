@@ -1,5 +1,19 @@
 # @stealthscale/provider-shell
 
+## 0.1.1
+
+### Patch Changes
+
+- Updated dependencies [[`a4b1d24`](https://github.com/stealth-scale/config/commit/a4b1d2460ded2afebd340ccdce38a79b1d880fdf), [`8d6817e`](https://github.com/stealth-scale/config/commit/8d6817e34dc94a02b98933c39e2cd6f94cca5c34)]:
+  - @stealthscale/provider-viewport@0.2.0
+  - @stealthscale/theme@0.4.0
+  - @stealthscale/provider-color-mode@0.1.1
+  - @stealthscale/provider-environment@0.1.0
+  - @stealthscale/provider-hotkeys@0.1.0
+  - @stealthscale/provider-i18n@0.1.0
+  - @stealthscale/provider-locale@0.1.0
+  - @stealthscale/settings@0.1.0
+
 ## 0.1.0
 
 ### Minor Changes
