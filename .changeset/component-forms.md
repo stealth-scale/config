@@ -2,7 +2,24 @@
 "@stealthscale/component-forms": minor
 ---
 
-component-forms: publish Fieldset, Field, Checkbox, Textarea and InputGroup
+component-forms: publish Fieldset, Field, Checkbox, Switch, Textarea and InputGroup
+
+- `Switch` draws a track a person throws on and off. Four parts under one namespace: `Root`,
+  `Control`, `Thumb` and `Label`. It binds Zag's switch machine.
+- The input carries `role="switch"` and `aria-checked`. The machine draws it as a checkbox and
+  states neither, so a reader announced a switch as a checkbox. The role is the pattern the APG
+  names for a native checkbox, and axe accepts `aria-checked` where it agrees with the element.
+- `label` is taken off the root's props. The machine's splitter claims the name and the machine
+  reads it nowhere, so a caller stating it lost the prop off the element and gained nothing.
+- The geometry comes from three scales and one rule. The track is `control` wide and `tag` tall,
+  which hold one ratio at every step because both read the control shares. The thumb fills the
+  track's content box as a square, so the track's padding is the inset and the thumb states no size.
+  The size axis writes the track's width less its height into `--switch-travel` and the thumb reads
+  it, so one rule moves the thumb whatever the padding is.
+- Six axes: `size`, `variant`, `status`, `radius`, `align` and `spread`. The track rests on the
+  muted surface rather than the panel, because the thumb is drawn on the panel.
+- A switch inside a `Field` takes that field's `disabled`, `invalid`, `readOnly` and `required`, and
+  its input is described by the field's texts.
 
 - `Checkbox` draws a box a person turns on and off. Four parts under one namespace: `Root`,
   `Control`, `Indicator` and `Label`. It binds Zag's checkbox machine.

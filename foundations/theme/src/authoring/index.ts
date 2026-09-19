@@ -127,6 +127,7 @@ export {
   sizeVariants,
   slotsOf,
   spanCounts,
+  statusEmitted,
   statusVariants,
   surface,
   tagSizes,

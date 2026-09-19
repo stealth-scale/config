@@ -30,4 +30,16 @@ describe("Indicator", () => {
 
     expect(slotElement(container, "menu", "indicator").tagName).toBe("SPAN");
   });
+
+  it("keeps its mark out of the name the control is announced by", async () => {
+    const { container } = await drawn(listed(<Indicator>▾</Indicator>));
+
+    expect(slotElement(container, "menu", "indicator").getAttribute("aria-hidden")).toBe("true");
+  });
+
+  it("reads a mark out where a caller says it means something", async () => {
+    const { container } = await drawn(listed(<Indicator aria-hidden={false}>3 more</Indicator>));
+
+    expect(slotElement(container, "menu", "indicator").getAttribute("aria-hidden")).toBe("false");
+  });
 });

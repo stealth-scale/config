@@ -20,6 +20,7 @@ import {
   interactive,
   liftVariants,
   lookVariants,
+  statusEmitted,
   statusVariants,
   touchTarget,
 } from "@stealthscale/theme/authoring";
@@ -55,7 +56,7 @@ export const recipe = defineRecipe({
   ],
   defaultVariants: { size: "md", variant: "solid" },
   jsx: [/Button$/u],
-  staticCss: [{ shape: ["square"] }],
+  staticCss: [{ shape: ["square"] }, statusEmitted()],
   variants: {
     effect: {
       glow: { layerStyle: "glow.md" },

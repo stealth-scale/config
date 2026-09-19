@@ -2,6 +2,30 @@
 "@stealthscale/theme": minor
 ---
 
+theme: publish statusEmitted
+
+- `statusEmitted()` writes the `staticCss` entry a recipe with a `status` axis carries, so every
+  status reaches an application's stylesheet whether the application writes one or not. Without it a
+  component handed a status from a record, a validator or a server carries a class the compiler
+  emitted no rule for.
+- The values are listed rather than asked for with `true`, which the compiler's own types offer for
+  an axis and its compiler ignores. They are read from `STATUSES`, so adding a status to the
+  vocabulary reaches every recipe without one of them being edited.
+
+theme: publish the safe-area spacing, the reading measure, and a condition for the highlight axis
+
+- `spacing.safe.{top,right,bottom,left}` is the room a device keeps for a home indicator, a notch or
+  a rounded corner. Only the browser knows how much, so these read `env()` and answer zero on every
+  device that reserves nothing. Anything a page fixes to an edge of the screen reads them, because a
+  recipe may not write `env()` itself.
+- `sizes.prose` is the measure body text is read at, stated in characters rather than in rems. The
+  line a reader follows without losing their place is counted in characters, so a measure in `ch`
+  stays right at every type size a theme sets.
+- `highlightVariants(highlights, when)` takes the condition to write the mark against. A listbox
+  marks `_highlighted`, which is the row the keys are on, and a navigation marks `_currentPage`,
+  which is the condition `aria-current="page"` sets. The helper wrote `_highlighted` alone before
+  this, so a navigation restated the whole axis to change one selector.
+
 theme: publish the field looks as layer styles and open a control's insets
 
 - `layerStyles.field` names `outline` on `bg.panel`, `subtle` on `bg.muted`, and `flushed` with its

@@ -152,6 +152,44 @@ function tracks(pattern: RegExp | string, name: string): boolean {
 }
 
 /**
+ * The axis whose values an application reads off its data rather than writing at the call site.
+ */
+const MEASURED = "status";
+
+/**
+ * Reports whether a `staticCss` entry emits the values of an axis.
+ *
+ * @remarks
+ *   `*` for a whole recipe and a list of values for one axis are the two forms the compiler acts
+ *   on. `true` is not one of them, although the compiler's own types offer it for an axis: a recipe
+ *   written that way type-checks, emits nothing, and reads as though it had been handled. Listing
+ *   the values keeps the two in step, and a list written from the vocabulary's own array cannot go
+ *   stale.
+ */
+function emits(entry: unknown, axis: string): boolean {
+  return entry === "*" || (isRecord(entry) && Array.isArray(entry[axis]));
+}
+
+/**
+ * Reports a recipe that offers a status without listing it under `staticCss`.
+ *
+ * @remarks
+ *   The compiler emits a rule for a value it reads from a literal in an application's source. A
+ *   status is the one axis an application usually does not write: it hands over what a record, a
+ *   validator or a server said, and the compiler sees a name it cannot follow. The class lands on
+ *   the element with no rule behind it, and the component draws in its default palette while
+ *   reporting an error. Listing the axis under `staticCss` emits every value whether an application
+ *   writes one or not, which for a four-value status measured at 0.19 kB over the wire.
+ */
+export function emittedViolations(recipe: Declared): readonly string[] {
+  if (!isRecord(recipe.variants) || !Object.hasOwn(recipe.variants, MEASURED)) return [];
+
+  return (recipe.staticCss ?? []).some((entry) => emits(entry, MEASURED))
+    ? []
+    : [`${recipe.className} offers ${MEASURED}, which staticCss does not emit`];
+}
+
+/**
  * Reports every name the recipe's tag patterns miss, and every pattern that matches no name.
  *
  * @remarks

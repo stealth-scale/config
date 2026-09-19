@@ -2,9 +2,12 @@
  * Draws the mark that turns as the block opens.
  *
  * @remarks
- *   The mark says nothing a screen reader needs, because the trigger it sits in already says
- *   whether the block is expanded. The machine hides it from the accessibility tree for that
- *   reason, and a caller hands over a glyph without sizing it or turning it.
+ *   A caller hands over a glyph without sizing it or turning it. It states `aria-hidden`, because
+ *   it sits inside the trigger and everything inside a control is read as part of that control's
+ *   name. A chevron drawn here would otherwise be announced after the words the trigger was named
+ *   with, and the trigger already carries `aria-expanded`. The machine writes no such attribute, so
+ *   this does. A caller whose mark says something the name does not can state
+ *   `aria-hidden={false}`.
  */
 
 import { type ComponentProps, type ReactElement } from "react";
@@ -33,5 +36,5 @@ export type IndicatorProps = ComponentProps<typeof Turned>;
 export function Indicator(props: IndicatorProps): ReactElement {
   const api = useCollapsible();
 
-  return <Turned {...mergeProps(api.getIndicatorProps(), props)} />;
+  return <Turned {...mergeProps({ "aria-hidden": true }, api.getIndicatorProps(), props)} />;
 }

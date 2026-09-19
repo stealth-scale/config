@@ -154,11 +154,17 @@ const MARKS: Readonly<Record<Highlight, string>> = {
 };
 
 /**
+ * Selects the state a row is marked in: the one a list has moved its highlight onto, or the one
+ * naming the page a reader is on.
+ */
+export type Marked = "_currentPage" | "_highlighted";
+
+/**
  * Writes the `highlight` axis of a list: how the one row the reader is on is marked.
  *
  * @remarks
  *   A menu, a select and a combobox all move one highlight over their rows, and each of them marks
- *   it in the same three ways. The styles sit under the highlighted condition rather than on the
+ *   it in the same three ways. The styles sit under the marked condition rather than on the
  *   row, because the row is drawn plain until the list reaches it. The bar draws a line down the
  *   leading edge and tints the row behind it, so the row the reader is on is marked twice over and
  *   a reader who cannot separate the two colors still has the line.
@@ -176,15 +182,34 @@ export function highlightVariants<const Offered extends Highlight>(
 ): Record<Offered, SystemStyleObject>;
 
 /**
- * Writes one entry per highlight, each reading its layer style under the highlighted condition.
+ * Writes the `highlight` axis for a list that marks the page a reader is on rather than a row it
+ * has moved a highlight onto.
+ *
+ * @remarks
+ *   A navigation list marks a destination the reader has already arrived at, which the browser
+ *   states as `aria-current`, and it marks it in the same three ways a menu marks a highlight. The
+ *   condition is the only thing that differs, so the marks stay in one place and a theme that
+ *   restates how a highlighted row is drawn reaches both.
+ * @typeParam Offered - The highlights the recipe offers.
+ */
+export function highlightVariants<const Offered extends Highlight>(
+  highlights: readonly Offered[],
+  when: Marked,
+): Record<Offered, SystemStyleObject>;
+
+/**
+ * Writes one entry per highlight, each reading its layer style under the condition given.
  */
 export function highlightVariants(
   highlights: readonly Highlight[] = HIGHLIGHTS,
+  when: Marked = "_highlighted",
 ): Record<string, SystemStyleObject> {
-  return recordOf(highlights, (highlight) => ({
-    _highlighted:
+  return recordOf(highlights, (highlight): SystemStyleObject => {
+    const marked =
       highlight === "bar"
         ? { background: "colorPalette.subtle", layerStyle: MARKS[highlight] }
-        : { layerStyle: MARKS[highlight] },
-  }));
+        : { layerStyle: MARKS[highlight] };
+
+    return when === "_currentPage" ? { _currentPage: marked } : { _highlighted: marked };
+  });
 }

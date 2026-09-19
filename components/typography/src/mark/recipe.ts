@@ -19,6 +19,7 @@ import {
   flatVariants,
   motionVariants,
   sizeVariants,
+  statusEmitted,
   statusVariants,
 } from "@stealthscale/theme/authoring";
 
@@ -38,6 +39,7 @@ export const recipe = defineRecipe({
   ],
   defaultVariants: { inset: "xs", radius: "l1", variant: "subtle" },
   jsx: [/Mark$/u],
+  staticCss: [statusEmitted()],
   variants: {
     /**
      * A highlight that asks to be noticed beyond its fill.

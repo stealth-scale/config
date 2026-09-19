@@ -1,8 +1,8 @@
 # @stealthscale/component-forms
 
-Draws what a person fills in: the group, the field that explains a control, the checkbox, the text
-field, the multi-line box, the field with a mark at one end or both, and the search field with a
-control that empties it.
+Draws what a person fills in: the group, the field that explains a control, the checkbox, the
+switch, the text field, the multi-line box, the field with a mark at one end or both, and the search
+field with a control that empties it.
 
 Every value a theme can change is an axis of a component's recipe, so set it as a prop and write no
 style. Change the element a component draws with `as`. A component with parts is published as a
@@ -175,6 +175,53 @@ Put the checkbox inside a `Field` and it takes the field's `disabled`, `invalid`
   <Field.ErrorText>Accept the terms to go on.</Field.ErrorText>
 </Field.Root>
 ```
+
+## Switch
+
+Draws a track a person throws on and off, and the words that name it.
+
+```tsx
+import { Switch } from "@stealthscale/component-forms";
+
+<Switch.Root name="theme" onCheckedChange={({ checked }) => setDark(checked)} spread>
+  <Switch.Label>Dark mode</Switch.Label>
+  <Switch.Control>
+    <Switch.Thumb />
+  </Switch.Control>
+</Switch.Root>;
+```
+
+| Axis      | Values                                | Default  |
+| --------- | ------------------------------------- | -------- |
+| `size`    | `sm`, `md`, `lg`                      | `md`     |
+| `variant` | `solid`, `subtle`, `outline`          | `solid`  |
+| `status`  | `info`, `success`, `warning`, `error` | none     |
+| `radius`  | `l1`, `l2`, `full`                    | `full`   |
+| `align`   | `center`, `start`                     | `center` |
+| `spread`  | `true`                                | off      |
+
+| Part      | Element | What it draws                   |
+| --------- | ------- | ------------------------------- |
+| `Root`    | `label` | The row, and the control itself |
+| `Control` | `span`  | The track the thumb crosses     |
+| `Thumb`   | `span`  | The knob that crosses it        |
+| `Label`   | `span`  | The words naming the switch     |
+
+`Switch.Root` also takes `checked`, `defaultChecked`, `disabled`, `form`, `invalid`, `name`,
+`onCheckedChange`, `readOnly`, `required` and `value`.
+
+The root draws the control a form submits, and a reader hears it as a switch that is on or off. Do
+not add an input of your own.
+
+Name the switch. Write `Switch.Label`, or state `aria-label` on the root.
+
+Write the label before the track for a settings row, and set `spread`. The row takes the width it is
+given, the label keeps the start, and the track goes to the far end.
+
+`Switch.Thumb` states no size. It fills the track, so one `size` moves both.
+
+Put the switch inside a `Field` and it takes the field's `disabled`, `invalid`, `readOnly` and
+`required`, and is described by the field's texts.
 
 ## Input
 

@@ -23,6 +23,7 @@ import {
   onSlot,
   onSlots,
   sizeVariants,
+  statusEmitted,
 } from "@stealthscale/theme/authoring";
 
 /**
@@ -78,6 +79,7 @@ export const recipe = defineSlotRecipe({
   defaultVariants: { grip: "vertical", size: "md", variant: "outline" },
   jsx: [/^Textarea$/u],
   slots: ["root", "control"],
+  staticCss: [statusEmitted()],
   variants: {
     /**
      * Which way a person can drag the box bigger, which is the CSS `resize` property.

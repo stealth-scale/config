@@ -22,6 +22,7 @@ import {
   justifyVariants,
   motionVariants,
   onSlot,
+  statusEmitted,
   statusVariants,
   surface,
 } from "@stealthscale/theme/authoring";
@@ -95,6 +96,7 @@ export const recipe = defineSlotRecipe({
     "content",
     "footer",
   ],
+  staticCss: [statusEmitted()],
   variants: {
     /**
      * Whether a rule separates the header and the footer from the band between them.

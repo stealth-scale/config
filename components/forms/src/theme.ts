@@ -15,6 +15,7 @@ import { recipe as fieldset } from "#fieldset/recipe.ts";
 import { recipe as inputGroup } from "#input-group/recipe.ts";
 import { recipe as input } from "#input/recipe.ts";
 import { recipe as searchInput } from "#search-input/recipe.ts";
+import { recipe as switchRecipe } from "#switch/recipe.ts";
 import { recipe as textarea } from "#textarea/recipe.ts";
 
 export default definePreset({
@@ -22,7 +23,7 @@ export default definePreset({
   theme: {
     extend: {
       recipes: { input, searchInput },
-      slotRecipes: { checkbox, field, fieldset, inputGroup, textarea },
+      slotRecipes: { checkbox, field, fieldset, inputGroup, switch: switchRecipe, textarea },
     },
   },
 });

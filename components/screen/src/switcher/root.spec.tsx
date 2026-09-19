@@ -1,0 +1,41 @@
+import { render, screen } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+
+import { slotClass, slotClasses, variantClass } from "@stealthscale/testing-theme";
+
+import { Root } from "#switcher/root.ts";
+import { Trigger } from "#switcher/trigger.tsx";
+
+describe("Root", () => {
+  it("draws the control and nothing of its own inside it", () => {
+    const { container } = render(
+      <Root>
+        <Trigger label="Workspace">Acme</Trigger>
+      </Root>,
+    );
+
+    expect(container.querySelector("button")).toBeTruthy();
+  });
+
+  it("hands its variants to the control below it", () => {
+    const { container } = render(
+      <Root size="lg">
+        <Trigger label="Workspace">Acme</Trigger>
+      </Root>,
+    );
+
+    expect(slotClasses(container, "switcher", "root")).toContain(
+      variantClass(slotClass("switcher", "root"), "size", "lg"),
+    );
+  });
+
+  it("keeps the menu closed until it is asked to open", () => {
+    render(
+      <Root>
+        <Trigger label="Workspace">Acme</Trigger>
+      </Root>,
+    );
+
+    expect(screen.getByRole("button").getAttribute("aria-expanded")).toBe("false");
+  });
+});

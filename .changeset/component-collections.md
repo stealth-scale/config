@@ -2,6 +2,29 @@
 "@stealthscale/component-collections": minor
 ---
 
+component-collections: publish Listbox, useListCollection and useFilter
+
+- `Listbox` draws a list of rows a person picks from, with the keys the ARIA pattern calls for. Ten
+  parts under one namespace. It binds Zag's listbox machine, which writes every role, every
+  identifier and every key.
+- Every part is a `div`. A listbox is a grouping for a screen reader rather than a list of items,
+  and drawing it as one nested an `li` with `role="option"` inside an `li` with `role="group"`,
+  which axe reports as `aria-allowed-role`.
+- `highlight` marks the row the keys are on rather than the row that has focus, because a listbox
+  driven from a field never moves focus off the field. `highlightVariants` now takes the condition
+  to write against, so this reads `_highlighted` while a navigation reads `_currentPage`.
+- Four axes: `highlight`, `radius`, `size` and `variant`.
+- Rows go in through `collection`, so the component holds no matching of its own.
+
+- `useListCollection` holds the rows a list draws and the text typed, and answers what is left of
+  them. A caller passes a predicate to match on the words a reader sees or on anything else the row
+  holds, and `narrow("")` restores every row.
+- `useFilter` answers `contains`, `startsWith` and `endsWith` over `Intl.Collator`, so `Jose`
+  matches `José` and `strasse` matches `Straße`. The default sensitivity ignores case and accents,
+  which is what a person typing into a search field expects.
+- `ListCollection` is re-exported from the engine rather than retyped, so a consumer naming it in a
+  declaration file resolves it without declaring the engine themselves.
+
 component-collections: publish Table
 
 - `Table` draws a table of records. Thirteen parts under one namespace: `Scroller`, `Root`,

@@ -114,6 +114,7 @@ const SURFACE = [
   "spanCounts",
   "stack",
   "STATUSES",
+  "statusEmitted",
   "statusVariants",
   "stepped",
   "sticky",

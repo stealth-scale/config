@@ -11,8 +11,9 @@ import { definePreset } from "@stealthscale/theme/authoring";
 
 import { recipe as breadcrumb } from "#breadcrumb/recipe.ts";
 import { recipe as link } from "#link/recipe.ts";
+import { recipe as navList } from "#nav-list/recipe.ts";
 
 export default definePreset({
   name: "@stealthscale/component-navigation",
-  theme: { extend: { recipes: { link }, slotRecipes: { breadcrumb } } },
+  theme: { extend: { recipes: { link }, slotRecipes: { breadcrumb, navList } } },
 });

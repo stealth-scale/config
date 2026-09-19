@@ -79,7 +79,11 @@ export const recipe = defineSlotRecipe({
       zIndex: "dropdown",
     },
     contextTrigger: { cursor: "menuitem" },
-    indicator: { _open: { rotate: "180deg" }, transitionDuration: "fast" },
+    indicator: {
+      _motionReduce: { transitionDuration: "0s" },
+      _open: { rotate: "180deg" },
+      transitionDuration: "fast",
+    },
     item: {
       ...row(),
       "&[data-tone=critical]": { color: "colorPalette.fg", colorPalette: "error" },

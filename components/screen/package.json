@@ -54,6 +54,14 @@
   "devDependencies": {
     "@arethetypeswrong/core": "catalog:",
     "@rolldown/plugin-babel": "catalog:",
+    "@stealthscale/component-a11y": "workspace:^",
+    "@stealthscale/component-actions": "workspace:^",
+    "@stealthscale/component-disclosure": "workspace:^",
+    "@stealthscale/component-layout": "workspace:^",
+    "@stealthscale/component-navigation": "workspace:^",
+    "@stealthscale/component-typography": "workspace:^",
+    "@stealthscale/hooks": "workspace:^",
+    "@stealthscale/provider-viewport": "workspace:^",
     "@stealthscale/theme": "workspace:^",
     "@stealthscale/vite-config": "workspace:^",
     "@stealthscale/vite-config-react": "workspace:^",
@@ -72,6 +80,14 @@
     "vitest": "catalog:"
   },
   "peerDependencies": {
+    "@stealthscale/component-a11y": "workspace:^",
+    "@stealthscale/component-actions": "workspace:^",
+    "@stealthscale/component-disclosure": "workspace:^",
+    "@stealthscale/component-layout": "workspace:^",
+    "@stealthscale/component-navigation": "workspace:^",
+    "@stealthscale/component-typography": "workspace:^",
+    "@stealthscale/hooks": "workspace:^",
+    "@stealthscale/provider-viewport": "workspace:^",
     "@stealthscale/theme": "workspace:^",
     "react": "catalog:"
   },

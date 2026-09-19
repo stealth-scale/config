@@ -14,6 +14,7 @@ import {
   interactive,
   lookVariants,
   stack,
+  statusEmitted,
   statusVariants,
 } from "@stealthscale/theme/authoring";
 
@@ -43,6 +44,7 @@ export const recipe = defineRecipe({
   ],
   defaultVariants: { size: "md", variant: "solid" },
   jsx: [/Button$/u],
+  staticCss: [statusEmitted()],
   variants: {
     size: controlSizes(["sm", "md", "lg"]),
     status: statusVariants(),

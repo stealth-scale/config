@@ -1,0 +1,21 @@
+import { render, screen } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+
+import { slotElement } from "@stealthscale/testing-theme";
+
+import { paged } from "#page/page.fixtures.tsx";
+import { Picker } from "#page/picker.ts";
+
+describe("Picker", () => {
+  it("draws a button inside the column it needs above it", () => {
+    const { container } = render(paged(<Picker>Lines</Picker>));
+
+    expect(slotElement(container, "page", "picker").tagName).toBe("BUTTON");
+  });
+
+  it("says it submits nothing, so a picker inside a form does not", () => {
+    render(paged(<Picker>Lines</Picker>));
+
+    expect(screen.getByRole("button").getAttribute("type")).toBe("button");
+  });
+});

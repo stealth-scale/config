@@ -50,8 +50,8 @@ describe("recipe", () => {
     expect(valuesOf(recipe, "motion")).toStrictEqual(["float", "spin", "twinkle"]);
   });
 
-  it("flips a mirrored mark where the page reads right to left", () => {
-    expect(recipe.variants?.mirrored.true).toStrictEqual({ _rtl: { transform: "scaleX(-1)" } });
+  it("flips a mirrored mark through a property the spin motion does not animate", () => {
+    expect(recipe.variants?.mirrored.true).toStrictEqual({ _rtl: { scale: "-1 1" } });
   });
 
   it("tracks every tag whose name ends in Icon", () => {

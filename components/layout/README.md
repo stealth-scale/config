@@ -50,6 +50,44 @@ import { Spacer, Stack } from "@stealthscale/component-layout";
 so `justify` and `align` cannot both offer `center`. A row centres its children already, which is
 the case the short name would have been for.
 
+## Group
+
+Lays controls along one direction, a semantic gap apart or attached into one control with several
+parts.
+
+```tsx
+import { Button, IconButton } from "@stealthscale/component-actions";
+import { Group } from "@stealthscale/component-layout";
+
+<Group>
+  <Button>Save</Button>
+  <Button variant="subtle">Discard</Button>
+</Group>;
+<Group attached>
+  <Button>Day</Button>
+  <Button>Week</Button>
+  <Button>Month</Button>
+</Group>;
+```
+
+| Axis          | Values                                                  | Default      |
+| ------------- | ------------------------------------------------------- | ------------ |
+| `orientation` | `horizontal`, `vertical`                                | `horizontal` |
+| `gap`         | `xs`, `sm`, `md`, `lg`, `xl`                            | `sm`         |
+| `attached`    | `true`                                                  | off          |
+| `grow`        | `true`                                                  | off          |
+| `justify`     | `start`, `center`, `end`, `between`, `around`, `evenly` | start        |
+| `align`       | `flex-start`, `flex-end`, `stretch`, `baseline`         | stretch      |
+
+Set `attached` for controls that read as one. The corners between neighbours are squared and the
+border between them is drawn once, so three buttons read as one control with three parts. An
+attached group does not wrap and ignores `gap`.
+
+Set `grow` for children that share the room evenly rather than taking what each needs.
+
+Name the set where the children are one choice. `Group` draws a `div` and says nothing about what it
+holds, so a group of options takes `as="fieldset"` or a role and a label from you.
+
 ## Grid
 
 Lays its entries out in columns, as `Grid.Root` holding `Grid.Item`. The columns axis states a count

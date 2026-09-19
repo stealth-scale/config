@@ -102,6 +102,17 @@ holds nothing, the result comes from the viewport: narrow under `md`, which is w
 phone never lays out wide first. Pass a third argument to assume narrow under a different
 breakpoint.
 
+`widthOf` reads the width a breakpoint starts at, so a component measures against the vocabulary
+rather than against a number a caller invented:
+
+```tsx
+const narrow = useNarrow(ref, widthOf("md"), "md");
+```
+
+Warning: `widthOf` answers a number, not a condition. A component that reads it measures its own
+element and folds on that. A component that wants the window folds on a style prop or a media query
+instead, which is what the breakpoints are for.
+
 ## Reference
 
 | Export               | Signature                                                           |
@@ -112,6 +123,7 @@ breakpoint.
 | `useBreakpointValue` | `<Value>(value: Responsive<Value>, options?) => undefined \| Value` |
 | `useNarrow`          | `(ref, width: number, below?: Breakpoint) => boolean`               |
 | `sizesOf`            | `() => readonly Size[]`                                             |
+| `widthOf`            | `(breakpoint: Breakpoint) => number`                                |
 | `pixelsOf`           | `(length: null \| string \| undefined) => number`                   |
 | `BASE_SIZE`          | `Size`                                                              |
 

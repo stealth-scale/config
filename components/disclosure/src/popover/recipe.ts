@@ -53,7 +53,11 @@ export const recipe = defineSlotRecipe({
       zIndex: "popover",
     },
     description: { color: "fg.muted" },
-    indicator: { _open: { rotate: "180deg" }, transitionDuration: "fast" },
+    indicator: {
+      _motionReduce: { transitionDuration: "0s" },
+      _open: { rotate: "180deg" },
+      transitionDuration: "fast",
+    },
     positioner: { position: "relative" },
     root: { display: "contents" },
     title: { fontWeight: "semibold" },

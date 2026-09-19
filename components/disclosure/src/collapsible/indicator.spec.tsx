@@ -24,4 +24,20 @@ describe("Indicator", () => {
 
     expect(slotElement(container, "collapsible", "indicator").tagName).toBe("svg");
   });
+
+  it("keeps its mark out of the name the trigger is announced by", () => {
+    const { container } = render(disclosed(<Indicator>▾</Indicator>));
+
+    expect(slotElement(container, "collapsible", "indicator").getAttribute("aria-hidden")).toBe(
+      "true",
+    );
+  });
+
+  it("reads a mark out where a caller says it means something", () => {
+    const { container } = render(disclosed(<Indicator aria-hidden={false}>3 more</Indicator>));
+
+    expect(slotElement(container, "collapsible", "indicator").getAttribute("aria-hidden")).toBe(
+      "false",
+    );
+  });
 });

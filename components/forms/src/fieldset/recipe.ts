@@ -18,6 +18,7 @@ import {
   onSlot,
   onSlots,
   sizeVariants,
+  statusEmitted,
   statusVariants,
 } from "@stealthscale/theme/authoring";
 
@@ -49,6 +50,7 @@ export const recipe = defineSlotRecipe({
   defaultVariants: { orientation: "vertical", size: "md" },
   jsx: [/^Fieldset(\.\w+)?$/u],
   slots: ["root", "legend", "helperText", "errorText"],
+  staticCss: [statusEmitted()],
   variants: {
     /**
      * Which way the fields inside the group run.

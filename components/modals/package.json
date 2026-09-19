@@ -54,6 +54,8 @@
   "devDependencies": {
     "@arethetypeswrong/core": "catalog:",
     "@rolldown/plugin-babel": "catalog:",
+    "@stealthscale/component-collections": "workspace:^",
+    "@stealthscale/hooks": "workspace:^",
     "@stealthscale/theme": "workspace:^",
     "@stealthscale/vite-config": "workspace:^",
     "@stealthscale/vite-config-react": "workspace:^",
@@ -72,6 +74,8 @@
     "vitest": "catalog:"
   },
   "peerDependencies": {
+    "@stealthscale/component-collections": "workspace:^",
+    "@stealthscale/hooks": "workspace:^",
     "@stealthscale/theme": "workspace:^",
     "react": "catalog:"
   },

@@ -2,6 +2,14 @@
 "@stealthscale/component-typography": minor
 ---
 
+component-typography: keep a mirrored icon mirrored while it spins
+
+- `Icon`'s `mirrored` axis wrote `transform: scaleX(-1)`, and the `spin` motion animates
+  `transform`. An animation overrides a declaration of the same property, so a mark that was both
+  mirrored and spinning lost its mirror for as long as it turned.
+- The axis now writes the `scale` property, which is a property of its own and composes with the
+  animation.
+
 component-typography: publish Em, Strong, Mark, Quote and Span
 
 - `Em` marks a run of words the writer stressed. The element is `em` and it exposes the `emphasis`

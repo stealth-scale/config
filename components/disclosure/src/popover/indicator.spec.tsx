@@ -26,4 +26,18 @@ describe("Indicator", () => {
 
     expect(slotElement(container, "popover", "indicator").tagName).toBe("svg");
   });
+
+  it("keeps its mark out of the name the control is announced by", () => {
+    const { container } = render(opened(<Indicator>▾</Indicator>));
+
+    expect(slotElement(container, "popover", "indicator").getAttribute("aria-hidden")).toBe("true");
+  });
+
+  it("reads a mark out where a caller says it means something", () => {
+    const { container } = render(opened(<Indicator aria-hidden={false}>3 more</Indicator>));
+
+    expect(slotElement(container, "popover", "indicator").getAttribute("aria-hidden")).toBe(
+      "false",
+    );
+  });
 });

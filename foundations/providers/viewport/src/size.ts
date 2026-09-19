@@ -91,3 +91,20 @@ export function sizesOf(): readonly Size[] {
 
   return known;
 }
+
+/**
+ * Reads the width a breakpoint starts at, for measuring an element rather than the window.
+ *
+ * @remarks
+ *   A component that folds measures itself, so it cannot ask a media query and has to compare its
+ *   own width to a number. This answers that number from the scale the breakpoints are stated in,
+ *   so a folding component and a page laid out responsively give way at the same widths and
+ *   neither carries a length of its own.
+ *   It is not a breakpoint condition and must not become one. A screen component beside an open
+ *   sidebar is narrow while the window is wide, which is the case a media query cannot see.
+ * @param breakpoint - The breakpoint to read, or `base` for no width at all.
+ * @returns The width in pixels, and zero for `base`.
+ */
+export function widthOf(breakpoint: Breakpoint): number {
+  return sizesOf().find((size) => size.name === breakpoint)?.min ?? BASE_SIZE.min;
+}

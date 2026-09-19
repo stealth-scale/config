@@ -63,7 +63,7 @@ describe("Item", () => {
   });
 
   it("hands the element to a caller taking it in a callback", () => {
-    const seen: Array<HTMLDivElement | null> = [];
+    const seen: Array<HTMLElement | null> = [];
 
     render(
       grouped(

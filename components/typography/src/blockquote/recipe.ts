@@ -14,6 +14,7 @@ import {
   defineSlotRecipe,
   motionVariants,
   onSlot,
+  statusEmitted,
   statusVariants,
 } from "@stealthscale/theme/authoring";
 
@@ -37,6 +38,7 @@ export const recipe = defineSlotRecipe({
   defaultVariants: { justify: "start", size: "md", variant: "subtle" },
   jsx: [/^Blockquote(\.\w+)?$/u],
   slots: ["root", "content", "caption", "icon"],
+  staticCss: [statusEmitted()],
   variants: {
     justify: {
       center: { root: { alignItems: "center", textAlign: "center" } },

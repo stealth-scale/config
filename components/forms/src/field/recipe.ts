@@ -17,6 +17,7 @@ import {
   onSlot,
   onSlots,
   sizeVariants,
+  statusEmitted,
   statusVariants,
 } from "@stealthscale/theme/authoring";
 
@@ -53,6 +54,7 @@ export const recipe = defineSlotRecipe({
   defaultVariants: { orientation: "vertical", size: "md" },
   jsx: [/^Field(\.\w+)?$/u],
   slots: ["root", "label", "requiredIndicator", "control", "helperText", "counter", "errorText"],
+  staticCss: [statusEmitted()],
   variants: {
     /**
      * Where the label sits against the control.

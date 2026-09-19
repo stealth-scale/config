@@ -16,4 +16,4 @@ export {
 export { useViewport, type ViewportContextValue } from "#context.ts";
 export { useNarrow } from "#narrow.ts";
 export { ViewportProvider, type ViewportProviderProps } from "#provider.tsx";
-export { BASE_SIZE, type Breakpoint, pixelsOf, type Size, sizesOf } from "#size.ts";
+export { BASE_SIZE, type Breakpoint, pixelsOf, type Size, sizesOf, widthOf } from "#size.ts";

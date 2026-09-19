@@ -18,6 +18,7 @@ import {
   cornerVariants,
   defineRecipe,
   flatVariants,
+  statusEmitted,
   statusVariants,
   tagSizes,
 } from "@stealthscale/theme/authoring";
@@ -42,6 +43,7 @@ export const recipe = defineRecipe({
   className: "badge",
   defaultVariants: { radius: "l2", size: "md", variant: "subtle" },
   jsx: [/Badge$/u],
+  staticCss: [statusEmitted()],
   variants: {
     radius: cornerVariants(),
     size: tagSizes(),

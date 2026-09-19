@@ -40,6 +40,7 @@ export {
   type Look,
   LOOKS,
   lookVariants,
+  type Marked,
 } from "#authoring/recipes/looks.ts";
 export { motion, type Motion, MOTIONS, motionVariants } from "#authoring/recipes/motion.ts";
 export { cornerVariants, ratioVariants } from "#authoring/recipes/shape.ts";
@@ -56,7 +57,7 @@ export {
   touchTarget,
 } from "#authoring/recipes/sizes.ts";
 export { type Anatomy, onSlot, onSlots, slotsOf } from "#authoring/recipes/slots.ts";
-export { fieldStatusVariants, statusVariants } from "#authoring/recipes/status.ts";
+export { fieldStatusVariants, statusEmitted, statusVariants } from "#authoring/recipes/status.ts";
 export {
   divider,
   type Elevation,

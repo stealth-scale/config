@@ -41,10 +41,14 @@ catalog:
   # focus-visible, which installs a document listener. The whole set moves at one version together.
   "@zag-js/checkbox": 1.44.0
   "@zag-js/collapsible": 1.44.0
+  "@zag-js/collection": 1.44.0
   "@zag-js/focus-visible": 1.44.0
+  "@zag-js/i18n-utils": 1.44.0
+  "@zag-js/listbox": 1.44.0
   "@zag-js/menu": 1.44.0
   "@zag-js/popover": 1.44.0
   "@zag-js/react": 1.44.0
+  "@zag-js/switch": 1.44.0
   "@zag-js/tabs": 1.44.0
   "@zag-js/tooltip": 1.44.0
   "@zag-js/types": 1.44.0

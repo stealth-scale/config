@@ -212,6 +212,7 @@ moves.
 | Export                                | Writes                                                                             |
 | ------------------------------------- | ---------------------------------------------------------------------------------- |
 | `interactive()`                       | The hand, the transition, no selection, the disabled look, the focus ring          |
+| `highlightVariants(highlights, when)` | A `highlight` axis, each value a mark on the row the keys are on                   |
 | `link()`                              | The link ink, an underline on hover, the focus ring                                |
 | `lookVariants(looks)`                 | A `variant` axis, each look a layer style                                          |
 | `statusVariants()`                    | A `status` axis, each status a palette                                             |
@@ -303,6 +304,13 @@ draws.
 
 The build plugin generates the runtime under `generated/` from the foundation, once, in this
 package. Every other package reads that runtime through `.`.
+
+Three semantic tokens are not a theme's to move. `sizes.prose` is the measure body text is read at,
+counted in characters so it stays right at every type size. `spacing.marker` is the gutter a browser
+draws a list marker in. `spacing.safe.{top,right,bottom,left}` is the room a device keeps for a home
+indicator, a notch or a rounded corner, which only the browser knows. Anything fixed to an edge of
+the screen reads the safe tokens rather than writing `env()`, which a recipe may not do, and reads
+zero on every device that reserves nothing.
 
 ## Licence
 

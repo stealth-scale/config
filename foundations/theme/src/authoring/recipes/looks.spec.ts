@@ -124,6 +124,19 @@ describe("highlightVariants", () => {
     expect(Object.keys(highlightVariants()).toSorted()).toStrictEqual([...HIGHLIGHTS].toSorted());
   });
 
+  it("puts every mark under the current page where a recipe asks for it", () => {
+    expect(highlightVariants(["tint", "bar"], "_currentPage")).toStrictEqual({
+      bar: { _currentPage: { background: "colorPalette.subtle", layerStyle: "indicator.start" } },
+      tint: { _currentPage: { layerStyle: "fill.subtle" } },
+    });
+  });
+
+  it("draws the fill mark the same way under the current page", () => {
+    expect(highlightVariants(["fill"], "_currentPage")).toStrictEqual({
+      fill: { _currentPage: { layerStyle: "fill.solid" } },
+    });
+  });
+
   it("reads a layer style the foundation defines for every mark", () => {
     const recipe = defineRecipe({
       className: "x",

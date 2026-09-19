@@ -284,7 +284,16 @@ catalogs:
     '@zag-js/collapsible':
       specifier: 1.44.0
       version: 1.44.0
+    '@zag-js/collection':
+      specifier: 1.44.0
+      version: 1.44.0
     '@zag-js/focus-visible':
+      specifier: 1.44.0
+      version: 1.44.0
+    '@zag-js/i18n-utils':
+      specifier: 1.44.0
+      version: 1.44.0
+    '@zag-js/listbox':
       specifier: 1.44.0
       version: 1.44.0
     '@zag-js/menu':
@@ -294,6 +303,9 @@ catalogs:
       specifier: 1.44.0
       version: 1.44.0
     '@zag-js/react':
+      specifier: 1.44.0
+      version: 1.44.0
+    '@zag-js/switch':
       specifier: 1.44.0
       version: 1.44.0
     '@zag-js/tabs':
@@ -609,6 +621,22 @@ importers:
         version: 4.1.11(@types/node@26.5.1)(@vitest/browser-playwright@4.1.11)(@vitest/browser-preview@4.1.11)(@vitest/coverage-v8@4.1.11)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(happy-dom@20.14.5)
 
   components/collections:
+    dependencies:
+      '@zag-js/collection':
+        specifier: 'catalog:'
+        version: 1.44.0
+      '@zag-js/i18n-utils':
+        specifier: 'catalog:'
+        version: 1.44.0
+      '@zag-js/listbox':
+        specifier: 'catalog:'
+        version: 1.44.0
+      '@zag-js/react':
+        specifier: 'catalog:'
+        version: 1.44.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@zag-js/types':
+        specifier: 'catalog:'
+        version: 1.44.0
     devDependencies:
       '@arethetypeswrong/core':
         specifier: 'catalog:'
@@ -616,6 +644,9 @@ importers:
       '@rolldown/plugin-babel':
         specifier: 'catalog:'
         version: 0.2.4(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@7.29.7)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(rolldown@1.2.7)
+      '@stealthscale/hooks':
+        specifier: workspace:^
+        version: link:../../foundations/hooks
       '@stealthscale/theme':
         specifier: workspace:^
         version: link:../../foundations/theme
@@ -929,6 +960,9 @@ importers:
       '@zag-js/react':
         specifier: 'catalog:'
         version: 1.44.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@zag-js/switch':
+        specifier: 'catalog:'
+        version: 1.44.0
       '@zag-js/types':
         specifier: 'catalog:'
         version: 1.44.0
@@ -1056,6 +1090,12 @@ importers:
       '@rolldown/plugin-babel':
         specifier: 'catalog:'
         version: 0.2.4(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@7.29.7)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(rolldown@1.2.7)
+      '@stealthscale/component-collections':
+        specifier: workspace:^
+        version: link:../collections
+      '@stealthscale/hooks':
+        specifier: workspace:^
+        version: link:../../foundations/hooks
       '@stealthscale/theme':
         specifier: workspace:^
         version: link:../../foundations/theme
@@ -1113,6 +1153,9 @@ importers:
       '@rolldown/plugin-babel':
         specifier: 'catalog:'
         version: 0.2.4(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@7.29.7)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(rolldown@1.2.7)
+      '@stealthscale/hooks':
+        specifier: workspace:^
+        version: link:../../foundations/hooks
       '@stealthscale/theme':
         specifier: workspace:^
         version: link:../../foundations/theme
@@ -1221,6 +1264,30 @@ importers:
       '@rolldown/plugin-babel':
         specifier: 'catalog:'
         version: 0.2.4(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@7.29.7)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(rolldown@1.2.7)
+      '@stealthscale/component-a11y':
+        specifier: workspace:^
+        version: link:../a11y
+      '@stealthscale/component-actions':
+        specifier: workspace:^
+        version: link:../actions
+      '@stealthscale/component-disclosure':
+        specifier: workspace:^
+        version: link:../disclosure
+      '@stealthscale/component-layout':
+        specifier: workspace:^
+        version: link:../layout
+      '@stealthscale/component-navigation':
+        specifier: workspace:^
+        version: link:../navigation
+      '@stealthscale/component-typography':
+        specifier: workspace:^
+        version: link:../typography
+      '@stealthscale/hooks':
+        specifier: workspace:^
+        version: link:../../foundations/hooks
+      '@stealthscale/provider-viewport':
+        specifier: workspace:^
+        version: link:../../foundations/providers/viewport
       '@stealthscale/theme':
         specifier: workspace:^
         version: link:../../foundations/theme
@@ -6559,6 +6626,9 @@ packages:
   '@zag-js/collapsible@1.44.0':
     resolution: {integrity: sha512-VPSW2MgFtXSH85GSpfo61LKpW66Rp4v9LsMggp/ITKNj7+HQ5Q8CaWQRhe3FYQdZ9OefaCkC6IFVnIFilE8feQ==}
 
+  '@zag-js/collection@1.44.0':
+    resolution: {integrity: sha512-BmBSYuj+bLQWOpj0pe7E5ulCgSikT7Hr69noc09j9TT8GN3Jf8yfN1houQdKpM61qjlllDSeN3t7j3HQDAJJ8Q==}
+
   '@zag-js/core@1.44.0':
     resolution: {integrity: sha512-tqDBJeDpDuLfjodk6NetSDZLMy7+r799RcC5oDtVivowfSxfPBSsfh4UxYT/+zXv9RZ0mYG3TzO4yFROPmniIA==}
 
@@ -6574,8 +6644,14 @@ packages:
   '@zag-js/focus-visible@1.44.0':
     resolution: {integrity: sha512-uw/MjetjFP16IiOQLr3snfnEd5772lXPuQR8mct432t4AyPEAskZBwO9MTDbWukNXQ20VKpcorMZm+QXG3NY4g==}
 
+  '@zag-js/i18n-utils@1.44.0':
+    resolution: {integrity: sha512-UGYpkpnEowFqeBkSIw4dtRJCf5O/4JH3eDT0BXKFHMFAptwCM/4+lHD8dnxkUgjFN8H5OELUtBWZDrM71VlrcA==}
+
   '@zag-js/interact-outside@1.44.0':
     resolution: {integrity: sha512-yFX3eHamp82kax65xIYLemXNH8kD9MvXm7lHttnwlp/XZoAgDTR2l+iLJYU6pLZsuSM9GsrnWQrfHaHWBhyNWw==}
+
+  '@zag-js/listbox@1.44.0':
+    resolution: {integrity: sha512-K7b/xuKEsFxqoI9SOukSLqrHxeW7C1x+iOfIXh1sLhQG+CRZBJlvzc8GmGljuQQHCrXgUwQXSOPs8HCNEVpoPQ==}
 
   '@zag-js/menu@1.44.0':
     resolution: {integrity: sha512-Z1k6h8PRYtO7S8CeMupoODyuMWBK+eDBwS+r+A8gQOajWXxn7YGKha4/fxtUyyuW0e0U/b//JIM8qvwDPLoK3Q==}
@@ -6600,6 +6676,9 @@ packages:
 
   '@zag-js/store@1.44.0':
     resolution: {integrity: sha512-syjbybsc1e2zro50Eu+SaloeJbiXTY78wa+m8iUzswdmVzpts+7KSk3Oogso7jxZ7L91vNAQDhSqZR73Il3KOA==}
+
+  '@zag-js/switch@1.44.0':
+    resolution: {integrity: sha512-J4Xk4kK2NmY5CGho8a4AOlcxtJI/it9ITNmmP3ZONdfu3IJGJxs7VCLHfcRc+89iKtqLuD+KB2yaCyZ8lS/tOQ==}
 
   '@zag-js/tabs@1.44.0':
     resolution: {integrity: sha512-RZq89qz3SRVDHa1Og/Apco1gGPt0qK9tfoiWf61NA/ckV8r2LGf8IxvilGgUuHc5TUYWh938ERzZ4vjqWzGRug==}
@@ -10162,6 +10241,10 @@ snapshots:
       '@zag-js/types': 1.44.0
       '@zag-js/utils': 1.44.0
 
+  '@zag-js/collection@1.44.0':
+    dependencies:
+      '@zag-js/utils': 1.44.0
+
   '@zag-js/core@1.44.0':
     dependencies:
       '@zag-js/dom-query': 1.44.0
@@ -10185,9 +10268,23 @@ snapshots:
     dependencies:
       '@zag-js/dom-query': 1.44.0
 
+  '@zag-js/i18n-utils@1.44.0':
+    dependencies:
+      '@zag-js/dom-query': 1.44.0
+
   '@zag-js/interact-outside@1.44.0':
     dependencies:
       '@zag-js/dom-query': 1.44.0
+      '@zag-js/utils': 1.44.0
+
+  '@zag-js/listbox@1.44.0':
+    dependencies:
+      '@zag-js/anatomy': 1.44.0
+      '@zag-js/collection': 1.44.0
+      '@zag-js/core': 1.44.0
+      '@zag-js/dom-query': 1.44.0
+      '@zag-js/focus-visible': 1.44.0
+      '@zag-js/types': 1.44.0
       '@zag-js/utils': 1.44.0
 
   '@zag-js/menu@1.44.0':
@@ -10239,6 +10336,15 @@ snapshots:
   '@zag-js/store@1.44.0':
     dependencies:
       proxy-compare: 3.0.1
+
+  '@zag-js/switch@1.44.0':
+    dependencies:
+      '@zag-js/anatomy': 1.44.0
+      '@zag-js/core': 1.44.0
+      '@zag-js/dom-query': 1.44.0
+      '@zag-js/focus-visible': 1.44.0
+      '@zag-js/types': 1.44.0
+      '@zag-js/utils': 1.44.0
 
   '@zag-js/tabs@1.44.0':
     dependencies:

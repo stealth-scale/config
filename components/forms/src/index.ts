@@ -14,4 +14,5 @@ export * as Fieldset from "#fieldset/index.ts";
 export * as InputGroup from "#input-group/index.ts";
 export * from "#input/index.ts";
 export * from "#search-input/index.ts";
+export * as Switch from "#switch/index.ts";
 export * from "#textarea/index.ts";

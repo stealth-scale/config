@@ -33,7 +33,7 @@ const Shell = withContext("div", "item");
 /**
  * Describes what an item takes beside everything a styled element takes.
  */
-export interface ItemProps extends ComponentProps<typeof Shell> {
+export interface ItemProps extends Omit<ComponentProps<typeof Shell>, "ref"> {
   /**
    * Whether the arrows pass over the item.
    */
@@ -46,8 +46,14 @@ export interface ItemProps extends ComponentProps<typeof Shell> {
 
   /**
    * Where a caller wants the element.
+   *
+   * @remarks
+   *   Typed to any element rather than to a div, because the item is what a caller draws their
+   *   control as. The tab stop sits on this element, so a control drawn inside an item rather than
+   *   as one carries a second stop and the group's promise of one stop per group is broken. A
+   *   toolbar writes `as="button"`.
    */
-  ref?: Ref<HTMLDivElement> | undefined;
+  ref?: Ref<HTMLElement> | undefined;
 }
 
 /**

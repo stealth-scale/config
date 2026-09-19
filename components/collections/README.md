@@ -93,6 +93,77 @@ Declare the columns in `Table.ColumnGroup` for a table with `layout="fixed"`. A 
 `col`'s width, background, border and visibility and ignores everything else, so tint and size a
 column there and style it from its cells.
 
+## Listbox
+
+Draws a list of rows a person picks from, with the keys the ARIA pattern calls for. Composed as
+`Listbox.Root` holding `Listbox.Content`.
+
+```tsx
+import { Listbox, useFilter, useListCollection } from "@stealthscale/component-collections";
+
+const filter = useFilter();
+const { collection, narrow } = useListCollection({
+  filter: filter.contains,
+  itemToString: (client) => client.name,
+  itemToValue: (client) => client.id,
+  rows: clients,
+});
+
+<Listbox.Root collection={collection} selectionMode="multiple">
+  <Listbox.Label>Clients</Listbox.Label>
+  <Listbox.Input onChange={(event) => narrow(event.target.value)} />
+  <Listbox.Content>
+    {collection.items.map((client) => (
+      <Listbox.Item item={client} key={client.id}>
+        <Listbox.ItemText>{client.name}</Listbox.ItemText>
+        <Listbox.ItemIndicator />
+      </Listbox.Item>
+    ))}
+  </Listbox.Content>
+</Listbox.Root>;
+```
+
+| Axis        | Values                        | Default |
+| ----------- | ----------------------------- | ------- |
+| `highlight` | `bar`, `fill`, `tint`         | `tint`  |
+| `radius`    | `l1`, `l2`, `l3`              | `l1`    |
+| `size`      | `sm`, `md`, `lg`              | `md`    |
+| `variant`   | `outline`, `plain`, `surface` | `plain` |
+
+`highlight` marks the row the keys are on rather than the row that has focus, because a listbox
+driven from a field never moves focus off the field. `tint` fills the row faintly, `fill` fills it
+solidly, and `bar` draws a rule down its leading edge.
+
+The machine writes every role, every identifier and every key. Arrow keys move the highlight, typing
+jumps to a row, and `selectionMode` decides whether Enter and Space pick one row or many. Every part
+is a `div`: a listbox is a grouping for a screen reader rather than a list of items, and `role` says
+so on its own.
+
+Rows go in through `collection`, which is what `useListCollection` answers. Nothing about narrowing
+lives in the component.
+
+## useListCollection and useFilter
+
+Keeps the rows a list draws and narrows them to what has been typed.
+
+```tsx
+const filter = useFilter({ sensitivity: "base" });
+const { collection, narrow } = useListCollection({
+  filter: filter.contains,
+  itemToString: (client) => client.name,
+  itemToValue: (client) => client.id,
+  rows: clients,
+});
+```
+
+`useFilter` answers `contains`, `startsWith` and `endsWith`, each built on `Intl.Collator`, so
+`Jose` matches `José` and `strasse` matches `Straße`. The default sensitivity ignores case and
+accents, which is what a person typing into a search field expects.
+
+`useListCollection` holds the rows and the text typed and answers what is left of them. Pass
+`filter` to match on the words a reader sees, or write your own predicate to match on anything the
+row holds. `narrow("")` restores every row.
+
 ## Licence
 
 MIT. See [LICENSE](LICENSE).

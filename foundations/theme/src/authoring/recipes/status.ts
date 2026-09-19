@@ -10,6 +10,7 @@
 
 import { type Status, STATUSES } from "#authoring/contract.ts";
 import type { SystemStyleObject } from "#generated/types/system.d.mts";
+import { type RecipeRule } from "#pandacss.ts";
 import { recordOf } from "#record.ts";
 
 /**
@@ -35,4 +36,20 @@ export function fieldStatusVariants(): Record<Status, SystemStyleObject> {
     borderColor: `border.${status}`,
     colorPalette: status,
   }));
+}
+
+/**
+ * Writes the `staticCss` entry a recipe with a `status` axis carries.
+ *
+ * @remarks
+ *   The compiler emits a rule for a value it reads from a literal in an application's source. A
+ *   status is the one axis an application usually does not write: it hands over what a record, a
+ *   validator or a server said, and the compiler sees a name it cannot follow. Without this the
+ *   class lands on the element with no rule behind it, and a component reporting an error draws in
+ *   its default palette. The values are listed rather than asked for with `true`, which the
+ *   compiler's own types offer for an axis and its compiler ignores. Reading them from the
+ *   vocabulary's own array is what keeps the list from going stale when a status is added.
+ */
+export function statusEmitted(): RecipeRule {
+  return { status: [...STATUSES] };
 }

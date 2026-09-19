@@ -21,6 +21,7 @@ import {
   field,
   fieldStatusVariants,
   fieldVariants,
+  statusEmitted,
 } from "@stealthscale/theme/authoring";
 
 /**
@@ -37,6 +38,7 @@ export const recipe = defineRecipe({
   className: "input",
   defaultVariants: { size: "md", variant: "outline" },
   jsx: [/^Input$/u],
+  staticCss: [statusEmitted()],
   variants: {
     size: controlSizes(),
     status: fieldStatusVariants(),

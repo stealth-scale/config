@@ -29,6 +29,7 @@ import {
   onSlot,
   onSlots,
   sizeVariants,
+  statusEmitted,
   touchTarget,
 } from "@stealthscale/theme/authoring";
 
@@ -72,6 +73,7 @@ export const recipe = defineSlotRecipe({
   defaultVariants: { align: "center", radius: "l1", size: "md", variant: "solid" },
   jsx: [/^Checkbox(\.\w+)?$/u],
   slots: ["root", "control", "indicator", "label"],
+  staticCss: [statusEmitted()],
   variants: {
     /**
      * Where the box sits against a label that runs to more than one line.

@@ -54,6 +54,7 @@
   "dependencies": {
     "@zag-js/checkbox": "catalog:",
     "@zag-js/react": "catalog:",
+    "@zag-js/switch": "catalog:",
     "@zag-js/types": "catalog:"
   },
   "devDependencies": {
