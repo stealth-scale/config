@@ -10,6 +10,7 @@ describe("@stealthscale/component-content", () => {
     await expect(
       violations({
         at: join(import.meta.dirname, ".."),
+        barrels: true,
         kind: "library",
         module: published,
       }),

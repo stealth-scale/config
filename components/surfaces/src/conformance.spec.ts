@@ -10,6 +10,7 @@ describe("@stealthscale/component-surfaces", () => {
     await expect(
       violations({
         at: join(import.meta.dirname, ".."),
+        barrels: true,
         kind: "library",
         module: published,
       }),
