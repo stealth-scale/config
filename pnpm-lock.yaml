@@ -1370,19 +1370,6 @@ importers:
         version: 4.1.11(@types/node@26.5.1)(@vitest/browser-playwright@4.1.11)(@vitest/browser-preview@4.1.11)(@vitest/coverage-v8@4.1.11)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(happy-dom@20.14.5)
 
   components/specimen:
-    dependencies:
-      '@stealthscale/component-actions':
-        specifier: workspace:^
-        version: link:../actions
-      '@stealthscale/provider-i18n':
-        specifier: workspace:^
-        version: link:../../foundations/providers/i18n
-      '@stealthscale/provider-router':
-        specifier: workspace:^
-        version: link:../../foundations/providers/router
-      '@stealthscale/vite-plugin-specimen':
-        specifier: workspace:^
-        version: link:../../packages/vite-plugin-specimen
     devDependencies:
       '@arethetypeswrong/core':
         specifier: 'catalog:'
@@ -1390,12 +1377,21 @@ importers:
       '@rolldown/plugin-babel':
         specifier: 'catalog:'
         version: 0.2.4(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@7.29.7)(@voidzero-dev/vite-plus-core@0.3.1(@arethetypeswrong/core@0.18.5)(@types/node@26.5.1)(jiti@2.6.1)(publint@0.3.24)(typescript@7.0.2)(yaml@2.9.1))(rolldown@1.2.7)
+      '@stealthscale/component-actions':
+        specifier: workspace:^
+        version: link:../actions
       '@stealthscale/component-layout':
         specifier: workspace:^
         version: link:../layout
       '@stealthscale/component-typography':
         specifier: workspace:^
         version: link:../typography
+      '@stealthscale/provider-i18n':
+        specifier: workspace:^
+        version: link:../../foundations/providers/i18n
+      '@stealthscale/provider-router':
+        specifier: workspace:^
+        version: link:../../foundations/providers/router
       '@stealthscale/testing-router':
         specifier: workspace:^
         version: link:../../packages/testing-router
@@ -1411,6 +1407,9 @@ importers:
       '@stealthscale/vite-config-typescript':
         specifier: workspace:^
         version: link:../../packages/vite-config-typescript
+      '@stealthscale/vite-plugin-specimen':
+        specifier: workspace:^
+        version: link:../../packages/vite-plugin-specimen
       '@testing-library/react':
         specifier: 'catalog:'
         version: 16.3.3(@testing-library/dom@10.4.1)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -4072,6 +4071,9 @@ importers:
       '@stealthscale/provider-i18n':
         specifier: workspace:^
         version: link:../../foundations/providers/i18n
+      '@stealthscale/testing':
+        specifier: workspace:^
+        version: link:../testing
       '@stealthscale/testing-config':
         specifier: workspace:^
         version: link:../testing-config

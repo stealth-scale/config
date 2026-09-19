@@ -20,8 +20,19 @@ const SOURCE = "stealth-source";
 
 /**
  * Lists the directories the specification glob never descends into.
+ *
+ * @remarks
+ *   Written out rather than imported, because this package configures itself without extending a
+ *   tier and so reaches for nothing the tier publishes. Its own specification compares the two
+ *   lists, which is what keeps this copy honest.
  */
-const FOREIGN = ["**/node_modules/**", "**/.git/**", "**/dist/**", "**/coverage/**"];
+const FOREIGN = [
+  "**/node_modules/**",
+  "**/.git/**",
+  "**/.claude/**",
+  "**/dist/**",
+  "**/coverage/**",
+];
 
 /**
  * Configures a package that packs and tests without extending a tier.
