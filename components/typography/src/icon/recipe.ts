@@ -35,8 +35,17 @@ export const recipe = defineRecipe({
   defaultVariants: { size: "inherit" },
   jsx: [/Icon$/u],
   variants: {
+    /**
+     * Whether the mark turns around where the page reads right to left.
+     *
+     * @remarks
+     *   Written as `scale` rather than as a `transform` function. The `spin` motion animates
+     *   `transform`, and an animation overrides a declaration of the same property, so a mirrored
+     *   mark that also spins lost its mirror for as long as it turned. The two are separate
+     *   properties and compose.
+     */
     mirrored: {
-      true: { _rtl: { transform: "scaleX(-1)" } },
+      true: { _rtl: { scale: "-1 1" } },
     },
     motion: motionVariants(["float", "spin", "twinkle"]),
     size: { ...iconSizes(), inherit: { boxSize: "1em" } },

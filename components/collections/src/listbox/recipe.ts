@@ -1,0 +1,102 @@
+/**
+ * Defines the styles a listbox is drawn with.
+ *
+ * @remarks
+ *   Ten parts. The root frames the set, the label names it, the input narrows it, and the content
+ *   is the list itself. An item holds its words and the mark saying it is chosen, and a group
+ *   gathers items under a heading.
+ *   A row is drawn from the theme's `row` fragment. Focus stays on the list and a highlight moves
+ *   over the rows, which is why a row carries no ring and no press of its own, and why the
+ *   `highlight` axis reads the same three marks a menu reads.
+ *   The content scrolls rather than the root, so a label and a field above it stay put while the
+ *   rows move under them.
+ */
+
+import {
+  cornerVariants,
+  defineSlotRecipe,
+  highlightVariants,
+  iconSizes,
+  onSlot,
+  onSlots,
+  row,
+  sizeVariants,
+  surface,
+  truncate,
+} from "@stealthscale/theme/authoring";
+
+/**
+ * Draws a plain listbox at the middle size, tinting the row the highlight is on.
+ */
+export const recipe = defineSlotRecipe({
+  base: {
+    content: { display: "flex", flexDirection: "column", minBlockSize: "0", overflowY: "auto" },
+    input: { inlineSize: "full" },
+    item: { ...row(), _selected: { fontWeight: "medium" } },
+    itemGroup: { display: "flex", flexDirection: "column", minInlineSize: "0" },
+    itemGroupLabel: { color: "fg.muted", fontWeight: "medium" },
+    itemIndicator: {
+      alignItems: "center",
+      display: "inline-flex",
+      flexShrink: "0",
+      justifyContent: "center",
+      marginInlineStart: "auto",
+    },
+    itemText: { ...truncate(), flex: "1", minInlineSize: "0", textAlign: "start" },
+    label: { color: "fg.muted", fontWeight: "medium" },
+    root: { display: "flex", flexDirection: "column", minBlockSize: "0", minInlineSize: "0" },
+    valueText: truncate(),
+  },
+  className: "listbox",
+  defaultVariants: { highlight: "tint", radius: "l1", size: "md", variant: "plain" },
+  jsx: [/^Listbox(\.\w+)?$/u],
+  slots: [
+    "root",
+    "label",
+    "input",
+    "content",
+    "item",
+    "itemText",
+    "itemIndicator",
+    "itemGroup",
+    "itemGroupLabel",
+    "valueText",
+  ],
+  variants: {
+    /**
+     * How the row the list has moved its highlight onto is marked.
+     */
+    highlight: onSlot("item", highlightVariants()),
+
+    radius: onSlot("item", cornerVariants(["l1", "l2", "l3"])),
+
+    size: onSlots({
+      content: sizeVariants((size) => ({ gap: `gap.${size}` }), ["sm", "md", "lg"]),
+      item: sizeVariants(
+        (size) => ({
+          blockSize: `tag.${size}`,
+          gap: `gap.${size}`,
+          paddingInline: `inset.${size}`,
+          textStyle: `label.${size}`,
+        }),
+        ["sm", "md", "lg"],
+      ),
+      itemGroup: sizeVariants((size) => ({ gap: `gap.${size}` }), ["sm", "md", "lg"]),
+      itemGroupLabel: sizeVariants(
+        (size) => ({ paddingInline: `inset.${size}`, textStyle: `label.${size}` }),
+        ["sm", "md", "lg"],
+      ),
+      itemIndicator: iconSizes(["sm", "md", "lg"]),
+      label: sizeVariants((size) => ({ textStyle: `label.${size}` }), ["sm", "md", "lg"]),
+      root: sizeVariants((size) => ({ gap: `gap.${size}` }), ["sm", "md", "lg"]),
+    }),
+
+    /**
+     * Whether the list is raised on a surface of its own or drawn against what holds it.
+     */
+    variant: {
+      plain: { root: { background: "transparent" } },
+      surface: { root: { ...surface(), overflow: "clip" } },
+    },
+  },
+});

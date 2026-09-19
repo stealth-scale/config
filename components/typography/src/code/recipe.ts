@@ -9,7 +9,12 @@
  *   recipe. Tabular figures keep a column of snippets aligned.
  */
 
-import { defineRecipe, lookVariants, statusVariants } from "@stealthscale/theme/authoring";
+import {
+  defineRecipe,
+  lookVariants,
+  statusEmitted,
+  statusVariants,
+} from "@stealthscale/theme/authoring";
 
 /**
  * Draws a snippet on the neutral palette in the subtle look and the middle size until a caller
@@ -27,6 +32,7 @@ export const recipe = defineRecipe({
   className: "code",
   defaultVariants: { size: "md", variant: "subtle" },
   jsx: [/Code$/u],
+  staticCss: [statusEmitted()],
   variants: {
     size: {
       md: { paddingInline: "inset.sm", textStyle: "code.md" },

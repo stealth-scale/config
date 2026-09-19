@@ -36,15 +36,23 @@ catalog:
   "@vitejs/plugin-react": ^6.1.1
   "@vitest/browser-playwright": 4.1.11
   "@vitest/coverage-v8": 4.1.11
-  # Every machine shares @zag-js/core, so the whole set moves at one version together.
-  "@zag-js/collapsible": 1.43.3
-  "@zag-js/focus-visible": 1.43.3
-  "@zag-js/menu": 1.43.3
-  "@zag-js/popover": 1.43.3
-  "@zag-js/react": 1.43.3
-  "@zag-js/tabs": 1.43.3
-  "@zag-js/tooltip": 1.43.3
-  "@zag-js/types": 1.43.3
+  # A machine pins its own dependencies exactly: @zag-js/checkbox@1.44.0 asks for core, types,
+  # utils, anatomy, dom-query and focus-visible at 1.44.0 and no range. A caret here would let two
+  # machines resolve to different minors and install two copies of all six, including
+  # focus-visible, which installs a document listener. The whole set moves at one version together.
+  "@zag-js/checkbox": 1.44.0
+  "@zag-js/collapsible": 1.44.0
+  "@zag-js/collection": 1.44.0
+  "@zag-js/focus-visible": 1.44.0
+  "@zag-js/i18n-utils": 1.44.0
+  "@zag-js/listbox": 1.44.0
+  "@zag-js/menu": 1.44.0
+  "@zag-js/popover": 1.44.0
+  "@zag-js/react": 1.44.0
+  "@zag-js/switch": 1.44.0
+  "@zag-js/tabs": 1.44.0
+  "@zag-js/tooltip": 1.44.0
+  "@zag-js/types": 1.44.0
   "@commitlint/cli": ^21.2.2
   # The faces the themes name. Every one is an open face, taken from the package that ships it.
   "@fontsource-variable/geist": ^5.3.0

@@ -12,6 +12,8 @@ describe("index", () => {
       "Frame",
       "FramePropsProvider",
       "Grid",
+      "Group",
+      "GroupPropsProvider",
       "Spacer",
       "SpacerPropsProvider",
       "Stack",

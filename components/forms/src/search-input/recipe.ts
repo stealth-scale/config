@@ -1,55 +1,33 @@
 /**
- * States what a search field is: a text field with a control at its end that empties it.
+ * Defines the styles the control that empties a search field is drawn with.
  *
  * @remarks
- *   Three parts. The root positions the control against the field, the field leaves room at its
- *   end so the typing never runs under that control, and the clear is the control itself. The
- *   field's own surface, edge and size are the text field's recipe, which this one does not
- *   restate: the field part here writes the room and nothing else.
- *   The room is a square the height of the control, which is exactly what the clear occupies, so
- *   the two read the same scale and stay lined up at every size. A field that reserved a fixed
- *   width would crowd its own text at the small end and leave a gap at the large one.
+ *   The one element this component adds. The box, the field and the room the field leaves at its
+ *   end are the input group's, so the two components write one mechanism between them rather than
+ *   the same one twice, and a theme that moves every grouped field moves this one.
+ *   The control fills the mark it sits in, which the group sizes off the control scale, so the
+ *   control and the field step together at every size.
  */
 
-import {
-  defineSlotRecipe,
-  iconOnly,
-  interactive,
-  onSlots,
-  sizeVariants,
-} from "@stealthscale/theme/authoring";
+import { defineRecipe, iconOnly, interactive } from "@stealthscale/theme/authoring";
 
 /**
- * Draws the control against the end of the field, at the middle size until a caller says
- * otherwise.
+ * Draws the control at the middle size until a caller says otherwise.
  */
-export const recipe = defineSlotRecipe({
+export const recipe = defineRecipe({
   base: {
-    clear: {
-      ...interactive(),
-      _hover: { color: "fg" },
-      alignItems: "center",
-      borderRadius: "l1",
-      color: "fg.muted",
-      display: "inline-flex",
-      insetInlineEnd: "0",
-      justifyContent: "center",
-      position: "absolute",
-      top: "0",
-    },
-    root: { display: "block", position: "relative", width: "full" },
+    ...interactive(),
+    _hover: { color: "fg" },
+    alignItems: "center",
+    blockSize: "full",
+    borderRadius: "l1",
+    color: "fg.muted",
+    display: "inline-flex",
+    inlineSize: "full",
+    justifyContent: "center",
   },
   className: "search-input",
   defaultVariants: { size: "md" },
   jsx: [/^SearchInput$/u],
-  slots: ["root", "field", "clear"],
-  variants: {
-    /**
-     * How much room the field leaves at its end, which is the box the clear occupies.
-     */
-    size: onSlots({
-      clear: iconOnly(),
-      field: sizeVariants((size) => ({ paddingInlineEnd: `{sizes.control.${size}}` })),
-    }),
-  },
+  variants: { size: iconOnly() },
 });

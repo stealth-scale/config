@@ -1,9 +1,9 @@
 # @stealthscale/component-navigation
 
-Draws the ways a person moves between places: the link, and the trail of crumbs from the front of a
-site. Every component binds a recipe and draws nothing of its own, so a theme restyles all of them
-by extending the recipe. The preset under `./theme` registers the recipes with an application's
-compiler.
+Draws the ways a person moves between places: the link, the trail of crumbs from the front of a
+site, and the list of destinations a page is reached from. Every component binds a recipe and draws
+nothing of its own, so a theme restyles all of them by extending the recipe. The preset under
+`./theme` registers the recipes with an application's compiler.
 
 Every value a theme can change on a component is an axis of its recipe, so a caller sets it as a
 prop and writes no style. A caller changes the element a component draws with `as`.
@@ -102,6 +102,84 @@ The trail does four more things for accessibility:
 
 The separator turns around where the line runs right to left, so a chevron pointing forwards keeps
 pointing forwards.
+
+## NavList
+
+Draws the destinations a page is reached from: rows one under another, and branches that open onto
+rows of their own.
+
+```tsx
+import { NavList } from "@stealthscale/component-navigation";
+
+<NavList.Root aria-label="Main" as="nav" iconic={collapsed}>
+  <NavList.Item>
+    <NavList.Link aria-current="page" href="/">
+      Overview
+    </NavList.Link>
+    <NavList.Badge>3</NavList.Badge>
+  </NavList.Item>
+  <NavList.Branch defaultOpen>
+    <NavList.Trigger>
+      Settings
+      <NavList.Indicator>
+        <ChevronIcon />
+      </NavList.Indicator>
+    </NavList.Trigger>
+    <NavList.Content>
+      <NavList.Item>
+        <NavList.Link href="/settings/team">Team</NavList.Link>
+      </NavList.Item>
+    </NavList.Content>
+  </NavList.Branch>
+</NavList.Root>;
+```
+
+| Axis        | Values                   | Default  |
+| ----------- | ------------------------ | -------- |
+| `size`      | `sm`, `md`, `lg`         | `md`     |
+| `variant`   | `list`, `dock`           | `list`   |
+| `highlight` | `tint`, `fill`, `bar`    | `tint`   |
+| `radius`    | `l1`, `l2`, `l3`, `full` | `l2`     |
+| `iconic`    | `true`                   | off      |
+| `reveal`    | `always`, `hover`        | `always` |
+
+| Part        | Element  | What it draws                    |
+| ----------- | -------- | -------------------------------- |
+| `Root`      | `ul`     | The list, and the variants       |
+| `Item`      | `li`     | One row                          |
+| `Link`      | `a`      | The destination a reader presses |
+| `Action`    | `span`   | A control at the end of a row    |
+| `Badge`     | `span`   | A count at the end of a row      |
+| `Branch`    | `li`     | A row that opens, and its state  |
+| `Trigger`   | `button` | The row that opens a branch      |
+| `Indicator` | `span`   | The mark that turns as it opens  |
+| `Content`   | `ul`     | The rows beneath a branch        |
+| `Skeleton`  | `li`     | The room a row on its way takes  |
+
+State `aria-current="page"` on the row naming the page being read. That attribute is what a screen
+reader announces and what `highlight` draws, so the two cannot disagree.
+
+The list carries no landmark. A page holds more than one of these, so name the set on whatever holds
+it, or state `as="nav"` and an `aria-label` on the root.
+
+`NavList.Branch` takes `open`, `defaultOpen`, `onOpenChange` and `id`. Pass `open` to keep the
+branch holding the current page open across a navigation. The trigger says what it controls and
+whether that list is expanded, so state neither yourself.
+
+Set `iconic` for a list collapsed to a rail. The rows become squares, the actions and the chevrons
+go, and the words stay in the document out of sight, so a screen reader still names every row. Pass
+it from whatever collapses. The list measures nothing itself.
+
+Set `reveal="hover"` for a control that appears with the pointer. It stays drawn under a coarse
+pointer and while anything in the row holds focus, so a keyboard and a finger both reach it.
+
+Set `variant="dock"` for a bar of destinations across the foot of a screen. It keeps clear of the
+room a device reserves for a home indicator.
+
+Nested rows are the same `Item` and `Link`. `Content` mutes the ink and they inherit it.
+
+Say that a list is loading. State `aria-busy` on the root around a set of `NavList.Skeleton` rows,
+and put the feedback package's skeleton inside each one.
 
 ## Licence
 

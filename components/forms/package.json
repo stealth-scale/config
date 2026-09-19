@@ -51,6 +51,12 @@
     "prepublishOnly": "vp pack",
     "test": "vp test"
   },
+  "dependencies": {
+    "@zag-js/checkbox": "catalog:",
+    "@zag-js/react": "catalog:",
+    "@zag-js/switch": "catalog:",
+    "@zag-js/types": "catalog:"
+  },
   "devDependencies": {
     "@arethetypeswrong/core": "catalog:",
     "@rolldown/plugin-babel": "catalog:",

@@ -28,6 +28,9 @@ export {
 } from "#authoring/recipes/flow.ts";
 export { interactive, link, row } from "#authoring/recipes/interactive.ts";
 export {
+  type Field,
+  FIELDS,
+  fieldVariants,
   type Flat,
   FLATS,
   flatVariants,
@@ -37,11 +40,14 @@ export {
   type Look,
   LOOKS,
   lookVariants,
+  type Marked,
 } from "#authoring/recipes/looks.ts";
 export { motion, type Motion, MOTIONS, motionVariants } from "#authoring/recipes/motion.ts";
 export { cornerVariants, ratioVariants } from "#authoring/recipes/shape.ts";
 export {
   below,
+  CONTROL_INSET_END,
+  CONTROL_INSET_START,
   controlSizes,
   iconOnly,
   iconSizes,
@@ -51,7 +57,7 @@ export {
   touchTarget,
 } from "#authoring/recipes/sizes.ts";
 export { type Anatomy, onSlot, onSlots, slotsOf } from "#authoring/recipes/slots.ts";
-export { statusVariants } from "#authoring/recipes/status.ts";
+export { fieldStatusVariants, statusEmitted, statusVariants } from "#authoring/recipes/status.ts";
 export {
   divider,
   type Elevation,

@@ -157,6 +157,34 @@ describe("layerStyles", () => {
     });
   });
 
+  it("names three field looks", () => {
+    expect(Object.keys(tokenAt(layerStyles, "field") ?? {}).toSorted()).toStrictEqual([
+      "flushed",
+      "outline",
+      "subtle",
+    ]);
+  });
+
+  it("draws an outlined field on the panel surface and a subtle one on the muted fill", () => {
+    expect(tokenAt(layerStyles, "field.outline")).toStrictEqual({
+      background: "bg.panel",
+      borderColor: "border",
+    });
+    expect(tokenAt(layerStyles, "field.subtle")).toStrictEqual({
+      background: "bg.muted",
+      borderColor: "transparent",
+    });
+  });
+
+  it("leaves a flushed field its bottom edge alone", () => {
+    expect(tokenAt(layerStyles, "field.flushed")).toStrictEqual({
+      background: "transparent",
+      borderBlockEndColor: "border",
+      borderColor: "transparent",
+      borderRadius: "0",
+    });
+  });
+
   it("draws an outline in the palette's solid or its border", () => {
     expect(tokenAt(layerStyles, "outline.solid")).toMatchObject({
       borderColor: "colorPalette.solid",

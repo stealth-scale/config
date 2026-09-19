@@ -3,8 +3,11 @@
  *
  * @remarks
  *   The machine writes the open state onto it and the recipe turns it half a revolution, so a
- *   caller draws whatever artwork they like inside and the turn follows the menu. It carries no
- *   label of its own, because the control beside it already says what pressing it does.
+ *   caller draws whatever artwork they like inside and the turn follows the menu.
+ *   It states `aria-hidden`, because it sits inside the control and everything inside a control is
+ *   read as part of that control's name. A chevron drawn here would otherwise be announced after
+ *   the words the control was named with, and the control already carries `aria-expanded`. A caller
+ *   whose mark says something the name does not can state `aria-hidden={false}`.
  */
 
 import { type ComponentProps, type ReactElement } from "react";
@@ -33,5 +36,5 @@ export type IndicatorProps = ComponentProps<typeof Marked>;
 export function Indicator(props: IndicatorProps): ReactElement {
   const { api } = useMenu();
 
-  return <Marked {...mergeProps(api.getIndicatorProps(), props)} />;
+  return <Marked {...mergeProps({ "aria-hidden": true }, api.getIndicatorProps(), props)} />;
 }

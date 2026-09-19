@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { BASE_SIZE, pixelsOf, sizesOf } from "#size.ts";
+import { BASE_SIZE, pixelsOf, sizesOf, widthOf } from "#size.ts";
 
 describe("pixelsOf", () => {
   it("converts a length in rem against the engine's own root font size", () => {
@@ -50,5 +50,23 @@ describe("sizesOf", () => {
 describe("BASE_SIZE", () => {
   it("starts at no width at all", () => {
     expect(BASE_SIZE).toStrictEqual({ min: 0, name: "base" });
+  });
+});
+
+describe("widthOf", () => {
+  it("reads the width a breakpoint starts at", () => {
+    expect(widthOf("sm")).toBe(640);
+  });
+
+  it("answers nothing for the breakpoint every theme starts at", () => {
+    expect(widthOf("base")).toBe(0);
+  });
+
+  it("answers a wider number for a wider breakpoint", () => {
+    expect(widthOf("lg")).toBeGreaterThan(widthOf("sm"));
+  });
+
+  it("answers the same number the size list holds", () => {
+    expect(widthOf("md")).toBe(sizesOf().find((size) => size.name === "md")?.min);
   });
 });

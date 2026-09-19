@@ -31,6 +31,7 @@ const ARGUMENTS: Arguments = {
   "fmt.own": [{ because: BECAUSE, patterns: ["@acme/"] }],
   "fmt.skip": [{ because: BECAUSE, files: ["**/CHANGELOG.md"] }],
   "lint.barrelled": [["**/index.ts"]],
+  "lint.composed": [["**/*.fixtures.tsx"]],
   "lint.defaultExported": [["**/*.stories.tsx"]],
   "lint.enforce": [{ because: BECAUSE, files: ["src/**"], rules: {} }],
   "lint.forbid": [{ because: BECAUSE, files: ["src/**"], packages: ["node:*"] }],

@@ -1,9 +1,9 @@
 # @stealthscale/component-typography
 
 Draws the components that are text: a heading, a paragraph, a snippet of code, a key a reader is
-asked to press, a mark, a list and a quotation. Every component binds a recipe and draws nothing of
-its own, so a theme restyles all of them by extending the recipe. The preset under `./theme`
-registers the recipes with an application's compiler.
+asked to press, a stressed run, an important run, a mark, a list and a quotation. Every component
+binds a recipe and draws nothing of its own, so a theme restyles all of them by extending the
+recipe. The preset under `./theme` registers the recipes with an application's compiler.
 
 Every value a theme can change on a component is an axis of its recipe, so a caller sets it as a
 prop and writes no style. A caller changes the element a component draws with `as`. A component with
@@ -21,9 +21,7 @@ The package peers on `react` and `@stealthscale/theme`. An application lists the
 ## Text
 
 Draws a paragraph, in a size, an ink, a weight and an alignment, cut to one line where a caller sets
-`truncate`, and animated or masked where a page sets those axes. The element is `p`. A truncated or
-masked paragraph hides words. The full words are the caller's to keep reachable, in a `title` or in
-text nearby.
+`truncate`, and animated or masked where a page sets those axes. The element is `p`.
 
 ```tsx
 import { Text } from "@stealthscale/component-typography";
@@ -31,10 +29,13 @@ import { Text } from "@stealthscale/component-typography";
 <Text size="lg" tone="muted" weight="medium">
   A sentence set large, muted and a little heavier.
 </Text>;
-<Text as="span" truncate>
-  A run of words inside a line, cut at its box.
+<Text align="center" motion="fade">
+  A sentence that fades in, centred.
 </Text>;
 ```
+
+`truncate` hides words and `mask` fades them out. Keep the full words reachable, in a `title` or in
+text nearby. Use `Span` to cut a run inside a line.
 
 | Axis       | Values                                                                | Default |
 | ---------- | --------------------------------------------------------------------- | ------- |
@@ -87,6 +88,124 @@ import { Code } from "@stealthscale/component-typography";
 | `variant` | `solid`, `subtle`, `surface`, `outline`, `plain` | `subtle` |
 | `size`    | `sm`, `md`                                       | `md`     |
 | `status`  | `info`, `success`, `warning`, `error`            | none     |
+
+## Em
+
+Marks a run of words the writer stressed. The element is `em`, and it exposes the `emphasis` role.
+
+```tsx
+import { Em } from "@stealthscale/component-typography";
+
+<Em>never</Em>;
+<Em tone="error">deleted</Em>;
+<Em as="i">Beagle</Em>;
+```
+
+| Axis     | Values                                                                | Default |
+| -------- | --------------------------------------------------------------------- | ------- |
+| `tone`   | `default`, `muted`, `inverted`, `info`, `success`, `warning`, `error` | inherit |
+| `motion` | `fade`, `rise`, `reveal`                                              | none    |
+
+Set `as="i"` for a run drawn in italic for another reason, such as a ship's name or a term being
+introduced. That element states no stress.
+
+## Strong
+
+Marks a run of words as more important than the words around it. The element is `strong`, and it
+exposes the `strong` role.
+
+```tsx
+import { Strong } from "@stealthscale/component-typography";
+
+<Strong>Do not</Strong>;
+<Strong weight="bold" tone="error">
+  Deleting is permanent
+</Strong>;
+```
+
+| Axis     | Values                                                                | Default    |
+| -------- | --------------------------------------------------------------------- | ---------- |
+| `weight` | `medium`, `semibold`, `bold`                                          | `semibold` |
+| `tone`   | `default`, `muted`, `inverted`, `info`, `success`, `warning`, `error` | inherit    |
+| `motion` | `fade`, `rise`, `reveal`                                              | none       |
+
+Set `as="b"` for a run drawn heavy for another reason, such as a keyword in a definition. That
+element states no importance.
+
+## Mark
+
+Picks a run of words out of the text around it, for a search hit or a term a page wants noticed. The
+element is `mark`, and it exposes the `mark` role. `MarkPropsProvider` sets the variants of every
+mark below it.
+
+```tsx
+import { Mark, MarkPropsProvider } from "@stealthscale/component-typography";
+
+<Mark>chassis</Mark>;
+<MarkPropsProvider value={{ radius: "l1", status: "warning", variant: "solid" }}>
+  <Results />
+</MarkPropsProvider>;
+```
+
+| Axis      | Values                                                   | Default  |
+| --------- | -------------------------------------------------------- | -------- |
+| `variant` | `solid`, `subtle`, `surface`, `outline`, `plain`, `text` | `subtle` |
+| `status`  | `info`, `success`, `warning`, `error`                    | none     |
+| `radius`  | `l1`, `l2`, `l3`, `full`                                 | `l1`     |
+| `inset`   | `xs`, `sm`, `md`                                         | `xs`     |
+| `motion`  | `fade`, `rise`, `reveal`                                 | none     |
+| `effect`  | `glow`, `shine`                                          | none     |
+
+Give a highlight that carries meaning a second cue. Take the `text` variant for one in weight, or
+put the meaning in a `VisuallyHidden` beside the run. Most screen readers announce a `mark` only
+where the reader has turned that on, and WCAG 1.4.1 fails a distinction drawn in colour alone.
+
+## Quote
+
+Quotes a run of words inside the line around it. The element is `q`, and the browser draws the marks
+for the `lang` in force. Write none yourself.
+
+```tsx
+import { Quote } from "@stealthscale/component-typography";
+
+<Quote cite="https://example.org/paper">a measured claim</Quote>;
+<Quote marks="none">the caller writes the punctuation</Quote>;
+```
+
+| Axis     | Values                                                                | Default |
+| -------- | --------------------------------------------------------------------- | ------- |
+| `marks`  | `auto`, `none`                                                        | `auto`  |
+| `tone`   | `default`, `muted`, `inverted`, `info`, `success`, `warning`, `error` | inherit |
+| `motion` | `fade`, `rise`, `reveal`                                              | none    |
+
+Set `marks="none"` where the text already holds its punctuation, as a quotation inside another one
+does. Use `Blockquote.Root` for a quotation set as its own block, which is a `figure` with its own
+content, caption and icon. State `cite` with the source's address where there is one.
+
+## Span
+
+Draws a run of words inside a line without starting a block. The element is `span`, which carries no
+meaning, so a screen reader reads the words as part of the line around them.
+
+```tsx
+import { Span } from "@stealthscale/component-typography";
+
+<Span data-testid="total">1,024</Span>;
+<Span truncate>a path that would otherwise wrap</Span>;
+```
+
+| Axis       | Values                                                                | Default |
+| ---------- | --------------------------------------------------------------------- | ------- |
+| `tone`     | `default`, `muted`, `inverted`, `info`, `success`, `warning`, `error` | inherit |
+| `weight`   | `normal`, `medium`, `semibold`, `bold`                                | inherit |
+| `truncate` | `true`                                                                | off     |
+| `motion`   | `fade`, `rise`, `reveal`                                              | none    |
+
+A span takes no size and inherits the surrounding line's. Use it over a `Text` drawn as one wherever
+the run has to keep that size, such as inside a heading.
+
+Use a run that carries meaning where there is one: `Em` for stress, `Strong` for importance, `Mark`
+for a highlight, `Quote` for a quotation.
 
 ## Kbd
 
@@ -199,6 +318,11 @@ import { Blockquote } from "@stealthscale/component-typography";
 | `TextProps`            | `type`      | The paragraph's variants and everything a `p` takes      |
 | `HeadingProps`         | `type`      | The heading's variants and everything an `h2` takes      |
 | `CodeProps`            | `type`      | The snippet's variants and everything a `code` takes     |
+| `EmProps`              | `type`      | The run's variants and everything an `em` takes          |
+| `StrongProps`          | `type`      | The run's variants and everything a `strong` takes       |
+| `MarkProps`            | `type`      | The highlight's variants and everything a `mark` takes   |
+| `QuoteProps`           | `type`      | The quotation's variants and everything a `q` takes      |
+| `SpanProps`            | `type`      | The run's variants and everything a `span` takes         |
 | `KbdProps`             | `type`      | The key's variants and everything a `kbd` takes          |
 | `IconProps`            | `type`      | The icon's variants and everything an `svg` takes        |
 | `List.RootProps`       | `type`      | The list's variants and everything a `ul` takes          |

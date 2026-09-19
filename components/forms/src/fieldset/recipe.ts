@@ -1,0 +1,76 @@
+/**
+ * Defines the styles a fieldset is drawn with.
+ *
+ * @remarks
+ *   Four parts. The root groups the fields, the legend names the group, and the two texts sit
+ *   under them.
+ *   The message reads the palette, which the status axis sets, the same way a field's does. A
+ *   fieldset defaults to the error palette.
+ *   The orientation axis lays the fields down the group or across it. A group of two or three
+ *   short options reads better across, and anything longer wraps and reads better down.
+ *   The root clears the browser's own border, inset and minimum width. A `fieldset` defaults to a
+ *   minimum inline size of its content, so one inside a flex or grid parent refuses to shrink and
+ *   pushes the layout wider than the page.
+ */
+
+import {
+  defineSlotRecipe,
+  onSlot,
+  onSlots,
+  sizeVariants,
+  statusEmitted,
+  statusVariants,
+} from "@stealthscale/theme/authoring";
+
+/**
+ * The steps a group is read at.
+ */
+const SIZES = ["sm", "md", "lg"] as const;
+
+/**
+ * Draws a group stacked at the middle size until a caller says otherwise.
+ */
+export const recipe = defineSlotRecipe({
+  base: {
+    errorText: { alignItems: "center", color: "colorPalette.fg", display: "flex", gap: "gap.xs" },
+    helperText: { color: "fg.muted" },
+    legend: { fontWeight: "semibold" },
+    root: {
+      borderStyle: "none",
+      colorPalette: "error",
+      display: "flex",
+      flexDirection: "column",
+      inlineSize: "full",
+      margin: "0",
+      minInlineSize: "0",
+      padding: "0",
+    },
+  },
+  className: "fieldset",
+  defaultVariants: { orientation: "vertical", size: "md" },
+  jsx: [/^Fieldset(\.\w+)?$/u],
+  slots: ["root", "legend", "helperText", "errorText"],
+  staticCss: [statusEmitted()],
+  variants: {
+    /**
+     * Which way the fields inside the group run.
+     */
+    orientation: {
+      horizontal: { root: { flexFlow: "row wrap" } },
+      vertical: { root: { flexDirection: "column" } },
+    },
+
+    size: onSlots({
+      errorText: sizeVariants((size) => ({ textStyle: `body.${size}` }), SIZES),
+      helperText: sizeVariants((size) => ({ textStyle: `body.${size}` }), SIZES),
+      legend: sizeVariants((size) => ({ textStyle: `label.${size}` }), SIZES),
+      root: sizeVariants((size) => ({ gap: `gap.${size}` }), SIZES),
+    }),
+
+    /**
+     * The palette the message is drawn in. A group defaults to the error palette, and one
+     * reporting something else states its own.
+     */
+    status: onSlot("root", statusVariants()),
+  },
+});

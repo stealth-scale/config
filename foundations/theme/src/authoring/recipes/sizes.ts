@@ -13,6 +13,16 @@ import { recordOf } from "#record.ts";
 import { SCALE, type Scale } from "#scales/geometry.ts";
 
 /**
+ * The property a control reads the room at its inline start from, its own step as the fallback.
+ */
+export const CONTROL_INSET_START = "--control-inset-start";
+
+/**
+ * The property a control reads the room at its inline end from, its own step as the fallback.
+ */
+export const CONTROL_INSET_END = "--control-inset-end";
+
+/**
  * Pairs each step with the one below it, the smallest reading itself.
  */
 const BELOW: Readonly<Record<Scale, Scale>> = {
@@ -35,6 +45,10 @@ const BELOW: Readonly<Record<Scale, Scale>> = {
  *   than a word and the same inset on both sides reads as a gap before the mark. A control that
  *   holds a mark and nothing else states its own inset, which this one does not reach, because
  *   the two rules are equally specific and a recipe's compound is written after its variants.
+ *   Each inset is written through {@link CONTROL_INSET_START} or {@link CONTROL_INSET_END} with
+ *   the step as the fallback, so a component that places something inside a control opens the
+ *   side it needs by setting a property rather than by writing padding of its own. One rule then
+ *   writes the padding, and the two never race for it.
  */
 export function controlSizes(): Record<Scale, SystemStyleObject>;
 
@@ -55,7 +69,8 @@ export function controlSizes(sizes: readonly Scale[] = SCALE): Record<string, Sy
     "&:has(> svg:first-child)": { paddingInlineStart: `inset.${below(size)}` },
     gap: `gap.${size}`,
     height: `control.${size}`,
-    paddingInline: `inset.${size}`,
+    paddingInlineEnd: `var(${CONTROL_INSET_END}, {spacing.inset.${size}})`,
+    paddingInlineStart: `var(${CONTROL_INSET_START}, {spacing.inset.${size}})`,
     textStyle: `label.${size}`,
   }));
 }

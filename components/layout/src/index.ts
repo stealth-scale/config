@@ -15,5 +15,6 @@ export * from "#container/index.ts";
 export * from "#divider/index.ts";
 export * from "#frame/index.ts";
 export * as Grid from "#grid/index.ts";
+export * from "#group/index.ts";
 export * from "#spacer/index.ts";
 export * from "#stack/index.ts";

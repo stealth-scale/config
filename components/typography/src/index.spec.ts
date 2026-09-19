@@ -7,10 +7,16 @@ describe("index", () => {
     expect(Object.keys(barrel).toSorted()).toStrictEqual([
       "Blockquote",
       "Code",
+      "Em",
       "Heading",
       "Icon",
       "Kbd",
       "List",
+      "Mark",
+      "MarkPropsProvider",
+      "Quote",
+      "Span",
+      "Strong",
       "Text",
     ]);
   });

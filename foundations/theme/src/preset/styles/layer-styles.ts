@@ -1,7 +1,7 @@
 /**
  * Defines the looks a recipe reads by name: the fills and outlines a control is drawn in, the
- * indicators along an edge, the disabled look, and the glows, glass, gradient texts and backdrops
- * a page is dressed with.
+ * edges a field is drawn with, the indicators along an edge, the disabled look, and the glows,
+ * glass, gradient texts and backdrops a page is dressed with.
  *
  * @remarks
  *   Every look reads the virtual palette, so one look draws in every palette an application
@@ -274,6 +274,18 @@ export const layerStyles: LayerStyles = {
     },
   },
   disabled: { value: { cursor: "disabled", opacity: "disabled" } },
+  field: {
+    flushed: {
+      value: {
+        background: "transparent",
+        borderBlockEndColor: "border",
+        borderColor: "transparent",
+        borderRadius: "0",
+      },
+    },
+    outline: { value: { background: "bg.panel", borderColor: "border" } },
+    subtle: { value: { background: "bg.muted", borderColor: "transparent" } },
+  },
   fill: {
     ghost: fill("transparent", "colorPalette.fg", "colorPalette.muted", "colorPalette.emphasized"),
     muted: fill("colorPalette.muted", "colorPalette.fg", "colorPalette.emphasized"),

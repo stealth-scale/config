@@ -63,7 +63,8 @@ describe("recipe", () => {
         "&:has(> svg:first-child)": { paddingInlineStart: "inset.sm" },
         gap: "gap.md",
         height: "control.md",
-        paddingInline: "inset.md",
+        paddingInlineEnd: "var(--control-inset-end, {spacing.inset.md})",
+        paddingInlineStart: "var(--control-inset-start, {spacing.inset.md})",
         textStyle: "label.md",
       },
     });

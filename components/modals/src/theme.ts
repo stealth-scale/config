@@ -9,7 +9,9 @@
 
 import { definePreset } from "@stealthscale/theme/authoring";
 
+import { recipe as command } from "#command/recipe.ts";
+
 export default definePreset({
   name: "@stealthscale/component-modals",
-  theme: { extend: { recipes: {} } },
+  theme: { extend: { slotRecipes: { command } } },
 });

@@ -30,4 +30,10 @@ describe("Indicator", () => {
 
     expect(slotElement(container, "tabs", "indicator").tagName).toBe("SPAN");
   });
+
+  it("leaves a reader stepping through the strip one stop for each control", async () => {
+    const { container } = await drawn(tabbed(<Indicator />));
+
+    expect(slotElement(container, "tabs", "indicator").getAttribute("aria-hidden")).toBe("true");
+  });
 });

@@ -4,6 +4,8 @@ import { recipeViolations } from "@stealthscale/testing-theme";
 
 import { defineRecipe } from "#authoring/recipe.ts";
 import {
+  FIELDS,
+  fieldVariants,
   FLATS,
   flatVariants,
   HIGHLIGHTS,
@@ -72,6 +74,34 @@ describe("flatVariants", () => {
   });
 });
 
+describe("fieldVariants", () => {
+  it("lists three looks", () => {
+    expect(FIELDS).toHaveLength(3);
+  });
+
+  it("reads the field layer style of each look's own name", () => {
+    expect(fieldVariants(FIELDS)).toStrictEqual({
+      flushed: { layerStyle: "field.flushed" },
+      outline: { layerStyle: "field.outline" },
+      subtle: { layerStyle: "field.subtle" },
+    });
+  });
+
+  it("reads a layer style for each look it was handed", () => {
+    expect(fieldVariants(["outline"])).toStrictEqual({ outline: { layerStyle: "field.outline" } });
+  });
+
+  it("offers every look where a recipe names none", () => {
+    expect(Object.keys(fieldVariants()).toSorted()).toStrictEqual([...FIELDS].toSorted());
+  });
+
+  it("reads a layer style the foundation defines for every field look", () => {
+    const recipe = defineRecipe({ className: "x", variants: { variant: fieldVariants(FIELDS) } });
+
+    expect(recipeViolations(recipe)).toStrictEqual([]);
+  });
+});
+
 describe("highlightVariants", () => {
   it("lists three marks", () => {
     expect(HIGHLIGHTS).toHaveLength(3);
@@ -92,6 +122,19 @@ describe("highlightVariants", () => {
 
   it("offers every mark where a recipe names none", () => {
     expect(Object.keys(highlightVariants()).toSorted()).toStrictEqual([...HIGHLIGHTS].toSorted());
+  });
+
+  it("puts every mark under the current page where a recipe asks for it", () => {
+    expect(highlightVariants(["tint", "bar"], "_currentPage")).toStrictEqual({
+      bar: { _currentPage: { background: "colorPalette.subtle", layerStyle: "indicator.start" } },
+      tint: { _currentPage: { layerStyle: "fill.subtle" } },
+    });
+  });
+
+  it("draws the fill mark the same way under the current page", () => {
+    expect(highlightVariants(["fill"], "_currentPage")).toStrictEqual({
+      fill: { _currentPage: { layerStyle: "fill.solid" } },
+    });
   });
 
   it("reads a layer style the foundation defines for every mark", () => {

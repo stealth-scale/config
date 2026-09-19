@@ -1,6 +1,6 @@
 /**
- * Writes the axes a recipe offers for how a thing is filled, from the looks it offers and the way
- * it marks a highlighted row, each a layer style the theme owns.
+ * Writes the axes a recipe offers for how a thing is filled, how a field's edge is drawn, and the
+ * way it marks a highlighted row, each a layer style the theme owns.
  *
  * @remarks
  *   A recipe that offers six looks would otherwise write six fills, six inks and six hovers by
@@ -97,6 +97,44 @@ export function flatVariants(looks: readonly Flat[] = FLATS): Record<string, Sys
 }
 
 /**
+ * Selects one of the ways the edge of a form field is drawn.
+ */
+export type Field = "flushed" | "outline" | "subtle";
+
+/**
+ * Lists every field look, in the order a documentation page shows them.
+ */
+export const FIELDS: readonly Field[] = ["outline", "subtle", "flushed"];
+
+/**
+ * Writes the `variant` axis of a form field, each look one layer style.
+ *
+ * @remarks
+ *   A field is drawn from a surface and an edge rather than from a fill, because the ink inside it
+ *   is the reader's own and a fill that repaints under a pointer reads as something to press. The
+ *   flushed look keeps its bottom edge alone. It drops the inset with it, which the recipe states,
+ *   because a layer style carries no padding.
+ * @typeParam Offered - The looks the recipe offers, which is every one unless it names them.
+ */
+export function fieldVariants(): Record<Field, SystemStyleObject>;
+
+/**
+ * Writes the `variant` axis for the field looks a recipe names.
+ *
+ * @typeParam Offered - The looks the recipe offers.
+ */
+export function fieldVariants<const Offered extends Field>(
+  looks: readonly Offered[],
+): Record<Offered, SystemStyleObject>;
+
+/**
+ * Writes one entry per look, each reading the field layer style of its name.
+ */
+export function fieldVariants(looks: readonly Field[] = FIELDS): Record<string, SystemStyleObject> {
+  return recordOf(looks, (look) => ({ layerStyle: `field.${look}` }));
+}
+
+/**
  * Selects how the row a list has moved its highlight onto is marked.
  */
 export type Highlight = "bar" | "fill" | "tint";
@@ -116,11 +154,17 @@ const MARKS: Readonly<Record<Highlight, string>> = {
 };
 
 /**
+ * Selects the state a row is marked in: the one a list has moved its highlight onto, or the one
+ * naming the page a reader is on.
+ */
+export type Marked = "_currentPage" | "_highlighted";
+
+/**
  * Writes the `highlight` axis of a list: how the one row the reader is on is marked.
  *
  * @remarks
  *   A menu, a select and a combobox all move one highlight over their rows, and each of them marks
- *   it in the same three ways. The styles sit under the highlighted condition rather than on the
+ *   it in the same three ways. The styles sit under the marked condition rather than on the
  *   row, because the row is drawn plain until the list reaches it. The bar draws a line down the
  *   leading edge and tints the row behind it, so the row the reader is on is marked twice over and
  *   a reader who cannot separate the two colors still has the line.
@@ -138,15 +182,34 @@ export function highlightVariants<const Offered extends Highlight>(
 ): Record<Offered, SystemStyleObject>;
 
 /**
- * Writes one entry per highlight, each reading its layer style under the highlighted condition.
+ * Writes the `highlight` axis for a list that marks the page a reader is on rather than a row it
+ * has moved a highlight onto.
+ *
+ * @remarks
+ *   A navigation list marks a destination the reader has already arrived at, which the browser
+ *   states as `aria-current`, and it marks it in the same three ways a menu marks a highlight. The
+ *   condition is the only thing that differs, so the marks stay in one place and a theme that
+ *   restates how a highlighted row is drawn reaches both.
+ * @typeParam Offered - The highlights the recipe offers.
+ */
+export function highlightVariants<const Offered extends Highlight>(
+  highlights: readonly Offered[],
+  when: Marked,
+): Record<Offered, SystemStyleObject>;
+
+/**
+ * Writes one entry per highlight, each reading its layer style under the condition given.
  */
 export function highlightVariants(
   highlights: readonly Highlight[] = HIGHLIGHTS,
+  when: Marked = "_highlighted",
 ): Record<string, SystemStyleObject> {
-  return recordOf(highlights, (highlight) => ({
-    _highlighted:
+  return recordOf(highlights, (highlight): SystemStyleObject => {
+    const marked =
       highlight === "bar"
         ? { background: "colorPalette.subtle", layerStyle: MARKS[highlight] }
-        : { layerStyle: MARKS[highlight] },
-  }));
+        : { layerStyle: MARKS[highlight] };
+
+    return when === "_currentPage" ? { _currentPage: marked } : { _highlighted: marked };
+  });
 }

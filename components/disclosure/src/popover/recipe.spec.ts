@@ -88,6 +88,12 @@ describe("recipe", () => {
     expect(recipe.base?.["indicator"]).toMatchObject({ _open: { rotate: "180deg" } });
   });
 
+  it("turns the mark without a turn for a reader who asked for no motion", () => {
+    expect(recipe.base?.["indicator"]).toMatchObject({
+      _motionReduce: { transitionDuration: "0s" },
+    });
+  });
+
   it("tracks the tag named Popover and every part under it", () => {
     expect(recipe.jsx).toStrictEqual([/^Popover(\.\w+)?$/u]);
   });

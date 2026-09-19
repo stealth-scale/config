@@ -7,6 +7,7 @@ import {
   interactive,
   lookVariants,
   stack,
+  statusEmitted,
   statusVariants,
 } from "@stealthscale/theme/authoring";
 
@@ -16,6 +17,7 @@ const button = defineRecipe({
   base: { ...interactive(), ...stack({ direction: "row", gap: "gap.sm" }) },
   className: "button",
   defaultVariants: { size: "md", variant: "solid" },
+  staticCss: [statusEmitted()],
   variants: {
     size: controlSizes(["xs", "sm", "md", "lg", "xl"]),
     status: statusVariants(),
@@ -518,5 +520,39 @@ describe("recipeViolations", () => {
     expect(
       recipeViolations({ base: INK, className: "x" }, { skip: { "recipe.colors": " " } }),
     ).toStrictEqual(["skip of recipe.colors gives no reason"]);
+  });
+
+  it("reports a status the compiler emits no rule for", () => {
+    expect(
+      recipeViolations({ base: INK, className: "x", variants: { status: { error: INK } } }),
+    ).toStrictEqual(["recipe.emitted: x offers status, which staticCss does not emit"]);
+  });
+
+  it("accepts a status emitted as the whole recipe", () => {
+    expect(
+      recipeViolations({
+        base: INK,
+        className: "x",
+        staticCss: ["*"],
+        variants: { status: { error: INK } },
+      }),
+    ).toStrictEqual([]);
+  });
+
+  it("accepts a status emitted value by value", () => {
+    expect(
+      recipeViolations({
+        base: INK,
+        className: "x",
+        staticCss: [{ status: ["error"] }],
+        variants: { status: { error: INK } },
+      }),
+    ).toStrictEqual([]);
+  });
+
+  it("says nothing about a recipe that offers no status", () => {
+    expect(
+      recipeViolations({ base: INK, className: "x", variants: { size: SIZES } }),
+    ).toStrictEqual([]);
   });
 });

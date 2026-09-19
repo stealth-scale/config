@@ -39,6 +39,18 @@ describe("field", () => {
     });
   });
 
+  it("raises the field to the middle control height on a coarse pointer", () => {
+    expect(field()).toMatchObject({ _touch: { minBlockSize: "control.md" } });
+  });
+
+  it("settles at the rate every pressed control settles at", () => {
+    expect(field()).toMatchObject({
+      transitionDuration: "fast",
+      transitionProperty: "common",
+      transitionTimingFunction: "out",
+    });
+  });
+
   it("passes the recipe checks", () => {
     expect(recipeViolations(defineRecipe({ base: field(), className: "x" }))).toStrictEqual([]);
   });

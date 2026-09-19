@@ -9,7 +9,12 @@
  *   than as a word. The other looks come from the foundation's layer styles.
  */
 
-import { defineRecipe, lookVariants, statusVariants } from "@stealthscale/theme/authoring";
+import {
+  defineRecipe,
+  lookVariants,
+  statusEmitted,
+  statusVariants,
+} from "@stealthscale/theme/authoring";
 
 /**
  * Draws a keycap on the neutral palette, raised and in the middle size until a caller says
@@ -29,6 +34,7 @@ export const recipe = defineRecipe({
   className: "kbd",
   defaultVariants: { size: "md", variant: "raised" },
   jsx: [/Kbd$/u],
+  staticCss: [statusEmitted()],
   variants: {
     size: {
       lg: { height: "control.md", paddingInline: "inset.sm", textStyle: "label.md" },

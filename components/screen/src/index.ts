@@ -6,3 +6,10 @@
  *
  * @packageDocumentation
  */
+
+export * as AppShell from "#app-shell/index.ts";
+export * as Page from "#page/index.ts";
+export * as Section from "#section/index.ts";
+export * as Sidebar from "#sidebar/index.ts";
+export * as Switcher from "#switcher/index.ts";
+export * as Toolbar from "#toolbar/index.ts";

@@ -235,3 +235,26 @@ export function barrelled(files: readonly string[]): Contribution {
     }),
   );
 }
+
+/**
+ * Excuses a fixture from the cap on dependencies.
+ *
+ * @remarks
+ *   A fixture builds the component its specifications measure, so it imports
+ *   every part that component is composed of. Its dependency count is the size
+ *   of the component rather than a sign that one module does too much, and a
+ *   fixture held to the cap pushes the composition back into the specifications
+ *   that were meant to share it. Only `import/max-dependencies` comes off, so
+ *   every other rule still reaches it.
+ */
+export function composed(files: readonly string[]): Contribution {
+  return named(
+    `lint.composed(${files.join(", ")})`,
+    relax({
+      because:
+        "a fixture imports every part of the component it builds, so its dependency count is the size of the component",
+      files,
+      rules: { "import/max-dependencies": "off" },
+    }),
+  );
+}

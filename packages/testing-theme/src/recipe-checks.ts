@@ -22,6 +22,7 @@ import { COMPOSITIONS, conditionNames, semanticColorPaths, tokenPaths } from "#c
 import { gated } from "#gate.ts";
 import {
   defaultViolations,
+  emittedViolations,
   emptyViolations,
   jsxViolations,
   selectionViolations,
@@ -38,6 +39,7 @@ export type RecipeCheck =
   | "recipe.compounds"
   | "recipe.conditions"
   | "recipe.defaults"
+  | "recipe.emitted"
   | "recipe.empty"
   | "recipe.jsx"
   | "recipe.lengths"
@@ -487,6 +489,7 @@ const RUNNERS: ReadonlyArray<readonly [RecipeCheck, Runner]> = [
   ["recipe.compounds", (recipe) => compoundViolations(recipe)],
   ["recipe.empty", (recipe) => emptyViolations(recipe)],
   ["recipe.defaults", (recipe) => defaultViolations(recipe)],
+  ["recipe.emitted", (recipe) => emittedViolations(recipe)],
   ["recipe.selections", (recipe) => selectionViolations(recipe)],
   [
     "recipe.jsx",
