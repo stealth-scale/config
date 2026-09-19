@@ -4,13 +4,16 @@
  * @remarks
  *   A part resolves to far more than it accepts, so every property is classified by where it was
  *   declared. A property declared by a recipe is a variant, one declared by the component's own
- *   package is an option, and one declared anywhere else is dropped and counted.
- *   Every declaration is read rather than the first. `gap` on a list is declared twice, by the
- *   generated style props and by the recipe, and `aria-label` on an icon button three times, twice
- *   by the rendering library and once by the component. Reading only the first drops all three.
+ *   package or by a package it depends on at run time is an option, and one declared anywhere else
+ *   is dropped and counted. Every declaration is read rather than the first. `gap` on a list is
+ *   declared twice, by the generated style props and by the recipe, and `aria-label` on an icon
+ *   button three times, twice by the rendering library and once by the component. Reading only the
+ *   first drops all three.
  */
 
 import { dirname } from "node:path";
+
+import { dependencies } from "@stealthscale/vite-plugin-base";
 
 import { isRecipe, type Settled } from "#anatomy/reading.ts";
 import { type Symbol as Named, type Program, type Project } from "#anatomy/types.ts";
@@ -39,10 +42,63 @@ const DEFAULTS = new Set(["default", "defaultValue"]);
  *
  * @remarks
  *   Asked of the compiler rather than matched against a path, so a workspace link, an installed
- *   copy and a nested package all answer correctly.
+ *   copy and a nested package all answer correctly. The compiler reports an empty directory for
+ *   one of its own libraries and for a file with no manifest above it, and neither belongs to a
+ *   package.
+ * @returns The directory, or undefined for a file in no package.
+ * @throws {@link Error} When the file is not part of the program.
  */
 function packageOf(program: Program, file: string): string | undefined {
-  return program.getSourceFileMetadata(file)?.packageJsonDirectory;
+  const { packageJsonDirectory } = sure(
+    program.getSourceFileMetadata(file),
+    `the package holding ${file}`,
+  );
+
+  return packageJsonDirectory === "" ? undefined : packageJsonDirectory;
+}
+
+/**
+ * Describes the package a specimen belongs to: where it is, and the packages it depends on.
+ *
+ * @remarks
+ *   A declaration in a dependency is part of what the component accepts. A menu built over a state
+ *   machine takes `open` and `onOpenChange` from the machine's package, and a caller sets them on
+ *   the menu. A peer declares what every component takes, such as the rendering library's
+ *   attributes and the foundation's style props, and a table does not draw those. The walk follows
+ *   `dependencies` alone, so a peer stays foreign however deep it sits. The dependencies are held
+ *   as directories, which Node and the compiler both resolve through the real path of a link, so
+ *   a workspace package and an installed one compare the same way.
+ */
+export interface Home {
+  /**
+   * The package's directory, as the compiler reports it.
+   */
+  at: string;
+
+  /**
+   * The directory of every package it depends on at run time, the transitive ones included.
+   */
+  dependencies: ReadonlySet<string>;
+}
+
+/**
+ * Reads the package a specimen belongs to and the packages it depends on.
+ *
+ * @throws {@link Error} When the specimen sits in no package.
+ */
+export function homeOf(program: Program, specimen: string): Home {
+  const at = sure(packageOf(program, specimen), `the package holding ${specimen}`);
+
+  return { at, dependencies: new Set(dependencies(at).map((one) => one.at)) };
+}
+
+/**
+ * Returns true when a file belongs to the specimen's package or to a package it depends on.
+ */
+function ownedBy(program: Program, home: Home, file: string): boolean {
+  const at = packageOf(program, file);
+
+  return at !== undefined && (at === home.at || home.dependencies.has(at));
 }
 
 /**
@@ -54,16 +110,12 @@ function packageOf(program: Program, file: string): string | undefined {
  *   however many style props share its name.
  * @returns The kind, or undefined for a property no table draws.
  */
-export function kindOf(
-  program: Program,
-  property: Named,
-  home: string | undefined,
-): Kind | undefined {
+export function kindOf(program: Program, property: Named, home: Home): Kind | undefined {
   let own = false;
 
   for (const declaration of property.declarations) {
     if (isRecipe(declaration.path)) return "variant";
-    if (home !== undefined && packageOf(program, declaration.path) === home) own = true;
+    if (ownedBy(program, home, declaration.path)) own = true;
   }
 
   return own ? "option" : undefined;
@@ -72,7 +124,7 @@ export function kindOf(
 /**
  * Reads one property into the row a table draws, where a table draws it.
  */
-function propOf(program: Program, property: Named, walk: Walk, home: string | undefined): Prop[] {
+function propOf(program: Program, property: Named, walk: Walk, home: Home): Prop[] {
   const kind = kindOf(program, property, home);
 
   if (kind === undefined) return [];
@@ -100,7 +152,7 @@ function propOf(program: Program, property: Named, walk: Walk, home: string | un
 /**
  * Counts the properties a part resolves to that no table draws.
  */
-function droppedOf(program: Program, members: readonly Named[], home: string | undefined): Dropped {
+function droppedOf(program: Program, members: readonly Named[], home: Home): Dropped {
   let conditions = 0;
   let foreign = 0;
 
@@ -180,7 +232,7 @@ export interface Driving {
  */
 export function anatomyOf(project: Project, specimen: string, driving: Driving): Anatomy {
   const { checker, program } = project;
-  const home = packageOf(program, specimen);
+  const home = homeOf(program, specimen);
   const walk: Walk = {
     checker,
     enumerated: driving.enumerated,
@@ -195,7 +247,7 @@ export function anatomyOf(project: Project, specimen: string, driving: Driving):
   for (const module of nearestFirst(driving.imports(project, specimen), specimen)) {
     const at = module.declarations[0]?.path;
 
-    if (at === undefined || packageOf(program, at) !== home) continue;
+    if (at === undefined || packageOf(program, at) !== home.at) continue;
 
     for (const exported of checker.getExportsOfModule(module)) {
       if (!exported.name.endsWith("Props")) continue;

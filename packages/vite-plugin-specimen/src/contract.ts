@@ -12,7 +12,8 @@
  *
  * @remarks
  *   A variant is declared by the component's recipe and is the axis a theme moves. An option is
- *   declared by the component's own source and is everything else it accepts. A property declared
+ *   declared by the component's own package or by a package it depends on at run time, such as the
+ *   state machine a menu is built over, and is everything else a caller sets. A property declared
  *   anywhere else is dropped, and counted rather than hidden.
  */
 export type Kind = "option" | "variant";
@@ -94,8 +95,8 @@ export interface Dropped {
   conditions: number;
 
   /**
-   * Properties declared outside the component's package and outside a recipe: the style props, the
-   * rendering library's own, and the factory's.
+   * Properties declared outside the component's package, its dependencies and a recipe: the style
+   * props, the rendering library's own, and the factory's.
    */
   foreign: number;
 }

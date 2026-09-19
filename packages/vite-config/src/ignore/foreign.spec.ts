@@ -11,6 +11,7 @@ describe("foreign", () => {
     expect(FOREIGN).toStrictEqual([
       "**/node_modules/**",
       "**/.git/**",
+      "**/.claude/**",
       "**/dist/**",
       "**/coverage/**",
     ]);
@@ -19,5 +20,9 @@ describe("foreign", () => {
   it("keeps the two directories a runner already walks past", () => {
     expect(FOREIGN).toContain("**/node_modules/**");
     expect(FOREIGN).toContain("**/.git/**");
+  });
+
+  it("walks past a worktree an agent session checked out", () => {
+    expect(FOREIGN).toContain("**/.claude/**");
   });
 });

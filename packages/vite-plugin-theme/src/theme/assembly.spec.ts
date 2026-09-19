@@ -3,6 +3,7 @@
  * every theme's extensions and values are scoped, and what an edit changes.
  */
 
+import { mkdirSync, symlinkSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -85,6 +86,27 @@ const APP: ScratchFiles = {
   "themes/abyss.ts": theme("abyss", tracking("0.06em")),
   "themes/fathom.ts": theme("fathom", tracking("0.01em")),
 };
+
+const LINKED: ScratchFiles = {
+  ...DESIGN,
+  ...packageFiles(
+    "packages/kit",
+    { exports: { ".": "./index.js", "./theme": "./theme.js" }, name: "@acme/kit", type: "module" },
+    { "index.js": "export {};\n", "theme.js": 'export default { name: "@acme/kit" };\n' },
+  ),
+  "package.json": manifest({
+    dependencies: { "@acme/design": "*", "@acme/kit": "*" },
+    name: "@acme/app",
+    type: "module",
+  }),
+  "src/page.tsx": 'export const Page = () => "page";\n',
+  "theme.config.ts": 'export default { themes: [{ fonts: [], name: "acme", variant: {} }] };\n',
+};
+
+function linked(workspace: ScratchWorkspace): void {
+  mkdirSync(workspace.path("node_modules/@acme"), { recursive: true });
+  symlinkSync(workspace.path("packages/kit"), workspace.path("node_modules/@acme/kit"), "dir");
+}
 
 async function compiled(workspace: ScratchWorkspace): Promise<string> {
   const { compiler } = await assemble({ root: workspace.root }, RESOLVED);
@@ -354,5 +376,26 @@ describe("assemble", () => {
 
     expect(sources).toHaveLength(1);
     expect(sources[0]).toMatch(/^\/.*[/\\]src[/\\]page\.tsx$/u);
+  });
+
+  it("draws the foundation alone where the application states no theme", async () => {
+    const files = { ...APP, "theme.config.ts": 'export default { static: "*" };\n' };
+    const css = await withScratchWorkspaceAsync(files, compiled);
+
+    expect(css).toContain("--colors-brand: #111");
+    expect(css).not.toContain("[data-theme=");
+    expect(declared(css, ".button", "letter-spacing")).toBe("0em");
+  });
+
+  it("lists the source directory of every workspace package and no installed one", async () => {
+    const roots = await withScratchWorkspaceAsync(LINKED, async (workspace) => {
+      linked(workspace);
+
+      const assembled = await assemble({ root: workspace.root }, RESOLVED);
+
+      return assembled.roots.map((at) => at.slice(workspace.root.length + 1));
+    });
+
+    expect(roots).toStrictEqual(["packages/kit/src"]);
   });
 });

@@ -22,9 +22,15 @@ describe("config", () => {
     const written = renderRuntimeConfig(SOURCE);
 
     expect(written).toContain(
-      'import base from "/node_modules/@pandacss/preset-base/dist/index.mjs";',
+      'import installed from "/node_modules/@pandacss/preset-base/dist/index.mjs";',
     );
     expect(written).toContain('presets: [base, {"name": "@acme/design"');
+  });
+
+  it("installs the base preset without its patterns in both configurations", () => {
+    for (const written of [renderRuntimeConfig(SOURCE), renderStylesheetConfig(SOURCE)]) {
+      expect(written).toContain("const base = { ...installed, patterns: {} };");
+    }
   });
 
   it("scans nothing for the runtime", () => {

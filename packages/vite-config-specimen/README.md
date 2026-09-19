@@ -64,6 +64,21 @@ without the entries the first page a reader opens re-optimises and reloads the c
 Naming the entries stops Vite working the entries out for itself, which is why `**/*.html` is named
 beside them.
 
+## The stylesheet a catalogue needs
+
+An application drawn on `@stealthscale/theme` states `static: "*"` in its `theme.config.ts`.
+
+```ts
+export default { static: "*", themes: [graphite] } satisfies Application;
+```
+
+The compiler extracts a value written as a JSX literal and nothing it reads from a prop. A scene
+draws its axis as `<Button variant={one}>`, so without this the compiler emits no rule for any value
+a matrix draws, and the page renders every look, size and status identically.
+
+Measured on the button: 21 recipe classes reach the page and 7 have rules until `static` is set. A
+product application states nothing and ships only the rules its own source asks for.
+
 ## The workspace root
 
 Add `specimen.workspace()` to the root configuration.

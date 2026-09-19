@@ -28,6 +28,10 @@ const { withContext } = createRecipeContext(recipe);
 export const Button = withContext("button");
 ```
 
+A bound element carries the recipe's name as `data-recipe`, which is the handle the testing kit
+finds it by. The attribute is written where `process.env.NODE_ENV` is not `production`, so a test
+runner and a dev server see it and a production page does not.
+
 A recipe states what a component is. The helpers read semantic tokens, layer styles and text styles,
 so no value in the recipe is a color, a pixel length or a color mode:
 
@@ -98,6 +102,8 @@ import own from "./src/theme.ts";
 
 export default { presets: [own], themes: [fathom, abyss] } satisfies Application;
 ```
+
+An application that states no theme draws the foundation alone.
 
 A page switches its theme and its color mode with two attributes, on the document root or on any
 element for a subtree. Five rules decide what a switch covers:
@@ -232,7 +238,9 @@ Each pattern is a function from typed props to a style object, and nothing is ge
 them: `stack`, `hstack`, `vstack`, `flex`, `center`, `grid`, `simpleGrid`, `visuallyHidden`,
 `absoluteCenter`, `cluster`, `sidebar`, `switcher`, `cover`, `frame`, `reel`, `scrollable`,
 `sticky`, and `bento` with `bentoCell` for a dense grid of tiles that span columns and rows.
-`responsive(value, transform)` applies a function to every breakpoint of a responsive prop.
+`responsive(value, transform)` applies a function to every breakpoint of a responsive prop. The
+compiler's base preset is installed without its own patterns, so no pattern module is generated and
+a recipe named `stack`, `grid`, `container`, `divider` or `spacer` shares its name with nothing.
 
 ### Looks and motions
 

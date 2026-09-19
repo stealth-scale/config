@@ -6,19 +6,26 @@ import { createRequire } from "node:module";
 
 import { contribute, type Contribution } from "@stealthscale/vite-config-core";
 
+import { setupIn } from "#setup.ts";
+
 /**
  * The configuration key the setup file joins.
  */
 const AT = "test.setupFiles";
 
 /**
+ * The foundation the setup file is published by.
+ */
+const FOUNDATION = "@stealthscale/provider-i18n";
+
+/**
  * The absolute path of the setup file the runner loads.
  *
  * @remarks
- *   Resolved through the foundation's package name, because the runner reads the path from the
- *   project root rather than from this file.
+ *   Resolved against this file, because the runner reads the path from the project root rather than
+ *   from here.
  */
-const SETUP = createRequire(import.meta.url).resolve("@stealthscale/provider-i18n/testing");
+const SETUP = setupIn(createRequire(import.meta.url), FOUNDATION);
 
 /**
  * Appends the foundation's setup file to the runner's setup files.

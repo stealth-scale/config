@@ -52,9 +52,10 @@ export interface Application {
   static?: "*" | StaticCssOptions | undefined;
 
   /**
-   * The themes the page can wear. The first is the default.
+   * The themes the page can wear. The first is the default. An application that states none
+   * draws the foundation alone.
    */
-  themes: readonly [Theme, ...Theme[]];
+  themes?: readonly Theme[] | undefined;
 }
 
 /**
@@ -144,5 +145,5 @@ export function presetEntry(root: string, conditions: readonly string[] = []): s
  * Collects the packages carrying the font faces every theme named, once each, sorted.
  */
 export function fontPackages(application: Application): readonly string[] {
-  return [...new Set(application.themes.flatMap((each) => each.fonts ?? []))].toSorted();
+  return [...new Set((application.themes ?? []).flatMap((each) => each.fonts ?? []))].toSorted();
 }

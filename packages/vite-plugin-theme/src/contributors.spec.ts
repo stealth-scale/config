@@ -10,7 +10,7 @@ import {
 } from "@stealthscale/testing";
 import { dependencies } from "@stealthscale/vite-plugin-base";
 
-import { contributors, workspaceSources } from "#contributors.ts";
+import { contributors, workspaceRoots, workspaceSources } from "#contributors.ts";
 
 function installed(
   name: string,
@@ -142,5 +142,24 @@ describe("contributors", () => {
     );
 
     expect(globs).toStrictEqual([]);
+  });
+
+  it("lists the source directory of every linked package as an absolute path", () => {
+    const roots = withScratchWorkspace(
+      {
+        ...root(["@acme/kit"]),
+        ...installed("@acme/deep", [], false, "packages/deep"),
+        ...installed("@acme/kit", ["@acme/deep"], false, "packages/kit"),
+      },
+      (workspace) => {
+        linked(workspace, ["deep", "kit"]);
+
+        return workspaceRoots(dependencies(workspace.root)).map((at) =>
+          at.slice(workspace.root.length + 1),
+        );
+      },
+    );
+
+    expect(roots).toStrictEqual(["packages/deep/src", "packages/kit/src"]);
   });
 });

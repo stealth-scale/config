@@ -47,6 +47,7 @@
   "devDependencies": {
     "@arethetypeswrong/core": "catalog:",
     "@stealthscale/provider-i18n": "workspace:^",
+    "@stealthscale/testing": "workspace:^",
     "@stealthscale/testing-config": "workspace:^",
     "@stealthscale/vite-config": "workspace:^",
     "@stealthscale/vite-config-core": "workspace:^",

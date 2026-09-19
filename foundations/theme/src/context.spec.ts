@@ -1,7 +1,7 @@
 import { createElement } from "react";
 
 import { render } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { defineRecipe, defineSlotRecipe } from "#authoring/recipe.ts";
 import { createRecipeContext, createSlotRecipeContext } from "#context.ts";
@@ -40,6 +40,20 @@ describe("createRecipeContext", () => {
     const { container } = render(createElement(Button, null, "Go"));
 
     expect(container.querySelector("button")?.dataset["recipe"]).toBe("button");
+  });
+
+  it("stamps no name on an element bound in a production build", () => {
+    vi.stubEnv("NODE_ENV", "production");
+
+    try {
+      const Button = createRecipeContext(button).withContext("button");
+      const { container } = render(createElement(Button, null, "Go"));
+
+      expect(container.querySelector("button")?.dataset["recipe"]).toBeUndefined();
+      expect(container.firstElementChild?.className).toBe("button button--solid");
+    } finally {
+      vi.unstubAllEnvs();
+    }
   });
 
   it("draws the class of the variant a caller picks", () => {
@@ -138,6 +152,26 @@ describe("createRecipeContext", () => {
 
     expect(container.querySelector("section")?.getAttribute("role")).toBe("note");
     expect(container.querySelector("section")?.dataset["recipe"]).toBe("dialog");
+  });
+
+  it("stamps no name on a provider bound in a production build", () => {
+    vi.stubEnv("NODE_ENV", "production");
+
+    try {
+      const { withProvider, withRootProvider } = createSlotRecipeContext(dialog);
+      const Content = withProvider("section", "content", { defaultProps: { role: "note" } });
+      const Root = withRootProvider("div");
+      const { container } = render(
+        createElement(Root, null, createElement(Content, null, "Hello")),
+      );
+
+      expect(container.querySelector("div")?.dataset["recipe"]).toBeUndefined();
+      expect(container.querySelector("section")?.dataset["recipe"]).toBeUndefined();
+      expect(container.querySelector("section")?.getAttribute("role")).toBe("note");
+      expect(container.querySelector("section")?.classList).toContain("dialog__content");
+    } finally {
+      vi.unstubAllEnvs();
+    }
   });
 
   it("binds a recipe with no variants and no defaults", () => {

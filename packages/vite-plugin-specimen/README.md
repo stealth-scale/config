@@ -89,17 +89,24 @@ A part is a `*Props` type a module exports beside the part it is named after, fr
 own package. The reader resolves that type to its properties and classifies each one by every
 declaration behind it:
 
-| Where a property is declared   | What it is                               |
-| ------------------------------ | ---------------------------------------- |
-| A `recipe.ts` or `*.recipe.ts` | A variant, the axis a theme moves        |
-| The component's own package    | An option                                |
-| Anywhere else                  | Dropped, and counted under `dropped`     |
-| Nowhere at all                 | A styling condition, dropped and counted |
+| Where a property is declared                                        | What it is                               |
+| ------------------------------------------------------------------- | ---------------------------------------- |
+| A `recipe.ts` or `*.recipe.ts`                                      | A variant, the axis a theme moves        |
+| The component's own package, or a package it depends on at run time | An option                                |
+| Anywhere else                                                       | Dropped, and counted under `dropped`     |
+| Nowhere at all                                                      | A styling condition, dropped and counted |
 
 Reading every declaration rather than the first is what keeps a variant that a style prop shares a
 name with. On a list, `gap` is declared by both the generated style props and the recipe. On an icon
 button, `aria-label` is declared twice by the rendering library and once by the component. Stopping
 at the first declaration loses the variant and the accessible name.
+
+A dependency counts as the component's own because a component built over a state machine takes its
+options from the machine's package. The dependencies are walked from the component's manifest
+through `dependencies` alone. A peer is therefore foreign, and the rendering library's attributes
+and the foundation's style props are declared by peers. A menu root resolves to 1351 properties and
+keeps 31: four variants from its recipe, and 27 options from the machine and the packages the
+machine depends on, `open`, `onOpenChange`, `positioning` and `onEscapeKeyDown` among them.
 
 A button resolves to 1341 properties, six of which are its own. `dropped` reports the other 1335
 under the reason each was cut, so a table can show its own arithmetic rather than ask to be trusted.
