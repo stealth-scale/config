@@ -12,7 +12,7 @@ import { type UserConfig } from "vite";
 import { type Layer, preset } from "@stealthscale/vite-config-core";
 
 import { GENERATED } from "#ignore/generated.ts";
-import { barrelled, defaultExported, specified, undocumented } from "#lint/departure.ts";
+import { barrelled, composed, defaultExported, specified, undocumented } from "#lint/departure.ts";
 import * as rules from "#lint/rules/index.ts";
 
 /**
@@ -65,6 +65,11 @@ const SPECIFIED_RENDERED = ["**/*.spec.tsx"];
 const BARRELLED = ["**/index.ts"];
 
 /**
+ * The globs of the fixtures excused from the dependency cap in every tier.
+ */
+const COMPOSED = ["**/*.fixtures.ts", "**/*.fixtures.tsx"];
+
+/**
  * The block every tier starts from, before it adds its own rules.
  *
  * @remarks
@@ -98,6 +103,7 @@ export function base(): readonly Layer[] {
     undocumented(UNDOCUMENTED),
     specified(SPECIFIED),
     barrelled(BARRELLED),
+    composed(COMPOSED),
   ];
 }
 
@@ -119,6 +125,7 @@ export function node(): readonly Layer[] {
     undocumented(UNDOCUMENTED),
     specified(SPECIFIED),
     barrelled(BARRELLED),
+    composed(COMPOSED),
   ];
 }
 
@@ -140,5 +147,6 @@ export function web(): readonly Layer[] {
     undocumented([...UNDOCUMENTED, ...RENDERED]),
     specified([...SPECIFIED, ...SPECIFIED_RENDERED]),
     barrelled(BARRELLED),
+    composed(COMPOSED),
   ];
 }

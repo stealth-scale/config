@@ -1,40 +1,20 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { Menu } from "@stealthscale/component-disclosure";
+import { drawn } from "@stealthscale/testing-react";
 
 import { Action } from "#switcher/action.ts";
-import { Content } from "#switcher/content.ts";
-import { Root } from "#switcher/root.ts";
-import { Trigger } from "#switcher/trigger.tsx";
+import { opened } from "#switcher/switcher.fixtures.tsx";
 
 describe("Action", () => {
-  it("draws a row that does something other than switch", () => {
-    render(
-      <Root open>
-        <Trigger label="Workspace">Acme</Trigger>
-        <Menu.Positioner>
-          <Content>
-            <Action value="new">New workspace</Action>
-          </Content>
-        </Menu.Positioner>
-      </Root>,
-    );
+  it("draws a row that does something other than switch", async () => {
+    await drawn(opened(<Action value="new">New workspace</Action>));
 
     expect(screen.getByRole("menuitem", { name: "New workspace" })).toBeTruthy();
   });
 
-  it("carries no tick, none of these being the current one", () => {
-    render(
-      <Root open>
-        <Trigger label="Workspace">Acme</Trigger>
-        <Menu.Positioner>
-          <Content>
-            <Action value="new">New workspace</Action>
-          </Content>
-        </Menu.Positioner>
-      </Root>,
-    );
+  it("carries no tick, none of these being the current one", async () => {
+    await drawn(opened(<Action value="new">New workspace</Action>));
 
     expect(screen.queryByRole("menuitemradio")).toBeNull();
   });

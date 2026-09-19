@@ -8,6 +8,7 @@
 
 export {
   barrelled,
+  composed,
   defaultExported,
   enforce,
   forbid,

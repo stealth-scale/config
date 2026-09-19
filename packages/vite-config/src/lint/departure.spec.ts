@@ -7,7 +7,14 @@ import { describe, expect, it } from "vitest";
 
 import { defineConfig, type Layer, owned, remove } from "@stealthscale/vite-config-core";
 
-import { barrelled, defaultExported, forbid, relax, undocumented } from "#lint/departure.ts";
+import {
+  barrelled,
+  composed,
+  defaultExported,
+  forbid,
+  relax,
+  undocumented,
+} from "#lint/departure.ts";
 
 const AT = import.meta.dirname;
 
@@ -230,10 +237,21 @@ describe("departure", () => {
     expect(held.rules).toStrictEqual({ "import/max-dependencies": "off" });
   });
 
+  it("turns off the dependency cap for a fixture", () => {
+    const held = composed(["**/*.fixtures.tsx"]).item as {
+      files: string[];
+      rules: Record<string, unknown>;
+    };
+
+    expect(held.files).toStrictEqual(["**/*.fixtures.tsx"]);
+    expect(held.rules).toStrictEqual({ "import/max-dependencies": "off" });
+  });
+
   it("names each delegating factory for the call a consumer writes", () => {
     expect(defaultExported(["**/*.config.ts"]).name).toBe("lint.defaultExported(**/*.config.ts)");
     expect(undocumented(["**/*.spec.ts"]).name).toBe("lint.undocumented(**/*.spec.ts)");
     expect(barrelled(["**/index.ts"]).name).toBe("lint.barrelled(**/index.ts)");
+    expect(composed(["**/*.fixtures.tsx"]).name).toBe("lint.composed(**/*.fixtures.tsx)");
   });
 
   it("lets a repository add its own beside the preset's", async () => {
